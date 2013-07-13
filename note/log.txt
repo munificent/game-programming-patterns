@@ -1,0 +1,38 @@
+2013-07-12 - 684 words, finish outline for state
+2013-07-11 - bunch of research on fsms and hierarchical fsms
+2013-07-10 - 1268 words of tight outline for State
+2013-07-09 - 298 words of outline for State
+2013-07-08 - Pile of notes for State, make format script estimate
+2013-07-07 - Finish third draft of Spatial Partition
+2013-07-06 - revised 1524 words, finished second draft
+2013-07-05 - revised 2577 words
+2013-07-04 - 870 words, finish first draft of spatial partition
+2013-07-03 - 636 words on design decisions
+2013-07-02 - 622 words on design decisions
+2013-07-01 - 329 words, really finished sample code section
+2013-06-30 - 548 words, finished sample code section
+2013-06-29 - [see 2013-06-25(2)]
+2013-06-28 - 87 works on sample code, a bit more code
+2013-06-27 - 581 works on motivation and sample code, some more code too
+2013-06-26(2) - 373 words of sample code, ~50 lines of code, test script
+2013-06-26 - More work on grid sample code
+2013-06-25(2) - Unit tests and get grid working
+2013-06-25 - Start writing grid code and tests for sample code, ~150 lines of code
+2013-06-24 - 276 words on Sample Code for Spatial Partition, 100+ lines of code
+2013-06-23 - 874 words on first draft of Spatial Partition
+2013-06-22 - Outline Spatial Partition (743 words)
+2013-06-21 - Finish updating asides and publish Game Loop
+2013-06-20 - Work on CSS and asides
+2013-06-19 - Figure out CSS/JS solution for asides on mobile
+2013-06-18 - Finish third draft of Game Loop
+2013-06-17 - 1,280 words revised in third draft of Game Loop
+2013-06-16 - ~1,000 words revised in third draft of Game Loop
+2013-06-15 - Finish second draft of Game Loop
+2013-06-14 - Revise couple of paragraphs of Game Loop
+2013-06-13 - Revise ~500 words of second draft of Game Loop
+2013-06-12 - Revise ~900 words of second draft of Game Loop
+2013-06-11 - Finish first draft of Game Loop
+2013-06-10 - 489 words on first draft of Game Loop
+2013-06-09 - 178 words on first draft of Game Loop
+2013-06-08 - 889 words on first draft of Game Loop
+2013-06-07 - 777 words on first draft of Game Loop

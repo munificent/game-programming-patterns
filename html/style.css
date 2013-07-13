@@ -1,0 +1,211 @@
+body, h1, h2, h3, h4, p, blockquote, code, ul, ol, dl, dd, img {
+  margin: 0; }
+
+body {
+  line-height: 24px;
+  padding: 24px; }
+
+.content {
+  max-width: 520px;
+  margin: 0 auto;
+  position: relative; }
+
+.content.sidebar {
+  padding-right: 280px; }
+
+h1 {
+  color: #000;
+  font: bold 36px/44px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  margin-bottom: 24px;
+  padding: 0 0 8px 0;
+  border-bottom: solid 4px #eeeeee; }
+
+h1.book {
+  color: #777;
+  font: normal 16px/20px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  padding-bottom: 12px;
+  border: none; }
+
+h2 {
+  color: #3366cc;
+  font: bold 24px/30px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  margin: 24px 0 12px 0; }
+
+h3 {
+  color: #3366cc;
+  font: bold 18px/24px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  margin: 24px 0 12px 0; }
+
+h4 {
+  color: #777;
+  font: 16px/18px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  margin: 24px 0 0 0; }
+
+p {
+  margin: 12px 0; }
+
+p, li {
+  color: #222;
+  font: normal 16px/24px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; }
+
+ul, ol {
+  padding: 0 0 0 24px; }
+
+a {
+  color: #3366cc;
+  text-decoration: none; }
+
+img {
+  max-width: 100%; }
+
+blockquote {
+  padding: 0 12px; }
+
+blockquote p {
+  font: italic 17px/26px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  color: #777; }
+
+code {
+  color: #444;
+  font: normal 15px "Source Code Pro", Menlo, Consolas, Monaco, monospace; }
+
+pre {
+  color: #444;
+  font: normal 13px/16px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+  padding: 0 0 0 12px;
+  border-left: solid 4px #eeeeee;
+  overflow: auto; }
+
+aside {
+  padding: 6px 0;
+  border-top: solid 1px #eeeeee;
+  border-bottom: solid 1px #eeeeee; }
+  aside p {
+    color: #666;
+    font: 13px/20px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
+  aside p:first-child {
+    margin-top: 0; }
+  aside p:last-child {
+    margin-bottom: 0; }
+  aside code {
+    color: #666;
+    font: normal 13px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+    white-space: nowrap; }
+  aside img {
+    padding: 0; }
+
+aside.sidebar {
+  position: absolute;
+  width: 240px;
+  right: 0;
+  padding: 0;
+  border-bottom: none; }
+
+p.note {
+  display: none;
+  /*
+  color: #d00;
+  font: normal 12px/20px $mono;
+  */ }
+
+pre.diagram {
+  background: #efe;
+  color: #080;
+  font: normal 12px/12px "Source Code Pro", Menlo, Consolas, Monaco, monospace; }
+
+a.pattern,
+a.gof-pattern {
+  border-bottom: solid 1px #acf; }
+
+a.pattern:after {
+  content: "\00A0\2192"; }
+
+a.gof-pattern:after {
+  content: "\00A0(GoF)"; }
+
+p.footer {
+  text-align: center;
+  color: #777;
+  font: 14px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+  margin: 24px 0 24px 0;
+  padding: 20px 0 0 0;
+  border-top: solid 4px #eeeeee; }
+
+.outline-note {
+  margin-right: 240px;
+  background: #fdf;
+  padding: 23px 24px 1px 24px;
+  margin-bottom: 24px; }
+
+.outline-note p,
+.outline h2,
+.outline h3,
+.outline a,
+a.outline {
+  color: #a0a; }
+
+a.outline {
+  font-style: italic; }
+
+a.outline:before {
+  content: "("; }
+
+a.outline:after {
+  content: ")"; }
+
+.codehilite .k {
+  color: #3366cc; }
+
+.codehilite .kt {
+  color: #09a; }
+
+.codehilite .s {
+  color: #c70; }
+
+.codehilite .sc {
+  color: #c70; }
+
+.codehilite .c {
+  color: #999; }
+
+.codehilite .c1 {
+  color: #999; }
+
+.codehilite .cm {
+  color: #999; }
+
+.codehilite .cp {
+  color: #594; }
+
+@media only screen and (max-width: 479px) {
+  h2 {
+    font: bold 20px/26px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+    margin: 20px 0 5px 0; }
+
+  h3 {
+    font: bold 16px/20px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+    margin: 20px 0 5px 0; }
+
+  p {
+    margin: 10px 0; }
+
+  p, li {
+    font: normal 14px/20px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; }
+
+  blockquote {
+    padding: 0 10px; }
+
+  blockquote p {
+    font: italic 15px/22px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; }
+
+  code {
+    font-size: 14px; }
+
+  pre {
+    font: normal 12px/14px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+    padding: 0;
+    border: none;
+    overflow: auto; }
+
+  ul, ol {
+    padding: 0 0 0 15px; } }

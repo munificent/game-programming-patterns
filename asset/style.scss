@@ -1,0 +1,280 @@
+$primary: hsl(220, 60%, 50%);
+$serif: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+$mono: "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+$sans: 'Lato', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
+$header: 'Lato', Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+
+$hairline: #eee;
+
+body, h1, h2, h3, h4, p, blockquote, code, ul, ol, dl, dd, img {
+  margin: 0;
+}
+
+body {
+  line-height: 24px;
+  padding: 24px;
+}
+
+.content {
+  max-width: 520px;
+  margin: 0 auto;
+
+  // So that asides are positioned relative to it.
+  position: relative;
+}
+
+.content.sidebar {
+  padding-right: 280px;
+}
+
+// Note: We use explicit line heights here so that the positions of the
+// elements don't change after the fonts are loaded asynchronously. That way,
+// when we position the asides procedurally, they are in the right place.
+
+
+h1 {
+  color: #000;
+  font: bold 36px/44px $header;
+  margin-bottom: 24px;
+  padding: 0 0 8px 0;
+  border-bottom: solid 4px $hairline;
+}
+
+h1.book {
+  color: #777;
+  font: normal 16px/20px $header;
+  padding-bottom: 12px;
+  border: none;
+}
+
+h2 {
+  color: $primary;
+  font: bold 24px/30px $header;
+  margin: 24px 0 12px 0;
+}
+
+h3 {
+  color: $primary;
+  font: bold 18px/24px $header;
+  margin: 24px 0 12px 0;
+}
+
+h4 {
+  color: #777;
+  font: 16px/18px $header;
+  margin: 24px 0 0 0;
+}
+
+p {
+  margin: 12px 0;
+}
+
+p, li {
+  color: #222;
+  font: normal 16px/24px $serif;
+}
+
+ul, ol {
+  padding: 0 0 0 24px;
+}
+
+a {
+  color: $primary;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+blockquote {
+  padding: 0 12px;
+}
+
+blockquote p {
+  font: italic 17px/26px $serif;
+  color: #777;
+}
+
+code {
+  color: #444;
+  font: normal 15px $mono;
+}
+
+pre {
+  color: #444;
+  font: normal 13px/16px $mono;
+  padding: 0 0 0 12px;
+  border-left: solid 4px $hairline;
+
+  // Scroll horizontally if not wide enough.
+  overflow: auto;
+}
+
+// Asides.
+
+aside {
+  padding: 6px 0;
+
+  border-top: solid 1px $hairline;
+  border-bottom: solid 1px $hairline;
+
+  p {
+    color: #666;
+    font: 13px/20px $sans;
+  }
+
+  p:first-child {
+    margin-top: 0;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  code {
+    color: #666;
+    font: normal 13px $mono;
+    white-space: nowrap;
+  }
+
+  img {
+    padding: 0;
+  }
+}
+
+aside.sidebar {
+  position: absolute;
+  width: 240px;
+  right: 0;
+
+  padding: 0;
+  border-bottom: none;
+}
+
+// Notes to myself.
+p.note {
+  display: none;
+  /*
+  color: #d00;
+  font: normal 12px/20px $mono;
+  */
+}
+
+// ASCII art diagrams.
+pre.diagram {
+  background: #efe;
+  color: #080;
+  font: normal 12px/12px $mono;
+}
+
+// Pattern links.
+a.pattern,
+a.gof-pattern {
+  border-bottom: solid 1px #acf;
+}
+
+a.pattern:after,
+a.gof-pattern:after {
+}
+
+a.pattern:after {
+  content: "\00A0\2192";
+}
+
+a.gof-pattern:after {
+  content: "\00A0(GoF)";
+}
+
+// Footer.
+p.footer {
+  text-align: center;
+  color: #777;
+  font: 14px $sans;
+  margin: 24px 0 24px 0;
+  padding: 20px 0 0 0;
+  border-top: solid 4px $hairline;
+}
+
+// Outline.
+.outline-note {
+  margin-right: 240px;
+  background: #fdf;
+  padding: 23px 24px 1px 24px;
+  margin-bottom: 24px;
+}
+
+.outline-note p,
+.outline h2,
+.outline h3,
+.outline a,
+a.outline {
+  color: #a0a;
+}
+
+a.outline {
+  font-style: italic;
+}
+
+a.outline:before {
+  content: "("
+}
+
+a.outline:after {
+  content: ")"
+}
+
+// Syntax highlighting.
+.codehilite .k  { color: $primary; } // keyword
+.codehilite .kt { color: #09a; }     // keyword type
+.codehilite .s  { color: #c70; }     // string
+.codehilite .sc { color: #c70; }     // string
+.codehilite .c  { color: #999; }     // comment
+.codehilite .c1 { color: #999; }     // comment
+.codehilite .cm { color: #999; }     // comment
+.codehilite .cp { color: #594; }     // preprocessor
+
+@media only screen and (max-width: 479px) {
+  h2 {
+    font: bold 20px/26px $header;
+    margin: 20px 0 5px 0;
+  }
+
+  h3 {
+    font: bold 16px/20px $header;
+    margin: 20px 0 5px 0;
+  }
+
+  p {
+    margin: 10px 0;
+  }
+
+  p, li {
+    font: normal 14px/20px $serif;
+  }
+
+  blockquote {
+    padding: 0 10px;
+  }
+
+  blockquote p {
+    font: italic 15px/22px $serif;
+  }
+
+  code {
+    font-size: 14px;
+  }
+
+  pre {
+    font: normal 12px/14px $mono;
+    padding: 0;
+    border: none;
+
+    // Scroll horizontally if not wide enough.
+    overflow: auto;
+  }
+
+  ul, ol {
+    padding: 0 0 0 15px;
+  }
+}
