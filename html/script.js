@@ -27,7 +27,6 @@ function sidebarAsides() {
     // Find the span the aside should be anchored next to.
     var name = aside.attr("name");
     var span = $("span[name='" + name + "']");
-    window.console.log(name);
     if (span == null) {
       window.console.log("Could not find span for '" + name + "'");
       return;
