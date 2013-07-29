@@ -13,6 +13,8 @@ body, h1, h2, h3, h4, p, blockquote, code, ul, ol, dl, dd, img {
 body {
   line-height: 24px;
   padding: 24px;
+  color: #222;
+  font: normal 16px/24px $serif;
 }
 
 .content {
@@ -69,11 +71,6 @@ p {
   margin: 12px 0;
 }
 
-p, li {
-  color: #222;
-  font: normal 16px/24px $serif;
-}
-
 ul, ol {
   padding: 0 0 0 24px;
 }
@@ -115,21 +112,25 @@ pre {
 
 aside {
   padding: 6px 0;
+  color: #666;
 
   border-top: solid 1px $hairline;
   border-bottom: solid 1px $hairline;
 
-  p {
-    color: #666;
+  p, li {
     font: 13px/20px $sans;
   }
 
-  p:first-child {
+  >p:first-child {
     margin-top: 0;
   }
 
-  p:last-child {
+  >p:last-child {
     margin-bottom: 0;
+  }
+
+  ul, ol {
+    padding: 0 0 0 18px;
   }
 
   code {

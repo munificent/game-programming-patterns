@@ -3,7 +3,9 @@ body, h1, h2, h3, h4, p, blockquote, code, ul, ol, dl, dd, img {
 
 body {
   line-height: 24px;
-  padding: 24px; }
+  padding: 24px;
+  color: #222;
+  font: normal 16px/24px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; }
 
 .content {
   max-width: 520px;
@@ -44,10 +46,6 @@ h4 {
 p {
   margin: 12px 0; }
 
-p, li {
-  color: #222;
-  font: normal 16px/24px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; }
-
 ul, ol {
   padding: 0 0 0 24px; }
 
@@ -78,15 +76,17 @@ pre {
 
 aside {
   padding: 6px 0;
+  color: #666;
   border-top: solid 1px #eeeeee;
   border-bottom: solid 1px #eeeeee; }
-  aside p {
-    color: #666;
+  aside p, aside li {
     font: 13px/20px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
-  aside p:first-child {
+  aside > p:first-child {
     margin-top: 0; }
-  aside p:last-child {
+  aside > p:last-child {
     margin-bottom: 0; }
+  aside ul, aside ol {
+    padding: 0 0 0 18px; }
   aside code {
     color: #666;
     font: normal 13px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
