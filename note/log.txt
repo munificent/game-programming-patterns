@@ -1,3 +1,19 @@
+2013-07-28 - 1041, finished second draft
+2013-07-27 - 1434 words revised second draft
+2013-07-26 - 895 words revised second draft
+2013-07-25 - 713 words revised second draft
+2013-07-24 - 183 lines, finish sample code for state
+2013-07-23 - 409 lines of sample code for state
+2013-07-22 - 217 words, end of first draft
+2013-07-21 - 1138 words first draft of state
+2013-07-20 - 771 words first draft of state
+2013-07-19 - 932 words first draft of state
+2013-07-18 - 772 words first draft of state
+2013-07-17 - 860 words first draft of state
+2013-07-16 - 535 words first draft of state
+2013-07-15 - 736 words first draft of state
+2013-07-14 - ~150 lines of code for state
+2013-07-13 - put on github, ~200 lines of code for state
 2013-07-12 - 684 words, finish outline for state
 2013-07-11 - bunch of research on fsms and hierarchical fsms
 2013-07-10 - 1268 words of tight outline for State

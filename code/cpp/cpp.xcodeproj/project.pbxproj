@@ -35,8 +35,9 @@
 		2924A07E16E63FB300515661 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = SOURCE_ROOT; };
 		29360F5A177949FD0005D95F /* spatial-partition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "spatial-partition.h"; sourceTree = SOURCE_ROOT; };
 		294AEA8E16E792ED004E3BD0 /* game-loop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "game-loop.h"; sourceTree = SOURCE_ROOT; };
+		295A7BB9179246E100A8C792 /* state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = state.h; sourceTree = SOURCE_ROOT; };
 		29BC60121779DA6C00C5D616 /* expect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = expect.h; sourceTree = SOURCE_ROOT; };
-		29F2A2A616E63EBB005803DA /* gpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		29F2A2A616E63EBB005803DA /* gpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = gpp; path = cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +83,7 @@
 				2924A07C16E63F5400515661 /* main.cpp */,
 				294AEA8E16E792ED004E3BD0 /* game-loop.h */,
 				29BC60121779DA6C00C5D616 /* expect.h */,
+				295A7BB9179246E100A8C792 /* state.h */,
 			);
 			name = cpp;
 			path = gpp;

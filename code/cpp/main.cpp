@@ -10,6 +10,7 @@
 #include "type-object.h"
 #include "game-loop.h"
 #include "spatial-partition.h"
+#include "state.h"
 
 int main (int argc, char * const argv[]) {
   UnbufferedSlapstick::testComedy();

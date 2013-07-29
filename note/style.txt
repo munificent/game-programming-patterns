@@ -8,5 +8,21 @@
 - Prefer present tense instead of future
 - Prefer "we" over "you" or "I"
 - Use *O(n&sup2;)* for Big-O notation, not `O(n^2)`
+- Put class name in `CodeFont` when referring to the class itself.
+  Ex: "Add a method to `Foo`."
+- Use normal font and lowercase when referring to objects of the class.
+  Ex: "Create a new foo and pass it to `bar()`."
+- Q: Use parentheses when referring to methods/functions? `foo` or `foo()`?
+- Q: `true` or true?
+- Q: Are "enum", "struct", "int", etc. normal words or `code font`?
+
+## Terminology
+
+- "vtable", all lowercase, no hyphen
+- "on-screen" when an adjective ("the on-screen player"), "on screen" when a
+  place ("the player is on screen")
 
 ## Code
+
+- Indent cases?
+-
