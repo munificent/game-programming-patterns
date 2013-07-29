@@ -2,23 +2,27 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+
 <title>Game Programming Patterns / Behaving Patterns / Subclass Sandbox</title>
 
-        <!-- Tell mobile browsers we're optimized for them and they don't need to crop the viewport. -->
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-        <link rel="stylesheet" type="text/css" href="style.css" />
-        <link href="http://fonts.googleapis.com/css?family=Source+Code+Pro|Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
-        </head>
-        <body id="top">
-        <div class="content">
+<!-- Tell mobile browsers we're optimized for them and they don't need to crop
+     the viewport. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<link rel="stylesheet" type="text/css" href="style.css" />
+<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro|Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+</head>
+<body id="top">
+<div class="content">
+
 <h1 class="book"><a href="index.html">Game Programming Patterns</a> / Behaving Patterns</h1>
+
 <h1>Subclass Sandbox</h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Create varied behavior by defining subclasses that use operations provided by
 their shared base class.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
 <p>Every kid has dreamed of being a superhero, but, unfortunately, cosmic rays are in short supply here on Earth. Games that let you pretend to be a superhero are the closest approximation. Because our game designers have never learned to say, "no", <em>our</em> superhero game is planning to have dozens, if not hundreds of different superpowers that players may have.</p>
-<p>Our plan is that we&#x2019;ll have a <code>Superpower</code> base class. Then we&#x2019;ll have a <span name="lots">derived</span> class that implements each superpower. We&#x2019;ll divy up the design doc among our team of programmers and get coding. When we&#x2019;re done, we&#x2019;ll have a hundred superpower classes.</p>
+<p>Our plan is that we'll have a <code>Superpower</code> base class. Then we'll have a <span name="lots">derived</span> class that implements each superpower. We'll divy up the design doc among our team of programmers and get coding. When we're done, we'll have a hundred superpower classes.</p>
 <aside name="lots">
 
 <p>When you find yourself with a <em>lot</em> of subclasses, like in this example, that
@@ -28,15 +32,15 @@ in <em>data</em> instead.</p>
 <p>Patterns like <a class="pattern" href="type-object.html">Type Object</a>, <a class="pattern" href="virtual-machine.html">Virtual Machine</a>, and <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Interpreter_pattern">Interpreter</a> can all help.</p>
 </aside>
 
-<p>We want to immerse our players in a world teeming with variety. Whatever power they dreamed up when they were a kid, we want in our game. That means these superpower subclasses will need to do just about everything: play sounds, spawn visual effects, interact with AI, create and destroy other game entities, and mess with physics. There&#x2019;s no corner of the codebase that won&#x2019;t get touched by them.</p>
-<p>Let&#x2019;s say we just unleash our team and get them writing superpower classes. What&#x2019;s going to happen?</p>
+<p>We want to immerse our players in a world teeming with variety. Whatever power they dreamed up when they were a kid, we want in our game. That means these superpower subclasses will need to do just about everything: play sounds, spawn visual effects, interact with AI, create and destroy other game entities, and mess with physics. There's no corner of the codebase that won't get touched by them.</p>
+<p>Let's say we just unleash our team and get them writing superpower classes. What's going to happen?</p>
 <ul>
 <li>
 <p><em>There will be lots of redundant code.</em> While the different powers will be
     wildly varied, we can still expect plenty of overlap. Many of them will
     spawn visual effects and play sounds in the same way. A freeze ray, heat
     ray, and Dijon mustard ray are all pretty similar when you get down to it.
-    If the people implementing those don&#x2019;t coordinate, that&#x2019;s going to be a lot
+    If the people implementing those don't coordinate, that's going to be a lot
     of duplicate code and effort.</p>
 </li>
 <li>
@@ -45,29 +49,29 @@ in <em>data</em> instead.</p>
     that were never meant to be tied directly to the superpower classes. If your
     renderer is organized into three nice neat layers, only one of which
     is intended to be used by code outside of the graphics engine, we can bet
-    that we&#x2019;ll have superpower code that pokes its way into all three.</p>
+    that we'll have superpower code that pokes its way into all three.</p>
 </li>
 <li>
 <p><em>When these outside systems need to change, odds are good some random
     superpower code will get broken.</em> Once we have different superpower classes
     coupling themselves to various and sundry parts of the game engine, its
     inevitable that changes to those systems will impact the power classes.
-    That&#x2019;s no fun because your graphics, audio, and UI programmers probably
-    don&#x2019;t also want to <em>have</em> to be gameplay programmers <em>too</em>.</p>
+    That's no fun because your graphics, audio, and UI programmers probably
+    don't also want to <em>have</em> to be gameplay programmers <em>too</em>.</p>
 </li>
 <li>
-<p><em>It&#x2019;s hard to define invariants that all superpowers obey.</em> Let&#x2019;s say we
+<p><em>It's hard to define invariants that all superpowers obey.</em> Let's say we
     want to make sure that all audio played by our powers gets properly queued
-    and prioritized. There&#x2019;s no easy way to do that if our hundred classes are
+    and prioritized. There's no easy way to do that if our hundred classes are
     all directly calling into the sound engine on their own.</p>
 </li>
 </ul>
-<p>What we want is to give each of the gameplay programmers who is implementing a superpower a set of "toys" they can play with. You want your power to play a sound, here&#x2019;s your <code>playSound()</code> function. You want particles? Here&#x2019;s <code>spawnParticles()</code>. We&#x2019;ll make sure these operations cover everything you need to do so that you don&#x2019;t need to <code>#include</code> random headers and nose your way into the rest of the codebase.</p>
+<p>What we want is to give each of the gameplay programmers who is implementing a superpower a set of "toys" they can play with. You want your power to play a sound, here's your <code>playSound()</code> function. You want particles? Here's <code>spawnParticles()</code>. We'll make sure these operations cover everything you need to do so that you don't need to <code>#include</code> random headers and nose your way into the rest of the codebase.</p>
 <p>We do this by making these operations <em>protected methods of the <code>Superpower</code>
 base class</em>. Putting them in the base class gives every power subclass direct,
 easy access to them. Making them protected (and likely non-virtual)
 communicates that they exist specifically to be <em>called</em> by subclasses.</p>
-<p>Once you have these toys to play with, you need a place to use them. For that, we&#x2019;ll define a <em>sandbox method</em>: an abstract protected method that subclasses must implement. Given those, to implement a new kind of power, you:</p>
+<p>Once you have these toys to play with, you need a place to use them. For that, we'll define a <em>sandbox method</em>: an abstract protected method that subclasses must implement. Given those, to implement a new kind of power, you:</p>
 <ol>
 <li>
 <p>Subclass <code>Superpower</code>.</p>
@@ -80,14 +84,14 @@ communicates that they exist specifically to be <em>called</em> by subclasses.</
     <code>Superpower</code> provides.</p>
 </li>
 </ol>
-<p>We can fix our redundant code problem now by making those provided operations as high-level as possible. When we see code that&#x2019;s duplicated between lots of the subclasses, we can always roll that up into <code>Superpower</code> as a new operation that they can all use.</p>
-<p>We&#x2019;ve addressed our coupling problem by constraining the coupling to one place.
+<p>We can fix our redundant code problem now by making those provided operations as high-level as possible. When we see code that's duplicated between lots of the subclasses, we can always roll that up into <code>Superpower</code> as a new operation that they can all use.</p>
+<p>We've addressed our coupling problem by constraining the coupling to one place.
 <code>Superpower</code> itself will end up coupled to the different game systems, but our
 hundred subclasses are not. Instead, they are <em>only</em> coupled to their
 superclass. When one of those game systems changes, modification to <code>Superpower</code>
-itself may be necessary, but dozens of subclasses shouldn&#x2019;t have to be touched.</p>
+itself may be necessary, but dozens of subclasses shouldn't have to be touched.</p>
 <p>This pattern leads to an architecture where you have a shallow but wide class
-hierarchy. Your <span name="wide">inheritance</span> chains aren&#x2019;t <em>deep</em>, but there are a <em>lot</em> of
+hierarchy. Your <span name="wide">inheritance</span> chains aren't <em>deep</em>, but there are a <em>lot</em> of
 classes that hang off <code>Superpower</code>. By having a single class with a lot of
 direct subclasses, we have a point of leverage in our codebase. Time and love
 that we put into <code>Superpower</code> itself can benefit a wide set of classes in the
@@ -95,7 +99,7 @@ game.</p>
 <aside name="wide">
 
 <p>Lately, you find a lot of people criticizing inheritance in object-oriented
-languages. Inheritance <em>is</em> problematic&mdash; there&#x2019;s really no deeper
+languages. Inheritance <em>is</em> problematic&mdash; there's really no deeper
 coupling in a codebase than the one between a base class and its subclass&mdash;
 but I find <em>wide</em> inheritance trees to be easier to work with than <em>deep</em> ones.</p>
 </aside>
@@ -108,7 +112,7 @@ implements the sandbox method using the provided operations.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>This is a very simple, common pattern lurking in lots of codebases, even
 outside of games. If you have a non-virtual protected method laying around,
-you&#x2019;re probably already using something like this. A Subclass Sandbox is a good
+you're probably already using something like this. A Subclass Sandbox is a good
 fit when:</p>
 <ul>
 <li>
@@ -132,7 +136,7 @@ fit when:</p>
 <p>Since every dependency that a subclass has ends up flowing through the base
 class first, it can end up large and deeply coupled to the rest of the
 game. Also, the subclasses themselves are deeply tied to the base
-class. Those together mean that making changes to it can be difficult without breaking something&mdash; you&#x2019;ve got the <a href="http://en.wikipedia.org/wiki/Fragile_base_class">brittle base class problem</a>.</p>
+class. Those together mean that making changes to it can be difficult without breaking something&mdash; you've got the <a href="http://en.wikipedia.org/wiki/Fragile_base_class">brittle base class problem</a>.</p>
 <p>If you find this pattern is turning your base class into a giant bowl of
 code stew, consider pulling some of the provided operations out into separate
 classes that the base class can dole out responsibility to. The
@@ -145,10 +149,10 @@ up to the base class, the derived classes are now much more cleanly separated.
 Ideally, most of the total volume of your game code will be in those subclasses.
 That means much of your codebase is isolated and fairly easy to maintain.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
-<p>Because this is such a simple pattern, there isn&#x2019;t much to the sample code.
-That doesn&#x2019;t mean it isn&#x2019;t useful&mdash; the pattern is about the <em>intent</em>, and
+<p>Because this is such a simple pattern, there isn't much to the sample code.
+That doesn't mean it isn't useful&mdash; the pattern is about the <em>intent</em>, and
 not the complexity of its implementation.</p>
-<p>We&#x2019;ll start with our <code>Superpower</code> superclass:</p>
+<p>We'll start with our <code>Superpower</code> superclass:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
 <span class="nl">protected:</span>
@@ -178,13 +182,13 @@ creating a power class where their work has to go.</p>
 <p>The other protected methods, <code>move()</code>, <code>playSound()</code>, and <code>spawnParticles()</code>
 are the provided operations. These are what the subclasses will call in their
 implementation of <code>activate()</code>.</p>
-<p>We didn&#x2019;t implement the provided operations in this example, but an actual game
+<p>We didn't implement the provided operations in this example, but an actual game
 would have real code there. Those methods are where <code>Superpower</code> gets coupled to
 other systems in the game: <code>move()</code> may call into physics code, <code>playSound()</code>
 will talk to the audio engine, etc. Since this is all in the <em>implementation</em>
 of the base class, it keeps that coupling encapsulated within <code>Superpower</code>
 itself.</p>
-<p>OK, now let&#x2019;s get our radioactive spiders out and create a power. Here&#x2019;s one:</p>
+<p>OK, now let's get our radioactive spiders out and create a power. Here's one:</p>
 <p><span name="jump"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">SkyLaunch</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Superpower</span>
 <span class="p">{</span>
@@ -202,17 +206,17 @@ itself.</p>
 
 <aside name="jump">
 
-<p>OK, maybe being able to <em>jump</em> isn&#x2019;t all that <em>super</em>, but I&#x2019;m trying to keep
+<p>OK, maybe being able to <em>jump</em> isn't all that <em>super</em>, but I'm trying to keep
 things basic here.</p>
 </aside>
 
 <p>This power springs the superhero into the air, playing an appropriate sound and
 kicking up a little cloud of dust. If all of the superpowers were this
 simple&mdash; just combination of a sound, particle affect, and motion&mdash;
-then we wouldn&#x2019;t need this pattern at all. Instead, <code>Superpower</code> could just
+then we wouldn't need this pattern at all. Instead, <code>Superpower</code> could just
 have a baked-in implementation of <code>activate()</code> that accesses fields for the
 sound ID, particle type, and movement. But that only works when every power
-essentially works the same way with just some differences in data. Let&#x2019;s
+essentially works the same way with just some differences in data. Let's
 elaborate it a bit.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
@@ -237,7 +241,7 @@ elaborate it a bit.</p>
 </pre></div>
 
 
-<p>Here, we&#x2019;ve added a couple of methods to get the hero&#x2019;s position. Our
+<p>Here, we've added a couple of methods to get the hero's position. Our
 <code>SkyLaunch</code> subclass can now use those:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">SkyLaunch</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Superpower</span>
 <span class="p">{</span>
@@ -269,7 +273,7 @@ elaborate it a bit.</p>
 </pre></div>
 
 
-<p>Since we have access to some state, now our sandbox method can do actual interesting control flow. Here it&#x2019;s still just a couple of simple <code>if</code> statements, but you can do <span name="data">anything</span> you want. By having the sandbox method be an actual full-fledged method that contains arbitrary code, the sky&#x2019;s the limit.</p>
+<p>Since we have access to some state, now our sandbox method can do actual interesting control flow. Here it's still just a couple of simple <code>if</code> statements, but you can do <span name="data">anything</span> you want. By having the sandbox method be an actual full-fledged method that contains arbitrary code, the sky's the limit.</p>
 <aside name="data">
 
 <p>Earlier I suggested a data-driven approach for powers. This is one
@@ -277,49 +281,49 @@ reason why you may decide to <em>not</em> do that. If your behavior is complex a
 </aside>
 
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
-<p>As you can see, this is a fairly "soft" pattern. It describes a basic idea, but doesn&#x2019;t have a lot of detailed mechanics. That means you&#x2019;ll be making some interesting choices each time you apply it. Here are some questions to consider.</p>
+<p>As you can see, this is a fairly "soft" pattern. It describes a basic idea, but doesn't have a lot of detailed mechanics. That means you'll be making some interesting choices each time you apply it. Here are some questions to consider.</p>
 <h3><a href="#what-operations-should-be-provided" name="what-operations-should-be-provided">What operations should be provided?</a></h3>
-<p>This is the biggest question. It deeply affects how this pattern feels and how well it works. At the minimum end of the spectrum, the base class doesn&#x2019;t provide <em>any</em> operations. It just has a sandbox method. To implement it, you&#x2019;ll have to call into systems outside of the base class. If you take that angle, it&#x2019;s probably not even fair to say you&#x2019;re using this pattern.</p>
-<p>On the other end of the spectrum, the base class provides <span name="include"><em>every</em></span> operation that a subclass may need. Subclasses are <em>only</em> coupled to the base class and don&#x2019;t call into any outside systems whatsoever.</p>
+<p>This is the biggest question. It deeply affects how this pattern feels and how well it works. At the minimum end of the spectrum, the base class doesn't provide <em>any</em> operations. It just has a sandbox method. To implement it, you'll have to call into systems outside of the base class. If you take that angle, it's probably not even fair to say you're using this pattern.</p>
+<p>On the other end of the spectrum, the base class provides <span name="include"><em>every</em></span> operation that a subclass may need. Subclasses are <em>only</em> coupled to the base class and don't call into any outside systems whatsoever.</p>
 <aside name="include">
 
 <p>Concretely, this means each source file for a subclass would only need a single <code>#include</code>: the one for its base class.</p>
 </aside>
 
-<p>Between these two points, there&#x2019;s a wide middle ground where some operations
+<p>Between these two points, there's a wide middle ground where some operations
 are provided by the base class and others are accessed directly from the
 outside system that defines it. The more operations you provide, the less
 coupled subclasses are to outside systems, but the <em>more</em> coupled the base
 class itself is. It removes coupling from the derived classes, but only by
 pushing that up to the base class itself.</p>
-<p>That&#x2019;s a win if you have a bunch of derived classes that were all coupled to
-some outside system. By moving that up into a provided operation, you&#x2019;ve
+<p>That's a win if you have a bunch of derived classes that were all coupled to
+some outside system. By moving that up into a provided operation, you've
 centralized that coupling into one place: the base class. But the more you do
 this, the bigger and harder to maintain the base class itself becomes.</p>
-<p>So where to draw the line? Here&#x2019;s a few rules of thumb:</p>
+<p>So where to draw the line? Here's a few rules of thumb:</p>
 <ul>
 <li>
-<p>If a provided operation is only used by one or a few subclasses, you don&#x2019;t
-    get a lot of bang for your buck. You&#x2019;re adding complexity to the base
+<p>If a provided operation is only used by one or a few subclasses, you don't
+    get a lot of bang for your buck. You're adding complexity to the base
     class, which affects everyone, but only a couple of classes benefit.</p>
 <p>This may be worth it for making the operation consistent with other
 provided operations, or it may be simpler and cleaner just to let those
 special case subclasses call out to the external systems directly.</p>
 </li>
 <li>
-<p>When you call a method in some other corner of the game, it&#x2019;s less
-    intrusive if that method doesn&#x2019;t modify any state. It still creates a
-    coupling, but it&#x2019;s a <span name="safe">"safe"</span> coupling because it
-    can&#x2019;t break anything in the game.</p>
+<p>When you call a method in some other corner of the game, it's less
+    intrusive if that method doesn't modify any state. It still creates a
+    coupling, but it's a <span name="safe">"safe"</span> coupling because it
+    can't break anything in the game.</p>
 <aside name="safe">
 
 <p>"Safe" is in quotes here because technically even just accessing data can
 cause problems. If your game is multi-threaded, you could read something at
-the same time that it&#x2019;s being modified. If you aren&#x2019;t careful you can end
+the same time that it's being modified. If you aren't careful you can end
 up with bogus data.</p>
 <p>Another nasty case is if your game is deterministic (which some online
 games are in order to keep all players in sync). If you access something
-that isn&#x2019;t in the set of controlled, deterministic game state, you can
+that isn't in the set of controlled, deterministic game state, you can
 cause incredibly painful non-determinism bugs.</p>
 </aside>
 
@@ -330,11 +334,11 @@ up into provided operations in the more visible base class.</p>
 </li>
 <li>
 <p>If the implementation of a provided operation just forwards a call to some
-    outside system, then it isn&#x2019;t adding much value. In that case, it may be
+    outside system, then it isn't adding much value. In that case, it may be
     simpler to just call the outside method directly.</p>
 <p>However, even simple forwarding can still be useful: those methods often
-access state that the base class doesn&#x2019;t want to directly expose to
-subclasses. For example, let&#x2019;s say <code>Superpower</code> provided this:</p>
+access state that the base class doesn't want to directly expose to
+subclasses. For example, let's say <code>Superpower</code> provided this:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="nf">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">float</span> <span class="n">volume</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">soundEngine_</span><span class="p">.</span><span class="n">play</span><span class="p">(</span><span class="n">sound</span><span class="p">,</span> <span class="n">volume</span><span class="p">);</span>
@@ -342,9 +346,9 @@ subclasses. For example, let&#x2019;s say <code>Superpower</code> provided this:
 </pre></div>
 
 
-<p>It&#x2019;s just forwarding the call to some <code>soundEngine_</code> field in <code>Superpower</code>.
+<p>It's just forwarding the call to some <code>soundEngine_</code> field in <code>Superpower</code>.
 The advantage, though, is that it keeps that field
-encapsulated in <code>Superpower</code> so subclasses can&#x2019;t poke at it.</p>
+encapsulated in <code>Superpower</code> so subclasses can't poke at it.</p>
 </li>
 </ul>
 <h3><a href="#should-methods-be-provided-directly,-or-through-objects-that-contain-them" name="should-methods-be-provided-directly,-or-through-objects-that-contain-them">Should methods be provided directly, or through objects that contain them?</a></h3>
@@ -436,7 +440,7 @@ things for you:</p>
     <code>playSound()</code> was a method directly on <code>Superpower</code>, that meant our base
     class was directly tied to <code>SoundId</code> and whatever audio code the
     implementation called into. Moving that over to <code>SoundPlayer</code> reduces
-    <code>Superpower</code>&#x2019;s coupling to just that single <code>SoundPlayer</code> class, which then
+    <code>Superpower</code>'s coupling to just that single <code>SoundPlayer</code> class, which then
     encapsulates all of its other dependencies.</p>
 </li>
 </ul>
@@ -466,7 +470,7 @@ argument:</p>
 
 
 <p>This safely ensures that every superpower does have a particle system by the
-time it&#x2019;s constructed. But let&#x2019;s look at a derived class:</p>
+time it's constructed. But let's look at a derived class:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">SkyLaunch</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Superpower</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -479,7 +483,7 @@ time it&#x2019;s constructed. But let&#x2019;s look at a derived class:</p>
 
 <p>Here we see the problem. Every derived class will need to have a constructor
 that calls the base class one and passes along that argument. That exposes
-every derived class to a piece of state that we don&#x2019;t want them to know
+every derived class to a piece of state that we don't want them to know
 about.</p>
 <p>This is also a maintenance headache. If we later add another piece of state
 to the base class, every constructor in each of our derived classes will
@@ -497,11 +501,11 @@ needs.</p>
 </pre></div>
 
 
-<p>Note here that since we aren&#x2019;t passing anything into the constructor for
-<code>SkyLaunch</code>, it isn&#x2019;t coupled to anything we want to keep private in
+<p>Note here that since we aren't passing anything into the constructor for
+<code>SkyLaunch</code>, it isn't coupled to anything we want to keep private in
 <code>Superpower</code>. The trouble with this approach, though, is that you have to
-make sure you always remember to call <code>init()</code>. If you ever forget, you&#x2019;ll
-have a power that&#x2019;s in some twilight half-created state and won&#x2019;t work.</p>
+make sure you always remember to call <code>init()</code>. If you ever forget, you'll
+have a power that's in some twilight half-created state and won't work.</p>
 <p>You can fix that by encapsulating the entire process into a single
 function, like so:</p>
 <p><span name="friend"></span></p>
@@ -518,7 +522,7 @@ function, like so:</p>
 
 <p>With a little trickery like private constructors and friend classes, you
 can ensure that this <code>createSuperpower()</code> function is the <em>only</em> function
-that can actually create powers. That ensures you won&#x2019;t ever forget one of
+that can actually create powers. That ensures you won't ever forget one of
 the initialization stages.</p>
 </aside>
 
@@ -527,7 +531,7 @@ the initialization stages.</p>
 <p><strong>Make the state static.</strong></p>
 <p>In the above example, we were initializing each <code>Superpower</code> <em>instance</em> with
 a particle system. That makes sense when every power needs its own unique
-state. But let&#x2019;s say that the particle system is a
+state. But let's say that the particle system is a
 <a class="pattern" href="singleton.html">Singleton</a>, and every power
 will be sharing the same one.</p>
 <p>In that case, we can make the state private to the base class, but also
@@ -537,8 +541,8 @@ initializes the state, but it only has to initialize the <code>Superpower</code>
 <aside name="singleton">
 
 <p>Keep in mind that this still has many of the problems of a singleton:
-you&#x2019;ve got some state shared between lots and lots of objects (all of the
-<code>Superpower</code> instances). The particle system is encapsulated, so it isn&#x2019;t
+you've got some state shared between lots and lots of objects (all of the
+<code>Superpower</code> instances). The particle system is encapsulated, so it isn't
 globally <em>visible</em> which is good, but it can still make reasoning about
 powers harder because they can all poke at the same object.</p>
 </aside>
@@ -562,9 +566,9 @@ powers harder because they can all poke at the same object.</p>
 <p>Note here that <code>init()</code> and <code>particles_</code> are both static. As long as the
 game calls <code>Superpower::init()</code> once early on, every power can access the
 particle system. At the same time, <code>Superpower</code> instances can be created
-freely just by calling the right derived class&#x2019;s constructor.</p>
-<p>Even better, now that <code>particles_</code> is a <em>static</em> variable, we don&#x2019;t
-have to store it for each instance of <code>Superpower</code>, so we&#x2019;ve made the class
+freely just by calling the right derived class's constructor.</p>
+<p>Even better, now that <code>particles_</code> is a <em>static</em> variable, we don't
+have to store it for each instance of <code>Superpower</code>, so we've made the class
 use less memory.</p>
 </li>
 <li>
@@ -598,7 +602,7 @@ one by outside code, it just fetches it itself from the service locator.</p>
 <li>
 <p>This pattern is a close cousin to
     <a class="pattern" href="context-parameter.html">Context Parameter</a>.
-    It&#x2019;s basically a context parameter where the "parameter" is <code>this</code>.</p>
+    It's basically a context parameter where the "parameter" is <code>this</code>.</p>
 <p>These patterns can be used in tandem. You may have a single sandbox
 method that provides some operations by making them protected on <code>this</code>
 (this pattern) and that also passes in a context parameter or two that
@@ -619,10 +623,9 @@ behavior to subclasses, the Template Method Pattern provides the high-level
 behavior and delegates the primitives.</p>
 </li>
 </ul>
-        <p class="footer">&copy; 2009-2013 Robert Nystrom &mdash; Last modified on June 20, 2013</p>
-        </div>
-        </body>
-        <script src="jquery-1.10.1.min.js"></script>
-        <script src="script.js"></script>
-        </html>
-        
+<p class="footer">&copy; 2009-2013 Robert Nystrom &mdash; Last modified on June 20, 2013</p>
+</div>
+</body>
+<script src="jquery-1.10.1.min.js"></script>
+<script src="script.js"></script>
+</html> <!-- mod_str -->

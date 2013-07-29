@@ -23,6 +23,9 @@ num_chapters = 0
 empty_chapters = 0
 total_words = 0
 
+with open("asset/template.html") as f:
+    TEMPLATE = f.read()
+
 def htmlpath(pattern):
     return 'html/' + pattern + '.html'
 
@@ -105,68 +108,19 @@ def formatfile(path, nav, skip_up_to_date):
 
     # write the html output
     with open(htmlpath(basename), 'w') as out:
-        out.write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n')
-        out.write('<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">\n')
-        out.write('<head>\n')
-        out.write('<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />\n')
+        title_text = title
+        section_header = ""
 
-        out.write('<title>Game Programming Patterns / ')
-        if section != '':
-            out.write(section + ' / ')
-        out.write(title + '</title>\n')
+        if section != "":
+            title_text = section + " / " + title
+            section_header = " / " + section
 
-        out.write("""
-        <!-- Tell mobile browsers we're optimized for them and they don't need to crop the viewport. -->
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-        <link rel="stylesheet" type="text/css" href="style.css" />
-        <link href="http://fonts.googleapis.com/css?family=Source+Code+Pro|Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
-        </head>
-        <body id="top">
-        """)
-
-        #out.write(navigationtohtml(section, title, navigation))
-
-        if isoutline:
-            out.write('<div class="content outline">\n')
-        else:
-            out.write('<div class="content">\n')
-
-        # title
-        out.write('<h1 class="book"><a href="index.html">Game Programming Patterns</a>')
-        if section != '':
-            out.write(' / ' + section)
-
-        out.write('</h1>\n')
-
-        out.write('<h1>{0}</h1>\n'.format(title))
-
-        if isoutline:
-            outline_header = """
-            <div class="outline-note">
-            <p>Note: This is only an outline. The full text has not been written yet.</p>
-            </div>
-            """
-
-            out.write(outline_header)
-
-        # markdownify contents of aside tags
         contents = contents.replace('<aside', '<aside markdown="1"')
-
-        # content
         html = markdown.markdown(contents, ['extra', 'def_list', 'codehilite'])
-
         html = html.replace('<aside markdown="1"', '<aside')
 
-        out.write(html)
-
-        out.write("""
-        <p class="footer">&copy; 2009-2013 Robert Nystrom &mdash; Last modified on {0}</p>
-        </div>
-        </body>
-        <script src="jquery-1.10.1.min.js"></script>
-        <script src="script.js"></script>
-        </html>
-        """.format(mod_str));
+        out.write(TEMPLATE.format(
+            title_text, section_header, title, html, mod_str))
 
     global total_words
     global num_chapters
