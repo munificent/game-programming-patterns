@@ -96,7 +96,8 @@ def formatfile(path, nav, skip_up_to_date):
 
             else:
                 # user nicer html entities
-                prettified = line.replace("'", '&#x2019;')
+                prettified = line.replace("'", "&#x2019;")
+                prettified = line.replace("...", "&hellip;")
                 contents += prettified
 
     modified = datetime.fromtimestamp(os.path.getmtime(path))

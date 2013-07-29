@@ -344,7 +344,7 @@ If I've accomplished my goal so far, you'll think twice before you
 pull Singleton out of your toolbox the next time you have a problem.
 But you still have a problem that needs solving. What tool *should*
 you pull out? Depending on what you're trying to do, I have a few
-options for you to consider, but first&hellip;
+options for you to consider, but first...
 
 ### See if you need the class at all
 
