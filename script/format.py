@@ -116,11 +116,17 @@ def formatfile(path, nav, skip_up_to_date):
             section_header = " / " + section
 
         contents = contents.replace('<aside', '<aside markdown="1"')
-        html = markdown.markdown(contents, ['extra', 'def_list', 'codehilite'])
-        html = html.replace('<aside markdown="1"', '<aside')
+        body = markdown.markdown(contents, ['extra', 'def_list', 'codehilite'])
+        body = body.replace('<aside markdown="1"', '<aside')
 
-        out.write(TEMPLATE.format(
-            title_text, section_header, title, html, mod_str))
+        html = TEMPLATE
+        html = html.replace("{{title}}", title_text)
+        html = html.replace("{{section_header}}", section_header)
+        html = html.replace("{{header}}", title)
+        html = html.replace("{{body}}", body)
+        html = html.replace("{{mod}}", mod_str)
+
+        out.write(html)
 
     global total_words
     global num_chapters
