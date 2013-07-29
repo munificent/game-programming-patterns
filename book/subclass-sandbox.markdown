@@ -87,8 +87,8 @@ game.
 <aside name="wide">
 
 Lately, you find a lot of people criticizing inheritance in object-oriented
-languages. Inheritance *is* problematic&mdash; there's really no deeper
-coupling in a codebase than the one between a base class and its subclass&mdash;
+languages. Inheritance *is* problematic -- there's really no deeper
+coupling in a codebase than the one between a base class and its subclass --
 but I find *wide* inheritance trees to be easier to work with than *deep* ones.
 
 </aside>
@@ -125,7 +125,7 @@ fit when:
 Since every dependency that a subclass has ends up flowing through the base
 class first, it can end up large and deeply coupled to the rest of the
 game. Also, the subclasses themselves are deeply tied to the base
-class. Those together mean that making changes to it can be difficult without breaking something&mdash; you've got the [brittle base class problem][].
+class. Those together mean that making changes to it can be difficult without breaking something -- you've got the [brittle base class problem][].
 
 If you find this pattern is turning your base class into a giant bowl of
 code stew, consider pulling some of the provided operations out into separate
@@ -146,7 +146,7 @@ That means much of your codebase is isolated and fairly easy to maintain.
 ## Sample Code
 
 Because this is such a simple pattern, there isn't much to the sample code.
-That doesn't mean it isn't useful&mdash; the pattern is about the *intent*, and
+That doesn't mean it isn't useful -- the pattern is about the *intent*, and
 not the complexity of its implementation.
 
 We'll start with our `Superpower` superclass:
@@ -183,7 +183,7 @@ things basic here.
 
 This power springs the superhero into the air, playing an appropriate sound and
 kicking up a little cloud of dust. If all of the superpowers were this
-simple&mdash; just combination of a sound, particle affect, and motion&mdash;
+simple -- just combination of a sound, particle affect, and motion --
 then we wouldn't need this pattern at all. Instead, `Superpower` could just
 have a baked-in implementation of `activate()` that accesses fields for the
 sound ID, particle type, and movement. But that only works when every power

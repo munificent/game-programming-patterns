@@ -200,7 +200,7 @@ keys and wallet.
 
 When you find yourself burning a lot of memory this way, consider
 splitting the pool into <span name="pools">separate</span> pools for different sizes of
-object&mdash; big trays for luggage, little trays for pocket stuff.
+object -- big trays for luggage, little trays for pocket stuff.
 
 <aside name="pools">
 

@@ -54,7 +54,7 @@ Again, we're trying to find which units are battling, which means which units ha
 
 This is essentially the same as a sorting algorithm called a *pigeonhole sort*. To sort a bunch of numbers within some range, you create second array of "pigeonholes", one for each value in the range. Then you walk the original array and put each number in its hole. Then you walk through the holes in order and copy the contents of the non-empty ones back to the array.
 
-Because it uses memory based on the *range* of values, it isn't a good fit for many problems, but for the ones where it does work, it's hard to beat&mdash;it has *O(n)* worst-case performance. Snazzy!
+Because it uses memory based on the *range* of values, it isn't a good fit for many problems, but for the ones where it does work, it's hard to beat -- it has *O(n)* worst-case performance. Snazzy!
 
 </aside>
 

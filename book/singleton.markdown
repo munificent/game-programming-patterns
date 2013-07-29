@@ -97,7 +97,7 @@ nice features too:
     is called. This means they can't use information known only once
     the program is up and running (for example, configuration
     information loaded from a file). It also means they can't reliably
-    depend on each other&mdash; the compiler does not guarantee the
+    depend on each other -- the compiler does not guarantee the
     order in which statics are initialized relative to each other.
 
     Lazy initialization solves both of those problems. The Singleton
@@ -413,7 +413,7 @@ the very nature of the class's structure.
 
 ### To provide convenient access to an instance
 
-Convenient access is the main reason we reach for Singletons&mdash;
+Convenient access is the main reason we reach for Singletons --
 they make it easy to get our hands on an object we need to use in a
 lot of different places. That ease comes at a cost, though: it becomes
 equally easy to get our hands on the object in places where we *don't*
@@ -516,7 +516,7 @@ still better than a giant pile of Singletons.
 
 If, later, the architecture is changed to support multiple `World`
 instances (perhaps for streaming or testing purposes), `Log`,
-`FileSystem`, and `AudioPlayer` are all unaffected&mdash; they won't
+`FileSystem`, and `AudioPlayer` are all unaffected -- they won't
 even know the difference. The downside with this, of course, is that
 more code ends up coupled to World itself. If a class just needs to
 play sound, our example still requires it to know about World in order

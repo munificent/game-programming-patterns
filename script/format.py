@@ -32,6 +32,13 @@ def htmlpath(pattern):
 def cpppath(pattern):
     return 'code/cpp/' + pattern + '.h'
 
+def pretty(text):
+    # user nicer html entities and special characters
+    return (text.replace("'", "&#x2019;")
+                .replace("...", "&hellip;")
+                .replace(" -- ", "&thinsp;&mdash;&thinsp;")
+                .replace("ø", "&oslash;"))
+
 def formatfile(path, nav, skip_up_to_date):
     basename = os.path.basename(path)
     basename = basename.split('.')[0]
@@ -85,7 +92,7 @@ def formatfile(path, nav, skip_up_to_date):
                 # build the page navigation from the headers
                 index = stripped.find(" ")
                 headertype = stripped[:index]
-                header = stripped[index:].strip()
+                header = pretty(stripped[index:].strip())
                 anchor = header.lower().replace(' ', '-')
                 anchor = anchor.translate(None, '.?!:/')
 
@@ -98,10 +105,7 @@ def formatfile(path, nav, skip_up_to_date):
                     navigation.append((len(headertype), header, anchor))
 
             else:
-                # user nicer html entities
-                prettified = line.replace("'", "&#x2019;")
-                prettified = line.replace("...", "&hellip;")
-                contents += prettified
+                contents += pretty(line)
 
     modified = datetime.fromtimestamp(os.path.getmtime(path))
     mod_str = modified.strftime('%B %d, %Y')
@@ -116,6 +120,7 @@ def formatfile(path, nav, skip_up_to_date):
             section_header = " / " + section
 
         contents = contents.replace('<aside', '<aside markdown="1"')
+
         body = markdown.markdown(contents, ['extra', 'def_list', 'codehilite'])
         body = body.replace('<aside markdown="1"', '<aside')
 

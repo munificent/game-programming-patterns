@@ -34,14 +34,14 @@ a computer game that you programmed yourself?
 We never did get it running, and after a year we moved out of that
 classroom. (Much later when I actually knew a bit of BASIC, I realized
 that it was just a character generator for the table-top game, and not
-a game in itself.) But the die was cast&mdash; from here on out, I
+a game in itself.) But the die was cast -- from here on out, I
 wanted to be a game programmer.
 
 When I was in my teens, my family got a Macintosh with QuickBASIC and
 later THINK C. I spent almost all of my <span name="snakes">summer vacations</span> hacking
 together game programs. Learning on my own was slow and painful. I'd
-get something up and running quickly&mdash; maybe a map screen, or a
-little puzzle&mdash; but as I added features it got harder and harder.
+get something up and running quickly -- maybe a map screen, or a
+little puzzle -- but as I added features it got harder and harder.
 Once I couldn't fit the entire program in my head anymore, it was
 doomed.
 
@@ -121,7 +121,7 @@ windows. This is the kind of stuff you can find in other books. These
 things matter, of course, but this book aims at something a bit more
 humble and fundamental: the framing. Other books can teach you about
 windows and fixtures, faucets and tubs. What I hope to cover in this
-book is the joist and the arch, plumbing and wiring&mdash; techniques
+book is the joist and the arch, plumbing and wiring -- techniques
 that will let you build an elegant and maintainable structure out of a
 few simple parts. Use them to frame the house, then crack open those
 other books to build it out.
@@ -268,7 +268,7 @@ in the larger pattern ecosystem.
 
 ## How the Book is Formatted
 
-Each <span name="aside">pattern</span> has a set of parts&mdash; the ingredients in its recipe.
+Each <span name="aside">pattern</span> has a set of parts -- the ingredients in its recipe.
 Every implementation will include these parts, so its important to
 note them all. The first time one is mentioned, it will be in **bold
 face**.

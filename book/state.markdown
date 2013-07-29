@@ -55,13 +55,13 @@ Bug hunting time again. Find it?
 
 We check that you can't air jump while jumping, but not while diving. Yet another field...
 
-Something is clearly <span name="se">wrong</span> with our approach. Every time we touch this handful of conditionals and interrelated boolean fields we add bugs to it. We intend to support a variety of moves&mdash;we haven't even added *walking* yet!&mdash;but at this rate it will collapse into a heap of bugs before we're done with it.
+Something is clearly <span name="se">wrong</span> with our approach. Every time we touch this handful of conditionals and interrelated boolean fields we add bugs to it. We intend to support a variety of moves -- we haven't even added *walking* yet! -- but at this rate it will collapse into a heap of bugs before we're done with it.
 
 <aside name="se">
 
 Those coders you idolize who always seem to create flawless code aren't simply superhuman programmers. Instead, they have an intuition about which *kinds* of code are error-prone, and they steer away from that.
 
-Complex conditional logic and mutable state&mdash;fields that change over time&mdash;are two of those error-prone kinds and this code has both.
+Complex conditional logic and mutable state -- fields that change over time -- are two of those error-prone kinds and this code has both.
 
 </aside>
 
@@ -279,7 +279,7 @@ If we want to stick to the confines of an FSM, we have to *double* the number of
 
 Add a couple of more weapons and the number of states explodes combinatorially. Not only is it a huge number of states, it's a huge amount of duplication: the unarmed and armed states are almost identical except for the little bit of code to handle firing.
 
-The problem is that we've <span name="combination">jammed</span> two sets of states&mdash;what she's *doing* and what she's *carrying*&mdash; into a single machine. To model all possible combinations, we need a state for each *pair*. The fix is obvious: have two separate state machines.
+The problem is that we've <span name="combination">jammed</span> two sets of states -- what she's *doing* and what she's *carrying* -- into a single machine. To model all possible combinations, we need a state for each *pair*. The fix is obvious: have two separate state machines.
 
 <aside name="combination">
 
@@ -353,7 +353,7 @@ Since this is behavior duplicated across several states, this may also be a good
 
 The tricky part is what state she transitions to *after* firing. She can pop off a round while standing, running, jumping, and ducking. When the firing sequence is complete, she should transition back to what she was doing before.
 
-If we're sticking with a vanilla FSM, we'll have to define a slew of nearly identical states&mdash;firing while standing, firing while running, firing while jumping, and so on&mdash;just so that each one can have a hardcoded transition that goes back to the right state when it's done. What we'd really like is a way to *store* the state she was in before firing and then *recall* it later. Again, automata theory is here to help. The relevant data structure is called a [*pushdown automaton*](http://en.wikipedia.org/wiki/Pushdown_automaton).
+If we're sticking with a vanilla FSM, we'll have to define a slew of nearly identical states -- firing while standing, firing while running, firing while jumping, and so on -- just so that each one can have a hardcoded transition that goes back to the right state when it's done. What we'd really like is a way to *store* the state she was in before firing and then *recall* it later. Again, automata theory is here to help. The relevant data structure is called a [*pushdown automaton*](http://en.wikipedia.org/wiki/Pushdown_automaton).
 
 Where a finite state machine has a *single* pointer to a state, a pushdown automaton has a *stack* of them. In an FSM, transitioning to a new state *replaces* the previous one. A pushdown automaton lets you do that, but also gives you two additional operations:
 

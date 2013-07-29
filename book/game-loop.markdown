@@ -56,7 +56,7 @@ Modern graphic UI applications look surprisingly similar to old adventure games 
 
 ^code 2
 
-The main difference is that instead of *text commands*, the program is waiting for *user input events*&mdash;mouse clicks and key presses. It still works basically like the old text adventures where the program <span name="idle">*blocks*</span> waiting for user input, which is a problem.
+The main difference is that instead of *text commands*, the program is waiting for *user input events* -- mouse clicks and key presses. It still works basically like the old text adventures where the program <span name="idle">*blocks*</span> waiting for user input, which is a problem.
 
 Unlike most other software, games keep moving even when the user isn't providing input. If you sit staring at the screen, the game doesn't freeze. Animations keep animating. Visual effects dance and sparkle. If you're unlucky, that monster keeps chomping on your hero.
 

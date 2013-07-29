@@ -40,7 +40,7 @@ A <span name="scan">video</span> display like a computer monitor draws one pixel
 sweeps across each row of pixels from left to right, and then moves
 down to the next row. When it reaches the bottom right corner, it
 scans back up to the top left and starts all over again. It does this
-so fast&mdash; around sixty times a second&mdash; that our eyes can't
+so fast -- around sixty times a second -- that our eyes can't
 see the scanning. To us, it's a single static field of colored pixels,
 an image.
 
@@ -110,7 +110,7 @@ user sees half of a circle on screen.
 
 This is why we need this pattern. Our program renders the pixels one
 at a time, but we need the display driver to see them all at
-once&mdash; one refresh the circle isn't there, the next one it is.
+once -- one refresh the circle isn't there, the next one it is.
 Double buffering solves this. I'll explain how by analogy.
 
 ### Act 1, Scene 1
@@ -215,13 +215,13 @@ things are true:
 
 Unlike larger architectural patterns, double-buffering exists at a
 lower implementation level. Because of this, it has fewer consequences
-for the rest of the codebase&mdash; most of the game won't even be
+for the rest of the codebase -- most of the game won't even be
 aware of the difference. There are a couple of caveats, though.
 
 ### The swap itself takes time
 
 Double-buffering requires a *swap* step once the state is done being
-modified. That operation must be atomic&mdash; no code can access
+modified. That operation must be atomic -- no code can access
 either state while they are being swapped. Often, the swap is as quick
 as assigning a pointer, but if it takes longer than it does to modify
 the state to begin with, then we haven't helped ourselves at all.
@@ -360,7 +360,7 @@ responds to a given slap once.
 
 Now, to get things going, let's define a concrete actor subclass. Our
 comedian here is pretty simple. He faces a single actor. Whenever he
-gets slapped&mdash; by anyone&mdash; he responds by slapping the
+gets slapped -- by anyone -- he responds by slapping the
 actor he faces.
 
 ^code 7
@@ -535,8 +535,8 @@ quickly as possible.
     If we can't just repoint users to the other buffer, the only other
     option is to actually copy the data from the next frame to the
     current frame. This is how our slapstick comedians work. In that
-    case, we chose this way because the state&mdash; a single boolean
-    flag&mdash; doesn't take any longer to copy than a pointer to the
+    case, we chose this way because the state -- a single boolean
+    flag -- doesn't take any longer to copy than a pointer to the
     buffer would.
 
     *   *Data on the next buffer is only a single frame old.* This is
@@ -579,7 +579,7 @@ that they all reference into by their index.
         to swap.
 
         In our comedian example, that was OK since we needed to clear
-        the next slap state anyway&mdash; every piece of buffered
+        the next slap state anyway -- every piece of buffered
         state needed to be touched each frame. If we don't need to
         otherwise touch the old buffer, there's a simple optimization
         we can do to get the same performance of a monolithic buffer

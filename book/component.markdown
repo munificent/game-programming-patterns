@@ -10,7 +10,7 @@ domains to each other.*
 
 Let's say we're building a platformer. The Italian plumber demographic
 is covered, so ours will be starring a Danish <span name="baker">baker</span>,
-Bj&oslash;rn. It stands to reason that we'll have a class representing our
+Bjørn. It stands to reason that we'll have a class representing our
 friendly pastry chef, and it will contain everything he does in the game.
 
 <aside name="baker">
@@ -87,7 +87,7 @@ our monolithic `Bjorn` class and slice it into separate parts along
 domain boundaries. For example, we'll take all of the code for
 handling user input and move it into a separate `InputComponent`
 class. `Bjorn` will then own an instance of this component. We repeat
-this process for each of the domains that Bj&oslash;rn touches.
+this process for each of the domains that Bjørn touches.
 
 When we're done, we'll have moved almost everything out of `Bjorn`.
 All that remains is a thin shell that binds the components together.
@@ -104,7 +104,7 @@ versa.
 
 In practice, the components will need to have *some* interaction
 between themselves. For example, the AI component may need to tell the
-physics component where Bj&oslash;rn is trying to go. However, we can
+physics component where Bjørn is trying to go. However, we can
 restrict this to just the components that *do* need to talk instead of
 just tossing them all in the same playpen together.
 
@@ -118,7 +118,7 @@ things in the world the player sees but doesn't interact with: bushes,
 debris and other visual detail. *Props* are like decorations but can
 be touched: boxes, boulders, and trees. *Zones* are the opposite of
 decorations: invisible but interactive. They're useful for things like
-triggering a cutscene when Bj&oslash;rn enters an area.
+triggering a cutscene when Bjørn enters an area.
 
 <aside name="inheritance">
 
@@ -283,11 +283,11 @@ engine works without mentioning fuel or oil.
 
 The Component pattern is a particularly hard one. You can't get a real
 feel for it without seeing some code for each of the domains that it
-decouples, so I'll have to sketch in a bit more of Bj&oslash;rn's code
+decouples, so I'll have to sketch in a bit more of Bjørn's code
 than I'd like to. The pattern is really just the component *classes*
 themselves, but the code in them should help clarify what the classes
-are for. It's fake code&mdash; it calls into other classes that aren't
-presented here&mdash; but it should give you an idea of what we're
+are for. It's fake code -- it calls into other classes that aren't
+presented here -- but it should give you an idea of what we're
 going for.
 
 ### A monolithic class
@@ -300,7 +300,7 @@ I should point out that using the actual name of the character in the
 codebase is usually a bad idea. The marketing department has an
 annoying habit of demanding name changes days before you ship.
 &ldquo;Focus tests show males between 11 and 15 respond negatively to
-&lsquo;Bj&oslash;rn&rsquo;. Use &lsquo;Sven&rsquo; instead.&rdquo;
+&lsquo;Bjørn&rsquo;. Use &lsquo;Sven&rsquo; instead.&rdquo;
 
 This is why many software projects use internal-only codenames. Well,
 that and because it's more fun to tell people you're working on
@@ -314,7 +314,7 @@ Photoshop.&rdquo;
 `Bjorn` has an `update()` method that gets called once per frame by
 the game. It reads the joystick to determine how to accelerate the
 baker. Then it resolves its new position with the physics engine.
-Finally, it draws Bj&oslash;rn onto the screen.
+Finally, it draws Bjørn onto the screen.
 
 The sample implemention here is trivially simple. There's no gravity,
 animation, or any of the dozens of other details that make a character
@@ -380,7 +380,7 @@ Secondly, and more importantly, it gives us an easy way for the
 components to communicate without being coupled to each other. Let's
 see if we can put that to use.
 
-### Robo-Bj&oslash;rn
+### Robo-Bjørn
 
 So far, we've pushed our behavior out to separate component classes,
 but we haven't *abstracted* the behavior out. `Bjorn` still knows the
@@ -426,14 +426,14 @@ normally used when playing the game. Now let's make another one:
 ^code 12
 
 When the game goes into demo mode, instead of constructing
-Bj&oslash;rn like we did earlier, we'll wire him up with our new
+Bjørn like we did earlier, we'll wire him up with our new
 component:
 
 ^code 13
 
 And now, just by swapping out a component, we've got a fully
 functioning computer-controlled player for demo mode. We're able to
-reuse all of the other code for Bj&oslash;rn&mdash; physics and
+reuse all of the other code for Bjørn -- physics and
 graphics don't even know there's a difference. Maybe I'm a bit
 strange, but it's stuff like this that gets me up in the <span name="coffee">morning</span>.
 
@@ -443,17 +443,17 @@ That, and coffee.
 
 </aside>
 
-### No Bj&oslash;rn at all?
+### No Bjørn at all?
 
 If you look at our `Bjorn` class now, you'll notice there's nothing
-really &ldquo;Bj&oslash;rn&rdquo; about it&mdash; it's just a
+really &ldquo;Bjørn&rdquo; about it -- it's just a
 component bag. In fact, it looks like a pretty good candidate for a
 base &ldquo;game object&rdquo; class that we can use for *every*
 object in the game. All we need to do is pass in *all* the components,
 and we can build any kind of object just by picking and choosing parts
 like Dr. Frankenstein.
 
-Let's take our two remaining concrete components&mdash; physics and graphics&mdash; and hide them behind interfaces like we did with input:
+Let's take our two remaining concrete components -- physics and graphics -- and hide them behind interfaces like we did with input:
 
 ^code 14
 
@@ -474,7 +474,7 @@ Our existing concrete classes will get renamed and implement those interfaces:
 
 ^code 16
 
-And now we can build an object that has all of Bj&oslash;rn's original
+And now we can build an object that has all of Bjørn's original
 behavior without having to actually create a class for him, just like
 this:
 
@@ -553,9 +553,9 @@ the same time in your designs.
 * **By modifying the container object's state:**
 
      *  *It keeps the components decoupled.* When our `InputComponent` set
-        Bj&oslash;rn's velocity and the PhysicsComponent later used it,
+        Bjørn's velocity and the PhysicsComponent later used it,
         the two components had no idea that the other even existed. For
-        all they knew, Bj&oslash;rn's velocity could have changed through
+        all they knew, Bjørn's velocity could have changed through
         black magic.
 
      *  *It requires any information that components need to share to get
@@ -577,13 +577,13 @@ the same time in your designs.
         monolithic `update()` method had a very carefully laid out order
         of operations: the user input modified the velocity, which was
         then used by the physics code to modify the position, which in
-        turn was used by the rendering code to draw Bj&oslash;rn at the
+        turn was used by the rendering code to draw Bjørn at the
         right spot. When we split that code out into components, we were
         careful to preserve that order of operations.
 
         If we hadn't, we would have introduced <span name="pure">subtle</span>, hard to track bugs.
         For example, if we'd updated the graphics component *first*, we
-        would wrongly render Bj&oslash;rn at his position on the *last*
+        would wrongly render Bjørn at his position on the *last*
         frame, not this one. If you imagine several more components and
         lots more code, then you can get an idea of how hard it can be to
         avoid bugs like this.
@@ -604,7 +604,7 @@ the same time in your designs.
         direct references to each other without having to go through the
         container object at all.
 
-        Let's say we want to let Bj&oslash;rn jump. The graphics code
+        Let's say we want to let Bjørn jump. The graphics code
         needs to know if he should be drawn using a jump sprite or not. It
         can determine this by asking the physics engine if he's currently
         on the ground. An easy way to do this is by letting the graphics
@@ -612,7 +612,7 @@ the same time in your designs.
 
         ^code 18
 
-        When we construct Bj&oslash;rn's `GraphicsComponent`, we'll give
+        When we construct Bjørn's `GraphicsComponent`, we'll give
         it a reference to his corresponding `PhysicsComponent`.
 
      *  *It's simple and fast.* Communication is a direct method call from
@@ -679,7 +679,7 @@ the same time in your designs.
 Unsurprisingly, there's no one best answer here. What you'll likely
 end up doing is using a bit of all of them. Shared state is useful for
 the really basic stuff that you can take for granted that every object
-has&mdash; things like position and size.
+has -- things like position and size.
 
 Some domains are distinct but still closely related. Things like
 animation and rendering, user input and AI, physics and collision. If
@@ -723,7 +723,7 @@ communication paths if you need them.
     pattern. Both patterns are about taking part of an object's
     behavior and delegating it to a separate subordinate object. The
     difference is that with the strategy pattern, the separate
-    &ldquo;strategy&rdquo; object is usually stateless&mdash; it
+    &ldquo;strategy&rdquo; object is usually stateless -- it
     encapsulates an algorithm but no data. It defines *how* an object
     behaves but not *what* it is.
 

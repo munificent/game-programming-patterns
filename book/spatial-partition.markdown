@@ -12,8 +12,8 @@ basic physics and tangibility of our world. This is why they can feel real despi
 
 One bit of fake reality that we'll focus on here is *location*. Game
 worlds have a sense of *space* and objects are somewhere in that space.
-This manifests itself in a bunch of ways. The obvious one is physics&mdash;objects
-move, collide, and interact&mdash;but there are other examples. The audio engine may take into account where
+This manifests itself in a bunch of ways. The obvious one is physics -- objects
+move, collide, and interact -- but there are other examples. The audio engine may take into account where
 sound sources are relative to the player so that distant sounds are quieter. Online chat may be restricted to other
 players close to yourself.
 
@@ -239,7 +239,7 @@ Our grid example partitioned space into a single flat set of cells. In contrast,
 
 <aside name="couple">
 
-They usually split it in two, four, or eight&mdash;nice round numbers to a programmer.
+They usually split it in two, four, or eight -- nice round numbers to a programmer.
 
 </aside>
 

@@ -28,7 +28,7 @@ system, with something like one of these:
 Either gets us where we're trying to go, but we stumbled into some
 sticky coupling along the way. Every place in the game calling into
 our audio system directly references the concrete AudioSystem class
-and the mechanism for accessing it&mdash; either as a static class or
+and the mechanism for accessing it -- either as a static class or
 a <a class="gof-pattern" href="singleton.html">Singleton</a>.
 
 These callsites, of course, have to be coupled to *something* in order
@@ -90,7 +90,7 @@ One limitation is that the implementation of the service doesn't know
 *who* is using it or what for. This means it must be able to work
 correctly in any circumstance. For example, a class that expects to
 only be used during the simulation portion of the game loop and not
-during rendering may not work as a service&mdash; it wouldn't be able
+during rendering may not work as a service -- it wouldn't be able
 to ensure that it's being used at the right time. So, if our class
 only expects to be used within a certain context, it may be safest to
 avoid exposing it to the world with this pattern.
@@ -139,7 +139,7 @@ the bodies of these functions, but you get the idea:
 ^code 10
 
 Now we have an interface and an implementation. The remaining piece is
-the service locator&mdash; the class that ties the two together.
+the service locator -- the class that ties the two together.
 
 ### A Simple Locator
 
@@ -160,7 +160,7 @@ dependent object to our Locator (i.e. injecting it into it).
 
 ^code 1
 
-The static `GetAudio()` function does the locating&mdash; we can call
+The static `GetAudio()` function does the locating -- we can call
 it from anywhere in the codebase and it will give us back an instance
 of our `IAudio` service to use:
 
