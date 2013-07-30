@@ -7,6 +7,7 @@
 import glob
 import markdown
 import os
+import subprocess
 import sys
 import time
 from datetime import datetime
@@ -22,9 +23,6 @@ YELLOW = '\033[33m'
 num_chapters = 0
 empty_chapters = 0
 total_words = 0
-
-with open("asset/template.html") as f:
-    TEMPLATE = f.read()
 
 def htmlpath(pattern):
     return 'html/' + pattern + '.html'
@@ -49,6 +47,7 @@ def formatfile(path, nav, skip_up_to_date):
 
     # see if the html is up to date
     sourcemod = os.path.getmtime(path)
+    sourcemod = max(sourcemod, os.path.getmtime('asset/template.html'))
     if os.path.exists(cpppath(basename)):
         sourcemod = max(sourcemod, os.path.getmtime(cpppath(basename)))
 
@@ -110,6 +109,9 @@ def formatfile(path, nav, skip_up_to_date):
     modified = datetime.fromtimestamp(os.path.getmtime(path))
     mod_str = modified.strftime('%B %d, %Y')
 
+    with open("asset/template.html") as f:
+        template = f.read()
+
     # write the html output
     with open(htmlpath(basename), 'w') as out:
         title_text = title
@@ -124,12 +126,11 @@ def formatfile(path, nav, skip_up_to_date):
         body = markdown.markdown(contents, ['extra', 'def_list', 'codehilite'])
         body = body.replace('<aside markdown="1"', '<aside')
 
-        html = TEMPLATE
+        html = template
         html = html.replace("{{title}}", title_text)
         html = html.replace("{{section_header}}", section_header)
         html = html.replace("{{header}}", title)
         html = html.replace("{{body}}", body)
-        html = html.replace("{{mod}}", mod_str)
 
         out.write(html)
 
@@ -259,9 +260,20 @@ searchpath = ('book/*.markdown')
 
 nav = buildnav(searchpath)
 
+def check_sass():
+    sourcemod = os.path.getmtime('asset/style.scss')
+    destmod = os.path.getmtime('html/style.css')
+    if sourcemod < destmod:
+        return
+
+    subprocess.call(['sass', 'asset/style.scss', 'html/style.css'])
+    print "{}✓{} style.css".format(GREEN, DEFAULT)
+
+
 if len(sys.argv) == 2 and sys.argv[1] == '--watch':
     while True:
         formatfiles(None, True)
+        check_sass()
         time.sleep(0.3)
 else:
     # can specify a file name filter to just regenerate a subset of the files
