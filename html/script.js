@@ -1,6 +1,10 @@
 $(document).ready(function() {
   $(window).resize(refreshAsides);
   refreshAsides();
+
+  $(".dismiss").show().click(function() {
+    $(".in-progress").hide();
+  });
 });
 
 function refreshAsides() {

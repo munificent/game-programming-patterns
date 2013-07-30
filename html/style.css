@@ -101,6 +101,30 @@ aside.sidebar {
   padding: 0;
   border-bottom: none; }
 
+.in-progress {
+  position: relative;
+  background: #fff7e5;
+  padding: 6px 18px;
+  font: normal 15px/24px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+  color: #8f6d3d;
+  border: solid 4px #f9e7c8;
+  margin-bottom: 24px; }
+  .in-progress .dismiss {
+    position: absolute;
+    right: 8px;
+    top: 0;
+    font: bold 24px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+    padding: 4px;
+    cursor: pointer;
+    display: none; }
+  .in-progress a {
+    color: #cc7700; }
+  .in-progress a:hover {
+    color: #994d00; }
+  .in-progress .signature {
+    text-align: right;
+    font: italic 13px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
+
 p.note {
   display: none;
   /*
@@ -208,4 +232,13 @@ a.outline:after {
     overflow: auto; }
 
   ul, ol {
-    padding: 0 0 0 15px; } }
+    padding: 0 0 0 15px; }
+
+  .in-progress {
+    padding: 4px 12px;
+    font: normal 13px/20px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+    margin-bottom: 18px; }
+    .in-progress p {
+      font: normal 13px/20px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
+    .in-progress .signature {
+      font: italic 12px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; } }

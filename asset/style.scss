@@ -33,7 +33,6 @@ body {
 // elements don't change after the fonts are loaded asynchronously. That way,
 // when we position the asides procedurally, they are in the right place.
 
-
 h1 {
   color: #000;
   font: bold 36px/44px $header;
@@ -151,6 +150,42 @@ aside.sidebar {
 
   padding: 0;
   border-bottom: none;
+}
+
+// In-progress banner.
+.in-progress {
+  position: relative;
+  background: hsl(40, 100%, 95%);
+  padding: 6px 18px;
+  font: normal 15px/24px $sans;
+  color: hsl(35, 40%, 40%);
+  border: solid 4px hsl(38, 80%, 88%);
+  margin-bottom: 24px;
+
+  .dismiss {
+    position: absolute;
+    right: 8px;
+    top: 0;
+    font: bold 24px $sans;
+    padding: 4px;
+    cursor: pointer;
+
+    // Hide it by default for users without JavaScript.
+    display: none;
+  }
+
+  a {
+    color: hsl(35, 100%, 40%);
+  }
+
+  a:hover {
+    color: hsl(30, 100%, 30%);
+  }
+
+  .signature {
+    text-align: right;
+    font: italic 13px $sans;
+  }
 }
 
 // Notes to myself.
@@ -277,5 +312,19 @@ a.outline:after {
 
   ul, ol {
     padding: 0 0 0 15px;
+  }
+
+  .in-progress {
+    padding: 4px 12px;
+    font: normal 13px/20px $sans;
+    margin-bottom: 18px;
+
+    p {
+      font: normal 13px/20px $sans;
+    }
+
+    .signature {
+      font: italic 12px $sans;
+    }
   }
 }
