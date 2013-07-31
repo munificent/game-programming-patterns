@@ -104,7 +104,7 @@ aside.sidebar {
 .in-progress {
   position: relative;
   background: #fff7e5;
-  padding: 6px 18px;
+  padding: 0 18px;
   font: normal 15px/24px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
   color: #8f6d3d;
   border: solid 4px #f9e7c8;
@@ -200,6 +200,80 @@ a.outline:after {
 
 .codehilite .cp {
   color: #594; }
+
+#mc_embed_signup table {
+  border-spacing: 0px; }
+
+#mc_embed_signup input {
+  border: 2px solid #f9e7c8;
+  -webkit-appearance: none; }
+
+#mc_embed_signup input:focus {
+  border-color: #ffd080; }
+
+#mc_embed_signup label {
+  white-space: nowrap; }
+
+#mc_embed_signup .button {
+  background-color: #f4af25;
+  border: 0 none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  height: 24px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: top;
+  width: 100%;
+  padding: 0 16px; }
+
+#mc_embed_signup .spacer {
+  width: 8px; }
+
+#mc_embed_signup .button:hover {
+  background-color: #e69900; }
+
+#mc_embed_signup .small-meta {
+  font-size: 11px; }
+
+#mc_embed_signup input.email {
+  padding: 5px 0;
+  text-indent: 5px;
+  width: 100%; }
+
+#mc_embed_signup div#mce-responses {
+  float: left;
+  top: -1.4em;
+  padding: 0em .5em 0em .5em;
+  overflow: hidden;
+  width: 90%;
+  margin: 0 5%;
+  clear: both; }
+
+#mc_embed_signup div.response {
+  margin: 1em 0;
+  padding: 1em .5em .5em 0;
+  font-weight: bold;
+  float: left;
+  top: -1.5em;
+  z-index: 1;
+  width: 80%; }
+
+#mc_embed_signup #mce-error-response {
+  display: none; }
+
+#mc_embed_signup #mce-success-response {
+  color: #529214;
+  display: none; }
+
+#mc_embed_signup label.error {
+  display: block;
+  float: none;
+  width: auto;
+  margin-left: 1.05em;
+  text-align: left;
+  padding: .5em 0; }
 
 @media only screen and (max-width: 479px) {
   h2 {
