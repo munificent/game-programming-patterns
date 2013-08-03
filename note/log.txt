@@ -1,3 +1,6 @@
+2013-08-02 - 1837 words revised, third draft
+2013-08-01 - 2118 words revised, third draft
+2013-07-31 - embed sign-up form in call to action box and style it
 2013-07-30 - call to action box, redo index, and make watch script watch css and template
 2013-07-29 - create mailchimp account, add google analytics
 2013-07-28 - 1041, finished second draft

@@ -4,7 +4,15 @@ $(document).ready(function() {
 
   $(".dismiss").show().click(function() {
     $(".in-progress").hide();
+    refreshAsides();
   });
+
+  // On the off chance the browser supports the new font loader API, use it.
+  if (document.fontloader) {
+    document.fontloader.notifyWhenFontsReady(function() {
+      refreshAsides();
+    });
+  }
 });
 
 function refreshAsides() {

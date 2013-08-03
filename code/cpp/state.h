@@ -505,10 +505,12 @@ namespace State
     class DuckingState : public HeroineState
     {
     public:
+      //^omit
       DuckingState()
       : chargeTime_(0)
       {}
 
+      //^omit
       void enter(Heroine& heroine)
       {
         chargeTime_ = 0;
