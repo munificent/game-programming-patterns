@@ -7,6 +7,12 @@ $(document).ready(function() {
     refreshAsides();
   });
 
+  // Since we may not have the height correct for the images, adjust the asides
+  // too when an image is loaded.
+  $('img').load(function() {
+    refreshAsides();
+  });
+
   // On the off chance the browser supports the new font loader API, use it.
   if (document.fontloader) {
     document.fontloader.notifyWhenFontsReady(function() {

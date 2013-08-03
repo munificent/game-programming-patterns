@@ -69,7 +69,7 @@ Complex branching and mutable state -- fields that change over time -- are two o
 
 In a fit of frustraction, you sweep everything off your desk except a pen and paper and start drawing a flowchart. You draw a box for each thing the heroine can be doing: standing, jumping, ducking, and diving. When she can respond to a button press in one of those states, you draw an arrow from that box, label it with that button, and connect it to the state she changes to.
 
-**TODO illustrate**
+<img src="images/state-flowchart.png"/>
 
 Congratulations, you've just created a *finite state machine*. These came out of a branch of computer science called *automata theory* whose family of data structures also include the famous Turing machine. FSMs are the simplest member of that family.
 
