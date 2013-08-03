@@ -343,7 +343,7 @@ This isn't the only way to implement the hierarchy, of course. If you aren't usi
 
 The current state is the one on the top of the stack, under that is its immediate superstate, and then *that* state's superstate and so on. When you dish out some state-specific behavior, you start at the top of the stack and walk down until one of the states handles it. (If none do, you just ignore it.)
 
-## Pushdown automata: Remembering where we left off
+## Pushdown Automata
 
 There's another common extension to finite state machines that also uses a stack of states. Confusingly, the stack represents something entirely different, and is used to solve a different problem.
 

@@ -638,7 +638,7 @@
 
 <p>This isn&#x2019;t the only way to implement the hierarchy, of course. If you aren&#x2019;t using the Gang of Four&#x2019;s state pattern, this won&#x2019;t work. Instead, you can model the current state&#x2019;s chain of superstates explicitly using a <em>stack</em> of states instead of a single state in the main class.</p>
 <p>The current state is the one on the top of the stack, under that is its immediate superstate, and then <em>that</em> state&#x2019;s superstate and so on. When you dish out some state-specific behavior, you start at the top of the stack and walk down until one of the states handles it. (If none do, you just ignore it.)</p>
-<h2><a href="#pushdown-automata-remembering-where-we-left-off" name="pushdown-automata-remembering-where-we-left-off">Pushdown automata: Remembering where we left off</a></h2>
+<h2><a href="#pushdown-automata" name="pushdown-automata">Pushdown Automata</a></h2>
 <p>There&#x2019;s another common extension to finite state machines that also uses a stack of states. Confusingly, the stack represents something entirely different, and is used to solve a different problem.</p>
 <p>The problem is that finite state machines have no concept of <em>history</em>. You know what state you <em>are</em> in, but have no memory of what state you <em>were</em> in. There&#x2019;s no easy way to go back to a previous state.</p>
 <p>Here&#x2019;s an example: Earlier, we let our fearless heroine arm herself to the teeth. When she fires her gun, we need a new state that plays the firing animation and spawns the bullet and any visual effects. So we slap together a <code>FiringState</code> and make <span name="shared">all of the states</span> that she can fire from transition into that when the fire button is pressed.</p>
