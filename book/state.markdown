@@ -203,7 +203,7 @@ In that case, you can just make a single *static* instance. Even if you have a b
 
 <aside name="flyweight">
 
-This is the <a href="http://en.wikipedia.org/wiki/Flyweight_pattern" class="gof-pattern">Flyweight Pattern</a>.
+This is the <a href="flyweight.html" class="gof-pattern">Flyweight Pattern</a>.
 
 </aside>
 

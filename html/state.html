@@ -439,7 +439,7 @@
 <p>In that case, you can just make a single <em>static</em> instance. Even if you have a bunch of FSMs all going at the same time in that same state, they can all point to the <span name="flyweight">same instance</span> since it has nothing machine-specific about it.</p>
 <aside name="flyweight">
 
-<p>This is the <a href="http://en.wikipedia.org/wiki/Flyweight_pattern" class="gof-pattern">Flyweight Pattern</a>.</p>
+<p>This is the <a href="flyweight.html" class="gof-pattern">Flyweight Pattern</a>.</p>
 </aside>
 
 <p><em>Where</em> you put that static instance is up to you. Find a place that makes sense. For no particular reason, let&#x2019;s put ours inside the base state class:</p>
