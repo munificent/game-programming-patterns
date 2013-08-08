@@ -86,7 +86,7 @@ nice features too:
 
 *   **It doesn't create the instance if no one uses it.** Saving
     memory and CPU cycles is always good. Since the Singleton is
-    initialized only when it's first accessed, if it won't be
+    initialized only when it's first accessed, it won't be
     instantiated at all if the game never asks for it.
 
 *   **It's initialized at runtime.** A common alternative to Singleton
