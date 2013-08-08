@@ -67,7 +67,7 @@ Complex branching and mutable state -- fields that change over time -- are two o
 
 ## Finite State Machines to the Rescue
 
-In a fit of frustraction, you sweep everything off your desk except a pen and paper and start drawing a flowchart. You draw a box for each thing the heroine can be doing: standing, jumping, ducking, and diving. When she can respond to a button press in one of those states, you draw an arrow from that box, label it with that button, and connect it to the state she changes to.
+In a fit of frustration, you sweep everything off your desk except a pen and paper and start drawing a flowchart. You draw a box for each thing the heroine can be doing: standing, jumping, ducking, and diving. When she can respond to a button press in one of those states, you draw an arrow from that box, label it with that button, and connect it to the state she changes to.
 
 <img src="images/state-flowchart.png"/>
 
