@@ -788,38 +788,29 @@ object-relative <em>offsets</em>. Like so:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Actor</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="k">static</span> <span class="kt">void</span> <span class="n">init</span><span class="p">()</span>
-  <span class="p">{</span>
-    <span class="n">current_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">next_</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="k">static</span> <span class="kt">void</span> <span class="n">swap</span><span class="p">()</span>
-  <span class="p">{</span>
-    <span class="c1">// swap the offsets</span>
-    <span class="kt">int</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">current_</span><span class="p">;</span>
-    <span class="n">current_</span> <span class="o">=</span> <span class="n">next_</span><span class="p">;</span>
-    <span class="n">next_</span> <span class="o">=</span> <span class="n">temp</span><span class="p">;</span>
-  <span class="p">}</span>
+  <span class="k">static</span> <span class="kt">void</span> <span class="n">init</span><span class="p">()</span> <span class="p">{</span> <span class="n">current_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+  <span class="k">static</span> <span class="kt">void</span> <span class="n">swap</span><span class="p">()</span> <span class="p">{</span> <span class="n">current_</span> <span class="o">=</span> <span class="n">next</span><span class="p">();</span> <span class="p">}</span>
 
 <span class="nl">protected:</span>
-  <span class="kt">void</span> <span class="n">slap</span><span class="p">()</span>       <span class="p">{</span> <span class="n">slapped_</span><span class="p">[</span><span class="n">next_</span><span class="p">]</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
-  <span class="kt">bool</span> <span class="n">wasSlapped</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">slapped_</span><span class="p">[</span><span class="n">current_</span><span class="p">];</span> <span class="p">}</span>
+  <span class="kt">void</span> <span class="n">slap</span><span class="p">()</span>        <span class="p">{</span> <span class="n">slapped_</span><span class="p">[</span><span class="n">next</span><span class="p">()]</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kt">bool</span> <span class="n">wasSlapped</span><span class="p">()</span>  <span class="p">{</span> <span class="k">return</span> <span class="n">slapped_</span><span class="p">[</span><span class="n">current_</span><span class="p">];</span> <span class="p">}</span>
 
 <span class="nl">private:</span>
   <span class="k">static</span> <span class="kt">int</span> <span class="n">current_</span><span class="p">;</span>
-  <span class="k">static</span> <span class="kt">int</span> <span class="n">next_</span><span class="p">;</span>
+  <span class="k">static</span> <span class="kt">int</span> <span class="nf">next</span><span class="p">()</span>  <span class="p">{</span> <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">current_</span><span class="p">;</span> <span class="p">}</span>
 
   <span class="kt">bool</span> <span class="n">slapped_</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
 <span class="p">};</span>
 </pre></div>
 
 
-<p>Actor&#x2019;s access their slap state by using <code>current_</code> and
-<code>next_</code> as indices into the state array. Swapping the state
-just swaps those indices. The clever bit is that <code>swap()</code> is
-now a <em>static</em> function: it only needs to be called once, and
-<em>every</em> actor&#x2019;s state will be swapped.</p>
+<p>Actors access their current slap state by using <code>current_</code> to
+index into the state array. The next state is always the other
+index in the array, so we can calculate that with <code>next()</code>.
+Swapping the state just alternates the <code>current_</code> index.
+The clever bit is that <code>swap()</code> is now a <em>static</em> function:
+it only needs to be called once, and <em>every</em> actor&#x2019;s state
+will be swapped.</p>
 </li>
 </ul>
 </li>

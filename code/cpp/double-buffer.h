@@ -362,27 +362,16 @@ namespace SwapOffset
   class Actor
   {
   public:
-    static void init()
-    {
-      current_ = 0;
-      next_    = 1;
-    }
-
-    static void swap()
-    {
-      // swap the offsets
-      int temp = current_;
-      current_ = next_;
-      next_ = temp;
-    }
+    static void init() { current_ = 0; }
+    static void swap() { current_ = next(); }
 
   protected:
-    void slap()       { slapped_[next_] = true; }
-    bool wasSlapped() { return slapped_[current_]; }
+    void slap()        { slapped_[next()] = true; }
+    bool wasSlapped()  { return slapped_[current_]; }
 
   private:
     static int current_;
-    static int next_;
+    static int next()  { return 1 - current_; }
 
     bool slapped_[2];
   };

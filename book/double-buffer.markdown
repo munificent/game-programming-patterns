@@ -591,11 +591,13 @@ that they all reference into by their index.
 
         ^code 13
 
-        Actor's access their slap state by using `current_` and
-        `next_` as indices into the state array. Swapping the state
-        just swaps those indices. The clever bit is that `swap()` is
-        now a *static* function: it only needs to be called once, and
-        *every* actor's state will be swapped.
+        Actors access their current slap state by using `current_` to
+        index into the state array. The next state is always the other
+        index in the array, so we can calculate that with `next()`.
+        Swapping the state just alternates the `current_` index.
+        The clever bit is that `swap()` is now a *static* function:
+        it only needs to be called once, and *every* actor's state
+        will be swapped.
 
 ## See Also
 
