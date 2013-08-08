@@ -295,7 +295,7 @@ point of updating. Look at the third render time. It's right between two updates
 
 Imagine a bullet is flying across the screen. On the first update, it's on the left side. The second update moves it to the right side. The game is rendered at a point in time right between those two updates, so the user expects to see that bullet in the center of the screen. With our current implementation, it will still just be on the left side. This means motion looks jagged or stuttery.
 
-Conveniently, we actually know *exactly* how far between update frames we are when we render: it's stored in `lag`. We bail out of the update loop when it's less than the update time step, but not when it's *zero*. That leftover amount? That's how far into the next frame we are.
+Conveniently, we actually know *exactly* how far between update frames we are when we render: it's stored in `lag`. We bail out of the update loop when it's less than the update time step, not when it's *zero*. That leftover amount? That's how far into the next frame we are.
 
 When we go to render, we'll pass that in:
 

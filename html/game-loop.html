@@ -343,7 +343,7 @@ point of updating. Look at the third render time. It&#x2019;s right between two 
 
 
 <p>Imagine a bullet is flying across the screen. On the first update, it&#x2019;s on the left side. The second update moves it to the right side. The game is rendered at a point in time right between those two updates, so the user expects to see that bullet in the center of the screen. With our current implementation, it will still just be on the left side. This means motion looks jagged or stuttery.</p>
-<p>Conveniently, we actually know <em>exactly</em> how far between update frames we are when we render: it&#x2019;s stored in <code>lag</code>. We bail out of the update loop when it&#x2019;s less than the update time step, but not when it&#x2019;s <em>zero</em>. That leftover amount? That&#x2019;s how far into the next frame we are.</p>
+<p>Conveniently, we actually know <em>exactly</em> how far between update frames we are when we render: it&#x2019;s stored in <code>lag</code>. We bail out of the update loop when it&#x2019;s less than the update time step, not when it&#x2019;s <em>zero</em>. That leftover amount? That&#x2019;s how far into the next frame we are.</p>
 <p>When we go to render, we&#x2019;ll pass that in:</p>
 <p><span name="normal"></span></p>
 <div class="codehilite"><pre><span class="n">render</span><span class="p">(</span><span class="n">lag</span> <span class="o">/</span> <span class="n">MS_PER_UPDATE</span><span class="p">);</span>
