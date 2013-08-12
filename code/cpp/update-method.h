@@ -15,7 +15,7 @@ namespace UpdateMethod
   {
     struct Entity
     {
-      void setPosition(int x, int y) {}
+      int x;
       void shootLightning() {}
     };
 
@@ -31,13 +31,13 @@ namespace UpdateMethod
         // Patrol right.
         for (int x = 0; x < 100; x++)
         {
-          skeleton.setPosition(x, 20);
+          skeleton.x = x;
         }
 
         // Patrol left.
         for (int x = 100; x < 0; x--)
         {
-          skeleton.setPosition(x, 20);
+          skeleton.x = x;
         }
       }
       //^just-patrol
@@ -64,7 +64,7 @@ namespace UpdateMethod
           if (x == 100) patrollingLeft = true;
         }
 
-        skeleton.setPosition(x, 20);
+        skeleton.x = x;
 
         // Handle user input and render game...
       }
@@ -101,6 +101,176 @@ namespace UpdateMethod
       }
       //^statues
     }
+  }
+  
+  namespace KeepInMind
+  {
+    struct Entity
+    {
+      void setPosition(int x, int y) {}
+      void shootLightning() {}
+      void update() {}
+    };
+
+#define MAX_ENTITIES 10
+    
+    void refreshGame() {}
+
+    void skipAdded()
+    {
+      int numEntities = 0;
+      Entity* entities[MAX_ENTITIES];
+      //^skip-added
+      int numEntitiesThisTurn = numEntities;
+      for (int i = 0; i < numEntitiesThisTurn; i++)
+      {
+        entities[i]->update();
+      }
+      //^skip-added
+    }
+
+    void skipRemoved()
+    {
+      int numEntities = 0;
+      Entity* entities[MAX_ENTITIES];
+
+      //^skip-removed
+      for (int i = 0; i < numEntities; i++)
+      {
+        entities[i]->update();
+      }
+      //^skip-removed
+    }
+  }
+
+  namespace SampleCode
+  {
+    //^entity-class
+    class Entity
+    {
+    public:
+      Entity()
+      : x(0), y(0)
+      {}
+      
+      virtual void update() = 0;
+
+    protected:
+      double x;
+      double y;
+    };
+    //^entity-class
+
+    //^game-world
+    class World
+    {
+    public:
+      World()
+      : numEntities_(0)
+      {}
+
+      void gameLoop();
+      
+    private:
+      Entity* entities_[MAX_ENTITIES];
+      int numEntities_;
+    };
+    //^game-world
+
+    //^game-loop
+    void World::gameLoop()
+    {
+      while (true)
+      {
+        // Update each entity.
+        //^update-component-entities
+        for (int i = 0; i < numEntities_; i++)
+        {
+          entities_[i]->update();
+        }
+        //^update-component-entities
+
+        // Physics and rendering...
+      }
+    }
+    //^game-loop
+
+    //^skeleton
+    class Skeleton : public Entity
+    {
+    public:
+      Skeleton()
+      : patrollingLeft_(false)
+      {}
+      
+      void update()
+      {
+        if (patrollingLeft_)
+        {
+          x--;
+          if (x == 0) patrollingLeft_ = false;
+        }
+        else
+        {
+          x++;
+          if (x == 100) patrollingLeft_ = true;
+        }
+      }
+
+    private:
+      bool patrollingLeft_;
+    };
+    //^skeleton
+
+    //^statue
+    class Statue : public Entity
+    {
+    public:
+      Statue(int delay)
+      : frames_(0),
+        delay_(delay)
+      {}
+
+      void update()
+      {
+        if (frames_-- == 0)
+        {
+          // Reset the timer.
+          frames_ = delay_;
+          shootLightning();
+        }
+      }
+
+    private:
+      int frames_;
+      int delay_;
+      
+      void shootLightning()
+      {
+        // Shoot the lightning...
+      }
+    };
+    //^statue
+  }
+  
+  namespace ForwardToDelegate
+  {
+    class Entity;
+
+    class Entity
+    {
+    public:
+      Entity* state_;
+      void update();
+    };
+
+    //^forward
+    void Entity::update()
+    {
+      // Forward to state object.
+      state_->update();
+    }
+    //^forward
   }
 }
 
