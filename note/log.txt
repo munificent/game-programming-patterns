@@ -1,3 +1,11 @@
+2013-08-10 - finish first draft of update method
+2013-08-09 - 751 words on update method
+2013-08-08 - fix #1, #2, #3. merge #6, 533 words on update method
+2013-08-07 - 812 words, first draft update method
+2013-08-06 - 895 words, first draft update method
+2013-08-05 - 651 words outline update method
+2013-08-04 - 1043 words outline update method
+2013-08-03 - illustration for state, put online, mail list, reddit, etc.
 2013-08-02 - 1837 words revised, third draft
 2013-08-01 - 2118 words revised, third draft
 2013-07-31 - embed sign-up form in call to action box and style it
