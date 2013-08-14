@@ -137,15 +137,20 @@ pre.diagram {
   color: #080;
   font: normal 12px/12px "Source Code Pro", Menlo, Consolas, Monaco, monospace; }
 
-a.pattern,
-a.gof-pattern {
+a:hover {
   border-bottom: solid 1px #acf; }
+
+a.pattern:after,
+a.gof-pattern:after {
+  font: 9px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+  color: #99b2e5;
+  vertical-align: super; }
 
 a.pattern:after {
   content: "\00A0\2192"; }
 
 a.gof-pattern:after {
-  content: "\00A0(GoF)"; }
+  content: "\00A0GoF"; }
 
 p.footer {
   text-align: center;

@@ -207,11 +207,17 @@ pre.diagram {
 // Pattern links.
 a.pattern,
 a.gof-pattern {
+}
+
+a:hover {
   border-bottom: solid 1px #acf;
 }
 
 a.pattern:after,
 a.gof-pattern:after {
+  font: 9px $sans;
+  color: mix($primary, #fff, 50%);
+  vertical-align: super;
 }
 
 a.pattern:after {
@@ -219,7 +225,7 @@ a.pattern:after {
 }
 
 a.gof-pattern:after {
-  content: "\00A0(GoF)";
+  content: "\00A0GoF";
 }
 
 // Footer.
