@@ -19,6 +19,11 @@ $(document).ready(function() {
       refreshAsides();
     });
   }
+
+  // Lame. Just do another refresh after a second when the font is *probably*
+  // loaded to hack around the fact that the metrics changed a bit and the
+  // help box has gotten a line taller.
+  window.setTimeout(refreshAsides, 200);
 });
 
 function refreshAsides() {
