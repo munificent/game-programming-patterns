@@ -284,9 +284,7 @@ else:
     formatfiles(file_filter, False)
 
     average_word_count = total_words / (num_chapters - empty_chapters)
-    estimated_word_count = total_words + (
-        (num_chapters - empty_chapters) * average_word_count)
-
+    estimated_word_count = total_words + (empty_chapters * average_word_count)
     percent_finished = total_words * 100 / estimated_word_count
 
     print "{}/~{} words ({}%)".format(
