@@ -1,3 +1,6 @@
+2013-08-13 - 1511 words, finish 2nd draft of update method
+2013-08-12 - 1090 words, 2nd draft of update method
+2013-08-11 - 952 words, 2nd draft of update method
 2013-08-10 - finish first draft of update method
 2013-08-09 - 751 words on update method
 2013-08-08 - fix #1, #2, #3. merge #6, 533 words on update method

@@ -118,26 +118,26 @@ namespace UpdateMethod
 
     void skipAdded()
     {
-      int numEntities = 0;
-      Entity* entities[MAX_ENTITIES];
+      int numObjects = 0;
+      Entity* objects[MAX_ENTITIES];
       //^skip-added
-      int numEntitiesThisTurn = numEntities;
-      for (int i = 0; i < numEntitiesThisTurn; i++)
+      int numObjectsThisTurn = numObjects;
+      for (int i = 0; i < numObjectsThisTurn; i++)
       {
-        entities[i]->update();
+        objects[i]->update();
       }
       //^skip-added
     }
 
     void skipRemoved()
     {
-      int numEntities = 0;
-      Entity* entities[MAX_ENTITIES];
+      int numObjects = 0;
+      Entity* objects[MAX_ENTITIES];
 
       //^skip-removed
-      for (int i = 0; i < numEntities; i++)
+      for (int i = 0; i < numObjects; i++)
       {
-        entities[i]->update();
+        objects[i]->update();
       }
       //^skip-removed
     }
@@ -182,6 +182,8 @@ namespace UpdateMethod
     {
       while (true)
       {
+        // Handle user input...
+        
         // Update each entity.
         //^update-component-entities
         for (int i = 0; i < numEntities_; i++)
