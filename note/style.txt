@@ -1,13 +1,13 @@
 ## Prose
 
 - ## Headers are Title Caps
-- ### And smaller are Sentence caps
-- Use "Naïve" instead of "Naive"
-- Use smart quotes
-- No spaces around &mdash;
-- Prefer present tense instead of future
-- Prefer "we" over "you" or "I"
-- Use *O(n&sup2;)* for Big-O notation, not `O(n^2)`
+- ### And smaller are sentence caps
+- Use "Naïve" instead of "Naive".
+- Use smart quotes.
+- No spaces around &mdash;.
+- Prefer present tense instead of future.
+- Prefer "we" over "you" or "I".
+- Use *O(n&sup2;)* for Big-O notation, not `O(n^2)`.
 - Put class name in `CodeFont` when referring to the class itself.
   Ex: "Add a method to `Foo`."
 - Use normal font and lowercase when referring to objects of the class.
@@ -25,4 +25,4 @@
 ## Code
 
 - Indent cases?
--
+- No "I" for interfaces.

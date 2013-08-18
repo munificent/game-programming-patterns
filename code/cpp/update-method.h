@@ -35,7 +35,7 @@ namespace UpdateMethod
         }
 
         // Patrol left.
-        for (int x = 100; x < 0; x--)
+        for (int x = 100; x > 0; x--)
         {
           skeleton.x = x;
         }
@@ -237,9 +237,10 @@ namespace UpdateMethod
       {
         if (frames_-- == 0)
         {
+          shootLightning();
+          
           // Reset the timer.
           frames_ = delay_;
-          shootLightning();
         }
       }
 
