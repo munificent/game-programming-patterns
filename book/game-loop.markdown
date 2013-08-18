@@ -168,7 +168,11 @@ The problem with it is you have no control over how fast the game runs. On a fas
 
 ### Take a little nap
 
-The first variation we'll look at adds a simple fix. Say you want your game to run at 60 FPS. That gives you about <span name="16">16</span> milliseconds per frame. As long as you can reliably do all of your game processing and rendering in less than that time, you can run at a steady frame rate. All you do process the frame and then *wait* until it's time for the next one. It looks a bit like this:
+The first variation we'll look at adds a simple fix. Say you want your game to run at 60 FPS. That gives you about <span name="16">16</span> milliseconds per frame. As long as you can reliably do all of your game processing and rendering in less than that time, you can run at a steady frame rate. All you do process the frame and then *wait* until it's time for the next one, like so:
+
+<img src="images/game-loop-simple.png"/>
+
+The code looks a bit like this:
 
 <aside name="16">
 
@@ -254,7 +258,9 @@ It goes like this: A certain amount of real time has elapsed since the last turn
 
 ^code 6
 
-There's a few pieces here. At the beginning of each frame, we update `lag` based on how much real time passed. This measures how far the game's clock is behind compared to the real world. We then have an inner loop to update the game one fixed step at a time until it's caught up. Once we're caught up, we render and start over again.
+There's a few pieces here. At the beginning of each frame, we update `lag` based on how much real time passed. This measures how far the game's clock is behind compared to the real world. We then have an inner loop to update the game one fixed step at a time until it's caught up. Once we're caught up, we render and start over again. You can visualize it sort of like this:
+
+<img src="images/game-loop-fixed.png"/>
 
 Note that the time step here isn't the *visible* frame rate any more. `MS_PER_UPDATE` is just the *granularity* we use to update the game. The shorter this step is, the more processing time it takes to catch up to real time. The longer it is, the choppier the gameplay is. Ideally, you want it pretty short, often faster than 60 FPS, so that the game simulates with high fidelity on fast machines.
 
@@ -287,11 +293,11 @@ whenever we can. It's less frequent than updating, and isn't steady either.
 Both of those are OK. The lame part is that we don't always render right at the
 point of updating. Look at the third render time. It's right between two updates:
 
-       update   update
-          |        |
-    ...----------------
-               |
-             render
+        update   update
+           |        |
+    - - ----------------
+                |
+              render
 
 Imagine a bullet is flying across the screen. On the first update, it's on the left side. The second update moves it to the right side. The game is rendered at a point in time right between those two updates, so the user expects to see that bullet in the center of the screen. With our current implementation, it will still just be on the left side. This means motion looks jagged or stuttery.
 

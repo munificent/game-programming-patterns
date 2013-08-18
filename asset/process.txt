@@ -1,0 +1,7 @@
+1. Desaturate.
+2. Adjust the bottom end of the levels a bit to get the darkest to just be black (but no other grays).
+3. Unsharp mask 90% 3.5 px 7 threshold
+4. Now adjust the levels again to make the pen lines mostly solid black. Bring up the mids a bit so the grid lines aren't too dark.
+5. Rotate about 1° CCW.
+6. Add the yellow overlay.
+7. Scale and crop.

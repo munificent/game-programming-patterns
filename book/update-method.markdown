@@ -161,15 +161,13 @@ A hairier problem is when objects are *removed* while iterating. You vanquish so
 
 ^code skip-removed
 
-This simple loop increments the index of the object being updated each iteration. But imagine the object array looks like:
+This simple loop increments the index of the object being updated each iteration. The left side of the illustration below shows what the array looks like while we're updating the heroine:
 
-    0. Foul Beast
-    1. Hero
-    2. Hapless Peasant
+<img src="images/update-method-remove.png"/>
 
-We're updating the hero, so `i` is 1. He slays the foul beast so it gets removed from the array. The hero shifts up to 0, and the hapless peasant shifts up to index 1. After updating the hero, `i` is incremented to 2, skipping right over the peasant.
+Since we're updating her, `i` is 1. She slays the foul beast so it gets removed from the array. The heroine shifts up to 0, and the hapless peasant shifts up to 1. After updating the heroine, `i` is incremented to 2. As you can see on the right, the hapless peasant is skipped over and never gets updated.
 
-One option is to just be careful when you remove objects and update any iteration variables to take the removal into account. Another is to <span name="defer">defer</span> removals until you're done walking the list. Mark the object as "dead" but leave it in place. During updating, make sure to skip any dead objects. Then, when that's done, walk the list again to remove the corpses.
+One fix is to just be careful when you remove objects and update any iteration variables to take the removal into account. Another is to <span name="defer">defer</span> removals until you're done walking the list. Mark the object as "dead" but leave it in place. During updating, make sure to skip any dead objects. Then, when that's done, walk the list again to remove the corpses.
 
 <aside name="defer">
 
@@ -250,6 +248,15 @@ Let's do this again with the statue:
 ^code statue
 
 Again, most of the change is just moving code out of the game loop and into the class and renaming some stuff. In this case, though, we've actually made the codebase simpler. In the original nasty imperative code, there were separate local variables for each statue's frame counter and rate of fire.
+
+<span name="uml"></span>
+<img src="images/update-method-uml.png"/>
+
+<aside name="uml">
+
+Do people still care about UML? If so, here's what we just created.
+
+</aside>
 
 Now that those have been moved into the `Statue` class itself, you can create as many as you want and each instance will have its own little timer. That's really the motivation behind this pattern: it's now much easier to add new entities to the game world because each one brings along everything it needs to take care of itself.
 

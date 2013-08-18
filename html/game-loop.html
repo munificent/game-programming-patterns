@@ -200,7 +200,9 @@ electrical don&#x2019;t take us seriously.</p>
 
 <p>The problem with it is you have no control over how fast the game runs. On a fast machine, that loop will spin so fast users won&#x2019;t be able to see what&#x2019;s going on. On a slow machine, the game will crawl. If you have a part of the game that&#x2019;s content-heavy or does more AI or physics, the game will actually play slower there.</p>
 <h3><a href="#take-a-little-nap" name="take-a-little-nap">Take a little nap</a></h3>
-<p>The first variation we&#x2019;ll look at adds a simple fix. Say you want your game to run at 60 FPS. That gives you about <span name="16">16</span> milliseconds per frame. As long as you can reliably do all of your game processing and rendering in less than that time, you can run at a steady frame rate. All you do process the frame and then <em>wait</em> until it&#x2019;s time for the next one. It looks a bit like this:</p>
+<p>The first variation we&#x2019;ll look at adds a simple fix. Say you want your game to run at 60 FPS. That gives you about <span name="16">16</span> milliseconds per frame. As long as you can reliably do all of your game processing and rendering in less than that time, you can run at a steady frame rate. All you do process the frame and then <em>wait</em> until it&#x2019;s time for the next one, like so:</p>
+<p><img src="images/game-loop-simple.png"/></p>
+<p>The code looks a bit like this:</p>
 <aside name="16">
 
 <p><code>1000 ms / FPS = ms per frame</code></p>
@@ -309,7 +311,8 @@ A graphic here would help.
 </pre></div>
 
 
-<p>There&#x2019;s a few pieces here. At the beginning of each frame, we update <code>lag</code> based on how much real time passed. This measures how far the game&#x2019;s clock is behind compared to the real world. We then have an inner loop to update the game one fixed step at a time until it&#x2019;s caught up. Once we&#x2019;re caught up, we render and start over again.</p>
+<p>There&#x2019;s a few pieces here. At the beginning of each frame, we update <code>lag</code> based on how much real time passed. This measures how far the game&#x2019;s clock is behind compared to the real world. We then have an inner loop to update the game one fixed step at a time until it&#x2019;s caught up. Once we&#x2019;re caught up, we render and start over again. You can visualize it sort of like this:</p>
+<p><img src="images/game-loop-fixed.png"/></p>
 <p>Note that the time step here isn&#x2019;t the <em>visible</em> frame rate any more. <code>MS_PER_UPDATE</code> is just the <em>granularity</em> we use to update the game. The shorter this step is, the more processing time it takes to catch up to real time. The longer it is, the choppier the gameplay is. Ideally, you want it pretty short, often faster than 60 FPS, so that the game simulates with high fidelity on fast machines.</p>
 <p>But be careful not to make it <em>too</em> short. You need to make sure the time step is greater than the time it takes to process an <code>update()</code>, even on the
 <span name="bail">slowest</span> hardware. Otherwise, your game simply can&#x2019;t catch up.</p>
@@ -334,11 +337,11 @@ A graphic here would help.
 whenever we can. It&#x2019;s less frequent than updating, and isn&#x2019;t steady either.
 Both of those are OK. The lame part is that we don&#x2019;t always render right at the
 point of updating. Look at the third render time. It&#x2019;s right between two updates:</p>
-<div class="codehilite"><pre>   <span class="n">update</span>   <span class="n">update</span>
-      <span class="o">|</span>        <span class="o">|</span>
-<span class="o">&amp;</span><span class="n">hellip</span><span class="p">;</span><span class="o">----------------</span>
-           <span class="o">|</span>
-         <span class="n">render</span>
+<div class="codehilite"><pre>    <span class="n">update</span>   <span class="n">update</span>
+       <span class="o">|</span>        <span class="o">|</span>
+<span class="o">-</span> <span class="o">-</span> <span class="o">----------------</span>
+            <span class="o">|</span>
+          <span class="n">render</span>
 </pre></div>
 
 
