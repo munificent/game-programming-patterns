@@ -265,7 +265,7 @@ render something by making a bunch of `draw()` calls on its buffer:
 
 Specifically, it draws this artistic masterpiece:
 
-<img src="images/double-buffer-canvas.gif" />
+<img src="images/double-buffer-face.png" width="240" />
 
 </aside>
 
