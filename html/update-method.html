@@ -64,7 +64,7 @@
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Simulate a collection of independent objects by telling each to process one frame of behavior at a time.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>The player&#x2019;s mighty valkyrie is on a quest to steal glorious jewels from where they rest on the bones of the long-dead sorceror-king. She tentatively approaches the entrance of his magnificent crypt and is attacked by&hellip; <em>nothing</em>. No cursed statues shooting lightning at him. No undead warriors patrolling the entrance. She just walks right in grabs the loot. <span name="win">Game over.</span> You win.</p>
+<p>The player&#x2019;s mighty valkyrie is on a quest to steal glorious jewels from where they rest on the bones of the long-dead sorceror-king. She tentatively approaches the entrance of his magnificent crypt and is attacked by&hellip; <em>nothing</em>. No cursed statues shooting lightning at her. No undead warriors patrolling the entrance. She just walks right in grabs the loot. <span name="win">Game over.</span> You win.</p>
 <p>Well, that won&#x2019;t do.</p>
 <aside name="win">
 
@@ -165,7 +165,7 @@
 </aside>
 
 <p>The pattern we&#x2019;ll use to fix this is so simple you probably have it in mind already: <em>Each entity in the game should encapsulate its own behavior.</em> This will keep the game loop uncluttered and make it easy to add and remove entities.</p>
-<p>To do this, we need is an <em>abstraction layer</em>, and we create that by defining an abstract <code>update()</code> method. The game loop maintains a collection of objects, but it doesn&#x2019;t know their concrete types. All it knows is that they have an <code>update()</code> method. This separates each object&#x2019;s behavior both from the game loop and from the other objects.</p>
+<p>To do this, we need an <em>abstraction layer</em>, and we create that by defining an abstract <code>update()</code> method. The game loop maintains a collection of objects, but it doesn&#x2019;t know their concrete types. All it knows is that they have an <code>update()</code> method. This separates each object&#x2019;s behavior both from the game loop and from the other objects.</p>
 <p>Each frame, the game loop walks the collection and calls <code>update()</code> on each object. This gives each one a chance to perform one frame&#x2019;s worth of behavior. By calling it on all objects every frame, they all behave <span name="simultaneously">simultaneously</span>.</p>
 <aside name="simultaneously">
 
@@ -204,7 +204,7 @@
 
 <h3><a href="#you-have-to-store-state-to-resume-where-you-left-off-each-frame" name="you-have-to-store-state-to-resume-where-you-left-off-each-frame">You have to store state to resume where you left off each frame</a></h3>
 <p>In the first code sample, we didn&#x2019;t have any variables to indicate whether the guard was moving left or right. That was implicit based on which code was currently executing.</p>
-<p>When we changed this to a one-frame-at-a-time form, we had to create a <code>movingLeft</code> variable to track that. When we return out of the code, the execution position is lost so we need to explicitly store enough information to restore it on the next frame.</p>
+<p>When we changed this to a one-frame-at-a-time form, we had to create a <code>patrollingLeft</code> variable to track that. When we return out of the code, the execution position is lost so we need to explicitly store enough information to restore it on the next frame.</p>
 <p>The <a href="state.html" class="pattern">State pattern</a> can often help here. Part of the reason state machines are common in games is because (like their name implies) they store the kind of state that you need to pick up where you left off.</p>
 <h3><a href="#objects-all-simulate-each-frame-but-are-not-truly-concurrent" name="objects-all-simulate-each-frame-but-are-not-truly-concurrent">Objects all simulate each frame but are not truly concurrent</a></h3>
 <p>In this pattern, the game loops over a collection of objects and updates each one. Within an object&#x2019;s <code>update()</code> call, we can see the rest of the game world, including other objects that are being updated. This means that the <em>order</em> that the objects are updated is significant.</p>

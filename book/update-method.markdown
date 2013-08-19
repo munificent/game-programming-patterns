@@ -7,7 +7,7 @@
 
 ## Motivation
 
-The player's mighty valkyrie is on a quest to steal glorious jewels from where they rest on the bones of the long-dead sorceror-king. She tentatively approaches the entrance of his magnificent crypt and is attacked by... *nothing*. No cursed statues shooting lightning at him. No undead warriors patrolling the entrance. She just walks right in grabs the loot. <span name="win">Game over.</span> You win.
+The player's mighty valkyrie is on a quest to steal glorious jewels from where they rest on the bones of the long-dead sorceror-king. She tentatively approaches the entrance of his magnificent crypt and is attacked by... *nothing*. No cursed statues shooting lightning at her. No undead warriors patrolling the entrance. She just walks right in grabs the loot. <span name="win">Game over.</span> You win.
 
 Well, that won't do.
 
@@ -59,7 +59,7 @@ Anytime "mushed" accurately describes your development process, you likely have 
 
 The pattern we'll use to fix this is so simple you probably have it in mind already: *Each entity in the game should encapsulate its own behavior.* This will keep the game loop uncluttered and make it easy to add and remove entities.
 
-To do this, we need is an *abstraction layer*, and we create that by defining an abstract `update()` method. The game loop maintains a collection of objects, but it doesn't know their concrete types. All it knows is that they have an `update()` method. This separates each object's behavior both from the game loop and from the other objects.
+To do this, we need an *abstraction layer*, and we create that by defining an abstract `update()` method. The game loop maintains a collection of objects, but it doesn't know their concrete types. All it knows is that they have an `update()` method. This separates each object's behavior both from the game loop and from the other objects.
 
 Each frame, the game loop walks the collection and calls `update()` on each object. This gives each one a chance to perform one frame's worth of behavior. By calling it on all objects every frame, they all behave <span name="simultaneously">simultaneously</span>.
 
@@ -119,7 +119,7 @@ The <a href="virtual-machine.html" class="pattern">Virtual Machine pattern</a> i
 
 In the first code sample, we didn't have any variables to indicate whether the guard was moving left or right. That was implicit based on which code was currently executing.
 
-When we changed this to a one-frame-at-a-time form, we had to create a `movingLeft` variable to track that. When we return out of the code, the execution position is lost so we need to explicitly store enough information to restore it on the next frame.
+When we changed this to a one-frame-at-a-time form, we had to create a `patrollingLeft` variable to track that. When we return out of the code, the execution position is lost so we need to explicitly store enough information to restore it on the next frame.
 
 The <a href="state.html" class="pattern">State pattern</a> can often help here. Part of the reason state machines are common in games is because (like their name implies) they store the kind of state that you need to pick up where you left off.
 
