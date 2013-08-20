@@ -97,7 +97,7 @@ Update methods work well when:
 
 This pattern is pretty simple so there aren't a lot of hidden surprises in its dark corners. Still, every line of code has its ramifications.
 
-### Splitting behavior into one frame slices makes code more complex
+### Splitting code into single frame slices makes it more complex
 
 When you compare the first two chunks of code, the second is a good bit more complex. Both simply make the skeleton guard walk back and forth, but the second one does this while yielding control to the game loop each frame.
 

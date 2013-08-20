@@ -191,7 +191,7 @@
 </ul>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <p>This pattern is pretty simple so there aren&#x2019;t a lot of hidden surprises in its dark corners. Still, every line of code has its ramifications.</p>
-<h3><a href="#splitting-behavior-into-one-frame-slices-makes-code-more-complex" name="splitting-behavior-into-one-frame-slices-makes-code-more-complex">Splitting behavior into one frame slices makes code more complex</a></h3>
+<h3><a href="#splitting-code-into-single-frame-slices-makes-it-more-complex" name="splitting-code-into-single-frame-slices-makes-it-more-complex">Splitting code into single frame slices makes it more complex</a></h3>
 <p>When you compare the first two chunks of code, the second is a good bit more complex. Both simply make the skeleton guard walk back and forth, but the second one does this while yielding control to the game loop each frame.</p>
 <p>That change is <span name="coroutine">almost</span> always necessary to handle user input, rendering and the other stuff that the game loop takes care of, so the first example wasn&#x2019;t very practical. But it&#x2019;s worth keeping in mind there&#x2019;s this sunk complexity cost when you julienne your behavioral code like this.</p>
 <aside name="coroutine">
