@@ -225,7 +225,7 @@ Just between you and me, I think the pendulum has swung a bit too far *away* fro
 
 </aside>
 
-When this realization percolated through the game industry, the solution that emerged was the <a href="component" class="pattern">Component</a> pattern. Using that, `update()` would be on the component types instead of `Entity`. That lets you avoid creating complicated class hierarchies of entities to define and reuse behavior. Instead, you just mix and match components.
+When this realization percolated through the game industry, the solution that emerged was the <a href="component.html" class="pattern">Component</a> pattern. Using that, `update()` would be on the component types instead of `Entity`. That lets you avoid creating complicated class hierarchies of entities to define and reuse behavior. Instead, you just mix and match components.
 
 If I were making a real game, I'd probably do that too. But <span name="chapter">this chapter</span> isn't about components. It's about `update()` methods, and the simplest way I can show them, with as few moving parts as possible, is by putting that method right on `Entity` and making a few subclasses.
 

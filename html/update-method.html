@@ -331,7 +331,7 @@
 <p>Just between you and me, I think the pendulum has swung a bit too far <em>away</em> from subclassing. I generally avoid it, but being dogmatic about <em>not</em> using inheritance is as bad as being dogmatic about using it. You can use it in moderation without having to be a teetotaler.</p>
 </aside>
 
-<p>When this realization percolated through the game industry, the solution that emerged was the <a href="component" class="pattern">Component</a> pattern. Using that, <code>update()</code> would be on the component types instead of <code>Entity</code>. That lets you avoid creating complicated class hierarchies of entities to define and reuse behavior. Instead, you just mix and match components.</p>
+<p>When this realization percolated through the game industry, the solution that emerged was the <a href="component.html" class="pattern">Component</a> pattern. Using that, <code>update()</code> would be on the component types instead of <code>Entity</code>. That lets you avoid creating complicated class hierarchies of entities to define and reuse behavior. Instead, you just mix and match components.</p>
 <p>If I were making a real game, I&#x2019;d probably do that too. But <span name="chapter">this chapter</span> isn&#x2019;t about components. It&#x2019;s about <code>update()</code> methods, and the simplest way I can show them, with as few moving parts as possible, is by putting that method right on <code>Entity</code> and making a few subclasses.</p>
 <aside name="chapter">
 
