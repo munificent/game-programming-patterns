@@ -115,6 +115,8 @@ namespace FixedUpdateFramerate
       previous = current;
       lag += elapsed;
 
+      processInput();
+
       while (lag >= MS_PER_UPDATE)
       {
         update();

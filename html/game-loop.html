@@ -300,6 +300,8 @@ A graphic here would help.
   <span class="n">previous</span> <span class="o">=</span> <span class="n">current</span><span class="p">;</span>
   <span class="n">lag</span> <span class="o">+=</span> <span class="n">elapsed</span><span class="p">;</span>
 
+  <span class="n">processInput</span><span class="p">();</span>
+
   <span class="k">while</span> <span class="p">(</span><span class="n">lag</span> <span class="o">&gt;=</span> <span class="n">MS_PER_UPDATE</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">update</span><span class="p">();</span>
