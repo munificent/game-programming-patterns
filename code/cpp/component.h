@@ -60,8 +60,13 @@ namespace Monolithic
       // Apply user input to hero's velocity.
       switch (Controller::getJoystickDirection())
       {
-        case DIR_LEFT:  velocity_ -= WALK_ACCELERATION; break;
-        case DIR_RIGHT: velocity_ += WALK_ACCELERATION; break;
+        case DIR_LEFT:
+          velocity_ -= WALK_ACCELERATION;
+          break;
+          
+        case DIR_RIGHT:
+          velocity_ += WALK_ACCELERATION;
+          break;
           //^omit
         case DIR_NONE: break; // Do nothing.
           //^omit
@@ -111,8 +116,13 @@ namespace SplitInputComponent
     {
       switch (Controller::getJoystickDirection())
       {
-        case DIR_LEFT:  bjorn.velocity -= WALK_ACCELERATION; break;
-        case DIR_RIGHT: bjorn.velocity += WALK_ACCELERATION; break;
+        case DIR_LEFT:
+          bjorn.velocity -= WALK_ACCELERATION;
+          break;
+          
+        case DIR_RIGHT:
+          bjorn.velocity += WALK_ACCELERATION;
+          break;
           //^omit
         case DIR_NONE: break; // Do nothing.
           //^omit
@@ -292,8 +302,13 @@ namespace AbstractInput
     {
       switch (Controller::getJoystickDirection())
       {
-        case DIR_LEFT:  bjorn.velocity -= WALK_ACCELERATION; break;
-        case DIR_RIGHT: bjorn.velocity += WALK_ACCELERATION; break;
+        case DIR_LEFT:
+          bjorn.velocity -= WALK_ACCELERATION;
+          break;
+          
+        case DIR_RIGHT:
+          bjorn.velocity += WALK_ACCELERATION;
+          break;
           //^omit
         case DIR_NONE: break; // Do nothing.
           //^omit
@@ -516,7 +531,7 @@ namespace DirectComponentRef
     void Update(Bjorn& bjorn, Graphics& graphics)
     {
       Sprite* sprite;
-      if (physics_->isOnGround()) sprite = &spriteJump_;
+      if (!physics_->isOnGround()) sprite = &spriteJump_;
       else
       {
         // Existing graphics code...

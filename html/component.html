@@ -336,8 +336,13 @@ Photoshop.&rdquo;</p>
     <span class="c1">// Apply user input to hero&#39;s velocity.</span>
     <span class="k">switch</span> <span class="p">(</span><span class="n">Controller</span><span class="o">::</span><span class="n">getJoystickDirection</span><span class="p">())</span>
     <span class="p">{</span>
-      <span class="k">case</span> <span class="n">DIR_LEFT</span>:  <span class="n">velocity_</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
-      <span class="k">case</span> <span class="n">DIR_RIGHT</span>: <span class="n">velocity_</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="n">DIR_LEFT</span>:
+        <span class="n">velocity_</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+
+      <span class="k">case</span> <span class="n">DIR_RIGHT</span>:
+        <span class="n">velocity_</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// Modify position by velocity.</span>
@@ -390,8 +395,13 @@ out into a separate class:</p>
   <span class="p">{</span>
     <span class="k">switch</span> <span class="p">(</span><span class="n">Controller</span><span class="o">::</span><span class="n">getJoystickDirection</span><span class="p">())</span>
     <span class="p">{</span>
-      <span class="k">case</span> <span class="n">DIR_LEFT</span>:  <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
-      <span class="k">case</span> <span class="n">DIR_RIGHT</span>: <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="n">DIR_LEFT</span>:
+        <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+
+      <span class="k">case</span> <span class="n">DIR_RIGHT</span>:
+        <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
 
@@ -546,8 +556,13 @@ down into a class that implements that interface:</p>
   <span class="p">{</span>
     <span class="k">switch</span> <span class="p">(</span><span class="n">Controller</span><span class="o">::</span><span class="n">getJoystickDirection</span><span class="p">())</span>
     <span class="p">{</span>
-      <span class="k">case</span> <span class="n">DIR_LEFT</span>:  <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
-      <span class="k">case</span> <span class="n">DIR_RIGHT</span>: <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span> <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="n">DIR_LEFT</span>:
+        <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+
+      <span class="k">case</span> <span class="n">DIR_RIGHT</span>:
+        <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
 
@@ -878,7 +893,7 @@ component know about the physics component directly:</p>
   <span class="kt">void</span> <span class="n">Update</span><span class="p">(</span><span class="n">Bjorn</span><span class="o">&amp;</span> <span class="n">bjorn</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">Sprite</span><span class="o">*</span> <span class="n">sprite</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">physics_</span><span class="o">-&gt;</span><span class="n">isOnGround</span><span class="p">())</span> <span class="n">sprite</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">spriteJump_</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">physics_</span><span class="o">-&gt;</span><span class="n">isOnGround</span><span class="p">())</span> <span class="n">sprite</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">spriteJump_</span><span class="p">;</span>
     <span class="k">else</span>
     <span class="p">{</span>
       <span class="c1">// Existing graphics code...</span>
