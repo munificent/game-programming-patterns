@@ -316,12 +316,7 @@ The pattern being explained is only concerned with the return value,
 and not the work being done. In that case, the sample code will look
 like:
 
-    :::cpp
-    bool update()
-    {
-        // Do work...
-        return isDone();
-    }
+^code update
 
 ## Where to Go From Here
 
