@@ -245,7 +245,12 @@
 <p>This simple loop increments the index of the object being updated each iteration. The left side of the illustration below shows what the array looks like while we&#x2019;re updating the heroine:</p>
 <p><img src="images/update-method-remove.png"/></p>
 <p>Since we&#x2019;re updating her, <code>i</code> is 1. She slays the foul beast so it gets removed from the array. The heroine shifts up to 0, and the hapless peasant shifts up to 1. After updating the heroine, <code>i</code> is incremented to 2. As you can see on the right, the hapless peasant is skipped over and never gets updated.</p>
-<p>One fix is to just be careful when you remove objects and update any iteration variables to take the removal into account. Another is to <span name="defer">defer</span> removals until you&#x2019;re done walking the list. Mark the object as "dead" but leave it in place. During updating, make sure to skip any dead objects. Then, when that&#x2019;s done, walk the list again to remove the corpses.</p>
+<p><span name="backwards">One fix</span> is to just be careful when you remove objects and update any iteration variables to take the removal into account. Another is to defer removals until you&#x2019;re done walking the list. Mark the object as "dead" but leave it in place. During updating, make sure to skip any dead objects. Then, when that&#x2019;s <span name="defer">done</span>, walk the list again to remove the corpses.</p>
+<aside name="backwards">
+
+<p>You could also walk the list backwards when you update. That way removing an item doesn&#x2019;t shift any of the items yet to be updated.</p>
+</aside>
+
 <aside name="defer">
 
 <p>If you have multiple threads processing the items in the update loop, then you are even more likely to defer any modification to it to avoid costly thread synchronization during updates.</p>

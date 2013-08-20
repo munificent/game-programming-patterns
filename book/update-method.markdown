@@ -167,7 +167,13 @@ This simple loop increments the index of the object being updated each iteration
 
 Since we're updating her, `i` is 1. She slays the foul beast so it gets removed from the array. The heroine shifts up to 0, and the hapless peasant shifts up to 1. After updating the heroine, `i` is incremented to 2. As you can see on the right, the hapless peasant is skipped over and never gets updated.
 
-One fix is to just be careful when you remove objects and update any iteration variables to take the removal into account. Another is to <span name="defer">defer</span> removals until you're done walking the list. Mark the object as "dead" but leave it in place. During updating, make sure to skip any dead objects. Then, when that's done, walk the list again to remove the corpses.
+<span name="backwards">One fix</span> is to just be careful when you remove objects and update any iteration variables to take the removal into account. Another is to defer removals until you're done walking the list. Mark the object as "dead" but leave it in place. During updating, make sure to skip any dead objects. Then, when that's <span name="defer">done</span>, walk the list again to remove the corpses.
+
+<aside name="backwards">
+
+You could also walk the list backwards when you update. That way removing an item doesn't shift any of the items yet to be updated.
+
+</aside>
 
 <aside name="defer">
 
