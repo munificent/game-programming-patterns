@@ -71,7 +71,13 @@ This is the first key part of a real game loop: *it processes user input, but do
 ^code 3
 
 We'll refine this later, but the basic pieces are here. `processInput()` handles any user input that's happened since the last call.
-Then `update()` advances the game simulation one step. It runs AI and physics (usually in that order). Finally, `render()` draws the game so the player can see what happened.
+Then <span name="update">`update()`</span> advances the game simulation one step. It runs AI and physics (usually in that order). Finally, `render()` draws the game so the player can see what happened.
+
+<aside name="update">
+
+As you might guess from the name, `update()` is a good place to use the <a href="update-method.html" class="pattern">Update Method</a> pattern.
+
+</aside>
 
 ### A world out of time
 

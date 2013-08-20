@@ -132,7 +132,12 @@
 
 
 <p>We&#x2019;ll refine this later, but the basic pieces are here. <code>processInput()</code> handles any user input that&#x2019;s happened since the last call.
-Then <code>update()</code> advances the game simulation one step. It runs AI and physics (usually in that order). Finally, <code>render()</code> draws the game so the player can see what happened.</p>
+Then <span name="update"><code>update()</code></span> advances the game simulation one step. It runs AI and physics (usually in that order). Finally, <code>render()</code> draws the game so the player can see what happened.</p>
+<aside name="update">
+
+<p>As you might guess from the name, <code>update()</code> is a good place to use the <a href="update-method.html" class="pattern">Update Method</a> pattern.</p>
+</aside>
+
 <h3><a href="#a-world-out-of-time" name="a-world-out-of-time">A world out of time</a></h3>
 <p>If this loop isn&#x2019;t blocking on input, that leads to the obvious question: how <em>fast</em> does it spin? Each turn through the game loop advances the state of the game by some amount. From the perspective of an inhabitant of the game world, the hand of their clock has <span name="tick">ticked</span> forward.</p>
 <aside name="tick">
