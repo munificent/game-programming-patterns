@@ -174,24 +174,7 @@ having them both <em>own an instance</em> of the same class.</p>
 
 <p>Now consider how we&#x2019;d set up an inheritance hierarchy for those
 classes if we weren&#x2019;t using components. A first pass might look like:</p>
-<div class="codehilite"><pre>option a<span class="o">:</span> reuse collision code
-         <span class="o">+---------+</span>
-         <span class="o">|</span>game obj <span class="o">|</span>
-         <span class="o">+---------+</span>
-           <span class="o">/</span>     \
-          <span class="o">/</span>       \
-<span class="o">+------------+</span>  <span class="o">+------------+</span>
-<span class="o">|</span>zone        <span class="o">|</span>  <span class="o">|</span>decoration  <span class="o">|</span>
-<span class="o">|</span>collision<span class="o">&amp;</span>hellip<span class="p">;</span><span class="o">|</span>  <span class="o">|</span>rendering<span class="o">&amp;</span>hellip<span class="p">;</span><span class="o">|</span>
-<span class="o">+------------+</span>  <span class="o">+------------+</span>
-    <span class="o">|</span>
-<span class="o">+------------+</span>        <span class="o">^</span>
-<span class="o">|</span>prop        <span class="o">|</span>    rendering is
-<span class="o">|</span>rendering<span class="o">&amp;</span>hellip<span class="p">;</span><span class="o">|</span> <span class="o">&lt;-</span> duplicated
-<span class="o">+------------+</span>
-</pre></div>
-
-
+<p><img src="images/component-uml.png" /></p>
 <p>We have a base <code>GameObject</code> class that has common stuff like position
 and orientation. <code>Zone</code> inherits from that and adds collision
 detection. Likewise, <code>Decoration</code> inherits from <code>GameObject</code> and adds

@@ -377,7 +377,7 @@ The resulting stage is set up a bit like the following image shows.
 The arrows show who is facing who, and the numbers show their index
 in the stage's array:
 
-<img src="images/double-buffer-stage-1.gif" />
+<img src="images/double-buffer-slaps-1.png" />
 
 Now, let's slap Harry to get things going and see what happens when
 we start processing:
@@ -401,7 +401,7 @@ through all of the comedians. Now let's mix things up a bit. Lets say
 we reorder the comedians within the stages array, but leaving them
 still facing each other the same way.
 
-<img src="images/double-buffer-stage-2.gif" />
+<img src="images/double-buffer-slaps-2.png" />
 
 We'll leave the rest of the stage setup alone, but replace the chunk
 of code where we add the actors to the stage with this:

@@ -138,21 +138,7 @@ having them both *own an instance* of the same class.
 Now consider how we'd set up an inheritance hierarchy for those
 classes if we weren't using components. A first pass might look like:
 
-    option a: reuse collision code
-             +---------+
-             |game obj |
-             +---------+
-               /     \
-              /       \
-    +------------+  +------------+
-    |zone        |  |decoration  |
-    |collision...|  |rendering...|
-    +------------+  +------------+
-        |
-    +------------+        ^
-    |prop        |    rendering is
-    |rendering...| <- duplicated
-    +------------+
+<img src="images/component-uml.png" />
 
 We have a base `GameObject` class that has common stuff like position
 and orientation. `Zone` inherits from that and adds collision
