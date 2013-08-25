@@ -61,7 +61,222 @@
     </tr>
   </table>
 </div>
-<p><em>Sorry, this chapter hasn&#x2019;t been written yet!</em></p>
+<h2><a href="#intent" name="intent">Intent</a></h2>
+<p><em>Avoid unneeded work by deferring it until the result is needed.</em></p>
+<h2><a href="#motivation" name="motivation">Motivation</a></h2>
+<p>OK, let&#x2019;s get two things out of the way first:</p>
+<ol>
+<li>
+<p>Yes, the name of this chapter does make me giggle every time. I have the
+    sense of humor of a ten-year-old boy.</p>
+</li>
+<li>
+<p>This is actually the widely-used name of this pattern.
+    <span name="google">Google it yourself.</span> Apparently I&#x2019;m not alone in
+    my juvenile disposition. Another name for the same pattern is
+    "dirty flag", but they are about equally commonly used. The Wikipedia
+    article is <a href="http://en.wikipedia.org/wiki/Dirty_bit">"dirty bit"</a> (though
+    it&#x2019;s about a more specific use of the term).</p>
+</li>
+</ol>
+<aside name="google">
+
+<p>You might want to wait until you&#x2019;re home from work before Googling it.</p>
+</aside>
+
+<p>Back to the matter at hand, let&#x2019;s talk about city-building games. I spent an
+inordinate amount of my childhood in slavish devotion to Will Wright&#x2019;s masterpieces, so for this chapter, let&#x2019;s imagine we&#x2019;re making an homage to the classic mayoral role-playing game.</p>
+<p>The player can build his city however he desires. As the city grows and develops, he occassionally is granted trophies and other rewards by his loving citizens. The player can bring up a trophy screen whenever he wants to bask in the light of his accomplishments. Here&#x2019;s where things get just a little bit tricky.</p>
+<p>Every time the player gets a new trophy, the entire trophy case needs to be rearranged from scratch to generate a <span name="packing">maximally pleasing</span> arrangement. (You can imagine the virtual mayor spending hours lovingly doing this himself when he should be proofreading zoning agreements.) For our only-slightly-contrived example, let&#x2019;s pretend that that calculation is actually pretty time-consuming.</p>
+<aside name="packing">
+
+<p>Arranging the trophies is kind of like the <a href="http://en.wikipedia.org/wiki/Bin_packing">classic bin-packing problem</a>, which is NP-hard, so this being time-consuming isn&#x2019;t totally outside the bounds of reason.</p>
+</aside>
+
+<p>We could calculate the trophy arrangement every time the mayor gets a new trophy. That makes sure the trophy case is always up-to-date when they go to look at it. But, in practice, the player rarely goes to that screen. If they get <em>two</em> trophies between going to that screen, then we&#x2019;ll spend time generating the first arrangement, only to discard it without the player ever seeing it when the next trophy is awarded.</p>
+<p>Instead, we could calculate the arrangement every time they enter the trophy room. But doing that is redundant if they go to the trophy room multiple times without having earned any new trophies. We&#x2019;ll just calculate the same arrangement each time.</p>
+<p>The obvious solution is:</p>
+<ol>
+<li>
+<p>When the mayor gets a new trophy, we set a special "need trophy arrangement" flag.</p>
+</li>
+<li>
+<p>When the player enters the trophy room, we check that flag. If it&#x2019;s set, we calculate the trophy arrangement and clear it. Otherwise, we use the previously calculated arrangement, which is still up to date.</p>
+</li>
+</ol>
+<p>The "need trophy arrangement" flag is the <em>dirty bit</em>. It&#x2019;s a single bit of data that indicates whether the current trophy arrangement is "dirty", or out of sync with the mayor&#x2019;s current set of trophies.</p>
+<p>This is one of the two <span name="graphics">main uses</span> for this pattern in a nutshell. We&#x2019;ll cover the other related use a little farther down the chapter.</p>
+<aside name="graphics">
+
+<p>Back in the day when I was just a little game dev, this pattern used to have one particularly common application: rendering. Before GPUs, when games did all of their rendering in software, sprite engines were optimized to only redraw portions of the screen that actually changed.</p>
+<p>The would maintain <em>dirty regions</em> that tracked which portions of the play area had been modified and needed re-rendering. These days with hardware-accelerated graphics, that technique is rarely needed anymore.</p>
+</aside>
+
+<h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
+<p>A set of <strong>primary data changes</strong> over time. A set of <strong>derived data</strong> is determined from this using some <strong>complex calculation or synchronization</strong>. A <strong>"dirty" flag</strong> tracks when the derived data is out of sync with the primary data. It is <strong>set when the primary data changes</strong>. When the derived data is requested <strong>it is calculated only when the flag is set and the flag is cleared.</strong> Otherwise, the previous <strong>cached derived data</strong> is used.</p>
+<h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
+<p>Compared to some other patterns in this book, this one solves a pretty specific problem. Also, like most optimization patterns, you should only reach for it when you have a performance problem big enough to justify the added code complexity. Added up, this means you probably won&#x2019;t use this often.</p>
+<p>Dirty bits are used to solve two related problems: <em>calculation</em> and <em>synchronization</em>. What they have in common is:</p>
+<ol>
+<li>A set of data that changes over time.</li>
+<li>Another set of data that&#x2019;s somehow derived from that.</li>
+<li>The process of going from 1 to 2 is "heavyweight".</li>
+</ol>
+<p>When you use this pattern for calculation, like in the example in the motivation section, it&#x2019;s because there is actual complex computation involved that you want to avoid. With synchronization, it&#x2019;s more often that the derived data is <em>somewhere else</em>&thinsp;&mdash;&thinsp;either on disk or over the network on another machine&thinsp;&mdash;&thinsp;and simply getting it from point A to point B is slow.</p>
+<p>In either case, it turns out that doing that heavyweight work is often for naught. Every time the primary data changes, you have to ditch the previous derived data and generate it again to take into account the new stuff. If the primary data changes <em>again</em> before you ever actually use the data derived from it, then there&#x2019;s no point in doing that work.</p>
+<p>That brings in a third requirement for this pattern: <em>the primary data has to change more often than the derived data is used</em>. If you always need the derived data every single time the primary data is modified, there&#x2019;s no way to avoid doing the work to generate it, and this pattern can&#x2019;t help you.</p>
+<p>There&#x2019;s one final softer fourth requirement. It&#x2019;s implied here that you can&#x2019;t easily <em>incrementally</em> update the derived data when the primary data changes. This pattern comes into play with the derived data is only calculated from <em>the primary data</em> and not from <em>the previous derived data</em>.</p>
+<p>For example, if the mayor&#x2019;s trophy room just lined the trophies up one after the other in the order they were awarded, this pattern wouldn&#x2019;t be helpful. Each time he got a trophy, we can calculate the position <em>of just that trophy</em> and then add it to the end of the row. Doing this would require using the previous derived data (the other trophy positions) and that means we&#x2019;d be best off updating the trophy positions <em>each time he gets a new trophy</em>.</p>
+<p>In constrast, this pattern comes into play when the old derived data is totally discarded and calculated from scratch based on the primary data. In that case, we can <em>skip</em> updates without things getting out of sync since the previous derived data isn&#x2019;t used anyway.</p>
+<p>All of this makes it sound like this pattern would never actually be useful, but over time you&#x2019;ll likely find a place here or there where it&#x2019;s a good fit. Grepping your average game codebase for the word "dirty" will often turn something up, and it almost always refers to this pattern.</p>
+<h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
+<p>Once you have convinced yourself this pattern is a good fit, there are a few wrinkled that can cause you some discomfort.</p>
+<h3><a href="#deferring-until-the-result-is-needed-can-cause-a-noticeable-pause" name="deferring-until-the-result-is-needed-can-cause-a-noticeable-pause">Deferring until the result is needed can cause a noticeable pause</a></h3>
+<p>In its simplest form, this pattern <aside name="gc">defers</aside> some slow work until the result is actually needed. But when the result is needed, it&#x2019;s often needed <em>right now</em> and the reason we&#x2019;re using this pattern to begin with is because calculating that result is slow!</p>
+<p>In our example, if we wait until the player enters the trophy room to calculate the trophy positions, there may be a visible delay before the screen appears while the game is busy playing interior decorator. Sometimes, the pause is small enough that this isn&#x2019;t a problem.</p>
+<p>When it is a problem, you&#x2019;ll often refine this pattern. There&#x2019;s actually a continuum of when to do the work ranging from "the second the primary data changes" all the way to "only at the last second when the derived data is needed". In between those two points are a range of options where you defer the work <em>somewhat</em> but still eventually kick it off before the result is actually needed.</p>
+<p>When your fancy text editor auto-saves a backup "in the background" every few minutes, that&#x2019;s basically the trade-off it&#x2019;s making. The frequency that it auto-saves&thinsp;&mdash;&thinsp;every few minutes to once an hour&thinsp;&mdash;&thinsp;is picking a point on the continuum that balances not losing too much work when a crash occurs against not thrashing the file system too much by saving all the time.</p>
+<p><span name="gc"></p>
+<p>This is mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting systems free memory the second its no longer needed, but suffer by spending CPU time updating ref counts eagerly every time references are changed.</p>
+<p>Simple garbage collectors defer reclaiming memory until it&#x2019;s really needed. But the cost here is the dreaded "GC pause" that can freeze your entire app until the GC is done walking the heap.</p>
+<p>In between the two are increasingly common more complex systems like deferred ref-counting and incremental GC that reclaim memory less eagerly than pure ref-counting but more eagerly than stop-the-world collectors.</p>
+<p></span></p>
+<h3><a href="#you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes" name="you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes">You have to make sure to set the flag <em>every</em> time the state changes</a></h3>
+<p>Since the derived data is calculated from the primary data, it&#x2019;s essentially a cache. Whenever you have cached data in memory, the trickiest aspect of it is <span name="cache"><em>cache invalidation</em></span>: correctly knowing when the cache is out of sync with its source data. In this pattern, that means correctly setting the dirty bit when <em>any</em> primary data changes.</p>
+<aside name="cache">
+
+<p>Phil Karlton famously said, "There are only two hard things in Computer Science: cache invalidation and naming things."</p>
+</aside>
+
+<p>Miss it in one place, and your program will incorrectly use stale derived data. This leads to confused players and very hard to track down bugs. When you use this pattern, you&#x2019;ll have to be very careful that any code that modifies the primary state also sets the dirty bit.</p>
+<p>One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes a single simple interface, you can set the dirty bit there and rest assurred that it won&#x2019;t go out of sync.</p>
+<ul>
+<li>
+<p>when the flag isn&#x2019;t dirty, you&#x2019;ll use previously calculated data. assumes you&#x2019;re willing to hang on to that then. like many optimizations, trades space for speed. if you can calculate it quickly and need the space, may be better to just calculate it every time.</p>
+</li>
+<li>
+<p>don&#x2019;t want to defer too long</p>
+</li>
+</ul>
+<h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
+<ul>
+<li>
+<p>motivation example was so simple the code would probably be pointless. whenever the notoriety changes or he gets a new scar, the flag is set. when the user brings up the screen, if the flag is set, we render the poster and clear it. done. simple!</p>
+</li>
+<li>
+<p>so instead of showing that, let&#x2019;s do the other main use case where dirty flags are used: synchronization. let&#x2019;s save our city&hellip; to disk.</p>
+</li>
+<li>
+<p>player spends lots of time building city, doesn&#x2019;t want to just trash it when they quit.</p>
+</li>
+<li>obviously saving to disk every time they change anything would be too slow.</li>
+<li>obvious is to save on quit</li>
+<li>but what if player didn&#x2019;t do anything?</li>
+<li>notice how in word processor, it only asks to save if you have unsaved changes. that&#x2019;s the dirty bit in action!</li>
+<li>we can do same thing</li>
+<li>
+<p>first, in any code that changes city, also set dirty flag</p>
+<p>&hellip;</p>
+</li>
+<li>
+<p>then, when player quits game, check flag and save if dirty</p>
+</li>
+</ul>
+<h3><a href="#too-slow" name="too-slow">Too slow</a></h3>
+<ul>
+<li>this works, but takes a long time to save.</li>
+<li>entire city is pretty huge file, and most of it is unchanged most of the time</li>
+<li>would like saving to be faster by only saving parts of city that change</li>
+<li>divide city into blocks</li>
+<li>each block has its own dirty flag, and own region in the file</li>
+<li>when quiting, we check if any flag is dirty</li>
+<li>if so, walk blocks and save dirty ones</li>
+<li>just seek over non-dirty ones</li>
+<li>when city changes, have to remember to mark correct block as dirty</li>
+<li>so, finer grained dirty checking can mean you do less work</li>
+<li>but also means have to do a bit more work checking all of the dirty flags</li>
+<li>and make sure right one is marked dirty at right time</li>
+</ul>
+<h3><a href="#game-crashes" name="game-crashes">Game crashes</a></h3>
+<ul>
+<li>saving on quit is fine most of the time, but sometimes game crashes (surely not our code, but other coders aren&#x2019;t so flawless)</li>
+<li>would be nice if all changes weren&#x2019;t lost</li>
+<li>so decide to save in the background</li>
+<li>don&#x2019;t want to save on every change of course. even with blocks, still too hard on disk</li>
+<li>so we&#x2019;ll save periodically.</li>
+<li>whenever block is marked dirty, start timer</li>
+<li>when timer fires, all dirty blocks are saved</li>
+<li>if timer is already running when block is dirty, just leave it</li>
+<li>once we save, clear timer</li>
+</ul>
+<h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
+<ul>
+<li>
+<p>what is granularity of dirtiness?</p>
+</li>
+<li>
+<p>do you have single flag for entire data structure, or flags for just pieces of it?</p>
+</li>
+<li>finer-grained means less work because you only process/transmit the chunks that are
+    dirty.</li>
+<li>
+<p>but can also adds complexity walking over the data structure to check which parts are
+    dirty.</p>
+</li>
+<li>
+<p>when is it cleaned?</p>
+</li>
+<li>
+<p>too aggressively defeats the purpose.</p>
+</li>
+<li>
+<p>too lazily can cause pauses or "clumpiness".</p>
+</li>
+<li>
+<p>when needed</p>
+<ul>
+<li>simplest answer for recalculation: run it when you need the result.</li>
+<li>avoid recalc if result is never used (or is invalidated before result is
+  used.)</li>
+<li>if calc is slow, can cause a noticeable pause.</li>
+<li>for synchronization "when needed" isn&#x2019;t always well-defined.</li>
+</ul>
+</li>
+<li>
+<p>at well-defined checkpoints</p>
+<ul>
+<li>for things like save/load or network sync, this may work best. have
+  well-defined points of synchonization.</li>
+<li>can be based on time ("game saves automatically every 5 min") or location
+  ("game is saved every time you enter town")</li>
+<li>always risk of data loss if something bad happens before reaching checkpoint</li>
+<li>can be a feature of the game</li>
+</ul>
+</li>
+<li>
+<p>in background</p>
+<ul>
+<li>when data is marked dirty, start a timer</li>
+<li>when timer fires, save or calculate and clear</li>
+<li>if timer is already running when something else becomes dirty, have to
+  decide if you want to reset timer or not</li>
+<li>resetting can give you better data batching: if the data keeps changing
+    frequently enough to reset the timer, it may be worth waiting until it
+    settles down instead of doing work on volatile data</li>
+<li>not resetting makes sure you don&#x2019;t delay work indefinitely and drop data
+    makes sure data is actually processed</li>
+</ul>
+</li>
+</ul>
+<h2><a href="#see-also" name="see-also">See Also</a></h2>
+<ul>
+<li>
+<p>mvc frameworks often use this to track model changes to know what notifications to send to view</p>
+</li>
+<li>
+<p>web mvc frameworks use this to know what modifications to view need to be synchronized with server/client.</p>
+</li>
+</ul>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </div>
 </body>
