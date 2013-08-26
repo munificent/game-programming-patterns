@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 
-<title>Game Programming Patterns / Optimizing Patterns / Dirty Bits</title>
+<title>Game Programming Patterns / Optimizing Patterns / Dirty Flag</title>
 
 <!-- Tell mobile browsers we're optimized for them and they don't need to crop
      the viewport. -->
@@ -23,7 +23,7 @@
 <body id="top">
 <div class="content">
 <h1 class="book"><a href="index.html">Game Programming Patterns</a> / Optimizing Patterns</h1>
-<h1>Dirty Bits</h1>
+<h1>Dirty Flag</h1>
 <div class="in-progress">
   <span class="dismiss">&times;</span>
   <p><strong>This book is a work in progress!</strong></p>
@@ -64,6 +64,7 @@
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Avoid unneeded work by deferring it until the result is needed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
+<p><strong>TODO: renamed chapter, update this:</strong></p>
 <p>OK, let&#x2019;s get two things out of the way first:</p>
 <ol>
 <li>
@@ -146,42 +147,133 @@ inordinate amount of my childhood in slavish devotion to Will Wright&#x2019;s ma
 <aside name="cache">
 
 <p>Phil Karlton famously said, "There are only two hard things in Computer Science: cache invalidation and naming things."</p>
+<p>My favorite variation is, "There are only two hard things in Computer Science: cache invalidation, naming things, and off-by-one errors."</p>
 </aside>
 
 <p>Miss it in one place, and your program will incorrectly use stale derived data. This leads to confused players and very hard to track down bugs. When you use this pattern, you&#x2019;ll have to be very careful that any code that modifies the primary state also sets the dirty bit.</p>
 <p>One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes a single simple interface, you can set the dirty bit there and rest assurred that it won&#x2019;t go out of sync.</p>
-<ul>
-<li>
-<p>when the flag isn&#x2019;t dirty, you&#x2019;ll use previously calculated data. assumes you&#x2019;re willing to hang on to that then. like many optimizations, trades space for speed. if you can calculate it quickly and need the space, may be better to just calculate it every time.</p>
-</li>
-<li>
-<p>don&#x2019;t want to defer too long</p>
-</li>
-</ul>
+<h3><a href="#you-will-have-to-keep-the-previous-derived-data-in-memory" name="you-will-have-to-keep-the-previous-derived-data-in-memory">You will have to keep the previous derived data in memory</a></h3>
+<p>When the game needs the derived data, it checks to see if the dirty flag is set. If it <em>isn&#x2019;t</em> set, then it uses the previously calculated data. This is obvious, but that does imply that you have to keep that derived data around in memory in case you end up needing it later.</p>
+<p>If you weren&#x2019;t using this pattern, another option would be just calculate the derived data on the fly right when you need it, and then discard it when you&#x2019;re done. That avoids the expense of keeping it cached in memory. The cost doing this is calculation: you&#x2019;ll have to do that calculation <em>every</em> time you need it.</p>
+<p>Like many optimizations, then, you can look at this pattern as trading off memory for space. In return for keeping the previously calculated data in memory, you avoid having to recalculate it when it&#x2019;s imput data hasn&#x2019;t changed. This trade-off makes sense when the calculation is slow and memory is cheap. When you&#x2019;ve got more time than memory on your hands, it may be better to just calculate it as needed and avoid this pattern.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
-<ul>
-<li>
-<p>motivation example was so simple the code would probably be pointless. whenever the notoriety changes or he gets a new scar, the flag is set. when the user brings up the screen, if the flag is set, we render the poster and clear it. done. simple!</p>
-</li>
-<li>
-<p>so instead of showing that, let&#x2019;s do the other main use case where dirty flags are used: synchronization. let&#x2019;s save our city&hellip; to disk.</p>
-</li>
-<li>
-<p>player spends lots of time building city, doesn&#x2019;t want to just trash it when they quit.</p>
-</li>
-<li>obviously saving to disk every time they change anything would be too slow.</li>
-<li>obvious is to save on quit</li>
-<li>but what if player didn&#x2019;t do anything?</li>
-<li>notice how in word processor, it only asks to save if you have unsaved changes. that&#x2019;s the dirty bit in action!</li>
-<li>we can do same thing</li>
-<li>
-<p>first, in any code that changes city, also set dirty flag</p>
-<p>&hellip;</p>
-</li>
-<li>
-<p>then, when player quits game, check flag and save if dirty</p>
-</li>
-</ul>
+<p>Assuming we&#x2019;ve met the surprisingly long list of requirements and this pattern does make sense for out problem, let&#x2019;s see how it looks to code it up. The initial problem in the motivation section is pretty obvious to implement. Whenever the mayor gets a new trophy, we set the flag. When the player opens the trophy screen, we check the flag. If it&#x2019;s set, we layout the trophies, clear the flag and continue.</p>
+<p>I&#x2019;m pretty sure you can code that up on your own, so let&#x2019;s leave that as an exercise for the reader. Instead, let&#x2019;s do a different example showing the other main use for this pattern, synchronization. The mayor is doing the best he can, but even he needs help saving his city. <span name="pun">To disk</span>, that is.</p>
+<aside name="pun">
+
+<p>If you&#x2019;re reading this awful pun, that means I managed to maintain the bad judgement to keep this in through each revision of this chapter. What was I thinking?</p>
+</aside>
+
+<p>Our player is going to spend hours meticulously crafting their city. They probably don&#x2019;t want to just throw it out the window and start over from scratch every time they quit the game, so we&#x2019;ll want to whip up some kind of save-load system.</p>
+<p>Obviously, saving the city to disk every time they plant a single mailbox or lightpost would be numbingly slow and cause undo torture to the player&#x2019;s hard disk. A better solution is to save when they quit the game.</p>
+<p><span name="elide"></span></p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Game</span><span class="o">::</span><span class="n">quit</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">city</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<aside name="elide">
+
+<p>Like many chapters in this book, I&#x2019;m eliding the concrete code to actually save the city. Since we&#x2019;re just concerned with the architectural structure here, the implementation details are, well, implementation details.</p>
+</aside>
+
+<p>Swell. Now every time the player quits the game, they&#x2019;re beautiful metropolis is lovingly enscribed on the platters of their hard disk, ready and waiting for the next time the game is run. Alas, this isn&#x2019;t a perfect solution.</p>
+<h3><a href="#wasting-time-in-a-clean-city" name="wasting-time-in-a-clean-city">Wasting time in a clean city</a></h3>
+<p>The problem is that in our awesome game, you can build huge cities. Writing out every street and telephone pole takes a long time. When they player&#x2019;s actually built lots of new stuff, there&#x2019;s not much you can do. But if they just open the city, look around a bit and quit, it&#x2019;s pointless to save the city: nothing&#x2019;s changed and the city on disk is already up to date.</p>
+<p>We&#x2019;ll apply this pattern and define a dirty flag for the city:</p>
+<div class="codehilite"><pre><span class="n">class</span> <span class="n">City</span> <span class="p">{</span>
+  <span class="c1">// Lots of other stuff&amp;hellip;</span>
+<span class="nl">private:</span>
+  <span class="kt">bool</span> <span class="n">dirty</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Now when we go to save, we&#x2019;ll first check and see if we have to:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">save</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="c1">// Bail if the city is already up to date.</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">dirty</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+  <span class="c1">// Write city to disk&amp;hellip;</span>
+
+  <span class="c1">// The city on disk is up to date now.</span>
+  <span class="n">dirty</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h3><a href="#getting-dirty" name="getting-dirty">Getting dirty</a></h3>
+<p>This is the easy part. The hard part is making sure that flag gets set. Every bit of code that modifies a part of the city&#x2019;s state that is saved to disk needs to make sure to set dirty to true. You can imagine lots of methods like:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">zoneArea</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="kt">int</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Set zoning&amp;hellip;</span>
+  <span class="n">dirty</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">placeBuilding</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Building</span> <span class="n">building</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Place building&amp;hellip;</span>
+  <span class="n">dirty</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">addRoad</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Direction</span> <span class="n">direction</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Add road&amp;hellip;</span>
+  <span class="n">dirty</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>If you have a <span name="wide">wide smear</span> of code that modifies state, you&#x2019;re just asking to make a mistake and forget to set the dirty flag somewhere. If you can, it helps to define that code in terms of a much smaller interface that does the low-level modification.</p>
+<aside name="wide">
+
+<p>In general, code that <em>modifies</em> state is more problematic than code that just <em>reads</em> state. Whenever you&#x2019;re trying to understand a chunk of code, you have to think about what state the data is in, how it got that way, and how it can change. When other random code reads that state, it doesn&#x2019;t affect your local understanding of what that code does. But when outside code can <em>change</em> the state, now you have to hold that much larger context in your head.</p>
+</aside>
+
+<p>For example, in our city-building game, the city is ultimately represented by a grid of tiles. Roads, buildings, and other stuff are all just different kinds of tiles. Given that, we could define a low-level method like:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">setTile</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Tile</span> <span class="n">tile</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">// Change tile data&amp;hellip;</span>
+  <span class="n">dirty</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>This method makes sure to set the dirty flag. Then the previous high level modification methods can be implemented using it:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">zoneArea</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">top</span><span class="p">,</span> <span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="kt">int</span> <span class="n">height</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">left</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">left</span> <span class="o">+</span> <span class="n">width</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="n">top</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">top</span> <span class="o">+</span> <span class="n">height</span><span class="p">;</span> <span class="n">y</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="n">setTile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">TILE_ZONE</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">placeBuilding</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Building</span> <span class="n">building</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">setTile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">building</span><span class="p">.</span><span class="n">tile</span><span class="p">());</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">addRoad</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Direction</span> <span class="n">direction</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">Tile</span> <span class="n">tile</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">direction</span> <span class="o">==</span> <span class="n">DIR_HORIZONTAL</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">tile</span> <span class="o">=</span> <span class="n">TILE_HOR_ROAD</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">else</span>
+  <span class="p">{</span>
+    <span class="n">tile</span> <span class="o">=</span> <span class="n">TILE_VERT_ROAD</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">setTile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">tile</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Notice that now none of these methods have to worry about the dirty flag. The more we can push setting the dirty flag into lower-level code, the fewer places we&#x2019;ll have to worry about it, and the less likely we are to forget.</p>
 <h3><a href="#too-slow" name="too-slow">Too slow</a></h3>
 <ul>
 <li>this works, but takes a long time to save.</li>
