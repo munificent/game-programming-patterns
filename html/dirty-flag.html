@@ -85,6 +85,7 @@
 <p>You might want to wait until you&#x2019;re home from work before Googling it.</p>
 </aside>
 
+<p><strong>TODO: A better example would be recalculating matrices in a scene graph.</strong></p>
 <p>Back to the matter at hand, let&#x2019;s talk about city-building games. I spent an
 inordinate amount of my childhood in slavish devotion to Will Wright&#x2019;s masterpieces, so for this chapter, let&#x2019;s imagine we&#x2019;re making an homage to the classic mayoral role-playing game.</p>
 <p>The player can build his city however he desires. As the city grows and develops, he occassionally is granted trophies and other rewards by his loving citizens. The player can bring up a trophy screen whenever he wants to bask in the light of his accomplishments. Here&#x2019;s where things get just a little bit tricky.</p>
@@ -365,13 +366,13 @@ between then and when the timer fires. Then you reset and start all over
 again.</p>
 <ul>
 <li>
-<p><strong>You can tune how frequently the work is performed.</strong> Here the timing of
+<p><em>You can tune how frequently the work is performed.</em> Here the timing of
     when we clean the dirty state and perform the work isn&#x2019;t dependent on
     the player requesting some data or reaching some checkpoint, so we can
     ensure it happens as frequently (or infrequently as we want).</p>
 </li>
 <li>
-<p><strong>You can do more redundant work.</strong> If the primary state only changes a
+<p><em>You can do more redundant work.</em> If the primary state only changes a
     tiny amount during the timer&#x2019;s run, and the granularity of our dirty
     flags is too coarse, we&#x2019;ll do work on a bunch of data that hasn&#x2019;t
     changed. If tiny changes trickle in, that timer will constantly be
@@ -379,7 +380,7 @@ again.</p>
     changed much.</p>
 </li>
 <li>
-<p><strong>You can end up throwing away work.</strong> The timer starts at the beginning
+<p><em>You can end up throwing away work.</em> The timer starts at the beginning
     of the first change to the primary data, and fires at some fixed
     interval after that. If the primary data is still being changed (i.e.
     the mayor is still in a zoning frenzy) when the timer goes off, we&#x2019;ll
@@ -395,7 +396,7 @@ on end without a break. The timer will keep getting reset and never
 actually auto-save the city.</p>
 </li>
 <li>
-<p><strong>You&#x2019;ll need some support for doing work "in the background".</strong>
+<p><em>You&#x2019;ll need some support for doing work "in the background".</em>
     Processing on a timer independent of what the player is doing implies
     the player can keep doing whatever that is while the processing is
     going on. After all, if the processing was so fast that we could do it
@@ -409,24 +410,57 @@ safe for concurrent modification too.</p>
 </li>
 </ul>
 </li>
+</ul>
+<h3><a href="#how-fine-grained-is-your-dirty-tracking" name="how-fine-grained-is-your-dirty-tracking">How fine-grained is your dirty tracking?</a></h3>
+<p>In our first sample, we had a single flag for the entire city. We improved performance at the expense of some complexity and overhead by changing that to track a dirty bit for each block in the city. Depending on your use case, you may have options like that too.</p>
+<ul>
 <li>
-<p>what is granularity of dirtiness?</p>
+<p><strong>If it&#x2019;s more coarse-grained:</strong></p>
+<ul>
+<li>
+<p><em>It&#x2019;s simpler.</em> You don&#x2019;t have to spend as much time determining which
+    <em>part</em> of the state is dirty. The code for doing the work can do it
+    in one monolithic chunk instead of needing to be able to handle
+    chewing on smaller isolated pieces of state.</p>
 </li>
 <li>
-<p>do you have single flag for entire data structure, or flags for just pieces of it?</p>
+<p><em>There&#x2019;s less overhead for tracking what is dirty.</em> You&#x2019;ll spend less
+    memory on the dirty flags themselves (though that&#x2019;s almost always
+    a trivial expense). When you go to process the dirty state and do
+    the work, you&#x2019;ll need less metadata to express what subset of the
+    data is dirty.</p>
 </li>
-<li>finer-grained means less work because you only process/transmit the chunks that are
-    dirty.</li>
-<li>but can also adds complexity walking over the data structure to check which parts are
-    dirty.</li>
+</ul>
+</li>
+<li>
+<p><strong>If it&#x2019;s more fine-grained:</strong></p>
+<ul>
+<li>
+<p><em>You need to be able to process a subset of the data.</em> In our trophy
+    room example, there&#x2019;d by no way to split it into several narrower
+    dirty flags. Since adding a single trophy can change the entire
+    layout, the processing we have to do has to be a single monolithic
+    operation that takes all trophies into account.</p>
+<p>In order to do finer-grained dirtiness-tracking, you&#x2019;ll need to make
+sure the work you have to do is amenable to being decomposed like
+that.</p>
+</li>
+<li>
+<p><em>You&#x2019;ll less more time working on unchanged data.</em> A coarse-grained
+    dirty flag invalidates a larger swath of data, much of which may be
+    unchanged. With finer-grained tracking, you only mark the data
+    that&#x2019;s actually different and thus only process actual changes.</p>
+</li>
+</ul>
+</li>
 </ul>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
 <li>
-<p>mvc frameworks often use this to track model changes to know what notifications to send to view</p>
+<p>This pattern is increasingly common outside of games in client-side MVC web frameworks like <a href="http://angularjs.org/">Angular</a> which use dirty flags to track which data has been changed in the browser and needs to be pushed up to the server.</p>
 </li>
 <li>
-<p>web mvc frameworks use this to know what modifications to view need to be synchronized with server/client.</p>
+<p>Physics engines keep track of which objects are resting and which are in motion. Since a resting body won&#x2019;t move until an impulse is applied to it, they don&#x2019;t need any processing until they get touched. This "is resting" bit is essentially a dirty flag to track which objects have had forces applied and need to have their physics resolved.</p>
 </li>
 </ul>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>

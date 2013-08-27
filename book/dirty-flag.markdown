@@ -27,6 +27,8 @@ You might want to wait until you're home from work before Googling it.
 
 </aside>
 
+**TODO: A better example would be recalculating matrices in a scene graph.**
+
 Back to the matter at hand, let's talk about city-building games. I spent an
 inordinate amount of my childhood in slavish devotion to Will Wright's masterpieces, so for this chapter, let's imagine we're making an homage to the classic mayoral role-playing game.
 
@@ -354,19 +356,19 @@ The most basic question you'll have to answer is when to actually do the work yo
     between then and when the timer fires. Then you reset and start all over
     again.
 
-    * **You can tune how frequently the work is performed.** Here the timing of
+    * *You can tune how frequently the work is performed.* Here the timing of
         when we clean the dirty state and perform the work isn't dependent on
         the player requesting some data or reaching some checkpoint, so we can
         ensure it happens as frequently (or infrequently as we want).
 
-    * **You can do more redundant work.** If the primary state only changes a
+    * *You can do more redundant work.* If the primary state only changes a
         tiny amount during the timer's run, and the granularity of our dirty
         flags is too coarse, we'll do work on a bunch of data that hasn't
         changed. If tiny changes trickle in, that timer will constantly be
         running and triggering work over data again and again that hasn't
         changed much.
 
-    * **You can end up throwing away work.** The timer starts at the beginning
+    * *You can end up throwing away work.* The timer starts at the beginning
         of the first change to the primary data, and fires at some fixed
         interval after that. If the primary data is still being changed (i.e.
         the mayor is still in a zoning frenzy) when the timer goes off, we'll
@@ -383,7 +385,7 @@ The most basic question you'll have to answer is when to actually do the work yo
         on end without a break. The timer will keep getting reset and never
         actually auto-save the city.
 
-    * **You'll need some support for doing work "in the background".**
+    * *You'll need some support for doing work "in the background".*
         Processing on a timer independent of what the player is doing implies
         the player can keep doing whatever that is while the processing is
         going on. After all, if the processing was so fast that we could do it
@@ -396,16 +398,42 @@ The most basic question you'll have to answer is when to actually do the work yo
         the state that you're processing, you'll need to think about making that
         safe for concurrent modification too.
 
-- what is granularity of dirtiness?
+### How fine-grained is your dirty tracking?
 
-  - do you have single flag for entire data structure, or flags for just pieces of it?
-  - finer-grained means less work because you only process/transmit the chunks that are
-    dirty.
-  - but can also adds complexity walking over the data structure to check which parts are
-    dirty.
+In our first sample, we had a single flag for the entire city. We improved performance at the expense of some complexity and overhead by changing that to track a dirty bit for each block in the city. Depending on your use case, you may have options like that too.
+
+* **If it's more coarse-grained:**
+
+    * *It's simpler.* You don't have to spend as much time determining which
+        *part* of the state is dirty. The code for doing the work can do it
+        in one monolithic chunk instead of needing to be able to handle
+        chewing on smaller isolated pieces of state.
+
+    * *There's less overhead for tracking what is dirty.* You'll spend less
+        memory on the dirty flags themselves (though that's almost always
+        a trivial expense). When you go to process the dirty state and do
+        the work, you'll need less metadata to express what subset of the
+        data is dirty.
+
+* **If it's more fine-grained:**
+
+    * *You need to be able to process a subset of the data.* In our trophy
+        room example, there'd by no way to split it into several narrower
+        dirty flags. Since adding a single trophy can change the entire
+        layout, the processing we have to do has to be a single monolithic
+        operation that takes all trophies into account.
+
+        In order to do finer-grained dirtiness-tracking, you'll need to make
+        sure the work you have to do is amenable to being decomposed like
+        that.
+
+    * *You'll less more time working on unchanged data.* A coarse-grained
+        dirty flag invalidates a larger swath of data, much of which may be
+        unchanged. With finer-grained tracking, you only mark the data
+        that's actually different and thus only process actual changes.
 
 ## See Also
 
-- mvc frameworks often use this to track model changes to know what notifications to send to view
+* This pattern is increasingly common outside of games in client-side MVC web frameworks like [Angular](http://angularjs.org/) which use dirty flags to track which data has been changed in the browser and needs to be pushed up to the server.
 
-- web mvc frameworks use this to know what modifications to view need to be synchronized with server/client.
+* Physics engines keep track of which objects are resting and which are in motion. Since a resting body won't move until an impulse is applied to it, they don't need any processing until they get touched. This "is resting" bit is essentially a dirty flag to track which objects have had forces applied and need to have their physics resolved.
