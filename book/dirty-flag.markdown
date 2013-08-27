@@ -264,34 +264,137 @@ This method makes sure to set the dirty flag. Then the previous high level modif
 
 Notice that now none of these methods have to worry about the dirty flag. The more we can push setting the dirty flag into lower-level code, the fewer places we'll have to worry about it, and the less likely we are to forget.
 
-### Too slow
+### Dirty parts of town
 
-- this works, but takes a long time to save.
-- entire city is pretty huge file, and most of it is unchanged most of the time
-- would like saving to be faster by only saving parts of city that change
-- divide city into blocks
-- each block has its own dirty flag, and own region in the file
-- when quiting, we check if any flag is dirty
-- if so, walk blocks and save dirty ones
-- just seek over non-dirty ones
-- when city changes, have to remember to mark correct block as dirty
-- so, finer grained dirty checking can mean you do less work
-- but also means have to do a bit more work checking all of the dirty flags
-- and make sure right one is marked dirty at right time
+We're in a pretty good place now, but our game is a bit old school. Why save to *disk* when you can save to the *cloud*. That way, the player can seamlessly play in the same city on their computer, phone and tablet. Exciting!
 
-### Game crashes
+But this means saving they're changes will take even longer: we'll have to push all of the data for the city over the network. Not only is it slow, it's a waste of bandwidth. Users on limited data plans won't be happy when our game burns through their allotment.
 
-- saving on quit is fine most of the time, but sometimes game crashes (surely not our code, but other coders aren't so flawless)
-- would be nice if all changes weren't lost
-- so decide to save in the background
-- don't want to save on every change of course. even with blocks, still too hard on disk
-- so we'll save periodically.
-- whenever block is marked dirty, start timer
-- when timer fires, all dirty blocks are saved
-- if timer is already running when block is dirty, just leave it
-- once we save, clear timer
+It's time to start thinking about the *granularity* of our dirty state. Right now, we have a single bit for the entire city. It's either completely out of date, or completely up to date. But in practice, *most* of the city is unchanged and only a couple of pieces have been modified.
+
+We can do something more sophisticated by having finer-grained dirty bits. We'll divide the city into *blocks* -- regions of some fixed size -- and associated a dirty flag with each block. Something along the lines of:
+
+    void City::setTile(int x, int y, Tile tile)
+    {
+      // Change tile data...
+
+      // Mark this block dirty.
+      setDirtyFlag(x / BLOCK_SIZE, y / BLOCK_SIZE);
+    }
+
+Internally, `City` will keep some kind of array of dirty bits, one for each block. When we go to save the city to the game servers, we just send the dirty blocks:
+
+    void City::save()
+    {
+      for (int x = 0; x < CITY_SIZE / BLOCK_SIZE; x++)
+      {
+        for (int y = 0; y < CITY_SIZE / BLOCK_SIZE; y++)
+        {
+          if (isDirty(x, y))
+          {
+            // Upload block (x, y) to server...
+            clearDirtyFlag(x, y);
+          }
+        }
+      }
+    }
+
+There's a small amount of overhead to doing things this way. Because we're only saving pieces of the city, we have to send along a bit of metadata with each block to identify it. That way the server knows which pieces of the city its getting.
+
+The trick then is to tune our granularity. If we make the blocks too small, this additional metadata will add more overhead than the savings we got from not having send the whole city. On the other hand, if we make the blocks too big, we end up sending larger amounts of unchanged data. Like all optimizations, we'll have to tune this based on some empirical data for our specific game.
 
 ## Design Decisions
+
+This is a pretty concrete pattern, so it isn't that open-ended. There are only a couple of things to tune with it:
+
+### When is the dirty flag cleaned?
+
+The most basic question you'll have to answer is when to actually do the work you've deferred. You can't defer it *forever*, after all. Here's a few options from least to most eager.
+
+* **If you defer it until the result is needed:**
+
+    * *It avoids doing calculation entirely if the result is never used.* For
+        primary data that changes frequently and where the derived data is
+        rarely accessed, this can be a huge win.
+
+    * *If the calculation is time-consuming, it can cause a noticeable pause.*
+        Postponing the work until the end-user is waiting to see the result can
+        affect their gameplay experience. Often, it's fast enough that this
+        isn't a problem, but if it is, you'll have to do the work earlier.
+
+* **At well-defined checkpoints:**
+
+    Sometimes there is a point in time or the progression of the game where it's
+    natural to do the deferred synchronization or calculation. For example, you
+    may want to delay saving the game until the player reaches some kind of
+    check point in the level.
+
+    These synchronization points may not be user visible or part of the game
+    mechanics. For example, maybe there's a loading screen or a cut scene that
+    you can hide the work behind.
+
+    * *You can ensure the time spent doing the work doesn't impact the user
+        experience.* Unlike the above option, you can often give something to
+        distract the player while the game is busy on other things.
+
+    * *You lose control of when the work actually happens.* This is sort of the
+        opposite of the above point. You have micro-scale control over when the
+        work happens, and can make sure the game handles it gracefully.
+
+        What you *can't* do is ensure the player actually makes it to the
+        checkpoint or meets whatever criteria you've defined. If they get lost
+        or the game gets in a weird state, you can end up deferring the work
+        longer than you expected.
+
+* **In the background:**
+
+    Like your text editor that auto-saves a backup every few minutes, you can
+    do the work on some fixed time interval. Usually, you'll kick off the timer
+    on the first modification and the process all of the changes that happened
+    between then and when the timer fires. Then you reset and start all over
+    again.
+
+    * **You can tune how frequently the work is performed.** Here the timing of
+        when we clean the dirty state and perform the work isn't dependent on
+        the player requesting some data or reaching some checkpoint, so we can
+        ensure it happens as frequently (or infrequently as we want).
+
+    * **You can do more redundant work.** If the primary state only changes a
+        tiny amount during the timer's run, and the granularity of our dirty
+        flags is too coarse, we'll do work on a bunch of data that hasn't
+        changed. If tiny changes trickle in, that timer will constantly be
+        running and triggering work over data again and again that hasn't
+        changed much.
+
+    * **You can end up throwing away work.** The timer starts at the beginning
+        of the first change to the primary data, and fires at some fixed
+        interval after that. If the primary data is still being changed (i.e.
+        the mayor is still in a zoning frenzy) when the timer goes off, we'll
+        do the processing, and then immediately start the timer again and throw
+        out what we just did since changes are still coming in.
+
+        If that happens often, it may make sense for the timer to be more
+        adaptive. One fix is to reset the timer on *every* change, not just the
+        first. This means it will do the processing after a fixed amount of time
+        has passed *where the primary state hasn't changed*.
+
+        This helps you avoid pointless work, at the expense of running the risk
+        of deferring too long. Imagine a player feverishly building for hours
+        on end without a break. The timer will keep getting reset and never
+        actually auto-save the city.
+
+    * **You'll need some support for doing work "in the background".**
+        Processing on a timer independent of what the player is doing implies
+        the player can keep doing whatever that is while the processing is
+        going on. After all, if the processing was so fast that we could do it
+        synchronously while they played, we wouldn't need this pattern to begin
+        with.
+
+        That does mean we'll need threading or some other kind of concurrency
+        support so that the work we're doing can happen while the game is still
+        responsive and being played. Since the player is also interacting with
+        the state that you're processing, you'll need to think about making that
+        safe for concurrent modification too.
 
 - what is granularity of dirtiness?
 
@@ -300,40 +403,6 @@ Notice that now none of these methods have to worry about the dirty flag. The mo
     dirty.
   - but can also adds complexity walking over the data structure to check which parts are
     dirty.
-
-- when is it cleaned?
-
-  - too aggressively defeats the purpose.
-  - too lazily can cause pauses or "clumpiness".
-
-  - when needed
-
-    - simplest answer for recalculation: run it when you need the result.
-    - avoid recalc if result is never used (or is invalidated before result is
-      used.)
-    - if calc is slow, can cause a noticeable pause.
-    - for synchronization "when needed" isn't always well-defined.
-
-  - at well-defined checkpoints
-
-    - for things like save/load or network sync, this may work best. have
-      well-defined points of synchonization.
-    - can be based on time ("game saves automatically every 5 min") or location
-      ("game is saved every time you enter town")
-    - always risk of data loss if something bad happens before reaching checkpoint
-    - can be a feature of the game
-
-  - in background
-
-    - when data is marked dirty, start a timer
-    - when timer fires, save or calculate and clear
-    - if timer is already running when something else becomes dirty, have to
-      decide if you want to reset timer or not
-      - resetting can give you better data batching: if the data keeps changing
-        frequently enough to reset the timer, it may be worth waiting until it
-        settles down instead of doing work on volatile data
-      - not resetting makes sure you don't delay work indefinitely and drop data
-        makes sure data is actually processed
 
 ## See Also
 

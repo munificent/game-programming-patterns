@@ -1,4 +1,5 @@
-3013-08-25 - 841 words, first draft of dirty flag
+2013-08-26 - 1148 words, first draft of dirty flag
+2013-08-25 - 841 words, first draft of dirty flag
 2013-08-24 - 1104 words, first draft of dirty bits
 2013-08-23 - 575 words, first draft of dirty bits
 2013-08-22 - 600 words, finish outline dirty bits
