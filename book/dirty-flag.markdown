@@ -7,6 +7,99 @@
 
 ## Motivation
 
+- scene graph
+  - most games have scene graph
+  - has all objects in world
+  - each node in the graph usually has transform: translate, scale and rotate
+  - scene graph usually hierarchical -> objects can have parent
+  - when object has parent, that means parent transform applies to it too
+  - imagine world has pirate ship, which has crow's nest, which has pirate,
+    which has parrot on shoulder
+  - each is node in graph
+  - each node's transform is relative to parent.
+  - parrot's position is in pirate coords, pirate is in crow's nest coords, etc.
+  - this is good because when the ship moves, the nest moves automatically,
+    and the pirate, and the parrot.
+
+- world coord
+  - but to actuall draw parrot at right place in world, need to determine absolute
+    world coordinates
+  - won't get into detail, but do this by calculating transform matrices.
+  - to get parrot's position, walk parent chain concatenating matrices. doing
+    that isn't magic, but takes a little cpu juice.
+
+- moving
+  - when anything in the parrot's parent chain (including parrot) moves, parrot's
+    position has to be recalculated: move the ship and the parrot moves too,
+    so its world coord has to be update
+  - simplest approach is to calc everything on render
+    - every frame, walk entire scene graph recursively starting at top of
+      hierarchy and calculate world pos for each node right before we render
+    - since calc from scratch, don't have to track motion
+    - slow! end up recalculating world coords for stuff every frame that
+      aren't moving!
+    - not good enough. obvious answer is cache world coord.
+  - each node keeps local transform and world transform.
+  - when object moves, update world transform too
+  - but! remember hierarchy!
+  - also have to walk child tree and recalc all of their nodes too
+  - now imagine that all in one frame, the ship gets tossed on the ocean a bit, the crow's nest rocks in the wind, the pirate leans to the edge, and the parrot hops onto his head.
+  - what happens:
+
+    1. update ship local transform
+    2. update ship world transform
+    3. update nest world transform
+    4. update pirate world transform
+    5. update parrot world transform
+    6. update nest local transform
+    7. update nest world transform
+    8. update pirate world transform
+    9. update parrot world transform
+    10. update pirate local transform
+    11. update pirate world transform
+    12. update parrot world transform
+    13. update parrot local transform
+    14. update parrot world transform
+
+  - whoa. note that we recalculate the parrot's world transform 4 times before
+    we render it once. that means first three are total wasted work. ditto the
+    2 extra times we calculate the pirate pos and the 1 time the nest.
+
+- problem is multiple node changes can invalidate a single node's world
+  transform and we recalculate it immediately.
+- solution is to decouple invalidating node from recalculating it.
+- that lets us defer slow recalculation until after all transform changes are
+  done
+- that in turn lets us collapse multiple invalidations into a single recalc
+- dirty flag
+  - way we do this is by adding a flag to node that says "my world coord is
+    invalid" (because local coord changed). call this "dirty".
+  - whenever we move node, just set flag to true, but don't touch world coord.
+  - then to all node movements for frame.
+  - once they're all done, right before we render, walk tree
+  - if we get to a node where flag is set, update world transform then *once*,
+    regardless of how many times flag was set.
+  - (when we recurse into child nodes, if the parent was dirty, implies they
+    are too.)
+  - if the flag *isn't* set, don't touch world coord. it's already fine.
+- this gives two-fold advantage:
+  - avoids recalculation on nodes that didn't change
+  - avoids redundant calculation on nodes that changed more than once.
+  - other minor bonus: if nodes are removed before rendering, never bother
+    calculating at all!
+  - in other words, world coords are only calculated right before they are
+    actually needed
+- in example, key pieces are:
+  - have two set of data, primary and derived. here, primary is local trans
+    for all nodes, derived is world coords.
+  - derived data is calculated in some expensive process from primary data.
+  - in this case, lots of matrix multiplies up the parent chain.
+  - to minimize number of times we calculate derived data, use flag to track
+    when its out of sync. allow it to go out of sync for as long as possible
+    then only recalc once at last minute when derived data is actually needed
+  - ensures you don't do any work that isn't needed
+
+<!--
 **TODO: renamed chapter, update this:**
 
 OK, let's get two things out of the way first:
@@ -26,8 +119,6 @@ OK, let's get two things out of the way first:
 You might want to wait until you're home from work before Googling it.
 
 </aside>
-
-**TODO: A better example would be recalculating matrices in a scene graph.**
 
 Back to the matter at hand, let's talk about city-building games. I spent an
 inordinate amount of my childhood in slavish devotion to Will Wright's masterpieces, so for this chapter, let's imagine we're making an homage to the classic mayoral role-playing game.
@@ -61,6 +152,7 @@ This is one of the two <span name="graphics">main uses</span> for this pattern i
 Back in the day when I was just a little game dev, this pattern used to have one particularly common application: rendering. Before GPUs, when games did all of their rendering in software, sprite engines were optimized to only redraw portions of the screen that actually changed.
 
 The would maintain *dirty regions* that tracked which portions of the play area had been modified and needed re-rendering. These days with hardware-accelerated graphics, that technique is rarely needed anymore.
+-->
 
 </aside>
 

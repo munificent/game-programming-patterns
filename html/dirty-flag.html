@@ -64,54 +64,167 @@
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Avoid unneeded work by deferring it until the result is needed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p><strong>TODO: renamed chapter, update this:</strong></p>
-<p>OK, let&#x2019;s get two things out of the way first:</p>
-<ol>
+<ul>
+<li>scene graph</li>
+<li>most games have scene graph</li>
+<li>has all objects in world</li>
+<li>each node in the graph usually has transform: translate, scale and rotate</li>
+<li>scene graph usually hierarchical -&gt; objects can have parent</li>
+<li>when object has parent, that means parent transform applies to it too</li>
+<li>imagine world has pirate ship, which has crow&#x2019;s nest, which has pirate,
+    which has parrot on shoulder</li>
+<li>each is node in graph</li>
+<li>each node&#x2019;s transform is relative to parent.</li>
+<li>parrot&#x2019;s position is in pirate coords, pirate is in crow&#x2019;s nest coords, etc.</li>
 <li>
-<p>Yes, the name of this chapter does make me giggle every time. I have the
-    sense of humor of a ten-year-old boy.</p>
+<p>this is good because when the ship moves, the nest moves automatically,
+    and the pirate, and the parrot.</p>
 </li>
 <li>
-<p>This is actually the widely-used name of this pattern.
+<p>world coord</p>
+</li>
+<li>but to actuall draw parrot at right place in world, need to determine absolute
+    world coordinates</li>
+<li>won&#x2019;t get into detail, but do this by calculating transform matrices.</li>
+<li>
+<p>to get parrot&#x2019;s position, walk parent chain concatenating matrices. doing
+    that isn&#x2019;t magic, but takes a little cpu juice.</p>
+</li>
+<li>
+<p>moving</p>
+</li>
+<li>when anything in the parrot&#x2019;s parent chain (including parrot) moves, parrot&#x2019;s
+    position has to be recalculated: move the ship and the parrot moves too,
+    so its world coord has to be update</li>
+<li>simplest approach is to calc everything on render<ul>
+<li>every frame, walk entire scene graph recursively starting at top of
+  hierarchy and calculate world pos for each node right before we render</li>
+<li>since calc from scratch, don&#x2019;t have to track motion</li>
+<li>slow! end up recalculating world coords for stuff every frame that
+  aren&#x2019;t moving!</li>
+<li>not good enough. obvious answer is cache world coord.</li>
+</ul>
+</li>
+<li>each node keeps local transform and world transform.</li>
+<li>when object moves, update world transform too</li>
+<li>but! remember hierarchy!</li>
+<li>also have to walk child tree and recalc all of their nodes too</li>
+<li>now imagine that all in one frame, the ship gets tossed on the ocean a bit, the crow&#x2019;s nest rocks in the wind, the pirate leans to the edge, and the parrot hops onto his head.</li>
+<li>
+<p>what happens:</p>
+<ol>
+<li>update ship local transform</li>
+<li>update ship world transform</li>
+<li>update nest world transform</li>
+<li>update pirate world transform</li>
+<li>update parrot world transform</li>
+<li>update nest local transform</li>
+<li>update nest world transform</li>
+<li>update pirate world transform</li>
+<li>update parrot world transform</li>
+<li>update pirate local transform</li>
+<li>update pirate world transform</li>
+<li>update parrot world transform</li>
+<li>update parrot local transform</li>
+<li>update parrot world transform</li>
+</ol>
+</li>
+<li>
+<p>whoa. note that we recalculate the parrot&#x2019;s world transform 4 times before
+    we render it once. that means first three are total wasted work. ditto the
+    2 extra times we calculate the pirate pos and the 1 time the nest.</p>
+</li>
+<li>
+<p>problem is multiple node changes can invalidate a single node&#x2019;s world
+  transform and we recalculate it immediately.</p>
+</li>
+<li>solution is to decouple invalidating node from recalculating it.</li>
+<li>that lets us defer slow recalculation until after all transform changes are
+  done</li>
+<li>that in turn lets us collapse multiple invalidations into a single recalc</li>
+<li>dirty flag</li>
+<li>way we do this is by adding a flag to node that says "my world coord is
+    invalid" (because local coord changed). call this "dirty".</li>
+<li>whenever we move node, just set flag to true, but don&#x2019;t touch world coord.</li>
+<li>then to all node movements for frame.</li>
+<li>once they&#x2019;re all done, right before we render, walk tree</li>
+<li>if we get to a node where flag is set, update world transform then <em>once</em>,
+    regardless of how many times flag was set.</li>
+<li>(when we recurse into child nodes, if the parent was dirty, implies they
+    are too.)</li>
+<li>if the flag <em>isn&#x2019;t</em> set, don&#x2019;t touch world coord. it&#x2019;s already fine.</li>
+<li>this gives two-fold advantage:</li>
+<li>avoids recalculation on nodes that didn&#x2019;t change</li>
+<li>avoids redundant calculation on nodes that changed more than once.</li>
+<li>other minor bonus: if nodes are removed before rendering, never bother
+    calculating at all!</li>
+<li>in other words, world coords are only calculated right before they are
+    actually needed</li>
+<li>in example, key pieces are:</li>
+<li>have two set of data, primary and derived. here, primary is local trans
+    for all nodes, derived is world coords.</li>
+<li>derived data is calculated in some expensive process from primary data.</li>
+<li>in this case, lots of matrix multiplies up the parent chain.</li>
+<li>to minimize number of times we calculate derived data, use flag to track
+    when its out of sync. allow it to go out of sync for as long as possible
+    then only recalc once at last minute when derived data is actually needed</li>
+<li>ensures you don&#x2019;t do any work that isn&#x2019;t needed</li>
+</ul>
+<!--
+**TODO: renamed chapter, update this:**
+
+OK, let&#x2019;s get two things out of the way first:
+
+1.  Yes, the name of this chapter does make me giggle every time. I have the
+    sense of humor of a ten-year-old boy.
+
+2.  This is actually the widely-used name of this pattern.
     <span name="google">Google it yourself.</span> Apparently I&#x2019;m not alone in
     my juvenile disposition. Another name for the same pattern is
     "dirty flag", but they are about equally commonly used. The Wikipedia
-    article is <a href="http://en.wikipedia.org/wiki/Dirty_bit">"dirty bit"</a> (though
-    it&#x2019;s about a more specific use of the term).</p>
-</li>
-</ol>
+    article is ["dirty bit"](http://en.wikipedia.org/wiki/Dirty_bit) (though
+    it&#x2019;s about a more specific use of the term).
+
 <aside name="google">
 
-<p>You might want to wait until you&#x2019;re home from work before Googling it.</p>
+You might want to wait until you&#x2019;re home from work before Googling it.
+
 </aside>
 
-<p><strong>TODO: A better example would be recalculating matrices in a scene graph.</strong></p>
-<p>Back to the matter at hand, let&#x2019;s talk about city-building games. I spent an
-inordinate amount of my childhood in slavish devotion to Will Wright&#x2019;s masterpieces, so for this chapter, let&#x2019;s imagine we&#x2019;re making an homage to the classic mayoral role-playing game.</p>
-<p>The player can build his city however he desires. As the city grows and develops, he occassionally is granted trophies and other rewards by his loving citizens. The player can bring up a trophy screen whenever he wants to bask in the light of his accomplishments. Here&#x2019;s where things get just a little bit tricky.</p>
-<p>Every time the player gets a new trophy, the entire trophy case needs to be rearranged from scratch to generate a <span name="packing">maximally pleasing</span> arrangement. (You can imagine the virtual mayor spending hours lovingly doing this himself when he should be proofreading zoning agreements.) For our only-slightly-contrived example, let&#x2019;s pretend that that calculation is actually pretty time-consuming.</p>
+Back to the matter at hand, let&#x2019;s talk about city-building games. I spent an
+inordinate amount of my childhood in slavish devotion to Will Wright&#x2019;s masterpieces, so for this chapter, let&#x2019;s imagine we&#x2019;re making an homage to the classic mayoral role-playing game.
+
+The player can build his city however he desires. As the city grows and develops, he occassionally is granted trophies and other rewards by his loving citizens. The player can bring up a trophy screen whenever he wants to bask in the light of his accomplishments. Here&#x2019;s where things get just a little bit tricky.
+
+Every time the player gets a new trophy, the entire trophy case needs to be rearranged from scratch to generate a <span name="packing">maximally pleasing</span> arrangement. (You can imagine the virtual mayor spending hours lovingly doing this himself when he should be proofreading zoning agreements.) For our only-slightly-contrived example, let&#x2019;s pretend that that calculation is actually pretty time-consuming.
+
 <aside name="packing">
 
-<p>Arranging the trophies is kind of like the <a href="http://en.wikipedia.org/wiki/Bin_packing">classic bin-packing problem</a>, which is NP-hard, so this being time-consuming isn&#x2019;t totally outside the bounds of reason.</p>
+Arranging the trophies is kind of like the [classic bin-packing problem](http://en.wikipedia.org/wiki/Bin_packing), which is NP-hard, so this being time-consuming isn&#x2019;t totally outside the bounds of reason.
+
 </aside>
 
-<p>We could calculate the trophy arrangement every time the mayor gets a new trophy. That makes sure the trophy case is always up-to-date when they go to look at it. But, in practice, the player rarely goes to that screen. If they get <em>two</em> trophies between going to that screen, then we&#x2019;ll spend time generating the first arrangement, only to discard it without the player ever seeing it when the next trophy is awarded.</p>
-<p>Instead, we could calculate the arrangement every time they enter the trophy room. But doing that is redundant if they go to the trophy room multiple times without having earned any new trophies. We&#x2019;ll just calculate the same arrangement each time.</p>
-<p>The obvious solution is:</p>
-<ol>
-<li>
-<p>When the mayor gets a new trophy, we set a special "need trophy arrangement" flag.</p>
-</li>
-<li>
-<p>When the player enters the trophy room, we check that flag. If it&#x2019;s set, we calculate the trophy arrangement and clear it. Otherwise, we use the previously calculated arrangement, which is still up to date.</p>
-</li>
-</ol>
-<p>The "need trophy arrangement" flag is the <em>dirty bit</em>. It&#x2019;s a single bit of data that indicates whether the current trophy arrangement is "dirty", or out of sync with the mayor&#x2019;s current set of trophies.</p>
-<p>This is one of the two <span name="graphics">main uses</span> for this pattern in a nutshell. We&#x2019;ll cover the other related use a little farther down the chapter.</p>
+We could calculate the trophy arrangement every time the mayor gets a new trophy. That makes sure the trophy case is always up-to-date when they go to look at it. But, in practice, the player rarely goes to that screen. If they get *two* trophies between going to that screen, then we&#x2019;ll spend time generating the first arrangement, only to discard it without the player ever seeing it when the next trophy is awarded.
+
+Instead, we could calculate the arrangement every time they enter the trophy room. But doing that is redundant if they go to the trophy room multiple times without having earned any new trophies. We&#x2019;ll just calculate the same arrangement each time.
+
+The obvious solution is:
+
+1. When the mayor gets a new trophy, we set a special "need trophy arrangement" flag.
+
+2. When the player enters the trophy room, we check that flag. If it&#x2019;s set, we calculate the trophy arrangement and clear it. Otherwise, we use the previously calculated arrangement, which is still up to date.
+
+The "need trophy arrangement" flag is the *dirty bit*. It&#x2019;s a single bit of data that indicates whether the current trophy arrangement is "dirty", or out of sync with the mayor&#x2019;s current set of trophies.
+
+This is one of the two <span name="graphics">main uses</span> for this pattern in a nutshell. We&#x2019;ll cover the other related use a little farther down the chapter.
+
 <aside name="graphics">
 
-<p>Back in the day when I was just a little game dev, this pattern used to have one particularly common application: rendering. Before GPUs, when games did all of their rendering in software, sprite engines were optimized to only redraw portions of the screen that actually changed.</p>
-<p>The would maintain <em>dirty regions</em> that tracked which portions of the play area had been modified and needed re-rendering. These days with hardware-accelerated graphics, that technique is rarely needed anymore.</p>
+Back in the day when I was just a little game dev, this pattern used to have one particularly common application: rendering. Before GPUs, when games did all of their rendering in software, sprite engines were optimized to only redraw portions of the screen that actually changed.
+
+The would maintain *dirty regions* that tracked which portions of the play area had been modified and needed re-rendering. These days with hardware-accelerated graphics, that technique is rarely needed anymore.
+-->
+
 </aside>
 
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>

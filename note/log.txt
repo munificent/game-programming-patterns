@@ -1,3 +1,5 @@
+2013-08-28 - 723 words outline new motivation section for dirty flag
+2013-08-27 - 372 words finish draft, research how it's used in other things
 2013-08-26 - 1148 words, first draft of dirty flag
 2013-08-25 - 841 words, first draft of dirty flag
 2013-08-24 - 1104 words, first draft of dirty bits
