@@ -7,85 +7,97 @@
 
 ## Motivation
 
-**TODO: talk about "dirty bit" and "dirty flag" name?*
+Let's talk about names. There's two common monikers often slapped on this pattern: "dirty flag" and "dirty bit". The latter is a more common term, but often has a <span name="specific">more specific meaning</span>. It also makes me giggle because I have the sense of humor of a ten-year-old. So I went with the former, despite massive temptation otherwise.
 
-- scene graph
-  - most games have scene graph
-  - has all objects in world
-  - each node in the graph usually has transform: translate, scale and rotate
-  - scene graph usually hierarchical -> objects can have parent
-  - when object has parent, that means parent transform applies to it too
-  - imagine world has pirate ship, which has crow's nest, which has pirate,
-    which has parrot on shoulder
-  - each is node in graph
-  - each node's transform is relative to parent.
-  - parrot's position is in pirate coords, pirate is in crow's nest coords, etc.
-  - this is good because when the ship moves, the nest moves automatically,
-    and the pirate, and the parrot.
+<aside name="specific">
 
-- world coord
-  - but to actuall draw parrot at right place in world, need to determine absolute
-    world coordinates
-  - won't get into detail, but do this by calculating transform matrices.
-  - to get parrot's position, walk parent chain concatenating matrices. doing
-    that isn't magic, but takes a little cpu juice.
-
-- moving
-  - when anything in the parrot's parent chain (including parrot) moves, parrot's
-    position has to be recalculated: move the ship and the parrot moves too,
-    so its world coord has to be update
-  - simplest approach is to calc everything on render
-    - every frame, walk entire scene graph recursively starting at top of
-      hierarchy and calculate world pos for each node right before we render
-    - since calc from scratch, don't have to track motion
-    - slow! end up recalculating world coords for stuff every frame that
-      aren't moving!
-    - not good enough. obvious answer is cache world coord.
-  - each node keeps local transform and world transform.
-  - when object moves, update world transform too
-  - but! remember hierarchy!
-  - also have to walk child tree and recalc all of their nodes too
-  - now imagine that all in one frame, the ship gets tossed on the ocean a bit, the crow's nest rocks in the wind, the pirate leans to the edge, and the parrot hops onto his head.
-  - what happens:
-
-    1. update ship local transform
-    2. update ship world transform
-    3. update nest world transform
-    4. update pirate world transform
-    5. update parrot world transform
-    6. update nest local transform
-    7. update nest world transform
-    8. update pirate world transform
-    9. update parrot world transform
-    10. update pirate local transform
-    11. update pirate world transform
-    12. update parrot world transform
-    13. update parrot local transform
-    14. update parrot world transform
-
-  - whoa. note that we recalculate the parrot's world transform 4 times before
-    we render it once. that means first three are total wasted work. ditto the
-    2 extra times we calculate the pirate pos and the 1 time the nest.
-
-- problem is multiple node changes can invalidate a single node's world
-  transform and we recalculate it immediately.
-- solution is to decouple invalidating node from recalculating it.
-- that lets us defer slow recalculation until we actually need world transform
-- that in turn lets us collapse multiple invalidations during update into a
-  single recalc that happens right before render
-- way we do this is by adding a flag to node that says "my world coord is
-  invalid". call this "dirty".
-- whenever the local coord changes, we set dirty flag. when world coord is
-  requested, if dirty, recalc then and clear flag.
-- this gives two-fold advantage:
-  - avoids recalculation on nodes that didn't change
-  - avoids redundant calculation on nodes that changed more than once.
-  - other minor bonus: if nodes are removed before rendering, never bother
-    calculating at all!
-  - in other words, world coords are only calculated right before they are
-    actually needed
+In particular, the self-same [Wikipedia article](http://en.wikipedia.org/wiki/Dirty_bit) uses the term to describe an OS-level application of this pattern where it uses a dirty bit to tell which memory pages are out of sync with the disk.
 
 </aside>
+
+Where were we? Oh, right, making a game. Most games or game engines have something called a *scene graph*. This is a big data structure that contains all of the visible objects in the world. It's used by the renderer to determine where to draw stuff on screen. You commonly hear it associated with 3D games, but 2D games often have something similar.
+
+At its simplest, a scene graph is just a pile of objects. Each object has a model or sprite some other basic visual component, and a <span name="transform">*transform*</span>. The transform describes the object's position, rotation, and scale in the world. To move an object around in the world, we just have to change the transform.
+
+<aside name="transform">
+
+The mechanics of *how* this transform is stored and manipulated is unfortunately out of scope for this chapter. The comically abbreviated summary is that in a 3D game, the transform is 4x4 matrix. Applying one transform onto another (for example translating and then rotating an object) just requires doing a matrix multiple on the the matrix for each transform.
+
+A proof of the correctness of that is left as an exercise for the reader.
+
+</aside>
+
+When the renderer goes to draw an object, it takes its geometry, applies the transform to get it to the right place in the world, and then renders it there. If we just had a scene *bag* and not a scene *graph* that would be it and life would be simple. However, most scene graphs are <span name="hierarchical">*hierarchical*</span>.
+
+An object in the graph may have a *parent* object that it is anchored to. In that case, its transform is relative to the paren't position, and isn't its absolute position in the world.
+
+For example, imagine your game world has a pirate ship at sea. On the pirate ship is an object for the crow's nest. In that crow's nest is an object for the pirate. Attached to the pirate is a parrot. The ship's local transform will position it in the sea. The crow's nest transform position it on the ship, and pirate's positions it in the nest, etc.
+
+**TODO illustrate**
+
+This way, when a parent object moves, its children move along with it. If we change the local transform of the ship, the crow's nest, pirate, and parrot all ride along with it. It would be a total headache if we had to manually adjust transforms of everything on the ship when it moved to keep everything from sliding off of it.
+
+But to actually draw the parrot on screen, we need to know its absolute transform in world coordinates. To clarify thing, we'll call the transform we already mentioned the object's *local transform*. That's the one that's relative to its parent. To render an object, we need to know its *world transform*.
+
+Calculating an object's world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, concatenating transforms as you go. In other worlds, the parrot's world transform is:
+
+    ship local transform * nest local transform * pirate local transform * parrot local transform
+
+In the degenerate case where the object is at the top of the scene graph and has no parent, that means its local and world transforms are equivalent. There's nothing magical here. Concatenating two transforms is just a matrix multiply, which is just a handful of floating point arithmetic. However, we do have to calculate the world transform of every object in the world every frame, so this code is definitely on the hot path where performance is critical.
+
+Where it gets tricky is when an object moves. The parrot's world coordinates are based on the local coordinates of its entire parent chain. That means if any of those local transforms change, the parrot's world transform will change too. Every time a parent moves all of its children move too, recursively.
+
+The simplest approach to handle that fact is to just calculate world transforms on fly when we render. Each frame, we recursively traverse the scene graph starting at the top of the hierarchy. For each object, we calculate its world coordinate right then and render the object.
+
+But this is terribly wasteful of our precious CPU juice! Many if not most of the objects in the world are *not* moving every frame. Think of all of the static geometry that makes up the level. Calculating their world coordinates each frame is a waste when it's the same every time.
+
+The obvious answer is to *cache* the world transform. In each object, we'll store its local transform and the world transform that's derived from it and its parents. When we render, we just use the precalculated world transform. If the object never moves, that's always up to date and everything's happy.
+
+When an object does move, the obvious approach is to just recalculate its world transform right then. But don't forget the hierarchy! If a parent moves, we'll have to recalculate its world transform *and all of its children's, recursively*.
+
+Now imagine some busy gameplay. In a single frame, the ship gets tossed on the ocean, the crow's nest rocks in the wind, the pirate leans to the edge, and the parrots hops onto his head. In this one frame, we've changed four local transforms. With our current approach of eagerly recalculating world transforms, why ends up happening?
+
+    1. update ship local transform
+    2. calculate ship world transform
+    3. calculate nest world transform
+    4. calculate pirate world transform
+    5. calculate parrot world transform
+    6. update nest local transform
+    7. calculate nest world transform
+    8. calculate pirate world transform
+    9. calculate parrot world transform
+    10. update pirate local transform
+    11. calculate pirate world transform
+    12. calculate parrot world transform
+    13. update parrot local transform
+    14. calculate parrot world transform
+
+We only have four objects, but we end up doing *ten* world transform calculations, each of which is itself an iterative walk up the parent chain. Notice that most of those world calculations are completely pointless. We end up calculating the parrot's world transform *four* times, but the first three just get discarded and overridden by later ones. This won't do.
+
+The problem is that when a single object moves, it invalidates the world transform of several objects: itself and all of its children. Flipping that around, it means any object's world transform is dependent on several local transforms. Since we recalculate immediately each time one of those local transforms changes, when a number of local transforms change in one frame, we end up calculating the world transform for the same object multiple times.
+
+The solution is to decouple changing local transforms from updating the world transforms. This would let us change a bunch of local transforms in a single batch and then recalculate the affected world transform *once* when all of those modifications are done, right before we need it to render.
+
+We do this by adding a boolean field to each node in the graph. When the local transform changes, we set this flag to true. When we need the object's world transform to render, we check the flag first. If it's set, we calculate the world transform then and clear the flag. In other words, the flag represents "is the world transform out of date". For reasons that aren't entirely clear, the traditional name for this "out-of-dateness" is "dirty". Hence: a dirty flag.
+
+Applying that pattern to our earlier example where everything moves in the same frame yields:
+
+    1. update ship local transform
+    2. update nest local transform
+    3. update pirate local transform
+    4. update parrot local transform
+    5. calculate ship world transform
+    6. calculate nest world transform
+    7. calculate pirate world transform
+    8. calculate parrot world transform
+
+Which is obviously the best you could hope to do. As you can see, the pattern gives us a few advantages:
+
+1. It collapses modifications to multiple local transforms along an object's parent chain into a single recalculation on the object.
+2. It avoids doing any recalculation on objects that didn't move.
+3. And a minor bonus: if any objects end up getting removed before they are rendered, we won't bother calculating their world transform at all.
+
+In other words, this pattern lets us only calculate the world transform when it's actually needed and when it's actually changed.
 
 ## The Pattern
 
