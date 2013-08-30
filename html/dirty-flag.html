@@ -64,6 +64,7 @@
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Avoid unneeded work by deferring it until the result is needed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
+<p>*<em>TODO: talk about "dirty bit" and "dirty flag" name?</em></p>
 <ul>
 <li>scene graph</li>
 <li>most games have scene graph</li>
@@ -139,20 +140,13 @@
   transform and we recalculate it immediately.</p>
 </li>
 <li>solution is to decouple invalidating node from recalculating it.</li>
-<li>that lets us defer slow recalculation until after all transform changes are
-  done</li>
-<li>that in turn lets us collapse multiple invalidations into a single recalc</li>
-<li>dirty flag</li>
+<li>that lets us defer slow recalculation until we actually need world transform</li>
+<li>that in turn lets us collapse multiple invalidations during update into a
+  single recalc that happens right before render</li>
 <li>way we do this is by adding a flag to node that says "my world coord is
-    invalid" (because local coord changed). call this "dirty".</li>
-<li>whenever we move node, just set flag to true, but don&#x2019;t touch world coord.</li>
-<li>then to all node movements for frame.</li>
-<li>once they&#x2019;re all done, right before we render, walk tree</li>
-<li>if we get to a node where flag is set, update world transform then <em>once</em>,
-    regardless of how many times flag was set.</li>
-<li>(when we recurse into child nodes, if the parent was dirty, implies they
-    are too.)</li>
-<li>if the flag <em>isn&#x2019;t</em> set, don&#x2019;t touch world coord. it&#x2019;s already fine.</li>
+  invalid". call this "dirty".</li>
+<li>whenever the local coord changes, we set dirty flag. when world coord is
+  requested, if dirty, recalc then and clear flag.</li>
 <li>this gives two-fold advantage:</li>
 <li>avoids recalculation on nodes that didn&#x2019;t change</li>
 <li>avoids redundant calculation on nodes that changed more than once.</li>
@@ -160,270 +154,234 @@
     calculating at all!</li>
 <li>in other words, world coords are only calculated right before they are
     actually needed</li>
-<li>in example, key pieces are:</li>
-<li>have two set of data, primary and derived. here, primary is local trans
-    for all nodes, derived is world coords.</li>
-<li>derived data is calculated in some expensive process from primary data.</li>
-<li>in this case, lots of matrix multiplies up the parent chain.</li>
-<li>to minimize number of times we calculate derived data, use flag to track
-    when its out of sync. allow it to go out of sync for as long as possible
-    then only recalc once at last minute when derived data is actually needed</li>
-<li>ensures you don&#x2019;t do any work that isn&#x2019;t needed</li>
 </ul>
-<!--
-**TODO: renamed chapter, update this:**
-
-OK, let&#x2019;s get two things out of the way first:
-
-1.  Yes, the name of this chapter does make me giggle every time. I have the
-    sense of humor of a ten-year-old boy.
-
-2.  This is actually the widely-used name of this pattern.
-    <span name="google">Google it yourself.</span> Apparently I&#x2019;m not alone in
-    my juvenile disposition. Another name for the same pattern is
-    "dirty flag", but they are about equally commonly used. The Wikipedia
-    article is ["dirty bit"](http://en.wikipedia.org/wiki/Dirty_bit) (though
-    it&#x2019;s about a more specific use of the term).
-
-<aside name="google">
-
-You might want to wait until you&#x2019;re home from work before Googling it.
-
-</aside>
-
-Back to the matter at hand, let&#x2019;s talk about city-building games. I spent an
-inordinate amount of my childhood in slavish devotion to Will Wright&#x2019;s masterpieces, so for this chapter, let&#x2019;s imagine we&#x2019;re making an homage to the classic mayoral role-playing game.
-
-The player can build his city however he desires. As the city grows and develops, he occassionally is granted trophies and other rewards by his loving citizens. The player can bring up a trophy screen whenever he wants to bask in the light of his accomplishments. Here&#x2019;s where things get just a little bit tricky.
-
-Every time the player gets a new trophy, the entire trophy case needs to be rearranged from scratch to generate a <span name="packing">maximally pleasing</span> arrangement. (You can imagine the virtual mayor spending hours lovingly doing this himself when he should be proofreading zoning agreements.) For our only-slightly-contrived example, let&#x2019;s pretend that that calculation is actually pretty time-consuming.
-
-<aside name="packing">
-
-Arranging the trophies is kind of like the [classic bin-packing problem](http://en.wikipedia.org/wiki/Bin_packing), which is NP-hard, so this being time-consuming isn&#x2019;t totally outside the bounds of reason.
-
-</aside>
-
-We could calculate the trophy arrangement every time the mayor gets a new trophy. That makes sure the trophy case is always up-to-date when they go to look at it. But, in practice, the player rarely goes to that screen. If they get *two* trophies between going to that screen, then we&#x2019;ll spend time generating the first arrangement, only to discard it without the player ever seeing it when the next trophy is awarded.
-
-Instead, we could calculate the arrangement every time they enter the trophy room. But doing that is redundant if they go to the trophy room multiple times without having earned any new trophies. We&#x2019;ll just calculate the same arrangement each time.
-
-The obvious solution is:
-
-1. When the mayor gets a new trophy, we set a special "need trophy arrangement" flag.
-
-2. When the player enters the trophy room, we check that flag. If it&#x2019;s set, we calculate the trophy arrangement and clear it. Otherwise, we use the previously calculated arrangement, which is still up to date.
-
-The "need trophy arrangement" flag is the *dirty bit*. It&#x2019;s a single bit of data that indicates whether the current trophy arrangement is "dirty", or out of sync with the mayor&#x2019;s current set of trophies.
-
-This is one of the two <span name="graphics">main uses</span> for this pattern in a nutshell. We&#x2019;ll cover the other related use a little farther down the chapter.
-
-<aside name="graphics">
-
-Back in the day when I was just a little game dev, this pattern used to have one particularly common application: rendering. Before GPUs, when games did all of their rendering in software, sprite engines were optimized to only redraw portions of the screen that actually changed.
-
-The would maintain *dirty regions* that tracked which portions of the play area had been modified and needed re-rendering. These days with hardware-accelerated graphics, that technique is rarely needed anymore.
--->
-
 </aside>
 
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
-<p>A set of <strong>primary data changes</strong> over time. A set of <strong>derived data</strong> is determined from this using some <strong>complex calculation or synchronization</strong>. A <strong>"dirty" flag</strong> tracks when the derived data is out of sync with the primary data. It is <strong>set when the primary data changes</strong>. When the derived data is requested <strong>it is calculated only when the flag is set and the flag is cleared.</strong> Otherwise, the previous <strong>cached derived data</strong> is used.</p>
+<p>A set of <strong>primary data changes</strong> over time. A set of <strong>derived data</strong> is determined from this using some <strong>time-consuming process</strong>. A <strong>"dirty" flag</strong> tracks when the derived data is out of sync with the primary data. It is <strong>set when the primary data changes</strong>. When the derived data is requested, if the flag is set <strong>the processing is done then and the flag is cleared.</strong> Otherwise, the previous <strong>cached derived data</strong> is used.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>Compared to some other patterns in this book, this one solves a pretty specific problem. Also, like most optimization patterns, you should only reach for it when you have a performance problem big enough to justify the added code complexity. Added up, this means you probably won&#x2019;t use this often.</p>
-<p>Dirty bits are used to solve two related problems: <em>calculation</em> and <em>synchronization</em>. What they have in common is:</p>
+<p>Dirty flags are used to solve two related problems: <em>calculation</em> and <em>synchronization</em>. What they have in common is:</p>
 <ol>
 <li>A set of data that changes over time.</li>
 <li>Another set of data that&#x2019;s somehow derived from that.</li>
-<li>The process of going from 1 to 2 is "heavyweight".</li>
+<li>The process of going from 1 to 2 is time-consuming or otherwise expensive.</li>
 </ol>
-<p>When you use this pattern for calculation, like in the example in the motivation section, it&#x2019;s because there is actual complex computation involved that you want to avoid. With synchronization, it&#x2019;s more often that the derived data is <em>somewhere else</em>&thinsp;&mdash;&thinsp;either on disk or over the network on another machine&thinsp;&mdash;&thinsp;and simply getting it from point A to point B is slow.</p>
-<p>In either case, it turns out that doing that heavyweight work is often for naught. Every time the primary data changes, you have to ditch the previous derived data and generate it again to take into account the new stuff. If the primary data changes <em>again</em> before you ever actually use the data derived from it, then there&#x2019;s no point in doing that work.</p>
-<p>That brings in a third requirement for this pattern: <em>the primary data has to change more often than the derived data is used</em>. If you always need the derived data every single time the primary data is modified, there&#x2019;s no way to avoid doing the work to generate it, and this pattern can&#x2019;t help you.</p>
-<p>There&#x2019;s one final softer fourth requirement. It&#x2019;s implied here that you can&#x2019;t easily <em>incrementally</em> update the derived data when the primary data changes. This pattern comes into play with the derived data is only calculated from <em>the primary data</em> and not from <em>the previous derived data</em>.</p>
-<p>For example, if the mayor&#x2019;s trophy room just lined the trophies up one after the other in the order they were awarded, this pattern wouldn&#x2019;t be helpful. Each time he got a trophy, we can calculate the position <em>of just that trophy</em> and then add it to the end of the row. Doing this would require using the previous derived data (the other trophy positions) and that means we&#x2019;d be best off updating the trophy positions <em>each time he gets a new trophy</em>.</p>
-<p>In constrast, this pattern comes into play when the old derived data is totally discarded and calculated from scratch based on the primary data. In that case, we can <em>skip</em> updates without things getting out of sync since the previous derived data isn&#x2019;t used anyway.</p>
-<p>All of this makes it sound like this pattern would never actually be useful, but over time you&#x2019;ll likely find a place here or there where it&#x2019;s a good fit. Grepping your average game codebase for the word "dirty" will often turn something up, and it almost always refers to this pattern.</p>
+<p>In our scene graph example, the process is time-consuming because there&#x2019;s just a lot of math to perform. When using this pattern for synchronization, it&#x2019;s more often that the derived data is <em>somewhere else</em>&thinsp;&mdash;&thinsp;either on disk or over the network on another machine&thinsp;&mdash;&thinsp;and simply getting it from point A to point B is what&#x2019;s expensive.</p>
+<p>In either case, it turns out that doing that heavyweight work is often for naught. Every time the primary data changes, you have to ditch the previous derived data and generate it again to take into account the new stuff. If the primary data changes <em>again</em> before you ever actually use the data derived from it, then there was no point in doing that work.</p>
+<p>That brings in another requirement for this pattern: <em>the primary data has to change more often than the derived data is used</em>. If you always need the derived data every single time the primary data is modified, there&#x2019;s no way to avoid doing the work to generate it each time, and this pattern can&#x2019;t help you.</p>
+<p>There&#x2019;s one final softer requirement. It&#x2019;s implied here that you can&#x2019;t easily <em>incrementally</em> update the derived data when the primary data changes. This pattern comes into play with the derived data is only calculated from <em>the primary data</em> and not from <em>the previous derived data</em>.</p>
+<p>Let&#x2019;s say you had a game where the character has a backpack and can only carry so much weight. You need to know the total weight by summing the weights of everything in the backpack. You <em>could</em> use this pattern and have a dirty flag for the total weight. Every time you add or remove an item you set the flag. Then when you need the total, you add up all of the items and clear the flag.</p>
+<p>But a simpler solution is to just <em>keep a running total</em>. When you add and remove an item, just add or remove its weight from the current total. If you can "pay as you go" like this and keep the derived data updated, then that&#x2019;s often a better choice than using this pattern.</p>
+<p>All of this makes it sound like this pattern is never actually useful, but over time you&#x2019;ll likely find a place here or there where it&#x2019;s a good fit. Grepping your average game codebase for the word "dirty" will often turn something up, and it almost always refers to this pattern.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
-<p>Once you have convinced yourself this pattern is a good fit, there are a few wrinkled that can cause you some discomfort.</p>
+<p>Once you have convinced yourself this pattern is a good fit, there are a few wrinkles that can cause you some discomfort.</p>
 <h3><a href="#deferring-until-the-result-is-needed-can-cause-a-noticeable-pause" name="deferring-until-the-result-is-needed-can-cause-a-noticeable-pause">Deferring until the result is needed can cause a noticeable pause</a></h3>
-<p>In its simplest form, this pattern <aside name="gc">defers</aside> some slow work until the result is actually needed. But when the result is needed, it&#x2019;s often needed <em>right now</em> and the reason we&#x2019;re using this pattern to begin with is because calculating that result is slow!</p>
-<p>In our example, if we wait until the player enters the trophy room to calculate the trophy positions, there may be a visible delay before the screen appears while the game is busy playing interior decorator. Sometimes, the pause is small enough that this isn&#x2019;t a problem.</p>
-<p>When it is a problem, you&#x2019;ll often refine this pattern. There&#x2019;s actually a continuum of when to do the work ranging from "the second the primary data changes" all the way to "only at the last second when the derived data is needed". In between those two points are a range of options where you defer the work <em>somewhat</em> but still eventually kick it off before the result is actually needed.</p>
+<p>In its simplest form, this pattern <aside name="gc">defers</aside> some slow work until the result is actually needed. But when the result <em>is</em> needed, it&#x2019;s often needed <em>right now</em> and the reason we&#x2019;re using this pattern to begin with is because calculating that result is slow!</p>
+<p>This isn&#x2019;t a problem in our example because calculating a given node&#x2019;s world coordinates isn&#x2019;t <em>too</em> slow. Our goal was to avoid doing it <em>redundantly</em>.
+But you can imagine other uses of this pattern where the work you&#x2019;re doing is a big monolithic chunk that takes a noticeable amount of time to chew through.</p>
+<p>If the game doesn&#x2019;t <em>start</em> doing that until right when the player brings up
+the screen the shows the result of it, then they will notice the pause.
+If this is a problem, you may need to start doing the processing earlier "in
+the background" so that at least some of the work is done by the time its
+needed.</p>
+<h3><a href="#you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes" name="you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes">You have to make sure to set the flag <em>every</em> time the state changes</a></h3>
+<p>Since the derived data is calculated from the primary data, it&#x2019;s essentially a cache. Whenever you have cached data in memory, the trickiest aspect of it is <span name="cache"><em>cache invalidation</em></span>&thinsp;&mdash;&thinsp;correctly knowing when the cache is out of sync with its source data. In this pattern, that means correctly setting the dirty flag when <em>any</em> primary data changes.</p>
+<aside name="cache">
+
+<p>Phil Karlton famously said, "There are only two hard things in Computer Science: cache invalidation and naming things."</p>
+</aside>
+
+<p>Miss it in one place, and your program will incorrectly use stale derived data. This leads to confused players and very hard to track down bugs. When you use this pattern, you&#x2019;ll have to be very careful that any code that modifies the primary state also sets the dirty flag. In our scene graph, for example, we have to remember to invalidate not just the object&#x2019;s world transform when its local transform changes, but all of its children too since they depend on it.</p>
+<p>One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes a single narrow interface, you can set the dirty bit there and rest assurred that it won&#x2019;t go out of sync.</p>
+<h3><a href="#you-will-have-to-keep-the-previous-derived-data-in-memory" name="you-will-have-to-keep-the-previous-derived-data-in-memory">You will have to keep the previous derived data in memory</a></h3>
+<p>When the game needs the derived data, it checks to see if the dirty flag is set. If it <em>isn&#x2019;t</em> set, then it uses the previously calculated data. This is obvious, but that does imply that you have to keep that derived data around in memory in case you end up needing it later.</p>
+<p>If you weren&#x2019;t using this pattern, another option would be just calculate the derived data on the fly right when you need it, and then discard it when you&#x2019;re done. That avoids the expense of keeping it cached in memory. The cost doing this is calculation: you&#x2019;ll have to do that calculation <em>every</em> time you need it.</p>
+<p>Like many optimizations, then, you can look at this pattern as <span name="trade">trading</span> off memory for space. In return for keeping the previously calculated data in memory, you avoid having to recalculate it when it&#x2019;s imput data hasn&#x2019;t changed. This trade-off makes sense when the calculation is slow and memory is cheap. When you&#x2019;ve got more time than memory on your hands, it may be better to just calculate it as needed and avoid this pattern.</p>
+<aside name="trade">
+
+<p>Conversely, you can consider compression algorithsm as making the opposite trade-off: they optimize space at the expense of needing processing time to decompress.</p>
+</aside>
+
+<h3><a href="#if-you&#x2019;re-synchronizing-and-you-defer-too-long,-you-risk-losing-changes" name="if-you&#x2019;re-synchronizing-and-you-defer-too-long,-you-risk-losing-changes">If you&#x2019;re synchronizing and you defer too long, you risk losing changes</a></h3>
+<p>Any program that lets you edit documents keeps track of if you have "unsaved changes", which is a picture-perfect example of this pattern. That little bullet or star in your document&#x2019;s title bar is literally the dirty flag visualized. The primary data is the open document in memory, and the derived data is the file on disk.</p>
+<p>Many programs don&#x2019;t save to disk until either the document is closed or the application is exited. That&#x2019;s fine most of the time, but if you accidentally kick the power cable out, there goes your masterpiece.</p>
+<p>There&#x2019;s actually a continuum of when to do the work ranging from "the second the primary data changes" all the way to "only at the last second when the derived data is needed". In between those two points are a range of options where you defer the work <em>somewhat</em> but still eventually kick it off even before the result is actually needed.</p>
 <p>When your fancy text editor auto-saves a backup "in the background" every few minutes, that&#x2019;s basically the trade-off it&#x2019;s making. The frequency that it auto-saves&thinsp;&mdash;&thinsp;every few minutes to once an hour&thinsp;&mdash;&thinsp;is picking a point on the continuum that balances not losing too much work when a crash occurs against not thrashing the file system too much by saving all the time.</p>
 <p><span name="gc"></p>
 <p>This is mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting systems free memory the second its no longer needed, but suffer by spending CPU time updating ref counts eagerly every time references are changed.</p>
 <p>Simple garbage collectors defer reclaiming memory until it&#x2019;s really needed. But the cost here is the dreaded "GC pause" that can freeze your entire app until the GC is done walking the heap.</p>
 <p>In between the two are increasingly common more complex systems like deferred ref-counting and incremental GC that reclaim memory less eagerly than pure ref-counting but more eagerly than stop-the-world collectors.</p>
 <p></span></p>
-<h3><a href="#you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes" name="you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes">You have to make sure to set the flag <em>every</em> time the state changes</a></h3>
-<p>Since the derived data is calculated from the primary data, it&#x2019;s essentially a cache. Whenever you have cached data in memory, the trickiest aspect of it is <span name="cache"><em>cache invalidation</em></span>: correctly knowing when the cache is out of sync with its source data. In this pattern, that means correctly setting the dirty bit when <em>any</em> primary data changes.</p>
-<aside name="cache">
-
-<p>Phil Karlton famously said, "There are only two hard things in Computer Science: cache invalidation and naming things."</p>
-<p>My favorite variation is, "There are only two hard things in Computer Science: cache invalidation, naming things, and off-by-one errors."</p>
-</aside>
-
-<p>Miss it in one place, and your program will incorrectly use stale derived data. This leads to confused players and very hard to track down bugs. When you use this pattern, you&#x2019;ll have to be very careful that any code that modifies the primary state also sets the dirty bit.</p>
-<p>One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes a single simple interface, you can set the dirty bit there and rest assurred that it won&#x2019;t go out of sync.</p>
-<h3><a href="#you-will-have-to-keep-the-previous-derived-data-in-memory" name="you-will-have-to-keep-the-previous-derived-data-in-memory">You will have to keep the previous derived data in memory</a></h3>
-<p>When the game needs the derived data, it checks to see if the dirty flag is set. If it <em>isn&#x2019;t</em> set, then it uses the previously calculated data. This is obvious, but that does imply that you have to keep that derived data around in memory in case you end up needing it later.</p>
-<p>If you weren&#x2019;t using this pattern, another option would be just calculate the derived data on the fly right when you need it, and then discard it when you&#x2019;re done. That avoids the expense of keeping it cached in memory. The cost doing this is calculation: you&#x2019;ll have to do that calculation <em>every</em> time you need it.</p>
-<p>Like many optimizations, then, you can look at this pattern as trading off memory for space. In return for keeping the previously calculated data in memory, you avoid having to recalculate it when it&#x2019;s imput data hasn&#x2019;t changed. This trade-off makes sense when the calculation is slow and memory is cheap. When you&#x2019;ve got more time than memory on your hands, it may be better to just calculate it as needed and avoid this pattern.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
-<p>Assuming we&#x2019;ve met the surprisingly long list of requirements and this pattern does make sense for out problem, let&#x2019;s see how it looks to code it up. The initial problem in the motivation section is pretty obvious to implement. Whenever the mayor gets a new trophy, we set the flag. When the player opens the trophy screen, we check the flag. If it&#x2019;s set, we layout the trophies, clear the flag and continue.</p>
-<p>I&#x2019;m pretty sure you can code that up on your own, so let&#x2019;s leave that as an exercise for the reader. Instead, let&#x2019;s do a different example showing the other main use for this pattern, synchronization. The mayor is doing the best he can, but even he needs help saving his city. <span name="pun">To disk</span>, that is.</p>
+<p><strong>TODO: redo</strong></p>
+<!--
+Assuming we&#x2019;ve met the surprisingly long list of requirements and this pattern does make sense for out problem, let&#x2019;s see how it looks to code it up. The initial problem in the motivation section is pretty obvious to implement. Whenever the mayor gets a new trophy, we set the flag. When the player opens the trophy screen, we check the flag. If it&#x2019;s set, we layout the trophies, clear the flag and continue.
+
+I&#x2019;m pretty sure you can code that up on your own, so let&#x2019;s leave that as an exercise for the reader. Instead, let&#x2019;s do a different example showing the other main use for this pattern, synchronization. The mayor is doing the best he can, but even he needs help saving his city. <span name="pun">To disk</span>, that is.
+
 <aside name="pun">
 
-<p>If you&#x2019;re reading this awful pun, that means I managed to maintain the bad judgement to keep this in through each revision of this chapter. What was I thinking?</p>
+If you&#x2019;re reading this awful pun, that means I managed to maintain the bad judgement to keep this in through each revision of this chapter. What was I thinking?
+
 </aside>
 
-<p>Our player is going to spend hours meticulously crafting their city. They probably don&#x2019;t want to just throw it out the window and start over from scratch every time they quit the game, so we&#x2019;ll want to whip up some kind of save-load system.</p>
-<p>Obviously, saving the city to disk every time they plant a single mailbox or lightpost would be numbingly slow and cause undo torture to the player&#x2019;s hard disk. A better solution is to save when they quit the game.</p>
-<p><span name="elide"></span></p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Game</span><span class="o">::</span><span class="n">quit</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="n">city</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-<span class="p">}</span>
-</pre></div>
+Our player is going to spend hours meticulously crafting their city. They probably don&#x2019;t want to just throw it out the window and start over from scratch every time they quit the game, so we&#x2019;ll want to whip up some kind of save-load system.
 
+Obviously, saving the city to disk every time they plant a single mailbox or lightpost would be numbingly slow and cause undo torture to the player&#x2019;s hard disk. A better solution is to save when they quit the game.
+
+<span name="elide"></span>
+
+    void Game::quit()
+    {
+      city.save();
+    }
 
 <aside name="elide">
 
-<p>Like many chapters in this book, I&#x2019;m eliding the concrete code to actually save the city. Since we&#x2019;re just concerned with the architectural structure here, the implementation details are, well, implementation details.</p>
+Like many chapters in this book, I&#x2019;m eliding the concrete code to actually save the city. Since we&#x2019;re just concerned with the architectural structure here, the implementation details are, well, implementation details.
+
 </aside>
 
-<p>Swell. Now every time the player quits the game, they&#x2019;re beautiful metropolis is lovingly enscribed on the platters of their hard disk, ready and waiting for the next time the game is run. Alas, this isn&#x2019;t a perfect solution.</p>
-<h3><a href="#wasting-time-in-a-clean-city" name="wasting-time-in-a-clean-city">Wasting time in a clean city</a></h3>
-<p>The problem is that in our awesome game, you can build huge cities. Writing out every street and telephone pole takes a long time. When they player&#x2019;s actually built lots of new stuff, there&#x2019;s not much you can do. But if they just open the city, look around a bit and quit, it&#x2019;s pointless to save the city: nothing&#x2019;s changed and the city on disk is already up to date.</p>
-<p>We&#x2019;ll apply this pattern and define a dirty flag for the city:</p>
-<div class="codehilite"><pre><span class="n">class</span> <span class="n">City</span> <span class="p">{</span>
-  <span class="c1">// Lots of other stuff&amp;hellip;</span>
-<span class="nl">private:</span>
-  <span class="kt">bool</span> <span class="n">dirty</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
+Swell. Now every time the player quits the game, they&#x2019;re beautiful metropolis is lovingly enscribed on the platters of their hard disk, ready and waiting for the next time the game is run. Alas, this isn&#x2019;t a perfect solution.
 
+###<a href="#wasting-time-in-a-clean-city" name="wasting-time-in-a-clean-city">Wasting time in a clean city</a>
 
-<p>Now when we go to save, we&#x2019;ll first check and see if we have to:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">save</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="c1">// Bail if the city is already up to date.</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">dirty</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+The problem is that in our awesome game, you can build huge cities. Writing out every street and telephone pole takes a long time. When they player&#x2019;s actually built lots of new stuff, there&#x2019;s not much you can do. But if they just open the city, look around a bit and quit, it&#x2019;s pointless to save the city: nothing&#x2019;s changed and the city on disk is already up to date.
 
-  <span class="c1">// Write city to disk&amp;hellip;</span>
+We&#x2019;ll apply this pattern and define a dirty flag for the city:
 
-  <span class="c1">// The city on disk is up to date now.</span>
-  <span class="n">dirty</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
+    class City {
+      // Lots of other stuff&hellip;
+    private:
+      bool dirty;
+    }
 
+Now when we go to save, we&#x2019;ll first check and see if we have to:
 
-<h3><a href="#getting-dirty" name="getting-dirty">Getting dirty</a></h3>
-<p>This is the easy part. The hard part is making sure that flag gets set. Every bit of code that modifies a part of the city&#x2019;s state that is saved to disk needs to make sure to set dirty to true. You can imagine lots of methods like:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">zoneArea</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="kt">int</span> <span class="n">height</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// Set zoning&amp;hellip;</span>
-  <span class="n">dirty</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-<span class="p">}</span>
+    void City::save()
+    {
+      // Bail if the city is already up to date.
+      if (!dirty) return;
 
-<span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">placeBuilding</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Building</span> <span class="n">building</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// Place building&amp;hellip;</span>
-  <span class="n">dirty</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-<span class="p">}</span>
+      // Write city to disk&hellip;
 
-<span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">addRoad</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Direction</span> <span class="n">direction</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// Add road&amp;hellip;</span>
-  <span class="n">dirty</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
+      // The city on disk is up to date now.
+      dirty = false;
+    }
 
+###<a href="#getting-dirty" name="getting-dirty">Getting dirty</a>
 
-<p>If you have a <span name="wide">wide smear</span> of code that modifies state, you&#x2019;re just asking to make a mistake and forget to set the dirty flag somewhere. If you can, it helps to define that code in terms of a much smaller interface that does the low-level modification.</p>
+This is the easy part. The hard part is making sure that flag gets set. Every bit of code that modifies a part of the city&#x2019;s state that is saved to disk needs to make sure to set dirty to true. You can imagine lots of methods like:
+
+    void City::zoneArea(int x, int y, int width, int height) {
+      // Set zoning&hellip;
+      dirty = true;
+    }
+
+    void City::placeBuilding(int x, int y, Building building) {
+      // Place building&hellip;
+      dirty = true;
+    }
+
+    void City::addRoad(int x, int y, Direction direction) {
+      // Add road&hellip;
+      dirty = true;
+    }
+
+If you have a <span name="wide">wide smear</span> of code that modifies state, you&#x2019;re just asking to make a mistake and forget to set the dirty flag somewhere. If you can, it helps to define that code in terms of a much smaller interface that does the low-level modification.
+
 <aside name="wide">
 
-<p>In general, code that <em>modifies</em> state is more problematic than code that just <em>reads</em> state. Whenever you&#x2019;re trying to understand a chunk of code, you have to think about what state the data is in, how it got that way, and how it can change. When other random code reads that state, it doesn&#x2019;t affect your local understanding of what that code does. But when outside code can <em>change</em> the state, now you have to hold that much larger context in your head.</p>
+In general, code that *modifies* state is more problematic than code that just *reads* state. Whenever you&#x2019;re trying to understand a chunk of code, you have to think about what state the data is in, how it got that way, and how it can change. When other random code reads that state, it doesn&#x2019;t affect your local understanding of what that code does. But when outside code can *change* the state, now you have to hold that much larger context in your head.
+
 </aside>
 
-<p>For example, in our city-building game, the city is ultimately represented by a grid of tiles. Roads, buildings, and other stuff are all just different kinds of tiles. Given that, we could define a low-level method like:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">setTile</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Tile</span> <span class="n">tile</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="c1">// Change tile data&amp;hellip;</span>
-  <span class="n">dirty</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
+For example, in our city-building game, the city is ultimately represented by a grid of tiles. Roads, buildings, and other stuff are all just different kinds of tiles. Given that, we could define a low-level method like:
 
+    void City::setTile(int x, int y, Tile tile)
+    {
+      // Change tile data&hellip;
+      dirty = true;
+    }
 
-<p>This method makes sure to set the dirty flag. Then the previous high level modification methods can be implemented using it:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">zoneArea</span><span class="p">(</span><span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">top</span><span class="p">,</span> <span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="kt">int</span> <span class="n">height</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">left</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">left</span> <span class="o">+</span> <span class="n">width</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="n">top</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">top</span> <span class="o">+</span> <span class="n">height</span><span class="p">;</span> <span class="n">y</span><span class="o">++</span><span class="p">)</span>
-    <span class="p">{</span>
-      <span class="n">setTile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">TILE_ZONE</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+This method makes sure to set the dirty flag. Then the previous high level modification methods can be implemented using it:
 
-<span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">placeBuilding</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Building</span> <span class="n">building</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="n">setTile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">building</span><span class="p">.</span><span class="n">tile</span><span class="p">());</span>
-<span class="p">}</span>
+    void City::zoneArea(int left, int top, int width, int height)
+    {
+      for (int x = left; x < left + width; x++)
+      {
+        for (int y = top; y < top + height; y++)
+        {
+          setTile(x, y, TILE_ZONE);
+        }
+      }
+    }
 
-<span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">addRoad</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Direction</span> <span class="n">direction</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="n">Tile</span> <span class="n">tile</span><span class="p">;</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">direction</span> <span class="o">==</span> <span class="n">DIR_HORIZONTAL</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="n">tile</span> <span class="o">=</span> <span class="n">TILE_HOR_ROAD</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="k">else</span>
-  <span class="p">{</span>
-    <span class="n">tile</span> <span class="o">=</span> <span class="n">TILE_VERT_ROAD</span><span class="p">;</span>
-  <span class="p">}</span>
+    void City::placeBuilding(int x, int y, Building building)
+    {
+      setTile(x, y, building.tile());
+    }
 
-  <span class="n">setTile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">tile</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
+    void City::addRoad(int x, int y, Direction direction)
+    {
+      Tile tile;
+      if (direction == DIR_HORIZONTAL)
+      {
+        tile = TILE_HOR_ROAD;
+      }
+      else
+      {
+        tile = TILE_VERT_ROAD;
+      }
 
+      setTile(x, y, tile);
+    }
 
-<p>Notice that now none of these methods have to worry about the dirty flag. The more we can push setting the dirty flag into lower-level code, the fewer places we&#x2019;ll have to worry about it, and the less likely we are to forget.</p>
-<h3><a href="#dirty-parts-of-town" name="dirty-parts-of-town">Dirty parts of town</a></h3>
-<p>We&#x2019;re in a pretty good place now, but our game is a bit old school. Why save to <em>disk</em> when you can save to the <em>cloud</em>. That way, the player can seamlessly play in the same city on their computer, phone and tablet. Exciting!</p>
-<p>But this means saving they&#x2019;re changes will take even longer: we&#x2019;ll have to push all of the data for the city over the network. Not only is it slow, it&#x2019;s a waste of bandwidth. Users on limited data plans won&#x2019;t be happy when our game burns through their allotment.</p>
-<p>It&#x2019;s time to start thinking about the <em>granularity</em> of our dirty state. Right now, we have a single bit for the entire city. It&#x2019;s either completely out of date, or completely up to date. But in practice, <em>most</em> of the city is unchanged and only a couple of pieces have been modified.</p>
-<p>We can do something more sophisticated by having finer-grained dirty bits. We&#x2019;ll divide the city into <em>blocks</em>&thinsp;&mdash;&thinsp;regions of some fixed size&thinsp;&mdash;&thinsp;and associated a dirty flag with each block. Something along the lines of:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">setTile</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="n">Tile</span> <span class="n">tile</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="c1">// Change tile data&amp;hellip;</span>
+Notice that now none of these methods have to worry about the dirty flag. The more we can push setting the dirty flag into lower-level code, the fewer places we&#x2019;ll have to worry about it, and the less likely we are to forget.
 
-  <span class="c1">// Mark this block dirty.</span>
-  <span class="n">setDirtyFlag</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">BLOCK_SIZE</span><span class="p">,</span> <span class="n">y</span> <span class="o">/</span> <span class="n">BLOCK_SIZE</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
+###<a href="#dirty-parts-of-town" name="dirty-parts-of-town">Dirty parts of town</a>
 
+We&#x2019;re in a pretty good place now, but our game is a bit old school. Why save to *disk* when you can save to the *cloud*. That way, the player can seamlessly play in the same city on their computer, phone and tablet. Exciting!
 
-<p>Internally, <code>City</code> will keep some kind of array of dirty bits, one for each block. When we go to save the city to the game servers, we just send the dirty blocks:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">City</span><span class="o">::</span><span class="n">save</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">CITY_SIZE</span> <span class="o">/</span> <span class="n">BLOCK_SIZE</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">CITY_SIZE</span> <span class="o">/</span> <span class="n">BLOCK_SIZE</span><span class="p">;</span> <span class="n">y</span><span class="o">++</span><span class="p">)</span>
-    <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">isDirty</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
-      <span class="p">{</span>
-        <span class="c1">// Upload block (x, y) to server&amp;hellip;</span>
-        <span class="n">clearDirtyFlag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
+But this means saving they&#x2019;re changes will take even longer: we&#x2019;ll have to push all of the data for the city over the network. Not only is it slow, it&#x2019;s a waste of bandwidth. Users on limited data plans won&#x2019;t be happy when our game burns through their allotment.
 
+It&#x2019;s time to start thinking about the *granularity* of our dirty state. Right now, we have a single bit for the entire city. It&#x2019;s either completely out of date, or completely up to date. But in practice, *most* of the city is unchanged and only a couple of pieces have been modified.
 
-<p>There&#x2019;s a small amount of overhead to doing things this way. Because we&#x2019;re only saving pieces of the city, we have to send along a bit of metadata with each block to identify it. That way the server knows which pieces of the city its getting.</p>
-<p>The trick then is to tune our granularity. If we make the blocks too small, this additional metadata will add more overhead than the savings we got from not having send the whole city. On the other hand, if we make the blocks too big, we end up sending larger amounts of unchanged data. Like all optimizations, we&#x2019;ll have to tune this based on some empirical data for our specific game.</p>
+We can do something more sophisticated by having finer-grained dirty bits. We&#x2019;ll divide the city into *blocks*&thinsp;&mdash;&thinsp;regions of some fixed size&thinsp;&mdash;&thinsp;and associated a dirty flag with each block. Something along the lines of:
+
+    void City::setTile(int x, int y, Tile tile)
+    {
+      // Change tile data&hellip;
+
+      // Mark this block dirty.
+      setDirtyFlag(x / BLOCK_SIZE, y / BLOCK_SIZE);
+    }
+
+Internally, `City` will keep some kind of array of dirty bits, one for each block. When we go to save the city to the game servers, we just send the dirty blocks:
+
+    void City::save()
+    {
+      for (int x = 0; x < CITY_SIZE / BLOCK_SIZE; x++)
+      {
+        for (int y = 0; y < CITY_SIZE / BLOCK_SIZE; y++)
+        {
+          if (isDirty(x, y))
+          {
+            // Upload block (x, y) to server&hellip;
+            clearDirtyFlag(x, y);
+          }
+        }
+      }
+    }
+
+There&#x2019;s a small amount of overhead to doing things this way. Because we&#x2019;re only saving pieces of the city, we have to send along a bit of metadata with each block to identify it. That way the server knows which pieces of the city its getting.
+
+The trick then is to tune our granularity. If we make the blocks too small, this additional metadata will add more overhead than the savings we got from not having send the whole city. On the other hand, if we make the blocks too big, we end up sending larger amounts of unchanged data. Like all optimizations, we&#x2019;ll have to tune this based on some empirical data for our specific game.
+-->
+
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
+<p><strong>TODO: revise after changing motivation</strong></p>
 <p>This is a pretty concrete pattern, so it isn&#x2019;t that open-ended. There are only a couple of things to tune with it:</p>
 <h3><a href="#when-is-the-dirty-flag-cleaned" name="when-is-the-dirty-flag-cleaned">When is the dirty flag cleaned?</a></h3>
 <p>The most basic question you&#x2019;ll have to answer is when to actually do the work you&#x2019;ve deferred. You can&#x2019;t defer it <em>forever</em>, after all. Here&#x2019;s a few options from least to most eager.</p>
@@ -570,7 +528,10 @@ that.</p>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
 <li>
-<p>This pattern is increasingly common outside of games in client-side MVC web frameworks like <a href="http://angularjs.org/">Angular</a> which use dirty flags to track which data has been changed in the browser and needs to be pushed up to the server.</p>
+<p>This pattern is increasingly common outside of games in client-side MVC
+    web frameworks like <a href="http://angularjs.org/">Angular</a> which use dirty
+    flags to track which data has been changed in the browser and needs to
+    be pushed up to the server.</p>
 </li>
 <li>
 <p>Physics engines keep track of which objects are resting and which are in motion. Since a resting body won&#x2019;t move until an impulse is applied to it, they don&#x2019;t need any processing until they get touched. This "is resting" bit is essentially a dirty flag to track which objects have had forces applied and need to have their physics resolved.</p>
