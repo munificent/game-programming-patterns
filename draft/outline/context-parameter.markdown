@@ -8,7 +8,7 @@ passed to the method.*
 
 ## Motivation
 Each entity defines a Render() function to draw the entity. In a
-na&iuml;ve implementation, would call low-level render API directly.
+naïve implementation, would call low-level render API directly.
 But that couples entity code to entire render API, some of which may
 be too low-level.
 

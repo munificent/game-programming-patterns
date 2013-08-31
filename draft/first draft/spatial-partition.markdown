@@ -28,7 +28,7 @@ a performance bottleneck for your game.
 
 Say we're making a real-time strategy game. Opposing armies with hundreds of units will clash together on the field of battle. Warriors need to know who is nearby to know who to avoid and who to swing their blade at.
 
-The na&iuml;ve way to determine this is to look at every pair of units and see how close they are to each other:
+The naïve way to determine this is to look at every pair of units and see how close they are to each other:
 
 ^code pairwise
 
@@ -180,7 +180,7 @@ Similar to the earlier example, it just walks each cell and then calls `handleCe
 
 ^code handle-cell
 
-Aside from the pointer shenanigans to deal with walking a linked list, you'll note that this is exactly like our original na&iuml;ve method for handling combat: it compares each pairs of units to see if they're in the same position.
+Aside from the pointer shenanigans to deal with walking a linked list, you'll note that this is exactly like our original naïve method for handling combat: it compares each pairs of units to see if they're in the same position.
 
 The only difference is that we no longer have to compare *all* of the units to each other. That's where all of the performance benefit comes from.
 

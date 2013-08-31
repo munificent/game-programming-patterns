@@ -15,13 +15,13 @@ In particular, the self-same [Wikipedia article](http://en.wikipedia.org/wiki/Di
 
 </aside>
 
-Where were we? Oh, right, making a game. Most games or game engines have something called a *scene graph*. This is a big data structure that contains all of the visible objects in the world. It's used by the renderer to determine where to draw stuff on screen. You commonly hear it associated with 3D games, but 2D games often have something similar.
+Where were we? Oh, right, making a game. Most games or game engines have something called a *scene graph*. This is a big data structure that contains all of the visible objects in the world. It's used by the renderer to determine where to draw stuff on screen. You commonly hear it associated with 3D games, but 2D games, especially newer ones where characters are built out of multiple sprites often have something similar.
 
 At its simplest, a scene graph is just a pile of objects. Each object has a model or sprite some other basic visual component, and a <span name="transform">*transform*</span>. The transform describes the object's position, rotation, and scale in the world. To move an object around in the world, we just have to change the transform.
 
 <aside name="transform">
 
-The mechanics of *how* this transform is stored and manipulated is unfortunately out of scope for this chapter. The comically abbreviated summary is that in a 3D game, the transform is 4x4 matrix. Applying one transform onto another (for example translating and then rotating an object) just requires doing a matrix multiple on the the matrix for each transform.
+The mechanics of *how* this transform is stored and manipulated is unfortunately out of scope for this chapter. The comically abbreviated summary is that in a 3D game, a transform is a 4x4 matrix. Combining transforms (for example translating and then rotating an object) just requires multiplying the two matrices.
 
 A proof of the correctness of that is left as an exercise for the reader.
 
@@ -31,13 +31,19 @@ When the renderer goes to draw an object, it takes its geometry, applies the tra
 
 An object in the graph may have a *parent* object that it is anchored to. In that case, its transform is relative to the paren't position, and isn't its absolute position in the world.
 
-For example, imagine your game world has a pirate ship at sea. On the pirate ship is an object for the crow's nest. In that crow's nest is an object for the pirate. Attached to the pirate is a parrot. The ship's local transform will position it in the sea. The crow's nest transform position it on the ship, and pirate's positions it in the nest, etc.
+For example, imagine your game world has a pirate ship at sea. On the pirate ship is a crow's nest. In that crow's nest is a pirate. Attached to the pirate is a parrot. The ship's local transform will position it in the sea. The crow's nest's transform positions it on the ship, and so on.
 
 **TODO illustrate**
 
-This way, when a parent object moves, its children move along with it. If we change the local transform of the ship, the crow's nest, pirate, and parrot all ride along with it. It would be a total headache if we had to manually adjust transforms of everything on the ship when it moved to keep everything from sliding off of it.
+This way, when a parent object moves, its children move along with it. If we change the local transform of the ship, the crow's nest, pirate, and parrot all ride along with it. It would be a total <span name="slide">headache</span> if we had to manually adjust transforms of everything on the ship when it moved to keep everything from sliding off of it.
 
-But to actually draw the parrot on screen, we need to know its absolute transform in world coordinates. To clarify thing, we'll call the transform we already mentioned the object's *local transform*. That's the one that's relative to its parent. To render an object, we need to know its *world transform*.
+<aside name="slide">
+
+To be honest, when you are at sea you do have to keep manually adjusting your position to keep from sliding off. Maybe I should have chosen a drier example.
+
+</aside>
+
+But to actually draw the parrot on screen, we need to know its absolute position in the world. To clarify things, we'll call the transform we already mentioned the object's *local transform*. That's the one that's relative to its parent. To render an object, we need to know its *world transform*.
 
 Calculating an object's world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, concatenating transforms as you go. In other worlds, the parrot's world transform is:
 
@@ -45,7 +51,7 @@ Calculating an object's world transform is pretty straightforward: you just walk
 
 In the degenerate case where the object is at the top of the scene graph and has no parent, that means its local and world transforms are equivalent. There's nothing magical here. Concatenating two transforms is just a matrix multiply, which is just a handful of floating point arithmetic. However, we do have to calculate the world transform of every object in the world every frame, so this code is definitely on the hot path where performance is critical.
 
-Where it gets tricky is when an object moves. The parrot's world coordinates are based on the local coordinates of its entire parent chain. That means if any of those local transforms change, the parrot's world transform will change too. Every time a parent moves all of its children move too, recursively.
+Where it gets tricky is when an object moves. The parrot's world coordinates are based on the local coordinates of its entire parent chain. That means if any of those local transforms change, the parrot's world transform will change too. Every time a parent moves, all of its children move too, recursively.
 
 The simplest approach to handle that fact is to just calculate world transforms on fly when we render. Each frame, we recursively traverse the scene graph starting at the top of the hierarchy. For each object, we calculate its world coordinate right then and render the object.
 
@@ -55,7 +61,7 @@ The obvious answer is to *cache* the world transform. In each object, we'll stor
 
 When an object does move, the obvious approach is to just recalculate its world transform right then. But don't forget the hierarchy! If a parent moves, we'll have to recalculate its world transform *and all of its children's, recursively*.
 
-Now imagine some busy gameplay. In a single frame, the ship gets tossed on the ocean, the crow's nest rocks in the wind, the pirate leans to the edge, and the parrots hops onto his head. In this one frame, we've changed four local transforms. With our current approach of eagerly recalculating world transforms, why ends up happening?
+Now imagine some busy gameplay. In a single frame, the ship gets tossed on the ocean, the crow's nest rocks in the wind, the pirate leans to the edge, and the parrots hops onto his head. In this one frame, we've changed four local transforms. With our current approach of eagerly recalculating world transforms, what ends up happening?
 
     1. update ship local transform
     2. calculate ship world transform
@@ -72,13 +78,19 @@ Now imagine some busy gameplay. In a single frame, the ship gets tossed on the o
     13. update parrot local transform
     14. calculate parrot world transform
 
-We only have four objects, but we end up doing *ten* world transform calculations, each of which is itself an iterative walk up the parent chain. Notice that most of those world calculations are completely pointless. We end up calculating the parrot's world transform *four* times, but the first three just get discarded and overridden by later ones. This won't do.
+We only have four objects, but we end up doing *ten* world transform calculations. Notice that most of those world calculations are completely pointless. We end up calculating the parrot's world transform *four* times, but the first three just get discarded and overridden by later ones. This won't do.
 
 The problem is that when a single object moves, it invalidates the world transform of several objects: itself and all of its children. Flipping that around, it means any object's world transform is dependent on several local transforms. Since we recalculate immediately each time one of those local transforms changes, when a number of local transforms change in one frame, we end up calculating the world transform for the same object multiple times.
 
 The solution is to decouple changing local transforms from updating the world transforms. This would let us change a bunch of local transforms in a single batch and then recalculate the affected world transform *once* when all of those modifications are done, right before we need it to render.
 
-We do this by adding a boolean field to each node in the graph. When the local transform changes, we set this flag to true. When we need the object's world transform to render, we check the flag first. If it's set, we calculate the world transform then and clear the flag. In other words, the flag represents "is the world transform out of date". For reasons that aren't entirely clear, the traditional name for this "out-of-dateness" is "dirty". Hence: a dirty flag.
+We do this by adding a boolean field to each node in the graph. When the local transform changes, we set this flag to true. When we need the object's world transform to render, we check the flag first. If it's set, we calculate the world transform then and clear the flag. In other words, the <span name="dirty-name">flag</span> represents "is the world transform out of date". For reasons that aren't entirely clear, the traditional name for this "out-of-dateness" is "dirty". Hence: a dirty flag.
+
+<aside name="dirty-name">
+
+One common aspect of programmers is that we like things neat and organized. When you have two pieces of data -- here the local and world transforms -- and one is current while the other is out-of-date, that inconsistency rubs us the wrong way. People who don't code don't often realize how intimate and nearly synesthetic our relationship to our code is. So to many, I think having some old data floating around in memory literally feels dirty to them, hence the name.
+
+</aside>
 
 Applying that pattern to our earlier example where everything moves in the same frame yields:
 
@@ -121,9 +133,9 @@ That brings in another requirement for this pattern: *the primary data has to ch
 
 There's one final softer requirement. It's implied here that you can't easily *incrementally* update the derived data when the primary data changes. This pattern comes into play with the derived data is only calculated from *the primary data* and not from *the previous derived data*.
 
-Let's say you had a game where the character has a backpack and can only carry so much weight. You need to know the total weight by summing the weights of everything in the backpack. You *could* use this pattern and have a dirty flag for the total weight. Every time you add or remove an item you set the flag. Then when you need the total, you add up all of the items and clear the flag.
+Let's say the pirate ship in our game can only carry so much weight in booty. You need to know the total weight by summing the weights of everything in the hold. You *could* use this pattern and have a dirty flag for the total weight. Every time you add or remove some loot, you set the flag. Then when you need the total, you add up all of the booty and clear the flag.
 
-But a simpler solution is to just *keep a running total*. When you add and remove an item, just add or remove its weight from the current total. If you can "pay as you go" like this and keep the derived data updated, then that's often a better choice than using this pattern.
+But a simpler solution is to just *keep a running total*. When you add or remove an item, just add or remove its weight from the current total. If you can "pay as you go" like this and keep the derived data updated, then that's often a better choice than using this pattern.
 
 All of this makes it sound like this pattern is never actually useful, but over time you'll likely find a place here or there where it's a good fit. Grepping your average game codebase for the word "dirty" will often turn something up, and it almost always refers to this pattern.
 
@@ -131,18 +143,31 @@ All of this makes it sound like this pattern is never actually useful, but over 
 
 Once you have convinced yourself this pattern is a good fit, there are a few wrinkles that can cause you some discomfort.
 
-### Deferring until the result is needed can cause a noticeable pause
+### There is a cost to deferring too long
 
-In its simplest form, this pattern <aside name="gc">defers</aside> some slow work until the result is actually needed. But when the result *is* needed, it's often needed *right now* and the reason we're using this pattern to begin with is because calculating that result is slow!
+In its simplest form, this pattern defers some slow work until the result is actually needed. But when the result *is* needed, it's often needed *right now* and the reason we're using this pattern to begin with is because calculating that result is slow!
 
-This isn't a problem in our example because calculating a given node's world coordinates isn't *too* slow. Our goal was to avoid doing it *redundantly*.
-But you can imagine other uses of this pattern where the work you're doing is a big monolithic chunk that takes a noticeable amount of time to chew through.
+In our example, this isn't a problem because calculating a given node's world coordinates isn't *too* slow. Our goal was to avoid doing it *redundantly*. But you can imagine other uses of this pattern where the work you're doing is a big monolithic chunk that takes a noticeable amount of time to chew through. If the game doesn't *start* doing the work until right when the player expects to the result, that can cause an unpleasant visible <span name="gc">pause</span>.
 
-If the game doesn't *start* doing that until right when the player brings up
-the screen the shows the result of it, then they will notice the pause.
-If this is a problem, you may need to start doing the processing earlier "in
-the background" so that at least some of the work is done by the time its
-needed.
+Another problem with deferring is that if something goes wrong, you may never do the work at all. This can be particularly problematic when you're using this pattern to save some state to a more persistent form.
+
+For example, any program that lets you edit documents keeps track of if you have "unsaved changes", which is a picture-perfect example of this pattern. That little bullet or star in your document's title bar is literally the dirty flag visualized. The primary data is the open document in memory, and the derived data is the file on disk.
+
+Many programs don't save to disk until either the document is closed or the application is exited. That's fine most of the time, but if you accidentally kick the power cable out, there goes your masterpiece.
+
+We've talked about two times you can calculate or synchronize the derived data -- the second the primary data changes or right before the derived data is needed -- but there's actually a continuum between those points. There are a range of options where you defer the work *somewhat* but still eventually kick it off even before the result is actually needed.
+
+<aside name="gc">
+
+This is mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting systems free memory the second its no longer needed, but suffer by spending CPU time updating ref counts eagerly every time references are changed.
+
+Simple garbage collectors defer reclaiming memory until it's really needed. But the cost here is the dreaded "GC pause" that can freeze your entire app until the GC is done walking the heap.
+
+In between the two are increasingly common more complex systems like deferred ref-counting and incremental GC that reclaim memory less eagerly than pure ref-counting but more eagerly than stop-the-world collectors.
+
+</aside>
+
+When your fancy text editor auto-saves a backup "in the background" every few minutes, that's basically the trade-off it's making. The frequency that it auto-saves -- every few minutes to once an hour -- is picking a point on the continuum that balances not losing too much work when a crash occurs against not thrashing the file system too much by saving all the time.
 
 ### You have to make sure to set the flag *every* time the state changes
 
@@ -172,194 +197,102 @@ Conversely, you can consider compression algorithsm as making the opposite trade
 
 </aside>
 
-### If you're synchronizing and you defer too long, you risk losing changes
-
-Any program that lets you edit documents keeps track of if you have "unsaved changes", which is a picture-perfect example of this pattern. That little bullet or star in your document's title bar is literally the dirty flag visualized. The primary data is the open document in memory, and the derived data is the file on disk.
-
-Many programs don't save to disk until either the document is closed or the application is exited. That's fine most of the time, but if you accidentally kick the power cable out, there goes your masterpiece.
-
-There's actually a continuum of when to do the work ranging from "the second the primary data changes" all the way to "only at the last second when the derived data is needed". In between those two points are a range of options where you defer the work *somewhat* but still eventually kick it off even before the result is actually needed.
-
-When your fancy text editor auto-saves a backup "in the background" every few minutes, that's basically the trade-off it's making. The frequency that it auto-saves -- every few minutes to once an hour -- is picking a point on the continuum that balances not losing too much work when a crash occurs against not thrashing the file system too much by saving all the time.
-
-<span name="gc">
-
-This is mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting systems free memory the second its no longer needed, but suffer by spending CPU time updating ref counts eagerly every time references are changed.
-
-Simple garbage collectors defer reclaiming memory until it's really needed. But the cost here is the dreaded "GC pause" that can freeze your entire app until the GC is done walking the heap.
-
-In between the two are increasingly common more complex systems like deferred ref-counting and incremental GC that reclaim memory less eagerly than pure ref-counting but more eagerly than stop-the-world collectors.
-
-</span>
-
 ## Sample Code
 
-**TODO: redo**
+Assuming we've met the surprisingly long list of requirements and this pattern does make sense for out problem, let's see how it looks to code it up. As I mentioned before, the actual math behind transform matrices is beyond the humble aims of this book, so I'll just encapsulate that in a class whose implementation you can presume exists somewhere out in the aether:
 
-<!--
-Assuming we've met the surprisingly long list of requirements and this pattern does make sense for out problem, let's see how it looks to code it up. The initial problem in the motivation section is pretty obvious to implement. Whenever the mayor gets a new trophy, we set the flag. When the player opens the trophy screen, we check the flag. If it's set, we layout the trophies, clear the flag and continue.
-
-I'm pretty sure you can code that up on your own, so let's leave that as an exercise for the reader. Instead, let's do a different example showing the other main use for this pattern, synchronization. The mayor is doing the best he can, but even he needs help saving his city. <span name="pun">To disk</span>, that is.
-
-<aside name="pun">
-
-If you're reading this awful pun, that means I managed to maintain the bad judgement to keep this in through each revision of this chapter. What was I thinking?
-
-</aside>
-
-Our player is going to spend hours meticulously crafting their city. They probably don't want to just throw it out the window and start over from scratch every time they quit the game, so we'll want to whip up some kind of save-load system.
-
-Obviously, saving the city to disk every time they plant a single mailbox or lightpost would be numbingly slow and cause undo torture to the player's hard disk. A better solution is to save when they quit the game.
-
-<span name="elide"></span>
-
-    void Game::quit()
-    {
-      city.save();
+    class Transform {
+      Transform combine(const Transform& other) const;
     }
 
-<aside name="elide">
+The only operator we care about here is being able to combine two transforms so that we can get an object's world transform using the local transforms of its parent chains.
 
-Like many chapters in this book, I'm eliding the concrete code to actually save the city. Since we're just concerned with the architectural structure here, the implementation details are, well, implementation details.
+Next, we'll sketch out the class for an object in the scene graph. This is the bare minimum its needs before actually applying this pattern:
 
-</aside>
+    class GraphNode {
+      Transform _local;
+      Mesh* _mesh;
 
-Swell. Now every time the player quits the game, they're beautiful metropolis is lovingly enscribed on the platters of their hard disk, ready and waiting for the next time the game is run. Alas, this isn't a perfect solution.
-
-### Wasting time in a clean city
-
-The problem is that in our awesome game, you can build huge cities. Writing out every street and telephone pole takes a long time. When they player's actually built lots of new stuff, there's not much you can do. But if they just open the city, look around a bit and quit, it's pointless to save the city: nothing's changed and the city on disk is already up to date.
-
-We'll apply this pattern and define a dirty flag for the city:
-
-    class City {
-      // Lots of other stuff...
-    private:
-      bool dirty;
+      GraphNode*[] _children;
+      int _numChildren;
     }
 
-Now when we go to save, we'll first check and see if we have to:
+Each node has its local transform which describes where it is relative to its parent. It has a mesh which is the actual graphic object that's used to render it. (We'd probably allow `_mesh` to be `NULL` too to handle non-visual nodes that are used just to group their children.) Finally, each node has a possibly empty collection of child nodes.
 
-    void City::save()
-    {
-      // Bail if the city is already up to date.
-      if (!dirty) return;
+To create an entire scene graph, we can just make a single root node whose children contain all of the objects in the world. We won't implement this, but the ultimate goal of the scene graph will be to invoke this function on each node with its correct world transform:
 
-      // Write city to disk...
+    void render(Mesh* mesh, Transform transform);
 
-      // The city on disk is up to date now.
-      dirty = false;
-    }
+This function does whatever magic the renderer needs to do to draw that mesh at the given location in the world. If we can call that correctly and efficiently on every node in the scene graph, we're happy.
 
-### Getting dirty
+### An unoptimized traversal
 
-This is the easy part. The hard part is making sure that flag gets set. Every bit of code that modifies a part of the city's state that is saved to disk needs to make sure to set dirty to true. You can imagine lots of methods like:
+To get our feet wet, let's whip up a basic traversal for rendering the scene graph by calculating the world positions on the fly. This won't be optimal, but it will be simple:
 
-    void City::zoneArea(int x, int y, int width, int height) {
-      // Set zoning...
-      dirty = true;
-    }
+    void GraphNode::render(Transform parentWorld) {
+      Transform world = _local.combine(parentWorld);
 
-    void City::placeBuilding(int x, int y, Building building) {
-      // Place building...
-      dirty = true;
-    }
+      if (_mesh) render(_mesh, world);
 
-    void City::addRoad(int x, int y, Direction direction) {
-      // Add road...
-      dirty = true;
-    }
-
-If you have a <span name="wide">wide smear</span> of code that modifies state, you're just asking to make a mistake and forget to set the dirty flag somewhere. If you can, it helps to define that code in terms of a much smaller interface that does the low-level modification.
-
-<aside name="wide">
-
-In general, code that *modifies* state is more problematic than code that just *reads* state. Whenever you're trying to understand a chunk of code, you have to think about what state the data is in, how it got that way, and how it can change. When other random code reads that state, it doesn't affect your local understanding of what that code does. But when outside code can *change* the state, now you have to hold that much larger context in your head.
-
-</aside>
-
-For example, in our city-building game, the city is ultimately represented by a grid of tiles. Roads, buildings, and other stuff are all just different kinds of tiles. Given that, we could define a low-level method like:
-
-    void City::setTile(int x, int y, Tile tile)
-    {
-      // Change tile data...
-      dirty = true;
-    }
-
-This method makes sure to set the dirty flag. Then the previous high level modification methods can be implemented using it:
-
-    void City::zoneArea(int left, int top, int width, int height)
-    {
-      for (int x = left; x < left + width; x++)
-      {
-        for (int y = top; y < top + height; y++)
-        {
-          setTile(x, y, TILE_ZONE);
-        }
+      for (int i = 0; i < _numChildren; i++) {
+        _children[i]->render(world);
       }
     }
 
-    void City::placeBuilding(int x, int y, Building building)
-    {
-      setTile(x, y, building.tile());
+This takes in the transform of the parent node which has already been converted to world coordinates. That means that to get the correct world transform of *this* node, all that's left is to combine it with its own local transform. We don't have to walk *up* the parent chain to calculate this because we calculate as we go while walking *down* the chain.
+
+So we calculate the node's world transform and store it in `world`. Then we render the mesh if we have one. Finally, we recurse into the child nodes passing in *this* node's world transform. All in all, it's nice tight, simple recursive method.
+
+### Let's get dirty
+
+The problem with it, the reason it's in this chapter is that calling `_local.combine(parentWorld)` on every node in the graph every frame is too wasteful. Now let's see how this pattern fixes that. First, we need to add two fields to `GraphNode`:
+
+    class GraphNode {
+      Transform _world;
+      bool _dirty;
+
+      GraphNode(Mesh* mesh, Transform local)
+      : _mesh(mesh),
+        _local(local),
+        _dirty(true)
+      {}
     }
 
-    void City::addRoad(int x, int y, Direction direction)
-    {
-      Tile tile;
-      if (direction == DIR_HORIZONTAL)
-      {
-        tile = TILE_HOR_ROAD;
+It now stores a cache of the previously-calculated world transform in `_world` and then, of course, the dirty flag. Note also that the flag starts out `true`. When we create a new node, we haven't calculated it's world transform yet, so it's born out of date already.
+
+The only reason we need this pattern is because objects can move, so let's add support for that:
+
+    void GraphNode::setTransform(Transform local) {
+      if (_local == local) return;
+      _local = local;
+      _dirty = true;
+    }
+
+The important bit here is that it sets the dirty flag. There's also a tiny optimization here to early out if the new local transform is actually the same as the previous one. When using this pattern to track state changes, it's often worthwhile to validate that the state actually has changed from its previous value before you go off and set the dirty flag and recalculate a bunch of stuff. However, if doing that equality itself is expensive, it may be faster to just always assume it's changed.
+
+Are we forgetting anything? Right: the child nodes. When a parent node moves, all of its children's world coordinates are invalidated too. But here we aren't setting their dirty flags. We *could* do that, but that's a bit slow and recursive. Instead we'll do something clever when we go to render. Let's see:
+
+    void GraphNode::render(Transform parentWorld, bool dirty) {
+      dirty |= _dirty;
+      if (dirty) {
+        _world = _local.combine(parentWorld);
+        _dirty = false;
       }
-      else
-      {
-        tile = TILE_VERT_ROAD;
-      }
 
-      setTile(x, y, tile);
-    }
+      if (_mesh) render(_mesh, _world);
 
-Notice that now none of these methods have to worry about the dirty flag. The more we can push setting the dirty flag into lower-level code, the fewer places we'll have to worry about it, and the less likely we are to forget.
-
-### Dirty parts of town
-
-We're in a pretty good place now, but our game is a bit old school. Why save to *disk* when you can save to the *cloud*. That way, the player can seamlessly play in the same city on their computer, phone and tablet. Exciting!
-
-But this means saving they're changes will take even longer: we'll have to push all of the data for the city over the network. Not only is it slow, it's a waste of bandwidth. Users on limited data plans won't be happy when our game burns through their allotment.
-
-It's time to start thinking about the *granularity* of our dirty state. Right now, we have a single bit for the entire city. It's either completely out of date, or completely up to date. But in practice, *most* of the city is unchanged and only a couple of pieces have been modified.
-
-We can do something more sophisticated by having finer-grained dirty bits. We'll divide the city into *blocks* -- regions of some fixed size -- and associated a dirty flag with each block. Something along the lines of:
-
-    void City::setTile(int x, int y, Tile tile)
-    {
-      // Change tile data...
-
-      // Mark this block dirty.
-      setDirtyFlag(x / BLOCK_SIZE, y / BLOCK_SIZE);
-    }
-
-Internally, `City` will keep some kind of array of dirty bits, one for each block. When we go to save the city to the game servers, we just send the dirty blocks:
-
-    void City::save()
-    {
-      for (int x = 0; x < CITY_SIZE / BLOCK_SIZE; x++)
-      {
-        for (int y = 0; y < CITY_SIZE / BLOCK_SIZE; y++)
-        {
-          if (isDirty(x, y))
-          {
-            // Upload block (x, y) to server...
-            clearDirtyFlag(x, y);
-          }
-        }
+      for (int i = 0; i < _numChildren; i++) {
+        _children[i]->render(world, dirty);
       }
     }
 
-There's a small amount of overhead to doing things this way. Because we're only saving pieces of the city, we have to send along a bit of metadata with each block to identify it. That way the server knows which pieces of the city its getting.
+This is pretty similar to the original naïve implementation. The main bit is that we check to see if its dirty before calculating the world transform, and we use a field for that instead of a local variable. When it's clean, we skip the `combine()` completely and use the old but still good value.
 
-The trick then is to tune our granularity. If we make the blocks too small, this additional metadata will add more overhead than the savings we got from not having send the whole city. On the other hand, if we make the blocks too big, we end up sending larger amounts of unchanged data. Like all optimizations, we'll have to tune this based on some empirical data for our specific game.
--->
+The clever bit is that `parentDirty` parameter. That will be `true` if any node above this node in the parent chain was dirty. In much the same way that `parentWorld` updates the world transform incrementally as we traverse down the hierarchy, `dirty` tracks the dirtiness of the parent chain.
+
+This lets us avoid having to actually recursively set each child's `_dirty` flag in `setTransform()`. Instead, we'll just pass the parent's dirty flag down to its children when we render and look at that too to see if we need to recalculate the world transform.
+
+The end result here is exactly what we want: changing a node's local transform is just a couple of assignments, and rendering the world calculates the exact minimum number of world transforms that are affected by those changes.
 
 ## Design Decisions
 

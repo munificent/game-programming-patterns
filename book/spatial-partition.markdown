@@ -22,7 +22,7 @@ a performance bottleneck.
 
 ### Units on the field of battle
 
-Say we're making a real-time strategy game. Opposing armies with hundreds of units will clash together on the field of battle. Warriors need to know which nearby enemy to swing their blade at. The na&iuml;ve way to handle this is by looking at every pair of units and seeing how close they are to each other:
+Say we're making a real-time strategy game. Opposing armies with hundreds of units will clash together on the field of battle. Warriors need to know which nearby enemy to swing their blade at. The naïve way to handle this is by looking at every pair of units and seeing how close they are to each other:
 
 ^code pairwise
 
@@ -138,7 +138,7 @@ It just walks each cell and then calls `handleCell` on it. As you can see, we re
 
 ^code handle-cell
 
-Aside from the pointer shenanigans to deal with walking a linked list, you'll note that this is exactly <span name="nested">like</span> our original na&iuml;ve method for handling combat: it compares each pairs of units to see if they're in the same position.
+Aside from the pointer shenanigans to deal with walking a linked list, you'll note that this is exactly <span name="nested">like</span> our original naïve method for handling combat: it compares each pairs of units to see if they're in the same position.
 
 The only difference is that we no longer have to compare *all* of the units in the battle to each other, just the ones close enough to be in the same cell. That's the heart of the optimization.
 

@@ -1,3 +1,4 @@
+2013-08-31 - 916+ rewrite sample code and revise other stuff
 2013-08-30 - 1454 rewrite first draft motivation in dirty flag
 2013-08-29 - 1447 words revised in dirty flag
 2013-08-28 - 723 words outline new motivation section for dirty flag
