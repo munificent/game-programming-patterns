@@ -289,7 +289,6 @@
 <p>This lets us avoid having to actually recursively set each child&#x2019;s <code>_dirty</code> flag in <code>setTransform()</code>. Instead, we&#x2019;ll just pass the parent&#x2019;s dirty flag down to its children when we render and look at that too to see if we need to recalculate the world transform.</p>
 <p>The end result here is exactly what we want: changing a node&#x2019;s local transform is just a couple of assignments, and rendering the world calculates the exact minimum number of world transforms that are affected by those changes.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
-<p><strong>TODO: revise after changing motivation</strong></p>
 <p>This is a pretty concrete pattern, so it isn&#x2019;t that open-ended. There are only a couple of things to tune with it:</p>
 <h3><a href="#when-is-the-dirty-flag-cleaned" name="when-is-the-dirty-flag-cleaned">When is the dirty flag cleaned?</a></h3>
 <p>The most basic question you&#x2019;ll have to answer is when to actually do the work you&#x2019;ve deferred. You can&#x2019;t defer it <em>forever</em>, after all. Here&#x2019;s a few options from least to most eager.</p>
@@ -360,28 +359,32 @@ again.</p>
 </li>
 <li>
 <p><em>You can end up throwing away work.</em> The timer starts at the beginning
-    of the first change to the primary data, and fires at some fixed
-    interval after that. If the primary data is still being changed (i.e.
-    the mayor is still in a zoning frenzy) when the timer goes off, we&#x2019;ll
-    do the processing, and then immediately start the timer again and throw
+    of the first change to the primary data, and fires at some fixed when
+    the timer goes off, we&#x2019;ll do the processing, and then immediately start
+    the timer again and throw
     out what we just did since changes are still coming in.</p>
 <p>If that happens often, it may make sense for the timer to be more
-adaptive. One fix is to reset the timer on <em>every</em> change, not just the
+<span name="adaptive">adaptive</span>. One fix is to reset the timer on <em>every</em> change, not just the
 first. This means it will do the processing after a fixed amount of time
 has passed <em>where the primary state hasn&#x2019;t changed</em>.</p>
+<aside name="adaptive">
+
+<p>An intentional delay where the program waits a bit after receiving user
+input before it responds is called <a href="http://en.wikipedia.org/wiki/Hysteresis"><em>hysteresis</em></a>, a delightful word.</p>
+</aside>
+
 <p>This helps you avoid pointless work, at the expense of running the risk
-of deferring too long. Imagine a player feverishly building for hours
-on end without a break. The timer will keep getting reset and never
-actually auto-save the city.</p>
+of deferring too long. If we were implemented auto-save in a text
+editor, imagine an author feverishly writing for hours on end without a
+break. The timer will keep getting reset and never actually auto-save
+the document.</p>
 </li>
 <li>
 <p><em>You&#x2019;ll need some support for doing work "in the background".</em>
     Processing on a timer independent of what the player is doing implies
     the player can keep doing whatever that is while the processing is
-    going on. After all, if the processing was so fast that we could do it
-    synchronously while they played, we wouldn&#x2019;t need this pattern to begin
-    with.</p>
-<p>That does mean we&#x2019;ll need threading or some other kind of concurrency
+    going on.</p>
+<p>That means we&#x2019;ll likely need threading or some other kind of concurrency
 support so that the work we&#x2019;re doing can happen while the game is still
 responsive and being played. Since the player is also interacting with
 the state that you&#x2019;re processing, you&#x2019;ll need to think about making that
@@ -391,44 +394,41 @@ safe for concurrent modification too.</p>
 </li>
 </ul>
 <h3><a href="#how-fine-grained-is-your-dirty-tracking" name="how-fine-grained-is-your-dirty-tracking">How fine-grained is your dirty tracking?</a></h3>
-<p>In our first sample, we had a single flag for the entire city. We improved performance at the expense of some complexity and overhead by changing that to track a dirty bit for each block in the city. Depending on your use case, you may have options like that too.</p>
+<p>Imagine we are working on a city-building game. Cities are automatically saved online so the player can resume where they left off. We&#x2019;re using dirty flags to determine which parts of the city have been bulldozed and need to be sent to the server. Each chunk of data we send to the server contains some modified city data and a bit of metadata describing where in the city this modification occurred.</p>
 <ul>
 <li>
-<p><strong>If it&#x2019;s more coarse-grained:</strong></p>
+<p><strong>If it&#x2019;s more fine-grained:</strong></p>
+<p>Say we slap a dirty flag on each tiny square foot of the metropolis.</p>
 <ul>
 <li>
-<p><em>It&#x2019;s simpler.</em> You don&#x2019;t have to spend as much time determining which
-    <em>part</em> of the state is dirty. The code for doing the work can do it
-    in one monolithic chunk instead of needing to be able to handle
-    chewing on smaller isolated pieces of state.</p>
+<p><em>We&#x2019;ll only process data that actually changed.</em> We&#x2019;ll send exactly the
+    facets of the city that were modified to the server.</p>
 </li>
 <li>
-<p><em>There&#x2019;s less overhead for tracking what is dirty.</em> You&#x2019;ll spend less
-    memory on the dirty flags themselves (though that&#x2019;s almost always
-    a trivial expense). When you go to process the dirty state and do
-    the work, you&#x2019;ll need less metadata to express what subset of the
-    data is dirty.</p>
+<p><em>When a lot of data changes, a larger number of dirty flags also need to
+    be set.</em></p>
 </li>
 </ul>
 </li>
 <li>
-<p><strong>If it&#x2019;s more fine-grained:</strong></p>
+<p><strong>If it&#x2019;s more coarse-grained:</strong></p>
+<p>Alternatively, we could associate a dirty bit with each <em>city block</em>.
+Changing anything within that area marks the entire block dirty.</p>
 <ul>
 <li>
-<p><em>You need to be able to process a subset of the data.</em> In our trophy
-    room example, there&#x2019;d by no way to split it into several narrower
-    dirty flags. Since adding a single trophy can change the entire
-    layout, the processing we have to do has to be a single monolithic
-    operation that takes all trophies into account.</p>
-<p>In order to do finer-grained dirtiness-tracking, you&#x2019;ll need to make
-sure the work you have to do is amenable to being decomposed like
-that.</p>
+<p><em>We&#x2019;ll end up processing unchanged data.</em> Add a single lamppost to a
+    street corner and we&#x2019;ll have to send the whole block to the server.</p>
 </li>
 <li>
-<p><em>You&#x2019;ll less more time working on unchanged data.</em> A coarse-grained
-    dirty flag invalidates a larger swath of data, much of which may be
-    unchanged. With finer-grained tracking, you only mark the data
-    that&#x2019;s actually different and thus only process actual changes.</p>
+<p><em>Less memory is used for storing dirty flags.</em></p>
+</li>
+<li>
+<p><em>Less time is spent on fixed overhead.</em> When processing some changed data,
+   there&#x2019;s often a bit of fixed work you have to do on top of handling the
+   data itself. In the example here, that&#x2019;s the metadata required to
+   identify where in the city the changed data lives. The bigger your
+   processing chunks, the fewer of them there are, which means the less
+   fixed overhead you have.</p>
 </li>
 </ul>
 </li>

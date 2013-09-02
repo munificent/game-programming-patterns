@@ -296,8 +296,6 @@ The end result here is exactly what we want: changing a node's local transform i
 
 ## Design Decisions
 
-**TODO: revise after changing motivation**
-
 This is a pretty concrete pattern, so it isn't that open-ended. There are only a couple of things to tune with it:
 
 ### When is the dirty flag cleaned?
@@ -360,30 +358,35 @@ The most basic question you'll have to answer is when to actually do the work yo
         changed much.
 
     * *You can end up throwing away work.* The timer starts at the beginning
-        of the first change to the primary data, and fires at some fixed
-        interval after that. If the primary data is still being changed (i.e.
-        the mayor is still in a zoning frenzy) when the timer goes off, we'll
-        do the processing, and then immediately start the timer again and throw
+        of the first change to the primary data, and fires at some fixed when
+        the timer goes off, we'll do the processing, and then immediately start
+        the timer again and throw
         out what we just did since changes are still coming in.
 
         If that happens often, it may make sense for the timer to be more
-        adaptive. One fix is to reset the timer on *every* change, not just the
+        <span name="adaptive">adaptive</span>. One fix is to reset the timer on *every* change, not just the
         first. This means it will do the processing after a fixed amount of time
         has passed *where the primary state hasn't changed*.
 
+        <aside name="adaptive">
+
+        An intentional delay where the program waits a bit after receiving user
+        input before it responds is called [*hysteresis*](http://en.wikipedia.org/wiki/Hysteresis), a delightful word.
+
+        </aside>
+
         This helps you avoid pointless work, at the expense of running the risk
-        of deferring too long. Imagine a player feverishly building for hours
-        on end without a break. The timer will keep getting reset and never
-        actually auto-save the city.
+        of deferring too long. If we were implemented auto-save in a text
+        editor, imagine an author feverishly writing for hours on end without a
+        break. The timer will keep getting reset and never actually auto-save
+        the document.
 
     * *You'll need some support for doing work "in the background".*
         Processing on a timer independent of what the player is doing implies
         the player can keep doing whatever that is while the processing is
-        going on. After all, if the processing was so fast that we could do it
-        synchronously while they played, we wouldn't need this pattern to begin
-        with.
+        going on.
 
-        That does mean we'll need threading or some other kind of concurrency
+        That means we'll likely need threading or some other kind of concurrency
         support so that the work we're doing can happen while the game is still
         responsive and being played. Since the player is also interacting with
         the state that you're processing, you'll need to think about making that
@@ -391,37 +394,34 @@ The most basic question you'll have to answer is when to actually do the work yo
 
 ### How fine-grained is your dirty tracking?
 
-In our first sample, we had a single flag for the entire city. We improved performance at the expense of some complexity and overhead by changing that to track a dirty bit for each block in the city. Depending on your use case, you may have options like that too.
-
-* **If it's more coarse-grained:**
-
-    * *It's simpler.* You don't have to spend as much time determining which
-        *part* of the state is dirty. The code for doing the work can do it
-        in one monolithic chunk instead of needing to be able to handle
-        chewing on smaller isolated pieces of state.
-
-    * *There's less overhead for tracking what is dirty.* You'll spend less
-        memory on the dirty flags themselves (though that's almost always
-        a trivial expense). When you go to process the dirty state and do
-        the work, you'll need less metadata to express what subset of the
-        data is dirty.
+Imagine we are working on a city-building game. Cities are automatically saved online so the player can resume where they left off. We're using dirty flags to determine which parts of the city have been bulldozed and need to be sent to the server. Each chunk of data we send to the server contains some modified city data and a bit of metadata describing where in the city this modification occurred.
 
 * **If it's more fine-grained:**
 
-    * *You need to be able to process a subset of the data.* In our trophy
-        room example, there'd by no way to split it into several narrower
-        dirty flags. Since adding a single trophy can change the entire
-        layout, the processing we have to do has to be a single monolithic
-        operation that takes all trophies into account.
+    Say we slap a dirty flag on each tiny square foot of the metropolis.
 
-        In order to do finer-grained dirtiness-tracking, you'll need to make
-        sure the work you have to do is amenable to being decomposed like
-        that.
+    * *We'll only process data that actually changed.* We'll send exactly the
+        facets of the city that were modified to the server.
 
-    * *You'll less more time working on unchanged data.* A coarse-grained
-        dirty flag invalidates a larger swath of data, much of which may be
-        unchanged. With finer-grained tracking, you only mark the data
-        that's actually different and thus only process actual changes.
+    * *When a lot of data changes, a larger number of dirty flags also need to
+        be set.*
+
+* **If it's more coarse-grained:**
+
+    Alternatively, we could associate a dirty bit with each *city block*.
+    Changing anything within that area marks the entire block dirty.
+
+    * *We'll end up processing unchanged data.* Add a single lamppost to a
+        street corner and we'll have to send the whole block to the server.
+
+    * *Less memory is used for storing dirty flags.*
+
+    * *Less time is spent on fixed overhead.* When processing some changed data,
+       there's often a bit of fixed work you have to do on top of handling the
+       data itself. In the example here, that's the metadata required to
+       identify where in the city the changed data lives. The bigger your
+       processing chunks, the fewer of them there are, which means the less
+       fixed overhead you have.
 
 ## See Also
 
