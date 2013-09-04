@@ -1,3 +1,5 @@
+2013-09-03 - revise 1357 words, trim about 200, 2nd draft dirty flag
+2013-09-02 - 4 illustrations for dirty flag
 2013-09-01 - 1019 revise design decisions, finish first draft of dirty flag
 2013-08-31 - 916+ rewrite sample code and revise other stuff
 2013-08-30 - 1454 rewrite first draft motivation in dirty flag

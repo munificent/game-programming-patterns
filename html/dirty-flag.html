@@ -64,43 +64,53 @@
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Avoid unneeded work by deferring it until the result is needed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>Let&#x2019;s talk about names. There&#x2019;s two common monikers often slapped on this pattern: "dirty flag" and "dirty bit". The latter is a more common term, but often has a <span name="specific">more specific meaning</span>. It also makes me giggle because I have the sense of humor of a ten-year-old. So I went with the former, despite massive temptation otherwise.</p>
+<p>"Flag" and "bit" are synonymous in programming: they both mean a single micron of data that can be in one of two states. With bits we say "true" or "false". For flags, you sometimes hear "set" and "cleared". I&#x2019;ll use all of these interchangeably. "Dirty bit" is an equally <span name="specific">common</span> name for this pattern, but I figured I&#x2019;d stick with a name that didn&#x2019;t seem quite so prurient.</p>
 <aside name="specific">
 
-<p>In particular, the self-same <a href="http://en.wikipedia.org/wiki/Dirty_bit">Wikipedia article</a> uses the term to describe an OS-level application of this pattern where it uses a dirty bit to tell which memory pages are out of sync with the disk.</p>
+<p>Wikipedia&#x2019;s editors don&#x2019;t have my level of self-control and went with <a href="http://en.wikipedia.org/wiki/Dirty_bit">dirty bit</a>.</p>
 </aside>
 
-<p>Where were we? Oh, right, making a game. Most games or game engines have something called a <em>scene graph</em>. This is a big data structure that contains all of the visible objects in the world. It&#x2019;s used by the renderer to determine where to draw stuff on screen. You commonly hear it associated with 3D games, but 2D games, especially newer ones where characters are built out of multiple sprites often have something similar.</p>
-<p>At its simplest, a scene graph is just a pile of objects. Each object has a model or sprite some other basic visual component, and a <span name="transform"><em>transform</em></span>. The transform describes the object&#x2019;s position, rotation, and scale in the world. To move an object around in the world, we just have to change the transform.</p>
+<p>Now let&#x2019;s talk games. Most games have something called a <span name="scene-graph"><em>scene graph</em></span>. This is a big data structure that contains all of the objects in the world. The rendering engine uses it to determine where on screen to draw stuff.</p>
+<aside name="scene-graph">
+
+<p>Maybe "Scene Graph" should be a chapter here. If so, it&#x2019;ll have to wait until the 2nd Edition.</p>
+</aside>
+
+<p>At its simplest, a scene graph is just a pile of objects. Each object has a model or some other graphic primitive, and a <span name="transform"><em>transform</em></span>. The transform describes the object&#x2019;s position, rotation, and scale in the world. To move or turn an object, we just change its transform.</p>
 <aside name="transform">
 
-<p>The mechanics of <em>how</em> this transform is stored and manipulated is unfortunately out of scope for this chapter. The comically abbreviated summary is that in a 3D game, a transform is a 4x4 matrix. Combining transforms (for example translating and then rotating an object) just requires multiplying the two matrices.</p>
-<p>A proof of the correctness of that is left as an exercise for the reader.</p>
+<p>The mechanics of <em>how</em> this transform is stored and manipulated is unfortunately out of scope here. The comically abbreviated summary is that it&#x2019;s a 4x4 matrix. You can make a single transform that combines two transforms&thinsp;&mdash;&thinsp;for example translating and then rotating an object&thinsp;&mdash;&thinsp;by multiplying the two matrices.</p>
+<p>How and why that works is left as an exercise for the reader.</p>
 </aside>
 
-<p>When the renderer goes to draw an object, it takes its geometry, applies the transform to get it to the right place in the world, and then renders it there. If we just had a scene <em>bag</em> and not a scene <em>graph</em> that would be it and life would be simple. However, most scene graphs are <span name="hierarchical"><em>hierarchical</em></span>.</p>
-<p>An object in the graph may have a <em>parent</em> object that it is anchored to. In that case, its transform is relative to the paren&#x2019;t position, and isn&#x2019;t its absolute position in the world.</p>
-<p>For example, imagine your game world has a pirate ship at sea. On the pirate ship is a crow&#x2019;s nest. In that crow&#x2019;s nest is a pirate. Attached to the pirate is a parrot. The ship&#x2019;s local transform will position it in the sea. The crow&#x2019;s nest&#x2019;s transform positions it on the ship, and so on.</p>
+<p>For the renderer to draw an object, it takes the object&#x2019;s geometry, applies the transform to it, and then renders it there in the world. If we just had a scene <em>bag</em> and not a scene <em>graph</em> that would be it and life would be simple. However, most scene graphs are <span name="hierarchical"><em>hierarchical</em></span>.</p>
+<p>An object in the graph may have a parent object that it is anchored to. In that case, its transform is relative to the <em>parent&#x2019;s</em> position, and isn&#x2019;t its absolute position in the world.</p>
+<p>For example, imagine your game world has a pirate ship at sea. On the pirate ship is a crow&#x2019;s nest. Hunched in that crow&#x2019;s nest is a pirate. Clutching the pirate&#x2019;s shoulder is a parrot. The ship&#x2019;s local transform will position it in the sea. The crow&#x2019;s nest&#x2019;s transform positions it on the ship, and so on.</p>
 <p><strong>TODO illustrate</strong></p>
-<p>This way, when a parent object moves, its children move along with it. If we change the local transform of the ship, the crow&#x2019;s nest, pirate, and parrot all ride along with it. It would be a total <span name="slide">headache</span> if we had to manually adjust transforms of everything on the ship when it moved to keep everything from sliding off of it.</p>
+<p>This way, when a parent object moves, its children move with it automatically. If we change the local transform of the ship, the crow&#x2019;s nest, pirate, and parrot go along for the ride. It would be a total <span name="slide">headache</span> if we had to manually adjust transforms of everything on the ship when it moved to keep everything from sliding off of it.</p>
 <aside name="slide">
 
-<p>To be honest, when you are at sea you do have to keep manually adjusting your position to keep from sliding off. Maybe I should have chosen a drier example.</p>
+<p>To be honest, when you are at sea you <em>do</em> have to keep manually adjusting your position to keep from sliding off. Maybe I should have chosen a drier example.</p>
 </aside>
 
-<p>But to actually draw the parrot on screen, we need to know its absolute position in the world. To clarify things, we&#x2019;ll call the transform we already mentioned the object&#x2019;s <em>local transform</em>. That&#x2019;s the one that&#x2019;s relative to its parent. To render an object, we need to know its <em>world transform</em>.</p>
-<p>Calculating an object&#x2019;s world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, concatenating transforms as you go. In other worlds, the parrot&#x2019;s world transform is:</p>
+<p>But to actually draw the parrot on screen, we need to know its absolute position in the world. To clarify things, I&#x2019;ll call the parent-relative transform the object&#x2019;s <em>local transform</em>. To render an object, we need to know its <em>world transform</em>.</p>
+<p>Calculating an object&#x2019;s world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other worlds, the parrot&#x2019;s world transform is:</p>
+<p><span name="degenerate"></span></p>
 <div class="codehilite"><pre><span class="n">ship</span> <span class="n">local</span> <span class="n">transform</span> <span class="o">*</span> <span class="n">nest</span> <span class="n">local</span> <span class="n">transform</span> <span class="o">*</span> <span class="n">pirate</span> <span class="n">local</span> <span class="n">transform</span> <span class="o">*</span> <span class="n">parrot</span> <span class="n">local</span> <span class="n">transform</span>
 </pre></div>
 
 
-<p>In the degenerate case where the object is at the top of the scene graph and has no parent, that means its local and world transforms are equivalent. There&#x2019;s nothing magical here. Concatenating two transforms is just a matrix multiply, which is just a handful of floating point arithmetic. However, we do have to calculate the world transform of every object in the world every frame, so this code is definitely on the hot path where performance is critical.</p>
-<p>Where it gets tricky is when an object moves. The parrot&#x2019;s world coordinates are based on the local coordinates of its entire parent chain. That means if any of those local transforms change, the parrot&#x2019;s world transform will change too. Every time a parent moves, all of its children move too, recursively.</p>
-<p>The simplest approach to handle that fact is to just calculate world transforms on fly when we render. Each frame, we recursively traverse the scene graph starting at the top of the hierarchy. For each object, we calculate its world coordinate right then and render the object.</p>
-<p>But this is terribly wasteful of our precious CPU juice! Many if not most of the objects in the world are <em>not</em> moving every frame. Think of all of the static geometry that makes up the level. Calculating their world coordinates each frame is a waste when it&#x2019;s the same every time.</p>
-<p>The obvious answer is to <em>cache</em> the world transform. In each object, we&#x2019;ll store its local transform and the world transform that&#x2019;s derived from it and its parents. When we render, we just use the precalculated world transform. If the object never moves, that&#x2019;s always up to date and everything&#x2019;s happy.</p>
-<p>When an object does move, the obvious approach is to just recalculate its world transform right then. But don&#x2019;t forget the hierarchy! If a parent moves, we&#x2019;ll have to recalculate its world transform <em>and all of its children&#x2019;s, recursively</em>.</p>
-<p>Now imagine some busy gameplay. In a single frame, the ship gets tossed on the ocean, the crow&#x2019;s nest rocks in the wind, the pirate leans to the edge, and the parrots hops onto his head. In this one frame, we&#x2019;ve changed four local transforms. With our current approach of eagerly recalculating world transforms, what ends up happening?</p>
+<aside name="degenerate">
+
+<p>In the degenerate case where the object has no parent, its local and world transforms are equivalent.</p>
+</aside>
+
+<p>We need the world transform for every object in the world every frame, so even though it&#x2019;s just a handful of matrix multiplications per object, it&#x2019;s on the hot code path where performance is critical. Keeping them up-to-date is tricky because when a parent object moves, that affects the world transform of itself and all of its children, recursively.</p>
+<p>The simplest approach is to just calculate transforms on the fly while rendering. Each frame, we recursively traverse the scene graph starting at the top of the hierarchy. For each object, we calculate its world transform right then and draw it.</p>
+<p>But this is terribly wasteful of our precious CPU juice! Many objects in the world are <em>not</em> moving every frame. Think of all of the static geometry that makes up the level. Calculating their world transform each frame is a waste when it hasn&#x2019;t changed.</p>
+<p>The obvious answer is to <em>cache</em> it. In each object, we store its local transform and its derived world transform. When we render, we just use the precalculated world transform. If the object never moves, that&#x2019;s always up to date and everything&#x2019;s happy.</p>
+<p>When an object <em>does</em> move, the simple approach is to refresh its world transform right then. But don&#x2019;t forget the hierarchy! When a parent moves, we have to recalculate its world transform <em>and all of its children&#x2019;s, recursively</em>.</p>
+<p>Imagine some busy gameplay. In a single frame, the ship gets tossed on the ocean, the crow&#x2019;s nest rocks in the wind, the pirate leans to the edge, and the parrot hops onto his head. We changed four local transforms. If we recalculate world transforms eagerly whenever a local transform changes, what ends up happening?</p>
 <div class="codehilite"><pre><span class="mf">1.</span> <span class="n">update</span> <span class="n">ship</span> <span class="n">local</span> <span class="n">transform</span>
 <span class="mf">2.</span> <span class="n">calculate</span> <span class="n">ship</span> <span class="n">world</span> <span class="n">transform</span>
 <span class="mf">3.</span> <span class="n">calculate</span> <span class="n">nest</span> <span class="n">world</span> <span class="n">transform</span>
@@ -118,16 +128,21 @@
 </pre></div>
 
 
-<p>We only have four objects, but we end up doing <em>ten</em> world transform calculations. Notice that most of those world calculations are completely pointless. We end up calculating the parrot&#x2019;s world transform <em>four</em> times, but the first three just get discarded and overridden by later ones. This won&#x2019;t do.</p>
-<p>The problem is that when a single object moves, it invalidates the world transform of several objects: itself and all of its children. Flipping that around, it means any object&#x2019;s world transform is dependent on several local transforms. Since we recalculate immediately each time one of those local transforms changes, when a number of local transforms change in one frame, we end up calculating the world transform for the same object multiple times.</p>
-<p>The solution is to decouple changing local transforms from updating the world transforms. This would let us change a bunch of local transforms in a single batch and then recalculate the affected world transform <em>once</em> when all of those modifications are done, right before we need it to render.</p>
-<p>We do this by adding a boolean field to each node in the graph. When the local transform changes, we set this flag to true. When we need the object&#x2019;s world transform to render, we check the flag first. If it&#x2019;s set, we calculate the world transform then and clear the flag. In other words, the <span name="dirty-name">flag</span> represents "is the world transform out of date". For reasons that aren&#x2019;t entirely clear, the traditional name for this "out-of-dateness" is "dirty". Hence: a dirty flag.</p>
-<aside name="dirty-name">
+<p>We only moved four objects, but we did <em>ten</em> world transform calculations. That&#x2019;s six pointless calculations that get thrown out before they are ever used by the renderer. We calculated the parrot&#x2019;s world transform <em>four</em> times, but it only gets rendered once. This won&#x2019;t do.</p>
+<p>The problem is that any world transform can depend on several local transforms. Since we recalculate immediately each time <em>one</em> of those changes, we end up recalculating the same transform multiple times when more than one of the local transforms it depends on changes in the same frame.</p>
+<p>We solve this by <span name="decoupling">decoupling</span> changing local transforms from updating the world transforms. This lets us change a bunch of local transforms in a single batch and <em>then</em> recalculate the affected world transform once after all of those modifications are done, right before we need it to render.</p>
+<aside name="decoupling">
 
-<p>One common aspect of programmers is that we like things neat and organized. When you have two pieces of data&thinsp;&mdash;&thinsp;here the local and world transforms&thinsp;&mdash;&thinsp;and one is current while the other is out-of-date, that inconsistency rubs us the wrong way. People who don&#x2019;t code don&#x2019;t often realize how intimate and nearly synesthetic our relationship to our code is. So to many, I think having some old data floating around in memory literally feels dirty to them, hence the name.</p>
+<p>It&#x2019;s interesting how much of software architecture is just intentionally engineering a little slippage.</p>
 </aside>
 
-<p>Applying that pattern to our earlier example where everything moves in the same frame yields:</p>
+<p>To do this, we add a flag to each object in the graph. When the local transform changes, we set it. When we need the object&#x2019;s world transform, we check the flag. If it&#x2019;s set, we calculate the world transform then and clear the flag. The flag represents, "Is the world transform out of date?" For reasons that aren&#x2019;t entirely <span name="dirty-name">clear</span>, the traditional name for this "out-of-date-ness" is "dirty". Hence: <em>a dirty flag</em>.</p>
+<aside name="dirty-name">
+
+<p>My armchair psychology guess: lots of programmers like things neat and consistent and organized. Having two pieces of data&thinsp;&mdash;&thinsp;here the local and world transforms&thinsp;&mdash;&thinsp;where one is current and the other is old bothers them in some almost tactile way. In other words, that out-of-date data feels "dirty".</p>
+</aside>
+
+<p>If we apply this pattern and then move all of the objects in our previous example, the game ends up doing:</p>
 <div class="codehilite"><pre><span class="mf">1.</span> <span class="n">update</span> <span class="n">ship</span> <span class="n">local</span> <span class="n">transform</span>
 <span class="mf">2.</span> <span class="n">update</span> <span class="n">nest</span> <span class="n">local</span> <span class="n">transform</span>
 <span class="mf">3.</span> <span class="n">update</span> <span class="n">pirate</span> <span class="n">local</span> <span class="n">transform</span>
@@ -139,13 +154,12 @@
 </pre></div>
 
 
-<p>Which is obviously the best you could hope to do. As you can see, the pattern gives us a few advantages:</p>
+<p>That&#x2019;s obviously the best you could hope to do: the world transform for each affected object is calculated exactly once. With a single bit of data, this pattern does a few things for us:</p>
 <ol>
 <li>It collapses modifications to multiple local transforms along an object&#x2019;s parent chain into a single recalculation on the object.</li>
-<li>It avoids doing any recalculation on objects that didn&#x2019;t move.</li>
-<li>And a minor bonus: if any objects end up getting removed before they are rendered, we won&#x2019;t bother calculating their world transform at all.</li>
+<li>It avoids recalculation on objects that didn&#x2019;t move.</li>
+<li>And a minor bonus: if an object gets removed before it&#x2019;s rendered, it doesn&#x2019;t calculate its world transform at all.</li>
 </ol>
-<p>In other words, this pattern lets us only calculate the world transform when it&#x2019;s actually needed and when it&#x2019;s actually changed.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>A set of <strong>primary data changes</strong> over time. A set of <strong>derived data</strong> is determined from this using some <strong>time-consuming process</strong>. A <strong>"dirty" flag</strong> tracks when the derived data is out of sync with the primary data. It is <strong>set when the primary data changes</strong>. When the derived data is requested, if the flag is set <strong>the processing is done then and the flag is cleared.</strong> Otherwise, the previous <strong>cached derived data</strong> is used.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
