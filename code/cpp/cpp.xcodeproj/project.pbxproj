@@ -38,6 +38,7 @@
 		2947E82C17C32E3500257E9B /* introduction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = introduction.h; sourceTree = SOURCE_ROOT; };
 		294AEA8E16E792ED004E3BD0 /* game-loop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "game-loop.h"; sourceTree = SOURCE_ROOT; };
 		295A7BB9179246E100A8C792 /* state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = state.h; sourceTree = SOURCE_ROOT; };
+		299FBF6F17D988660018EFD3 /* dirty-flag.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "dirty-flag.h"; sourceTree = SOURCE_ROOT; };
 		29BC60121779DA6C00C5D616 /* expect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = expect.h; sourceTree = SOURCE_ROOT; };
 		29F2A2A616E63EBB005803DA /* gpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = gpp; path = cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -88,6 +89,7 @@
 				295A7BB9179246E100A8C792 /* state.h */,
 				290D349B17B17F4500FF653B /* update-method.h */,
 				2947E82C17C32E3500257E9B /* introduction.h */,
+				299FBF6F17D988660018EFD3 /* dirty-flag.h */,
 			);
 			name = cpp;
 			path = gpp;

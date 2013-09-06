@@ -12,6 +12,7 @@
 #include "spatial-partition.h"
 #include "state.h"
 #include "update-method.h"
+#include "dirty-flag.h"
 
 int main (int argc, char * const argv[]) {
   UnbufferedSlapstick::testComedy();

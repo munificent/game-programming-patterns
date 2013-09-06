@@ -129,65 +129,84 @@ That's obviously the best you could hope to do: the world transform for each aff
 
 ## The Pattern
 
-A set of **primary data changes** over time. A set of **derived data** is determined from this using some **time-consuming process**. A **"dirty" flag** tracks when the derived data is out of sync with the primary data. It is **set when the primary data changes**. When the derived data is requested, if the flag is set **the processing is done then and the flag is cleared.** Otherwise, the previous **cached derived data** is used.
+A set of **primary data** changes over time. A set of **derived data** is determined from this using some **expensive process**. A **"dirty" flag** tracks when the derived data is out of sync with the primary data. It is **set when the primary data changes**. When the derived data is requested, if the flag is set **the processing is done then and the flag is cleared.** Otherwise, the previous **cached derived data** is used.
 
 ## When to Use It
 
-Compared to some other patterns in this book, this one solves a pretty specific problem. Also, like most optimization patterns, you should only reach for it when you have a performance problem big enough to justify the added code complexity. Added up, this means you probably won't use this often.
+Compared to some other patterns in this book, this one solves a pretty specific problem. Also, like most optimizations, you should only reach for it when you have a performance problem big enough to justify the added code complexity.
 
-Dirty flags are used to solve two related problems: *calculation* and *synchronization*. What they have in common is:
+Dirty flags are typically used to solve two problems: *calculation* and *synchronization*. In both cases, the process of going from the primary data to the derived data is time-consuming or otherwise costly.
 
-1. A set of data that changes over time.
-2. Another set of data that's somehow derived from that.
-3. The process of going from 1 to 2 is time-consuming or otherwise expensive.
+In our scene graph example, the process is slow because of the amount of math to perform. When using this pattern for synchronization on the other hand, it's more often that the derived data is *somewhere else* -- either on disk or over the network on another machine -- and simply getting it from point A to point B is what's expensive.
 
-In our scene graph example, the process is time-consuming because there's just a lot of math to perform. When using this pattern for synchronization, it's more often that the derived data is *somewhere else* -- either on disk or over the network on another machine -- and simply getting it from point A to point B is what's expensive.
+There are a couple of other requirements too:
 
-In either case, it turns out that doing that heavyweight work is often for naught. Every time the primary data changes, you have to ditch the previous derived data and generate it again to take into account the new stuff. If the primary data changes *again* before you ever actually use the data derived from it, then there was no point in doing that work.
+ *  **The primary data has to change more often than the derived data is used.**
+    This pattern gets its benefit from collapsing multiple changes to the
+    primary data into a single refresh of the derived data. That's possible
+    because those changes happen in a batch before the derived data is used.
+    If you find yourself always needing that derived data after every single
+    modification to the primary data, this pattern can't help.
 
-That brings in another requirement for this pattern: *the primary data has to change more often than the derived data is used*. If you always need the derived data every single time the primary data is modified, there's no way to avoid doing the work to generate it each time, and this pattern can't help you.
+ *  **It should be hard to incrementally update the derived data.** Let's say the
+    pirate ship in our game can only carry so much booty. We need to
+    know the total weight of everything in the hold. We
+    *could* use this pattern and have a dirty flag for the total weight. Every
+    time we add or remove some loot, we set the flag. When we need the
+    total, we add up all of the booty and clear the flag.
 
-There's one final softer requirement. It's implied here that you can't easily *incrementally* update the derived data when the primary data changes. This pattern comes into play with the derived data is only calculated from *the primary data* and not from *the previous derived data*.
+    But a simpler solution is to just *keep a running total*. When we add or
+    remove an item, just add or remove its weight from the current total. If
+    we can "pay as we go" like this and keep the derived data updated, then
+    that's often a better choice than using this pattern.
 
-Let's say the pirate ship in our game can only carry so much weight in booty. You need to know the total weight by summing the weights of everything in the hold. You *could* use this pattern and have a dirty flag for the total weight. Every time you add or remove some loot, you set the flag. Then when you need the total, you add up all of the booty and clear the flag.
+All of this makes it sound like dirty flags are never actually useful, but
+you'll eventually find a place here or there where they help.
+<span name="hacks">Grepping</span> your
+average game codebase for the word "dirty" will often
+turn up uses of this pattern.
 
-But a simpler solution is to just *keep a running total*. When you add or remove an item, just add or remove its weight from the current total. If you can "pay as you go" like this and keep the derived data updated, then that's often a better choice than using this pattern.
+<aside name="hacks">
 
-All of this makes it sound like this pattern is never actually useful, but over time you'll likely find a place here or there where it's a good fit. Grepping your average game codebase for the word "dirty" will often turn something up, and it almost always refers to this pattern.
-
-## Keep in Mind
-
-Once you have convinced yourself this pattern is a good fit, there are a few wrinkles that can cause you some discomfort.
-
-### There is a cost to deferring too long
-
-In its simplest form, this pattern defers some slow work until the result is actually needed. But when the result *is* needed, it's often needed *right now* and the reason we're using this pattern to begin with is because calculating that result is slow!
-
-In our example, this isn't a problem because calculating a given node's world coordinates isn't *too* slow. Our goal was to avoid doing it *redundantly*. But you can imagine other uses of this pattern where the work you're doing is a big monolithic chunk that takes a noticeable amount of time to chew through. If the game doesn't *start* doing the work until right when the player expects to the result, that can cause an unpleasant visible <span name="gc">pause</span>.
-
-Another problem with deferring is that if something goes wrong, you may never do the work at all. This can be particularly problematic when you're using this pattern to save some state to a more persistent form.
-
-For example, any program that lets you edit documents keeps track of if you have "unsaved changes", which is a picture-perfect example of this pattern. That little bullet or star in your document's title bar is literally the dirty flag visualized. The primary data is the open document in memory, and the derived data is the file on disk.
-
-Many programs don't save to disk until either the document is closed or the application is exited. That's fine most of the time, but if you accidentally kick the power cable out, there goes your masterpiece.
-
-We've talked about two times you can calculate or synchronize the derived data -- the second the primary data changes or right before the derived data is needed -- but there's actually a continuum between those points. There are a range of options where you defer the work *somewhat* but still eventually kick it off even before the result is actually needed.
-
-<aside name="gc">
-
-This is mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting systems free memory the second its no longer needed, but suffer by spending CPU time updating ref counts eagerly every time references are changed.
-
-Simple garbage collectors defer reclaiming memory until it's really needed. But the cost here is the dreaded "GC pause" that can freeze your entire app until the GC is done walking the heap.
-
-In between the two are increasingly common more complex systems like deferred ref-counting and incremental GC that reclaim memory less eagerly than pure ref-counting but more eagerly than stop-the-world collectors.
+From my research, it also turns up a lot of comments apologizing for "dirty" hacks.
 
 </aside>
 
-When your fancy text editor auto-saves a backup "in the background" every few minutes, that's basically the trade-off it's making. The frequency that it auto-saves -- every few minutes to once an hour -- is picking a point on the continuum that balances not losing too much work when a crash occurs against not thrashing the file system too much by saving all the time.
+## Keep in Mind
+
+Even after you've convinced yourself this pattern is a good fit, there are a few wrinkles that can cause you some discomfort.
+
+### There is a cost to deferring too long
+
+This pattern defers some slow work until the result is actually needed, but when is, it's often needed *right now*. But the reason we're using this pattern to begin with is because calculating that result is slow!
+
+This isn't a problem in our example because we can still calculate world coordinates fast enough to fit within a frame, but you can imagine other cases where the work you're doing is a big chunk that takes noticeable time to chew through. If the game doesn't *start* chewing until right when the player expects to see the result, that can cause an unpleasant visible <span name="gc">pause</span>.
+
+Another problem with deferring is that if something goes wrong, you may never do the work at all. This can be particularly problematic when you're using this pattern to save some state to a more persistent form.
+
+**TODO: Illustration of title bar**
+
+For example, text editors track if your document has "unsaved changes", which is a picture-perfect example of this pattern. That little bullet or star in your file's title bar is literally the dirty flag visualized. The primary data is the open document in memory, and the derived data is the file on disk.
+
+Many programs don't save to disk until either the document is closed or the application is exited. That's fine most of the time, but if you accidentally kick the power cable out, there goes your masterpiece.
+
+We've talked about two times you can calculate or synchronize the derived data -- the second the primary data changes or right before the derived data is needed -- but there's actually a continuum between those points. There are a range of options where you defer the work *somewhat* but still kick it off before the result is needed.
+
+<aside name="gc">
+
+This is mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting systems free memory the second its no longer needed, but burn CPU time updating ref counts eagerly every time references are changed.
+
+Simple garbage collectors defer reclaiming memory until it's really needed, but the cost is the dreaded "GC pause" that can freeze your entire app until the collector is done scouring the heap.
+
+In between the two are more complex systems like deferred ref-counting and incremental GC that reclaim memory less eagerly than pure ref-counting but more eagerly than stop-the-world collectors.
+
+</aside>
+
+When your fancy text editor auto-saves a backup in the background every few minutes, that's basically the trade-off it's making. The frequency that it auto-saves is the point it chose on the continuum between not losing too much work when a crash occurs and not thrashing the file system too much by saving all the time.
 
 ### You have to make sure to set the flag *every* time the state changes
 
-Since the derived data is calculated from the primary data, it's essentially a cache. Whenever you have cached data in memory, the trickiest aspect of it is <span name="cache">*cache invalidation*</span> -- correctly knowing when the cache is out of sync with its source data. In this pattern, that means correctly setting the dirty flag when *any* primary data changes.
+Since the derived data is calculated from the primary data, it's essentially a cache. Whenever you have cached data in memory, the trickiest aspect of it is <span name="cache">*cache invalidation*</span> -- correctly noting when the cache is out of sync with its source data. In this pattern, that means correctly setting the dirty flag when *any* primary data changes.
 
 <aside name="cache">
 
@@ -197,118 +216,93 @@ Phil Karlton famously said, "There are only two hard things in Computer Science:
 
 Miss it in one place, and your program will incorrectly use stale derived data. This leads to confused players and very hard to track down bugs. When you use this pattern, you'll have to be very careful that any code that modifies the primary state also sets the dirty flag. In our scene graph, for example, we have to remember to invalidate not just the object's world transform when its local transform changes, but all of its children too since they depend on it.
 
-One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes a single narrow interface, you can set the dirty bit there and rest assurred that it won't go out of sync.
+One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes a single narrow API, you can set the dirty bit there and rest assurred that it won't go out of sync.
 
-### You will have to keep the previous derived data in memory
+### You have to keep the previous derived data in memory
 
-When the game needs the derived data, it checks to see if the dirty flag is set. If it *isn't* set, then it uses the previously calculated data. This is obvious, but that does imply that you have to keep that derived data around in memory in case you end up needing it later.
+<span name="sync"></span>
 
-If you weren't using this pattern, another option would be just calculate the derived data on the fly right when you need it, and then discard it when you're done. That avoids the expense of keeping it cached in memory. The cost doing this is calculation: you'll have to do that calculation *every* time you need it.
+When the derived data is needed and the dirty flag *isn't* set, it uses the previously calculated data. This is obvious, but that does imply that you have to keep that derived data around in memory in case you end up needing it later.
 
-Like many optimizations, then, you can look at this pattern as <span name="trade">trading</span> off memory for space. In return for keeping the previously calculated data in memory, you avoid having to recalculate it when it's imput data hasn't changed. This trade-off makes sense when the calculation is slow and memory is cheap. When you've got more time than memory on your hands, it may be better to just calculate it as needed and avoid this pattern.
+<aside name="sync">
+
+This isn't much of an issue when you're using this pattern for synchronization. There, the derived data isn't usually in memory at all.
+
+</aside>
+
+If you weren't using this pattern, you could calculate the derived data on the fly whenever you needed it, then discard it when you were done. That avoids the expense of keeping it cached in memory, at the cost of having to do that calculation every time you need the result.
+
+Like many optimizations, then, this pattern <span name="trade">trades</span> memory for space. In return for keeping the previously calculated data in memory, you avoid having to recalculate it when it hasn't changed. This trade-off makes sense when the calculation is slow and memory is cheap. When you've got more time than memory on your hands, it's better to just calculate it as needed.
 
 <aside name="trade">
 
-Conversely, you can consider compression algorithsm as making the opposite trade-off: they optimize space at the expense of needing processing time to decompress.
+Conversely, compression algorithms make the opposite trade-off: they optimize *space* at the expense of the processing time needed to decompress.
 
 </aside>
 
 ## Sample Code
 
-Assuming we've met the surprisingly long list of requirements and this pattern does make sense for out problem, let's see how it looks to code it up. As I mentioned before, the actual math behind transform matrices is beyond the humble aims of this book, so I'll just encapsulate that in a class whose implementation you can presume exists somewhere out in the aether:
+Let's assume we've met the surprisingly long list of requirements and see how the pattern looks in code. As I mentioned before, the actual math behind transform matrices is beyond the humble aims of this book, so I'll just encapsulate that in a class whose implementation you can presume exists somewhere out in the ether:
 
-    class Transform {
-      Transform combine(const Transform& other) const;
-    }
+^code transform
 
-The only operator we care about here is being able to combine two transforms so that we can get an object's world transform using the local transforms of its parent chains.
+The only operation we need here is `combine()` so that we can get an object's world transform by combining all of the local transforms along its parent chain. It also has a method to get an "origin" transform: basically an identity matrix that means no translation, rotation, or scaling at all.
 
-Next, we'll sketch out the class for an object in the scene graph. This is the bare minimum its needs before actually applying this pattern:
+Next, we'll sketch out the class for an object in the scene graph. This is the bare minimum its needs *before* applying this pattern:
 
-    class GraphNode {
-      Transform _local;
-      Mesh* _mesh;
+^code graph-node
 
-      GraphNode*[] _children;
-      int _numChildren;
-    }
+Each node has a local transform which describes where it is relative to its parent. It has a mesh which is the actual graphic object that's used to render it. (We'll allow `_mesh` to be `NULL` too to handle non-visual nodes that are used just to group their children.) Finally, each node has a possibly empty collection of child nodes.
 
-Each node has its local transform which describes where it is relative to its parent. It has a mesh which is the actual graphic object that's used to render it. (We'd probably allow `_mesh` to be `NULL` too to handle non-visual nodes that are used just to group their children.) Finally, each node has a possibly empty collection of child nodes.
+With this, a "scene graph" object is really just a single root `GraphNode` object whose children (and grandchildren, etc.) are all of the objects in the world:
 
-To create an entire scene graph, we can just make a single root node whose children contain all of the objects in the world. We won't implement this, but the ultimate goal of the scene graph will be to invoke this function on each node with its correct world transform:
+^code scene-graph
 
-    void render(Mesh* mesh, Transform transform);
+In order to render a scene graph, all we need to do is traverse that tree of nodes starting at the root and call this function for each node's mesh with its correct world transform:
 
-This function does whatever magic the renderer needs to do to draw that mesh at the given location in the world. If we can call that correctly and efficiently on every node in the scene graph, we're happy.
+^code render
+
+We won't implement this here, but if we did, it would do whatever magic the renderer needs to draw that mesh at the given location in the world. If we can call that correctly and efficiently on every node in the scene graph, we're happy.
 
 ### An unoptimized traversal
 
-To get our feet wet, let's whip up a basic traversal for rendering the scene graph by calculating the world positions on the fly. This won't be optimal, but it will be simple:
+To get our hands dirty, let's throw together a basic traversal for rendering the scene graph by calculating the world positions on the fly. It won't be optimal, but it will be simple. We'll add a new method to `GraphNode`:
 
-    void GraphNode::render(Transform parentWorld) {
-      Transform world = _local.combine(parentWorld);
+^code render-on-fly
 
-      if (_mesh) render(_mesh, world);
+We pass the world transform of the node's parent into this in `parentWorld`. With that, all that's left to get the correct world transform of *this* node is to combine it with its own local transform. We don't have to walk *up* the parent chain to calculate this because we calculate as we go while walking *down* the chain.
 
-      for (int i = 0; i < _numChildren; i++) {
-        _children[i]->render(world);
-      }
-    }
+We calculate the node's world transform and store it in `world`, then we render the mesh if we have one. Finally, we recurse into the child nodes, passing in *this* node's world transform. All in all, it's nice tight, simple recursive method.
 
-This takes in the transform of the parent node which has already been converted to world coordinates. That means that to get the correct world transform of *this* node, all that's left is to combine it with its own local transform. We don't have to walk *up* the parent chain to calculate this because we calculate as we go while walking *down* the chain.
+We kick off the process by rendering the root node:
 
-So we calculate the node's world transform and store it in `world`. Then we render the mesh if we have one. Finally, we recurse into the child nodes passing in *this* node's world transform. All in all, it's nice tight, simple recursive method.
+^code render-root
 
 ### Let's get dirty
 
-The problem with it, the reason it's in this chapter is that calling `_local.combine(parentWorld)` on every node in the graph every frame is too wasteful. Now let's see how this pattern fixes that. First, we need to add two fields to `GraphNode`:
+So this code does the right thing -- renders all the meshes in the right place -- but it doesn't do it efficiently. It's calling `_local.combine(parentWorld)` on every node in the graph, every frame. Let's see how this pattern fixes that. First, we need to add two fields to `GraphNode`:
 
-    class GraphNode {
-      Transform _world;
-      bool _dirty;
+^code dirty-graph-node
 
-      GraphNode(Mesh* mesh, Transform local)
-      : _mesh(mesh),
-        _local(local),
-        _dirty(true)
-      {}
-    }
+The `_world` field caches the previously-calculated world transform, and `_dirty`, of course, is the dirty flag. Note that the flag starts out `true`. When we create a new node, we haven't calculated it's world transform yet, so at birth it's already out of sync with the local transform.
 
-It now stores a cache of the previously-calculated world transform in `_world` and then, of course, the dirty flag. Note also that the flag starts out `true`. When we create a new node, we haven't calculated it's world transform yet, so it's born out of date already.
+The only reason we need this pattern is because objects can *move*, so let's add support for that:
 
-The only reason we need this pattern is because objects can move, so let's add support for that:
+^code set-transform
 
-    void GraphNode::setTransform(Transform local) {
-      if (_local == local) return;
-      _local = local;
-      _dirty = true;
-    }
+The important part here is that it sets the dirty flag too. Are we forgetting anything? Right: the child nodes!
 
-The important bit here is that it sets the dirty flag. There's also a tiny optimization here to early out if the new local transform is actually the same as the previous one. When using this pattern to track state changes, it's often worthwhile to validate that the state actually has changed from its previous value before you go off and set the dirty flag and recalculate a bunch of stuff. However, if doing that equality itself is expensive, it may be faster to just always assume it's changed.
+When a parent node moves, all of its children's world coordinates are invalidated too. But here we aren't setting their dirty flags. We *could* do that, but that's recursive and slow. Instead we'll do something clever when we go to render. Let's see:
 
-Are we forgetting anything? Right: the child nodes. When a parent node moves, all of its children's world coordinates are invalidated too. But here we aren't setting their dirty flags. We *could* do that, but that's a bit slow and recursive. Instead we'll do something clever when we go to render. Let's see:
+^code dirty-render
 
-    void GraphNode::render(Transform parentWorld, bool dirty) {
-      dirty |= _dirty;
-      if (dirty) {
-        _world = _local.combine(parentWorld);
-        _dirty = false;
-      }
+This is similar to the original naïve implementation. The key changes are that we check to see if the node is dirty before calculating the world transform, and we store it in a field instead of a local variable. When the node is clean, we skip the `combine()` completely and use the old but still correct `_world` value.
 
-      if (_mesh) render(_mesh, _world);
-
-      for (int i = 0; i < _numChildren; i++) {
-        _children[i]->render(world, dirty);
-      }
-    }
-
-This is pretty similar to the original naïve implementation. The main bit is that we check to see if its dirty before calculating the world transform, and we use a field for that instead of a local variable. When it's clean, we skip the `combine()` completely and use the old but still good value.
-
-The clever bit is that `parentDirty` parameter. That will be `true` if any node above this node in the parent chain was dirty. In much the same way that `parentWorld` updates the world transform incrementally as we traverse down the hierarchy, `dirty` tracks the dirtiness of the parent chain.
+The clever bit is that `dirty` parameter. That will be `true` if any node above this node in the parent chain was dirty. In much the same way that `parentWorld` updates the world transform incrementally as we traverse down the hierarchy, `dirty` tracks the dirtiness of the parent chain.
 
 This lets us avoid having to actually recursively set each child's `_dirty` flag in `setTransform()`. Instead, we'll just pass the parent's dirty flag down to its children when we render and look at that too to see if we need to recalculate the world transform.
 
-The end result here is exactly what we want: changing a node's local transform is just a couple of assignments, and rendering the world calculates the exact minimum number of world transforms that are affected by those changes.
+The end result here is exactly what we want: changing a node's local transform is just a couple of assignments, and rendering the world calculates the exact minimum number of world transforms that have changed since the last frame.
 
 ## Design Decisions
 
