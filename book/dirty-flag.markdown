@@ -306,17 +306,15 @@ The end result here is exactly what we want: changing a node's local transform i
 
 ## Design Decisions
 
-This is a pretty concrete pattern, so it isn't that open-ended. There are only a couple of things to tune with it:
+This pattern is pretty specific, so there are only a couple of knobs to twiddle on it:
 
 ### When is the dirty flag cleaned?
-
-The most basic question you'll have to answer is when to actually do the work you've deferred. You can't defer it *forever*, after all. Here's a few options from least to most eager.
 
 * **If you defer it until the result is needed:**
 
     * *It avoids doing calculation entirely if the result is never used.* For
         primary data that changes frequently and where the derived data is
-        rarely accessed, this can be a huge win.
+        rarely accessed, this can be a big win.
 
     * *If the calculation is time-consuming, it can cause a noticeable pause.*
         Postponing the work until the end-user is waiting to see the result can
@@ -326,13 +324,10 @@ The most basic question you'll have to answer is when to actually do the work yo
 * **At well-defined checkpoints:**
 
     Sometimes there is a point in time or the progression of the game where it's
-    natural to do the deferred synchronization or calculation. For example, you
-    may want to delay saving the game until the player reaches some kind of
-    check point in the level.
-
-    These synchronization points may not be user visible or part of the game
-    mechanics. For example, maybe there's a loading screen or a cut scene that
-    you can hide the work behind.
+    natural to do the deferred synchronization or calculation. For example,
+    we may want to save the game only when the pirate sails into port. Or the
+    sync point may not part of the game mechanics. We may just want to hide the
+    work behind a loading screen or a cut scene.
 
     * *You can ensure the time spent doing the work doesn't impact the user
         experience.* Unlike the above option, you can often give something to
@@ -350,86 +345,74 @@ The most basic question you'll have to answer is when to actually do the work yo
 * **In the background:**
 
     Like your text editor that auto-saves a backup every few minutes, you can
-    do the work on some fixed time interval. Usually, you'll kick off the timer
-    on the first modification and the process all of the changes that happened
-    between then and when the timer fires. Then you reset and start all over
-    again.
+    do the work after some time interval. Usually, you'll start the <span name="hysteresis">timer</span>
+    on the first modification and then process all of the changes that happened
+    between then and when the timer fires.
 
-    * *You can tune how frequently the work is performed.* Here the timing of
-        when we clean the dirty state and perform the work isn't dependent on
-        the player requesting some data or reaching some checkpoint, so we can
-        ensure it happens as frequently (or infrequently as we want).
+    <aside name="hysteresis">
+
+    The term in human-computer interaction for in intentional delay between
+    when a program receives user input and when it responds is [*hysteresis*](http://en.wikipedia.org/wiki/Hysteresis).
+
+    </aside>
+
+    * *You can tune how often the work is performed.* Since the time
+        when we clean the dirty state and do the work isn't dependent on
+        the player requesting some data or reaching some checkpoint, we can
+        ensure it happens as frequently (or infrequently) as we want.
 
     * *You can do more redundant work.* If the primary state only changes a
-        tiny amount during the timer's run, and the granularity of our dirty
-        flags is too coarse, we'll do work on a bunch of data that hasn't
-        changed. If tiny changes trickle in, that timer will constantly be
-        running and triggering work over data again and again that hasn't
-        changed much.
+        tiny amount during the timer's run and our dirty flags are
+        coarse-grained, we'll process a bunch of data that hasn't
+        changed. When changes trickle in, that timer will constantly be
+        triggering work over data that hasn't changed much again and again.
 
-    * *You can end up throwing away work.* The timer starts at the beginning
-        of the first change to the primary data, and fires at some fixed when
-        the timer goes off, we'll do the processing, and then immediately start
-        the timer again and throw
-        out what we just did since changes are still coming in.
-
-        If that happens often, it may make sense for the timer to be more
-        <span name="adaptive">adaptive</span>. One fix is to reset the timer on *every* change, not just the
-        first. This means it will do the processing after a fixed amount of time
-        has passed *where the primary state hasn't changed*.
-
-        <aside name="adaptive">
-
-        An intentional delay where the program waits a bit after receiving user
-        input before it responds is called [*hysteresis*](http://en.wikipedia.org/wiki/Hysteresis), a delightful word.
-
-        </aside>
-
-        This helps you avoid pointless work, at the expense of running the risk
-        of deferring too long. If we were implemented auto-save in a text
-        editor, imagine an author feverishly writing for hours on end without a
-        break. The timer will keep getting reset and never actually auto-save
-        the document.
-
-    * *You'll need some support for doing work "in the background".*
-        Processing on a timer independent of what the player is doing implies
-        the player can keep doing whatever that is while the processing is
-        going on.
-
-        That means we'll likely need threading or some other kind of concurrency
+    * *You'll need some support for doing work asynchronously.*
+        Processing the data "in the background" implies that the player can
+        keep doing whatever it is that they're doing at the same time. That
+        means we'll likely need threading or some other kind of concurrency
         support so that the work we're doing can happen while the game is still
-        responsive and being played. Since the player is also interacting with
-        the state that you're processing, you'll need to think about making that
-        safe for concurrent modification too.
+        responsive and being played.
+
+        Since the player is likely interacting with
+        the same primary state that you're processing, you'll need to think
+        about making that safe for concurrent modification too.
 
 ### How fine-grained is your dirty tracking?
 
-Imagine we are working on a city-building game. Cities are automatically saved online so the player can resume where they left off. We're using dirty flags to determine which parts of the city have been bulldozed and need to be sent to the server. Each chunk of data we send to the server contains some modified city data and a bit of metadata describing where in the city this modification occurred.
+Imagine our pirate game lets players build and customize their pirate ship. Ships are automatically saved online so the player can resume where they left off. We're using dirty flags to determine which decks of the ship have been fitted and need to be sent to the server. Each chunk of data we send to the server contains some modified ship data and a bit of metadata describing where on the ship this modification occurred.
 
 * **If it's more fine-grained:**
 
-    Say we slap a dirty flag on each tiny square foot of the metropolis.
+    Say we slap a dirty flag on each tiny plank of each deck.
 
-    * *We'll only process data that actually changed.* We'll send exactly the
-        facets of the city that were modified to the server.
+    * *You only process data that actually changed.* We'll send exactly the
+        facets of the ship that were modified to the server.
 
     * *When a lot of data changes, a larger number of dirty flags also need to
         be set.*
 
 * **If it's more coarse-grained:**
 
-    Alternatively, we could associate a dirty bit with each *city block*.
-    Changing anything within that area marks the entire block dirty.
+    Alternatively, we could associate a dirty bit with each deck.
+    Changing anything on that deck marks the entire deck <span name="swab">dirty</span>.
 
-    * *We'll end up processing unchanged data.* Add a single lamppost to a
-        street corner and we'll have to send the whole block to the server.
+    <aside name="swab">
+
+    I could make some terrible joke about it needing to be swabbed here, but
+    I'll refrain.
+
+    </aside>
+
+    * *You end up processing unchanged data.* Add a single barrel to a deck
+        and we'll have to send the whole thing to the server.
 
     * *Less memory is used for storing dirty flags.*
 
     * *Less time is spent on fixed overhead.* When processing some changed data,
        there's often a bit of fixed work you have to do on top of handling the
        data itself. In the example here, that's the metadata required to
-       identify where in the city the changed data lives. The bigger your
+       identify where on the ship the changed data is. The bigger your
        processing chunks, the fewer of them there are, which means the less
        fixed overhead you have.
 
