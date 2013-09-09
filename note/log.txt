@@ -1,3 +1,4 @@
+2013-09-08 - revise 1362 words, 3rd draft dirty flag
 2013-09-07 - revise 367 words, finish 2nd draft dirty flag
 2013-09-06 - revise 541 words (delete ~200) 2nd draft dirty flag
 2013-09-05 - revise 800 words, write real sample code, 2nd draft dirty flag
