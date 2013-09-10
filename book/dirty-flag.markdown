@@ -35,7 +35,14 @@ However, most scene graphs are <span name="hierarchical">*hierarchical*</span>. 
 
 For example, imagine our game world has a pirate ship at sea. Atop the ship's mast is a crow's nest. Hunched in that crow's nest is a pirate. Clutching the pirate's shoulder is a parrot. The ship's local transform will position it in the sea. The crow's nest's transform positions it on the ship, and so on.
 
-**TODO illustrate**
+<span name="pirate"></span>
+<img src="images/dirty-flag-pirate.png" />
+
+<aside name="pirate">
+
+Programmer art!
+
+</aside>
 
 This way, when a parent object moves, its children move with it automatically. If we change the local transform of the ship, the crow's nest, pirate, and parrot go along for the ride. It would be a total <span name="slide">headache</span> if, when the ship moved, we had to manually adjust the transforms of everything on it to keep them from sliding off.
 
@@ -52,8 +59,7 @@ But to actually draw the parrot on screen, we need to know its absolute position
 Calculating an object's world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other worlds, the parrot's world transform is:
 
 <span name="degenerate"></span>
-
-    ship local transform * nest local transform * pirate local transform * parrot local transform
+<img src="images/dirty-flag-multiply.png" />
 
 <aside name="degenerate">
 
@@ -75,20 +81,14 @@ When an object *does* move, the simple approach is to refresh its world transfor
 
 Imagine some busy gameplay. In a single frame, the ship gets tossed on the ocean, the crow's nest rocks in the wind, the pirate leans to the edge, and the parrot hops onto his head. We changed four local transforms. If we recalculate world transforms eagerly whenever a local transform changes, what ends up happening?
 
-    1. update ship local transform
-    2. calculate ship world transform
-    3. calculate nest world transform
-    4. calculate pirate world transform
-    5. calculate parrot world transform
-    6. update nest local transform
-    7. calculate nest world transform
-    8. calculate pirate world transform
-    9. calculate parrot world transform
-    10. update pirate local transform
-    11. calculate pirate world transform
-    12. calculate parrot world transform
-    13. update parrot local transform
-    14. calculate parrot world transform
+<span name="stars"></span>
+<img src="images/dirty-flag-update-bad.png" />
+
+<aside name="stars">
+
+The lines marked with (&star;) are the world transform calculations that are actually used. The others are all wasted work.
+
+</aside>
 
 We only moved four objects, but we did *ten* world transform calculations. That's six pointless calculations that get thrown out before they are ever used by the renderer. We calculated the parrot's world transform *four* times, but it only got rendered once.
 
@@ -108,14 +108,7 @@ To do this, we add a flag to each object in the graph. When the local transform 
 
 If we apply this pattern and then move all of the objects in our previous example, the game ends up doing:
 
-    1. update ship local transform
-    2. update nest local transform
-    3. update pirate local transform
-    4. update parrot local transform
-    5. calculate ship world transform
-    6. calculate nest world transform
-    7. calculate pirate world transform
-    8. calculate parrot world transform
+<img src="images/dirty-flag-update-good.png" />
 
 That's the best you could hope to do: the world transform for each affected object is calculated exactly once. With just a single bit of data, this pattern does a few things for us:
 

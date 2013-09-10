@@ -4,4 +4,5 @@
 4. Now adjust the levels again to make the pen lines mostly solid black. Bring up the mids a bit so the grid lines aren't too dark.
 5. Rotate about 1° CCW.
 6. Add the yellow overlay.
-7. Scale and crop.
+7. Scale and crop to 1040 wide.
+8. Save as 8-bit PNG with diffusion dither and 32 colors.

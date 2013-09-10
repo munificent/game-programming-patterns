@@ -82,7 +82,13 @@
 <p>When the renderer draws an object, it takes the object&#x2019;s model, applies the transform to it, and then renders it there in the world. If we just had a scene <em>bag</em> and not a scene <em>graph</em> that would be it and life would be simple.</p>
 <p>However, most scene graphs are <span name="hierarchical"><em>hierarchical</em></span>. An object in the graph may have a parent object that it is anchored to. In that case, its transform is relative to the <em>parent&#x2019;s</em> position, and isn&#x2019;t its absolute position in the world.</p>
 <p>For example, imagine our game world has a pirate ship at sea. Atop the ship&#x2019;s mast is a crow&#x2019;s nest. Hunched in that crow&#x2019;s nest is a pirate. Clutching the pirate&#x2019;s shoulder is a parrot. The ship&#x2019;s local transform will position it in the sea. The crow&#x2019;s nest&#x2019;s transform positions it on the ship, and so on.</p>
-<p><strong>TODO illustrate</strong></p>
+<p><span name="pirate"></span>
+<img src="images/dirty-flag-pirate.png" /></p>
+<aside name="pirate">
+
+<p>Programmer art!</p>
+</aside>
+
 <p>This way, when a parent object moves, its children move with it automatically. If we change the local transform of the ship, the crow&#x2019;s nest, pirate, and parrot go along for the ride. It would be a total <span name="slide">headache</span> if, when the ship moved, we had to manually adjust the transforms of everything on it to keep them from sliding off.</p>
 <aside name="slide">
 
@@ -92,11 +98,8 @@
 <p>But to actually draw the parrot on screen, we need to know its absolute position in the world. I&#x2019;ll call the parent-relative transform the object&#x2019;s <em>local transform</em>. To render an object, we need to know its <em>world transform</em>.</p>
 <h3><a href="#local-and-world-transforms" name="local-and-world-transforms">Local and world transforms</a></h3>
 <p>Calculating an object&#x2019;s world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other worlds, the parrot&#x2019;s world transform is:</p>
-<p><span name="degenerate"></span></p>
-<div class="codehilite"><pre><span class="n">ship</span> <span class="n">local</span> <span class="n">transform</span> <span class="o">*</span> <span class="n">nest</span> <span class="n">local</span> <span class="n">transform</span> <span class="o">*</span> <span class="n">pirate</span> <span class="n">local</span> <span class="n">transform</span> <span class="o">*</span> <span class="n">parrot</span> <span class="n">local</span> <span class="n">transform</span>
-</pre></div>
-
-
+<p><span name="degenerate"></span>
+<img src="images/dirty-flag-multiply.png" /></p>
 <aside name="degenerate">
 
 <p>In the degenerate case where the object has no parent, its local and world transforms are equivalent.</p>
@@ -109,22 +112,12 @@
 <p>The obvious answer is to <em>cache</em> it. In each object, we store its local transform and its derived world transform. When we render, we just use the precalculated world transform. If the object never moves, that&#x2019;s always up to date and everything&#x2019;s happy.</p>
 <p>When an object <em>does</em> move, the simple approach is to refresh its world transform right then. But don&#x2019;t forget the hierarchy! When a parent moves, we have to recalculate its world transform <em>and all of its children&#x2019;s, recursively</em>.</p>
 <p>Imagine some busy gameplay. In a single frame, the ship gets tossed on the ocean, the crow&#x2019;s nest rocks in the wind, the pirate leans to the edge, and the parrot hops onto his head. We changed four local transforms. If we recalculate world transforms eagerly whenever a local transform changes, what ends up happening?</p>
-<div class="codehilite"><pre><span class="mf">1.</span> <span class="n">update</span> <span class="n">ship</span> <span class="n">local</span> <span class="n">transform</span>
-<span class="mf">2.</span> <span class="n">calculate</span> <span class="n">ship</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">3.</span> <span class="n">calculate</span> <span class="n">nest</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">4.</span> <span class="n">calculate</span> <span class="n">pirate</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">5.</span> <span class="n">calculate</span> <span class="n">parrot</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">6.</span> <span class="n">update</span> <span class="n">nest</span> <span class="n">local</span> <span class="n">transform</span>
-<span class="mf">7.</span> <span class="n">calculate</span> <span class="n">nest</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">8.</span> <span class="n">calculate</span> <span class="n">pirate</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">9.</span> <span class="n">calculate</span> <span class="n">parrot</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">10.</span> <span class="n">update</span> <span class="n">pirate</span> <span class="n">local</span> <span class="n">transform</span>
-<span class="mf">11.</span> <span class="n">calculate</span> <span class="n">pirate</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">12.</span> <span class="n">calculate</span> <span class="n">parrot</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">13.</span> <span class="n">update</span> <span class="n">parrot</span> <span class="n">local</span> <span class="n">transform</span>
-<span class="mf">14.</span> <span class="n">calculate</span> <span class="n">parrot</span> <span class="n">world</span> <span class="n">transform</span>
-</pre></div>
+<p><span name="stars"></span>
+<img src="images/dirty-flag-update-bad.png" /></p>
+<aside name="stars">
 
+<p>The lines marked with (&star;) are the world transform calculations that are actually used. The others are all wasted work.</p>
+</aside>
 
 <p>We only moved four objects, but we did <em>ten</em> world transform calculations. That&#x2019;s six pointless calculations that get thrown out before they are ever used by the renderer. We calculated the parrot&#x2019;s world transform <em>four</em> times, but it only got rendered once.</p>
 <p>The problem is that a world transform may depend on several local transforms. Since we recalculate immediately each time <em>one</em> of those changes, we end up recalculating the same transform multiple times when more than one of the local transforms it depends on changes in the same frame.</p>
@@ -137,17 +130,7 @@
 
 <p>To do this, we add a flag to each object in the graph. When the local transform changes, we set it. When we need the object&#x2019;s world transform, we check the flag. If it&#x2019;s set, we calculate the world transform then and clear the flag. The flag represents, "Is the world transform out of date?" For reasons that aren&#x2019;t entirely clear, the traditional name for this "out-of-date-ness" is "dirty". Hence: <em>a dirty flag</em>.</p>
 <p>If we apply this pattern and then move all of the objects in our previous example, the game ends up doing:</p>
-<div class="codehilite"><pre><span class="mf">1.</span> <span class="n">update</span> <span class="n">ship</span> <span class="n">local</span> <span class="n">transform</span>
-<span class="mf">2.</span> <span class="n">update</span> <span class="n">nest</span> <span class="n">local</span> <span class="n">transform</span>
-<span class="mf">3.</span> <span class="n">update</span> <span class="n">pirate</span> <span class="n">local</span> <span class="n">transform</span>
-<span class="mf">4.</span> <span class="n">update</span> <span class="n">parrot</span> <span class="n">local</span> <span class="n">transform</span>
-<span class="mf">5.</span> <span class="n">calculate</span> <span class="n">ship</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">6.</span> <span class="n">calculate</span> <span class="n">nest</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">7.</span> <span class="n">calculate</span> <span class="n">pirate</span> <span class="n">world</span> <span class="n">transform</span>
-<span class="mf">8.</span> <span class="n">calculate</span> <span class="n">parrot</span> <span class="n">world</span> <span class="n">transform</span>
-</pre></div>
-
-
+<p><img src="images/dirty-flag-update-good.png" /></p>
 <p>That&#x2019;s the best you could hope to do: the world transform for each affected object is calculated exactly once. With just a single bit of data, this pattern does a few things for us:</p>
 <ol>
 <li>It collapses modifications to multiple local transforms along an object&#x2019;s parent chain into a single recalculation on the object.</li>
