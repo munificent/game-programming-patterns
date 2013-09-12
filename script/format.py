@@ -36,7 +36,8 @@ def pretty(text):
                 .replace("...", "&hellip;")
                 .replace(" -- ", "&thinsp;&mdash;&thinsp;")
                 .replace("ï", "&iuml;")
-                .replace("ø", "&oslash;"))
+                .replace("ø", "&oslash;")
+                .replace("æ", "&aelig;"))
 
 def formatfile(path, nav, skip_up_to_date):
     basename = os.path.basename(path)

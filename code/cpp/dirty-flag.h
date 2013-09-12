@@ -32,6 +32,7 @@ namespace DirtyFlag
   }
 
   class Mesh;
+  static const int MAX_CHILDREN = 16;
 
   namespace Basic
   {
@@ -48,7 +49,6 @@ namespace DirtyFlag
       Transform _local;
       Mesh* _mesh;
 
-      static const int MAX_CHILDREN = 16;
       GraphNode* _children[MAX_CHILDREN];
       int _numChildren;
     };
@@ -75,6 +75,8 @@ namespace DirtyFlag
   
   namespace RenderOnTheFly
   {
+    static const int MAX_CHILDREN = 16;
+    
     class GraphNode
     {
     public:
@@ -89,7 +91,6 @@ namespace DirtyFlag
       Transform _local;
       Mesh* _mesh;
 
-      static const int MAX_CHILDREN = 16;
       GraphNode* _children[MAX_CHILDREN];
       int _numChildren;
     };
@@ -131,6 +132,8 @@ namespace DirtyFlag
       void setTransform(Transform local);
       void render(Transform parentWorld, bool dirty);
       //^omit
+
+      // Other methods...
 
     private:
       Transform _world;
