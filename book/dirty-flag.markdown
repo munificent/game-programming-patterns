@@ -299,47 +299,46 @@ Note that this clever trick only works because `render()` is the *only* thing in
 
 ## Design Decisions
 
-This pattern is fairly specific, so there are only a couple of knobs to twiddle on it:
+This pattern is fairly specific, so there are only a couple of knobs to twiddle:
 
 ### When is the dirty flag cleaned?
 
-* **If you defer it until the result is needed:**
+* **When the result is needed:**
 
     * *It avoids doing calculation entirely if the result is never used.* For
-        primary data that changes frequently and where the derived data is
-        rarely accessed, this can be a big win.
+        primary data that changes much more frequently than the derived data is
+        accessed, this can be a big win.
 
     * *If the calculation is time-consuming, it can cause a noticeable pause.*
-        Postponing the work until the end-user is waiting to see the result can
+        Postponing the work until the player is expecting to see the result can
         affect their gameplay experience. Often, it's fast enough that this
         isn't a problem, but if it is, you'll have to do the work earlier.
 
 * **At well-defined checkpoints:**
 
     Sometimes there is a point in time or the progression of the game where it's
-    natural to do the deferred synchronization or calculation. For example,
+    natural to do the deferred processing. For example,
     we may want to save the game only when the pirate sails into port. Or the
     sync point may not part of the game mechanics. We may just want to hide the
     work behind a loading screen or a cut scene.
 
-    * *You can ensure the time spent doing the work doesn't impact the user
-        experience.* Unlike the above option, you can often give something to
-        distract the player while the game is busy on other things.
+    * *Doing the work doesn't impact the user experience.* Unlike the above
+      option, you can often give something to
+        distract the player while the game is busy processing.
 
-    * *You lose control of when the work actually happens.* This is sort of the
-        opposite of the above point. You have micro-scale control over when the
-        work happens, and can make sure the game handles it gracefully.
+    * *You lose control over when the work happens.* This is sort of the
+        opposite of the above point. You have micro-scale control over when you
+        process, and can make sure the game handles it gracefully.
 
         What you *can't* do is ensure the player actually makes it to the
         checkpoint or meets whatever criteria you've defined. If they get lost
-        or the game gets in a weird state, you can end up deferring the work
-        longer than you expected.
+        or the game gets in a weird state, you can end up deferring
+        longer than you expect.
 
 * **In the background:**
 
-    Like your text editor that auto-saves a backup every few minutes, you can
-    do the work after some time interval. Usually, you'll start the <span name="hysteresis">timer</span>
-    on the first modification and then process all of the changes that happened
+    Usually, you start a fixed <span name="hysteresis">timer</span>
+    on the first modification and then process all of the changes that happen
     between then and when the timer fires.
 
     <aside name="hysteresis">
@@ -349,23 +348,20 @@ This pattern is fairly specific, so there are only a couple of knobs to twiddle 
 
     </aside>
 
-    * *You can tune how often the work is performed.* Since the time
-        when we clean the dirty state and do the work isn't dependent on
-        the player requesting some data or reaching some checkpoint, we can
-        ensure it happens as frequently (or infrequently) as we want.
+    * *You can tune how often the work is performed.* By adjusting the timer
+        interval you can ensure it happens as frequently (or infrequently) as
+        you want.
 
     * *You can do more redundant work.* If the primary state only changes a
-        tiny amount during the timer's run and our dirty flags are
-        coarse-grained, we'll process a bunch of data that hasn't
-        changed. When changes trickle in, that timer will constantly be
-        triggering work over data that hasn't changed much again and again.
+        tiny amount during the timer's run you can end up processing a large
+        chunk of mostly unchanged data.
 
-    * *You'll need some support for doing work asynchronously.*
+    * *You need support for doing work asynchronously.*
         Processing the data "in the background" implies that the player can
         keep doing whatever it is that they're doing at the same time. That
-        means we'll likely need threading or some other kind of concurrency
-        support so that the work we're doing can happen while the game is still
-        responsive and being played.
+        means you'll likely need threading or some other kind of concurrency
+        support so that the game can work on the data while it's still
+        being played.
 
         Since the player is likely interacting with
         the same primary state that you're processing, you'll need to think
@@ -377,18 +373,15 @@ Imagine our pirate game lets players build and customize their pirate ship. Ship
 
 * **If it's more fine-grained:**
 
-    Say we slap a dirty flag on each tiny plank of each deck.
+    Say you slap a dirty flag on each tiny plank of each deck.
 
-    * *You only process data that actually changed.* We'll send exactly the
+    * *You only process data that actually changed.* You'll send exactly the
         facets of the ship that were modified to the server.
-
-    * *When a lot of data changes, a larger number of dirty flags also need to
-        be set.*
 
 * **If it's more coarse-grained:**
 
     Alternatively, we could associate a dirty bit with each deck.
-    Changing anything on that deck marks the entire deck <span name="swab">dirty</span>.
+    Changing anything on it marks the entire deck <span name="swab">dirty</span>.
 
     <aside name="swab">
 
@@ -398,7 +391,7 @@ Imagine our pirate game lets players build and customize their pirate ship. Ship
     </aside>
 
     * *You end up processing unchanged data.* Add a single barrel to a deck
-        and we'll have to send the whole thing to the server.
+        and you'll have to send the whole thing to the server.
 
     * *Less memory is used for storing dirty flags.*
 
@@ -407,13 +400,13 @@ Imagine our pirate game lets players build and customize their pirate ship. Ship
        data itself. In the example here, that's the metadata required to
        identify where on the ship the changed data is. The bigger your
        processing chunks, the fewer of them there are, which means the less
-       fixed overhead you have.
+       overhead you have.
 
 ## See Also
 
-*   This pattern is increasingly common outside of games in client-side MVC
-    web frameworks like [Angular](http://angularjs.org/) which use dirty
+*   This pattern is common outside of games in browser-side web frameworks like
+    [Angular](http://angularjs.org/). They use dirty
     flags to track which data has been changed in the browser and needs to
     be pushed up to the server.
 
-* Physics engines keep track of which objects are resting and which are in motion. Since a resting body won't move until an impulse is applied to it, they don't need any processing until they get touched. This "is resting" bit is essentially a dirty flag to track which objects have had forces applied and need to have their physics resolved.
+* Physics engines track which objects are in motion and which are resting. Since a resting body won't move until an impulse is applied to it, they don't need processing until they get touched. This "is moving" bit is a dirty flag to note which objects have had forces applied and need to have their physics resolved.
