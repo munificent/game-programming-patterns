@@ -319,7 +319,7 @@ This pattern is fairly specific, so there are only a couple of knobs to twiddle:
     Sometimes there is a point in time or the progression of the game where it's
     natural to do the deferred processing. For example,
     we may want to save the game only when the pirate sails into port. Or the
-    sync point may not part of the game mechanics. We may just want to hide the
+    sync point may not be part of the game mechanics. We may just want to hide the
     work behind a loading screen or a cut scene.
 
     * *Doing the work doesn't impact the user experience.* Unlike the above
