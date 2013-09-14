@@ -184,7 +184,7 @@ Editors that auto-save a backup in the background are compensating specifically 
 
 <aside name="gc">
 
-This is mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting frees memory the second it's no longer needed, but burns CPU time updating ref counts eagerly every time references are changed.
+This mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting frees memory the second it's no longer needed, but burns CPU time updating ref counts eagerly every time references are changed.
 
 Simple garbage collectors defer reclaiming memory until it's really needed, but the cost is the dreaded "GC pause" that can freeze your entire game until the collector is done scouring the heap.
 
