@@ -690,16 +690,7 @@ uses those interfaces:</p>
 </aside>
 
 <p>Our existing concrete classes will get renamed and implement those interfaces:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">BjornInputComponent</span> <span class="o">:</span> <span class="k">public</span> <span class="n">InputComponent</span>
-<span class="p">{</span>
-<span class="nl">public:</span>
-  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">GameObject</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="c1">// User input code...</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="k">class</span> <span class="nc">BjornPhysicsComponent</span> <span class="o">:</span> <span class="k">public</span> <span class="n">PhysicsComponent</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">BjornPhysicsComponent</span> <span class="o">:</span> <span class="k">public</span> <span class="n">PhysicsComponent</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">GameObject</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">,</span> <span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">)</span>

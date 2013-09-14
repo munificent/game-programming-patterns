@@ -467,15 +467,6 @@ namespace BaseGameObject
   //^15
 
   //^16
-  class BjornInputComponent : public InputComponent
-  {
-  public:
-    virtual void update(GameObject& obj)
-    {
-      // User input code...
-    }
-  };
-
   class BjornPhysicsComponent : public PhysicsComponent
   {
   public:
