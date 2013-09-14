@@ -273,7 +273,7 @@ If you try using a state machine for something more complex like game AI, you wi
 
 ## Concurrent State Machines
 
-We've decided to give our heroine the ability carry a gun. When she's packing heat, she can still do everything she could before: run, jump, duck, etc. But she'll also need to be able to fire her weapon while doing it.
+We've decided to give our heroine the ability to carry a gun. When she's packing heat, she can still do everything she could before: run, jump, duck, etc. But she also needs to be able to fire her weapon while doing it.
 
 If we want to stick to the confines of an FSM, we have to *double* the number of states we have. For each existing state, we'll need another one for doing the same thing while she's armed: standing, standing with gun, jumping, jumping with gun, you get the idea.
 
