@@ -56,7 +56,7 @@ But to actually draw the parrot on screen, we need to know its absolute position
 
 ### Local and world transforms
 
-Calculating an object's world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other worlds, the parrot's world transform is:
+Calculating an object's world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other words, the parrot's world transform is:
 
 <span name="degenerate"></span>
 <img src="images/dirty-flag-multiply.png" />
