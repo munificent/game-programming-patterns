@@ -282,7 +282,19 @@ The important part here is that it sets the dirty flag too. Are we forgetting an
 
 When a parent node moves, all of its children's world coordinates are invalidated too. But here we aren't setting their dirty flags. We *could* do that, but that's recursive and slow. Instead we'll do something clever when we go to render. Let's see:
 
+<span name="branch"></span>
+
 ^code dirty-render
+
+<aside name="branch">
+
+There's a subtle assumption here that the `if` check is faster than a matrix multiply. Intuitively, you would think it is: surely testing a single bit is faster than a bunch of floating point arithematic.
+
+However, modern CPUs are fantastically complex. They rely heavily on *pipelining* -- queueing up a series of sequential instructions. A branch like our `if` here can cause a *branch misprediction* and force the CPU lose cycles refilling the pipeline.
+
+As always, the golden rule of optimization: *profile first*.
+
+</aside>
 
 This is similar to the original naïve implementation. The key changes are that we check to see if the node is dirty before calculating the world transform, and we store the result in a field instead of a local variable. When the node is clean, we skip `combine()` completely and use the old but still correct `_world` value.
 

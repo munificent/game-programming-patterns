@@ -316,6 +316,7 @@ turn up uses of this pattern.</p>
 
 <p>The important part here is that it sets the dirty flag too. Are we forgetting anything? Right: the child nodes!</p>
 <p>When a parent node moves, all of its children&#x2019;s world coordinates are invalidated too. But here we aren&#x2019;t setting their dirty flags. We <em>could</em> do that, but that&#x2019;s recursive and slow. Instead we&#x2019;ll do something clever when we go to render. Let&#x2019;s see:</p>
+<p><span name="branch"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">GraphNode</span><span class="o">::</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span> <span class="n">parentWorld</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">dirty</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">dirty</span> <span class="o">|=</span> <span class="n">_dirty</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">dirty</span><span class="p">)</span> <span class="p">{</span>
@@ -331,6 +332,13 @@ turn up uses of this pattern.</p>
 <span class="p">}</span>
 </pre></div>
 
+
+<aside name="branch">
+
+<p>There&#x2019;s a subtle assumption here that the <code>if</code> check is faster than a matrix multiply. Intuitively, you would think it is: surely testing a single bit is faster than a bunch of floating point arithematic.</p>
+<p>However, modern CPUs are fantastically complex. They rely heavily on <em>pipelining</em>&thinsp;&mdash;&thinsp;queueing up a series of sequential instructions. A branch like our <code>if</code> here can cause a <em>branch misprediction</em> and force the CPU lose cycles refilling the pipeline.</p>
+<p>As always, the golden rule of optimization: <em>profile first</em>.</p>
+</aside>
 
 <p>This is similar to the original na&iuml;ve implementation. The key changes are that we check to see if the node is dirty before calculating the world transform, and we store the result in a field instead of a local variable. When the node is clean, we skip <code>combine()</code> completely and use the old but still correct <code>_world</code> value.</p>
 <p>The <span name="clever">clever</span> bit is that <code>dirty</code> parameter. That will be <code>true</code> if any node above this node in the parent chain was dirty. In much the same way that <code>parentWorld</code> updates the world transform incrementally as we traverse down the hierarchy, <code>dirty</code> tracks the dirtiness of the parent chain.</p>
