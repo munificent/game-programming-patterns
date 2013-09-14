@@ -71,7 +71,7 @@
 </aside>
 
 <h3><a href="#locating-a-ship-at-sea" name="locating-a-ship-at-sea">Locating a ship at sea</a></h3>
-<p>Most games have something called a <em>scene graph</em>. This is a big data structure that contains all of the objects in the world. The rendering engine uses this to determine where on screen to draw stuff.</p>
+<p>Many games have something called a <em>scene graph</em>. This is a big data structure that contains all of the objects in the world. The rendering engine uses this to determine where on screen to draw stuff.</p>
 <p>At its simplest, a scene graph is just a flat list of objects. Each object has a model or some other graphic primitive, and a <span name="transform"><em>transform</em></span>. The transform describes the object&#x2019;s position, rotation, and scale in the world. To move or turn an object, we just change its transform.</p>
 <aside name="transform">
 
@@ -189,7 +189,7 @@ turn up uses of this pattern.</p>
 <p>Editors that auto-save a backup in the background are compensating specifically for this shortcoming. The frequency that it auto-saves is the point it chose on the continuum between not losing too much work when a crash occurs and not thrashing the file system too much by saving all the time.</p>
 <aside name="gc">
 
-<p>This is mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting frees memory the second it&#x2019;s no longer needed, but burns CPU time updating ref counts eagerly every time references are changed.</p>
+<p>This mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting frees memory the second it&#x2019;s no longer needed, but burns CPU time updating ref counts eagerly every time references are changed.</p>
 <p>Simple garbage collectors defer reclaiming memory until it&#x2019;s really needed, but the cost is the dreaded "GC pause" that can freeze your entire game until the collector is done scouring the heap.</p>
 <p>In between the two are more complex systems like deferred ref-counting and incremental GC that reclaim memory less eagerly than pure ref-counting but more eagerly than stop-the-world collectors.</p>
 </aside>

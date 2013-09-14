@@ -17,7 +17,7 @@ Wikipedia's editors don't have my level of self-control and went with [dirty bit
 
 ### Locating a ship at sea
 
-Most games have something called a *scene graph*. This is a big data structure that contains all of the objects in the world. The rendering engine uses this to determine where on screen to draw stuff.
+Many games have something called a *scene graph*. This is a big data structure that contains all of the objects in the world. The rendering engine uses this to determine where on screen to draw stuff.
 
 At its simplest, a scene graph is just a flat list of objects. Each object has a model or some other graphic primitive, and a <span name="transform">*transform*</span>. The transform describes the object's position, rotation, and scale in the world. To move or turn an object, we just change its transform.
 
