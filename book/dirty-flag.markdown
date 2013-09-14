@@ -86,7 +86,8 @@ Imagine some busy gameplay. In a single frame, the ship gets tossed on the ocean
 
 <aside name="stars">
 
-The lines marked with (&star;) are the world transform calculations that are actually used. The others are all wasted work.
+You can see on the lines marked &#x2605; that we're recalculating the parrot's
+world transform *four* times when we only need the result of the final one.
 
 </aside>
 

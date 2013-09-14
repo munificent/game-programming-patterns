@@ -116,7 +116,8 @@
 <img src="images/dirty-flag-update-bad.png" /></p>
 <aside name="stars">
 
-<p>The lines marked with (&star;) are the world transform calculations that are actually used. The others are all wasted work.</p>
+<p>You can see on the lines marked &#x2605; that we&#x2019;re recalculating the parrot&#x2019;s
+world transform <em>four</em> times when we only need the result of the final one.</p>
 </aside>
 
 <p>We only moved four objects, but we did <em>ten</em> world transform calculations. That&#x2019;s six pointless calculations that get thrown out before they are ever used by the renderer. We calculated the parrot&#x2019;s world transform <em>four</em> times, but it only got rendered once.</p>
