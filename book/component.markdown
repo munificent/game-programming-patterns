@@ -607,7 +607,7 @@ the same time in your designs.
         free-for-all.
 
      *  *The two components are tightly coupled.* The downside of the
-        free-for-fall. We've basically taken a step back towards our
+        free-for-all. We've basically taken a step back towards our
         monolithic class. It's not quite as bad as the original single
         class though, since we're at least restricting the coupling to
         just the component pairs that need to interact.
