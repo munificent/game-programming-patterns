@@ -20,7 +20,7 @@ go over the pattern itself.
 When much of the industry moved to object-oriented programming from C, one
 problem they ran into was "how do I get an instance?" They had some method they
 wanted to call, but didn't have an instance of the object that provides that
-method in hand. Singletons (in other words, making it global) was an easy way out.
+method in hand. Singletons (in other words, making it global) were an easy way out.
 
 </aside>
 
