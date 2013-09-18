@@ -61,7 +61,57 @@
     </tr>
   </table>
 </div>
-<p><em>Sorry, this chapter hasn&#x2019;t been written yet!</em></p>
+<p>A horn rings out a battle call in the distance. Starting with just a few tiny specks, a giant army crests over a hill, hordes of soldiers rushing down to crash into the waiting battlefield below. This is the kind of epic scenarios we dream of as game developers, and scenes like this are often enabled by a pattern whose name couldn&#x2019;t possibly be more modest: the humble Flyweight.</p>
+<h2><a href="#an-army-of-soldiers" name="an-army-of-soldiers">An Army of Soldiers</a></h2>
+<p>I can describe a scene like the above with just a few sentences, but actually <em>implementing</em> it in a realtime game is enough to make a seasoned graphics programmer blanch. When you&#x2019;ve got huge armies filling the screen, all they see is the millions of polygons they&#x2019;ll have to somehow cram onto the GPU in less than a sixtieth of a second.</p>
+<p>You&#x2019;ve got hundreds, maybe thousands of soldiers, each with a detailed mesh contains thousands of polygons. Even though you might have enough <em>memory</em> to hold that battlefield, in order to render it, that has to get pushed from the CPU over the bus to the GPU.</p>
+<p>Fortunately, there&#x2019;s a time-honored trick for handling this. Each warrior on the ground has a bunch of data associated with it:</p>
+<ul>
+<li>A mesh of polygons that define the shape and details of his skin</li>
+<li>A few textures painted onto that skin</li>
+<li>A skeleton of vertices used to animate that mesh</li>
+<li>The soldier&#x2019;s location on the battlefield</li>
+<li>The positions of all of the joints in their skeleton: their current pose.</li>
+<li>Maybe some other tuning parameters like a scale or tint to add some visual
+  variety to the army.</li>
+</ul>
+<p>The key observation here is that even though there may be thousands of soldiers on the battlefield, they mostly look the same. They will likely all use the <span name="same">same</span> mesh, skeleton, and textures. That means most of the data in that list is the <em>same</em> between all of those units.</p>
+<aside name="same">
+
+<p>You&#x2019;d have to be crazy or a billionaire (or both) to budget for the artists to individually model each lowly grunt in the military.</p>
+</aside>
+
+<p>If you were to sketch this out in code, you&#x2019;d have something like this:</p>
+<div class="codehilite"><pre><span class="n">class</span> <span class="n">Soldier</span> <span class="p">{</span>
+<span class="nl">private:</span>
+  <span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh</span><span class="p">;</span>
+  <span class="n">Skeleton</span><span class="o">*</span> <span class="n">skeleton</span><span class="p">;</span>
+  <span class="n">Texture</span><span class="o">*</span> <span class="n">texture</span><span class="p">;</span>
+  <span class="n">Vector</span> <span class="n">position</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">height</span><span class="p">;</span>
+  <span class="n">Color</span> <span class="n">skinTone</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>Each instance of <code>Soldier</code> would have its own <code>position</code>, <code>height</code>, and <code>skinTone</code>, but those pointers to <code>mesh</code>, <code>skeleton</code>, and <code>texture</code> would all point to the same objects. There&#x2019;s no reason to have the same mesh in memory a thousand times.</p>
+<p>This is all well and good for storing stuff in main memory, but that doesn&#x2019;t help rendering. Before the army gets onscreen, it&#x2019;s got to work it&#x2019;s way over to the GPU&#x2019;s memory. We need a way to model this that the graphics card understands. The answer is <em>instanced rendering</em>.</p>
+<h2><a href="#a-thousand-instances" name="a-thousand-instances">A Thousand Instances</a></h2>
+<p>To minimize the amount of data we have to push to the GPU, we&#x2019;d like to send the shared data&thinsp;&mdash;&thinsp;the mesh, skeleton, and textures&thinsp;&mdash;&thinsp;<em>once</em> and then push over each soldier instance&#x2019;s unique data&thinsp;&mdash;&thinsp;its position, height, and color. Then we&#x2019;d tell the GPU "use that shared data to render each of these instances".</p>
+<p>Fortunately, today&#x2019;s graphics APIs support exactly that.</p>
+<p><strong>TODO: Show D3D and GL APIs.</strong></p>
+<h2><a href="#the-flyweight-pattern" name="the-flyweight-pattern">The Flyweight Pattern</a></h2>
+<p>Now that we&#x2019;ve got one concrete example under our belts, I can walk you through the general pattern. Flyweight, like its name implies, comes into play when you have objects that you need to be more lightweight: generally because you have too many of them.</p>
+<p>With instanced rendering, it&#x2019;s not so much that they take up too much memory as it is they take too much <em>time</em> to push each separate soldier over the bus to the GPU. But the basic idea is the same.</p>
+<p>The pattern solves that issue by separating out the object&#x2019;s data into two kinds: The first kind of data is the stuff that&#x2019;s not specific to a single <em>instance</em> of that object. It&#x2019;s the stuff that&#x2019;s shared across all objects. The Gang of Four calls this the <em>extrinsic</em> state, but I like to think of it as the "context-free" stuff. In the example here, this is the geometry and textures for the soldier.</p>
+<p>The rest of the data is the <em>intrinsic</em> state, the stuff that is unique to that instance. In this case, that&#x2019;s the soldier&#x2019;s position, height, and color.</p>
+<p>Just like in the chunk of sample code up there, this pattern saves memory by moving the extrinsic state <em>out</em> of the main object and into something shared. It separates out an object from <em>the context where it is used</em>.</p>
+<p>From what we&#x2019;ve seen so far, this just seems like basic resource sharing, and hardly worth being called a pattern. That&#x2019;s because the soldier example didn&#x2019;t have any behavior. To get a better feel for how this pattern works, let&#x2019;s switch to a different example.</p>
+<h2><a href="#the-field-of-battle" name="the-field-of-battle">The Field of Battle</a></h2>
+<p>The battlefield these soldiers are marching around on needs to be represented in our game too. There can be patches of grass, dirty, hills, and whatever other terrain you can dream up. To make things retro-cool, let&#x2019;s decide to make the world <em>tile-based</em>: the ground will be a huge grid of tiny tiles. Each tile can be one of a few different terrain types: grass, dirt, hill, water, you get the idea.</p>
+<p><strong> TODO: talk about perf</strong></p>
+<h2><a href="#the-flyweight-pattern" name="the-flyweight-pattern">The Flyweight Pattern</a></h2>
+<p><strong>NOTES, delete when done:</strong></p>
 <p>http://sourcemaking.com/design_patterns/flyweight</p>
 <p>"Extrinsic state is stored or computed by client objects, and passed to the Flyweight when its operations are invoked."</p>
 <ul>
