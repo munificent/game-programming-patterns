@@ -1,3 +1,6 @@
+2013-09-18 - 327 words, first draft flyweight
+2013-09-17 - 863 words, first draft flyweight
+2013-09-16 - revise sequencing patterns intro, draw bunch of illustrations
 2013-09-15 - take notes for flyweight, write sequencing patterns section
 2013-09-14 - write and profile different flyweight examples
 2013-09-13 - fix nine bugs

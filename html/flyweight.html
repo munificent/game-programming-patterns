@@ -64,8 +64,8 @@
 <p>A horn rings out a battle call in the distance. Starting with just a few tiny specks, a giant army crests over a hill, hordes of soldiers rushing down to crash into the waiting battlefield below. This is the kind of epic scenarios we dream of as game developers, and scenes like this are often enabled by a pattern whose name couldn&#x2019;t possibly be more modest: the humble Flyweight.</p>
 <h2><a href="#an-army-of-soldiers" name="an-army-of-soldiers">An Army of Soldiers</a></h2>
 <p>I can describe a scene like the above with just a few sentences, but actually <em>implementing</em> it in a realtime game is enough to make a seasoned graphics programmer blanch. When you&#x2019;ve got huge armies filling the screen, all they see is the millions of polygons they&#x2019;ll have to somehow cram onto the GPU in less than a sixtieth of a second.</p>
-<p>You&#x2019;ve got hundreds, maybe thousands of soldiers, each with a detailed mesh contains thousands of polygons. Even though you might have enough <em>memory</em> to hold that battlefield, in order to render it, that has to get pushed from the CPU over the bus to the GPU.</p>
-<p>Fortunately, there&#x2019;s a time-honored trick for handling this. Each warrior on the ground has a bunch of data associated with it:</p>
+<p>You&#x2019;ve got hundreds, maybe thousands of soldiers, each with detailed geometry containing thousands of polygons. Even though you might have enough <em>memory</em> to hold that battlefield, in order to render it, that has to get pushed from the CPU over the bus to the GPU.</p>
+<p>Each warrior on the ground has a bunch of data associated with it:</p>
 <ul>
 <li>A mesh of polygons that define the shape and details of his skin</li>
 <li>A few textures painted onto that skin</li>
@@ -75,18 +75,13 @@
 <li>Maybe some other tuning parameters like a scale or tint to add some visual
   variety to the army.</li>
 </ul>
-<p>The key observation here is that even though there may be thousands of soldiers on the battlefield, they mostly look the same. They will likely all use the <span name="same">same</span> mesh, skeleton, and textures. That means most of the data in that list is the <em>same</em> between all of those units.</p>
-<aside name="same">
-
-<p>You&#x2019;d have to be crazy or a billionaire (or both) to budget for the artists to individually model each lowly grunt in the military.</p>
-</aside>
-
-<p>If you were to sketch this out in code, you&#x2019;d have something like this:</p>
+<p>If you were to sketch it out in code, you&#x2019;d have something like this:</p>
 <div class="codehilite"><pre><span class="n">class</span> <span class="n">Soldier</span> <span class="p">{</span>
 <span class="nl">private:</span>
-  <span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh</span><span class="p">;</span>
-  <span class="n">Skeleton</span><span class="o">*</span> <span class="n">skeleton</span><span class="p">;</span>
-  <span class="n">Texture</span><span class="o">*</span> <span class="n">texture</span><span class="p">;</span>
+  <span class="n">Mesh</span> <span class="n">mesh</span><span class="p">;</span>
+  <span class="n">Skeleton</span> <span class="n">skeleton</span><span class="p">;</span>
+  <span class="n">Texture</span> <span class="n">texture</span><span class="p">;</span>
+  <span class="n">Pose</span> <span class="n">pose</span><span class="p">;</span>
   <span class="n">Vector</span> <span class="n">position</span><span class="p">;</span>
   <span class="kt">double</span> <span class="n">height</span><span class="p">;</span>
   <span class="n">Color</span> <span class="n">skinTone</span><span class="p">;</span>
@@ -94,10 +89,43 @@
 </pre></div>
 
 
-<p>Each instance of <code>Soldier</code> would have its own <code>position</code>, <code>height</code>, and <code>skinTone</code>, but those pointers to <code>mesh</code>, <code>skeleton</code>, and <code>texture</code> would all point to the same objects. There&#x2019;s no reason to have the same mesh in memory a thousand times.</p>
+<p>Many of those fields are themselves pretty large objects: the <code>mesh</code> and <code>texture</code> in particular are a handful. Fortunately, there&#x2019;s a time-honored trick to handling this.</p>
+<p>The key observation is that even though there may be thousands of soldiers on the battlefield, they mostly look the same. They will likely all use the <span name="same">same</span> mesh, skeleton, and textures. That means most of the data in that list is the <em>same</em> between all of those units.</p>
+<aside name="same">
+
+<p>You&#x2019;d have to be crazy or a billionaire (or both) to budget for the artists to individually model each lowly grunt in the military.</p>
+</aside>
+
+<p>We can show that explicitly be tweaking our object model. We&#x2019;ll split our class in half:</p>
+<div class="codehilite"><pre><span class="n">class</span> <span class="n">SoldierModel</span> <span class="p">{</span>
+<span class="nl">private:</span>
+  <span class="n">Mesh</span> <span class="n">mesh</span><span class="p">;</span>
+  <span class="n">Skeleton</span> <span class="n">skeleton</span><span class="p">;</span>
+  <span class="n">Texture</span> <span class="n">texture</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">class</span> <span class="n">Soldier</span> <span class="p">{</span>
+<span class="nl">private:</span>
+  <span class="n">Model</span><span class="o">*</span> <span class="n">model</span><span class="p">;</span>
+  <span class="n">Pose</span> <span class="n">pose</span><span class="p">;</span>
+  <span class="n">Vector</span> <span class="n">position</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">height</span><span class="p">;</span>
+  <span class="n">Color</span> <span class="n">skinTone</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>The <code>SoldierModel</code> class contains the data that all soldiers have <span name="type">in common</span>. The game only needs a single one of these, since there&#x2019;s no reason to have the same mesh in memory a thousand times. Each <em>instance</em> of a soldier in the world has a <em>reference</em> to that since shared model. It then adds the state that is instance-specific: its <code>pose</code>, <code>position</code>, and other parameters.</p>
+<aside name="type">
+
+<p>This looks a lot like the <a href="type-object.html" class="pattern">Type Object</a> pattern. Both involve delegating part of an object&#x2019;s state to some other object shared between a number of instances. However, the intent behind the patterns differs.</p>
+<p>With a Type Object, the goal is to be able to define many different types of objects without having to define different <em>classes</em>. Even though a single instance of the type object will be shared across multiple objects, there are still <em>other</em> type objects used by other instances. Type objects make it easier to have many different types.</p>
+<p>This pattern is purely about sharing resources: it is most often used with only a single instance of the shared state.</p>
+</aside>
+
 <p>This is all well and good for storing stuff in main memory, but that doesn&#x2019;t help rendering. Before the army gets onscreen, it&#x2019;s got to work it&#x2019;s way over to the GPU&#x2019;s memory. We need a way to model this that the graphics card understands. The answer is <em>instanced rendering</em>.</p>
 <h2><a href="#a-thousand-instances" name="a-thousand-instances">A Thousand Instances</a></h2>
-<p>To minimize the amount of data we have to push to the GPU, we&#x2019;d like to send the shared data&thinsp;&mdash;&thinsp;the mesh, skeleton, and textures&thinsp;&mdash;&thinsp;<em>once</em> and then push over each soldier instance&#x2019;s unique data&thinsp;&mdash;&thinsp;its position, height, and color. Then we&#x2019;d tell the GPU "use that shared data to render each of these instances".</p>
+<p>To minimize the amount of data we have to push to the GPU, we&#x2019;d like to send the shared data&thinsp;&mdash;&thinsp;the <code>SoldierModel</code>&thinsp;&mdash;&thinsp;<em>once</em> and then push over each soldier instance&#x2019;s unique data&thinsp;&mdash;&thinsp;its position, pose, height, and color. Then we&#x2019;d tell the GPU "use that one model to render each of these instances".</p>
 <p>Fortunately, today&#x2019;s graphics APIs support exactly that.</p>
 <p><strong>TODO: Show D3D and GL APIs.</strong></p>
 <h2><a href="#the-flyweight-pattern" name="the-flyweight-pattern">The Flyweight Pattern</a></h2>
@@ -110,8 +138,23 @@
 <h2><a href="#the-field-of-battle" name="the-field-of-battle">The Field of Battle</a></h2>
 <p>The battlefield these soldiers are marching around on needs to be represented in our game too. There can be patches of grass, dirty, hills, and whatever other terrain you can dream up. To make things retro-cool, let&#x2019;s decide to make the world <em>tile-based</em>: the ground will be a huge grid of tiny tiles. Each tile can be one of a few different terrain types: grass, dirt, hill, water, you get the idea.</p>
 <p><strong> TODO: talk about perf</strong></p>
-<h2><a href="#the-flyweight-pattern" name="the-flyweight-pattern">The Flyweight Pattern</a></h2>
 <p><strong>NOTES, delete when done:</strong></p>
+<ul>
+<li>forest for the trees</li>
+<li>game takes place in woodland wonderland</li>
+<li>forest contains thousands of trees</li>
+<li>each a little different: height, color, location in world</li>
+<li>
+<p>how to render efficiently?</p>
+<ul>
+<li>millions of polys</li>
+<li>can&#x2019;t push across bus</li>
+</ul>
+</li>
+<li>
+<p>talk about perf</p>
+</li>
+</ul>
 <p>http://sourcemaking.com/design_patterns/flyweight</p>
 <p>"Extrinsic state is stored or computed by client objects, and passed to the Flyweight when its operations are invoked."</p>
 <ul>
