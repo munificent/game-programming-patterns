@@ -204,7 +204,7 @@ Phil Karlton famously said, "There are only two hard things in Computer Science:
 
 Miss it in one place, and your program will incorrectly use stale derived data. This leads to confused players and very hard to track down bugs. When you use this pattern, you'll have to take care that any code that modifies the primary state also sets the dirty flag.
 
-One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes a single narrow API, you can set the dirty bit there and rest assurred that it won't be missed.
+One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes through a single narrow API, you can set the dirty bit there and rest assured that it won't be missed.
 
 ### You have to keep the previous derived data in memory
 
