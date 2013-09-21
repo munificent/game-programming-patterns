@@ -15,7 +15,7 @@ Each warrior on the ground has a bunch of data associated with it:
 * A few textures painted onto that skin
 * A skeleton of vertices used to animate that mesh
 * The soldier's location on the battlefield
-* The positions of all of the joints in their skeleton: their current pose.
+* Their current pose -- the positions of all of the joints in their skeleton
 * Maybe some other tuning parameters like a scale or tint to add some visual
   variety to the army.
 
@@ -94,15 +94,151 @@ The rest of the data is the *intrinsic* state, the stuff that is unique to that 
 
 Just like in the chunk of sample code up there, this pattern saves memory by moving the extrinsic state *out* of the main object and into something shared. It separates out an object from *the context where it is used*.
 
-From what we've seen so far, this just seems like basic resource sharing, and hardly worth being called a pattern. That's because the soldier example didn't have any behavior. To get a better feel for how this pattern works, let's switch to a different example.
+From what we've seen so far, this just seems like basic resource sharing, and hardly worth being called a pattern. That's partially because in this example here, we could come up with a clear separate *identity* for the shared state: the `SoldierModel`.
+
+I find this pattern to be less obvious (and thus more clever) when used in cases where there isn't a real well-defined identity for the shared object. In those cases, it feels a little more like an object is magically in multiple places at the same time. Let me show you another example.
 
 ## The Field of Battle
 
-The battlefield these soldiers are marching around on needs to be represented in our game too. There can be patches of grass, dirty, hills, and whatever other terrain you can dream up. To make things retro-cool, let's decide to make the world *tile-based*: the ground will be a huge grid of tiny tiles. Each tile can be one of a few different terrain types: grass, dirt, hill, water, you get the idea.
+The battlefield these soldiers are marching around on needs to be represented in our game too. There can be patches of grass, dirt, hills, lakes, rivers, and whatever other terrain you can dream up. To make things retro-cool, let's decide to make the world *tile-based*: the ground will be a huge grid of tiny tiles. Each tile can be one of a few different terrain types: grass, dirt, hill, water, you get the idea.
+
+Each type of terrain has a number of properties that affect gameplay:
+
+* A movement cost that determines how quickly soldiers can move through it.
+* A flag for whether it's a watery terrain that can be crossed by boats.
+* How opaque the tile is: a number indicating how much it reduces the visibility radius.
+* A texture used to render it.
+
+Because we game programmers are paranoid about efficiency, there's no way we'd store all of that state in each tile on the battlefield. Instead, a common approach is to use an enum for tile terrain types:
+
+    enum Terrain
+    {
+      TERRAIN_GRASS,
+      TERRAIN_FOREST,
+      TERRAIN_HILL,
+      TERRAIN_RIVER,
+      // More types...
+    }
+
+Then the battlefield maintains a huge grid of those:
+
+<span name="grid"></aside>
+
+    class Battlefield
+    {
+      Terrain tiles[WIDTH * HEIGHT];
+    };
+
+<aside name="grid">
+
+The `WIDTH * HEIGHT` means we're storing a 2D grid in a 1D array. All that requires is storing each row one after the other in the array (or each column, if you're in [column-major order](http://en.wikipedia.org/wiki/Row-major_order)). I'm doing this here just to keep it simple. In real code, use a nice 2D grid data structure to hide this implementation detail.
+
+</aside>
+
+To actually get the useful data about a tile, we'd do something like:
+
+    int Battlefield::getMovementCost(int x, int y)
+    {
+      switch (tiles[y * WIDTH + x])
+      {
+        case TERRAIN_GRASS: return 1;
+        case TERRAIN_FOREST: return 3;
+        case TERRAIN_HILL: return 4;
+        case TERRAIN_RIVER: return 2;
+      }
+    }
+
+    bool Battlefield::isWater(int x, int y)
+    {
+      switch (tiles[y * WIDTH + x])
+      {
+        case TERRAIN_GRASS: return false;
+        case TERRAIN_FOREST: return false;
+        case TERRAIN_HILL: return false;
+        case TERRAIN_RIVER: return true;
+      }
+    }
+
+You get the idea. This works, but I find it a bit ugly. You've got all of the
+data for a terrain type smeared across a bunch of methods. It would be really nice to keep all of that encapsulated together. After all, that's what objects are designed for.
+
+It would be great if we could have an actual terrain *class*, like:
+
+    class Terrain
+    {
+      int movementCost;
+      int opacity;
+      bool isWater;
+      Texture texture;
+    };
+
+But we don't want to pay the cost of having an instance of that for each tile on the battlefield. If you look at that class, notice that there's actually *nothing* in there that's specific to *where* that tile is in the world. Given that, there's no reason to have more than one of each terrain type. Every grass tile in the world is identical to every other one.
+
+Instead of having the battlefield be a grid of enums, or Terrain objects, it will be a grid of *pointers* to `Terrain` objects. Each tile that uses the same terrain will point to the same terrain instance. We could lay out the battlefield something like:
+
+<span name="generate"></span>
+
+    // TODO: update to terrain objects above
+    void Battlefield::generateTerrain()
+    {
+      Terrain grass = Terrain(1, 0, false, GRASS_TEXTURE);
+      Terrain forest = Terrain(3, 5, false, FOREST_TEXTURE);
+      Terrain river = Terrain(1, 0, true, WATER_TEXTURE);
+
+      // Fill the battlefield with grass.
+      for (int y = 0; y < HEIGHT; y++)
+      {
+        for (int x = 0; x < WIDTH; x++)
+        {
+          // Sprinkle some woods.
+          if (rand(10) == 0)
+          {
+            tiles[y * WIDTH + x] = &forest;
+          }
+          else
+          {
+            tiles[y * WIDTH + x] = &grass;
+          }
+        }
+      }
+
+      // Lay a river.
+      int x = random(WIDTH);
+      for (int y = 0; y < HEIGHT; y++) {
+        tiles[y * WIDTH + x] = &river;
+      }
+    }
+
+<aside name="generate">
+
+I'll admit this isn't the world's greatest procedural terrain generation algorithm.
+
+</aside>
+
+Now instead of methods on `Battlefield` for accessing the terrain properties, we can just expose that directly:
+
+    const Terrain& getTile(int x, int y)
+    {
+      return *tiles[y * WIDTH + x];
+    }
+
+And if you want some property of the tile, you can get it right from that object:
+
+    int cost = battlefield.getTile(2, 3).movementCost();
+
+We're back to the pleasant API of working with real objects, but with almost none of the memory overhead.
+
+### What about performance?
+
+I say "almost" here because the performance bean counters will rightfully want to know how this compares to the perf of using an enum. Storing a pointer to the object implies an indirect lookup: to get to some terrain data like the movement cost, you first have to follow the pointer in the grid to find the terrain object, and then find the movement cost there. Chasing a pointer like this can cause a cache miss, which can slow things down.
+
+As always, the golden rule of optimization is *profile first*. Modern computer hardware is too complex for performance to be a game or pure reason anymore. In my tests, there was no noticeable difference between using an enum or a flyweight object. If anything, the latter was a bit faster. But that's entirely dependent on how other stuff was laid out in memory.
+
+What I *am* confident is that using flyweight objects shouldn't be dismissed out of hand here. I think they make your code easier to read and maintain. If you need to sacrifice that for speed, at least do the tests yourself to make sure there actually is a speed cost first.
 
 
 
-** TODO: talk about perf**
+** TODO: talk about immutability**
 
 **NOTES, delete when done:**
 
