@@ -26,3 +26,5 @@
 
 - Indent cases?
 - No "I" for interfaces.
+- Trailing underscore for fields. That way isFoo() doesn't collide with isFoo
+  field.

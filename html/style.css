@@ -206,6 +206,9 @@ a.outline:after {
 .codehilite .cp {
   color: #594; }
 
+.codehilite .nl {
+  color: #3366cc; }
+
 #mc_embed_signup table {
   border-spacing: 0px; }
 

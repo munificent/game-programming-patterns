@@ -21,16 +21,7 @@ Each warrior on the ground has a bunch of data associated with it:
 
 If you were to sketch it out in code, you'd have something like this:
 
-    class Soldier {
-    private:
-      Mesh mesh;
-      Skeleton skeleton;
-      Texture texture;
-      Pose pose;
-      Vector position;
-      double height;
-      Color skinTone;
-    };
+^code heavy-soldier
 
 Many of those fields are themselves pretty large objects: the `mesh` and `texture` in particular are a handful. Fortunately, there's a time-honored trick to handling this.
 
@@ -42,25 +33,13 @@ You'd have to be crazy or a billionaire (or both) to budget for the artists to i
 
 </aside>
 
-We can show that explicitly be tweaking our object model. We'll split our class in half:
+We can show that explicitly be tweaking our object model. We'll split our class in half. First, we take the data that all soldiers have <span name="type">in common</span> and move that into a separate class:
 
-    class SoldierModel {
-    private:
-      Mesh mesh;
-      Skeleton skeleton;
-      Texture texture;
-    };
+^code soldier-model
 
-    class Soldier {
-    private:
-      Model* model;
-      Pose pose;
-      Vector position;
-      double height;
-      Color skinTone;
-    };
+The game only needs a single one of these, since there's no reason to have the same mesh in memory a thousand times. Then, each *instance* of a soldier in the world has a *reference* to that since shared model. It then adds the state that is instance-specific: its `pose`, `position`, and other parameters.
 
-The `SoldierModel` class contains the data that all soldiers have <span name="type">in common</span>. The game only needs a single one of these, since there's no reason to have the same mesh in memory a thousand times. Each *instance* of a soldier in the world has a *reference* to that since shared model. It then adds the state that is instance-specific: its `pose`, `position`, and other parameters.
+^code split-soldier
 
 <aside name="type">
 
@@ -111,23 +90,13 @@ Each type of terrain has a number of properties that affect gameplay:
 
 Because we game programmers are paranoid about efficiency, there's no way we'd store all of that state in each tile on the battlefield. Instead, a common approach is to use an enum for tile terrain types:
 
-    enum Terrain
-    {
-      TERRAIN_GRASS,
-      TERRAIN_FOREST,
-      TERRAIN_HILL,
-      TERRAIN_RIVER,
-      // More types...
-    }
+^code terrain-enum
 
 Then the battlefield maintains a huge grid of those:
 
 <span name="grid"></aside>
 
-    class Battlefield
-    {
-      Terrain tiles[WIDTH * HEIGHT];
-    };
+^code enum-battlefield
 
 <aside name="grid">
 
@@ -137,40 +106,14 @@ The `WIDTH * HEIGHT` means we're storing a 2D grid in a 1D array. All that requi
 
 To actually get the useful data about a tile, we'd do something like:
 
-    int Battlefield::getMovementCost(int x, int y)
-    {
-      switch (tiles[y * WIDTH + x])
-      {
-        case TERRAIN_GRASS: return 1;
-        case TERRAIN_FOREST: return 3;
-        case TERRAIN_HILL: return 4;
-        case TERRAIN_RIVER: return 2;
-      }
-    }
-
-    bool Battlefield::isWater(int x, int y)
-    {
-      switch (tiles[y * WIDTH + x])
-      {
-        case TERRAIN_GRASS: return false;
-        case TERRAIN_FOREST: return false;
-        case TERRAIN_HILL: return false;
-        case TERRAIN_RIVER: return true;
-      }
-    }
+^code enum-data
 
 You get the idea. This works, but I find it a bit ugly. You've got all of the
 data for a terrain type smeared across a bunch of methods. It would be really nice to keep all of that encapsulated together. After all, that's what objects are designed for.
 
 It would be great if we could have an actual terrain *class*, like:
 
-    class Terrain
-    {
-      int movementCost;
-      int opacity;
-      bool isWater;
-      Texture texture;
-    };
+^code terrain-class
 
 But we don't want to pay the cost of having an instance of that for each tile on the battlefield. If you look at that class, notice that there's actually *nothing* in there that's specific to *where* that tile is in the world. Given that, there's no reason to have more than one of each terrain type. Every grass tile in the world is identical to every other one.
 
@@ -178,36 +121,7 @@ Instead of having the battlefield be a grid of enums, or Terrain objects, it wil
 
 <span name="generate"></span>
 
-    // TODO: update to terrain objects above
-    void Battlefield::generateTerrain()
-    {
-      Terrain grass = Terrain(1, 0, false, GRASS_TEXTURE);
-      Terrain forest = Terrain(3, 5, false, FOREST_TEXTURE);
-      Terrain river = Terrain(1, 0, true, WATER_TEXTURE);
-
-      // Fill the battlefield with grass.
-      for (int y = 0; y < HEIGHT; y++)
-      {
-        for (int x = 0; x < WIDTH; x++)
-        {
-          // Sprinkle some woods.
-          if (rand(10) == 0)
-          {
-            tiles[y * WIDTH + x] = &forest;
-          }
-          else
-          {
-            tiles[y * WIDTH + x] = &grass;
-          }
-        }
-      }
-
-      // Lay a river.
-      int x = random(WIDTH);
-      for (int y = 0; y < HEIGHT; y++) {
-        tiles[y * WIDTH + x] = &river;
-      }
-    }
+^code generate
 
 <aside name="generate">
 
@@ -217,14 +131,11 @@ I'll admit this isn't the world's greatest procedural terrain generation algorit
 
 Now instead of methods on `Battlefield` for accessing the terrain properties, we can just expose that directly:
 
-    const Terrain& getTile(int x, int y)
-    {
-      return *tiles[y * WIDTH + x];
-    }
+^code get-tile
 
 And if you want some property of the tile, you can get it right from that object:
 
-    int cost = battlefield.getTile(2, 3).movementCost();
+^code use-get-tile
 
 We're back to the pleasant API of working with real objects, but with almost none of the memory overhead.
 
@@ -238,7 +149,7 @@ What I *am* confident is that using flyweight objects shouldn't be dismissed out
 
 
 
-** TODO: talk about immutability**
+** TODO: talk about immutability, maybe when noting cost stuff in class?**
 
 **NOTES, delete when done:**
 

@@ -13,6 +13,7 @@
 #include "state.h"
 #include "update-method.h"
 #include "dirty-flag.h"
+#include "flyweight.h"
 
 int main (int argc, char * const argv[]) {
   UnbufferedSlapstick::testComedy();

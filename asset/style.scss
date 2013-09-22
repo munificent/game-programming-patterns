@@ -275,6 +275,7 @@ a.outline:after {
 .codehilite .c1 { color: #999; }     // comment
 .codehilite .cm { color: #999; }     // comment
 .codehilite .cp { color: #594; }     // preprocessor
+.codehilite .nl { color: $primary; } // keyword label (private: etc.)
 
 // Based on MailChimp Form Embed Code - Slim - 08/17/2011
 #mc_embed_signup table {
