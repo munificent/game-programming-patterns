@@ -131,8 +131,12 @@
 <p>This is all well and good for storing stuff in main memory, but that doesn&#x2019;t help rendering. Before the army gets onscreen, it&#x2019;s got to work it&#x2019;s way over to the GPU&#x2019;s memory. We need a way to model this that the graphics card understands. The answer is <em>instanced rendering</em>.</p>
 <h2><a href="#a-thousand-instances" name="a-thousand-instances">A Thousand Instances</a></h2>
 <p>To minimize the amount of data we have to push to the GPU, we&#x2019;d like to send the shared data&thinsp;&mdash;&thinsp;the <code>SoldierModel</code>&thinsp;&mdash;&thinsp;<em>once</em> and then push over each soldier instance&#x2019;s unique data&thinsp;&mdash;&thinsp;its position, pose, height, and color. Then we&#x2019;d tell the GPU "use that one model to render each of these instances".</p>
-<p>Fortunately, today&#x2019;s graphics APIs support exactly that.</p>
-<p><strong>TODO: Show D3D and GL APIs.</strong></p>
+<p>Fortunately, today&#x2019;s graphics APIs and <span name="hardware">cards</span> support exactly that. The details are fiddly, and out of the scope of this book, but both Direct3D and OpenGL have support for instanced rendering. In both cases, you provide two streams of data. The first is the blob of data that will be rendered multiple times: the mesh, texture and other details. The second is the sequence of instances and their parameters that will be used to tweak that first chunk of data each time it&#x2019;s drawn.</p>
+<aside name="hardware">
+
+<p>This fact means that the Flyweight pattern may be the only Gang of Four design pattern to have actual hardware support.</p>
+</aside>
+
 <h2><a href="#the-flyweight-pattern" name="the-flyweight-pattern">The Flyweight Pattern</a></h2>
 <p>Now that we&#x2019;ve got one concrete example under our belts, I can walk you through the general pattern. Flyweight, like its name implies, comes into play when you have objects that you need to be more lightweight: generally because you have too many of them.</p>
 <p>With instanced rendering, it&#x2019;s not so much that they take up too much memory as it is they take too much <em>time</em> to push each separate soldier over the bus to the GPU. But the basic idea is the same.</p>
@@ -155,7 +159,6 @@
 <span class="p">{</span>
   <span class="n">TERRAIN_GRASS</span><span class="p">,</span>
   <span class="n">TERRAIN_FOREST</span><span class="p">,</span>
-  <span class="n">TERRAIN_HILL</span><span class="p">,</span>
   <span class="n">TERRAIN_RIVER</span>
   <span class="c1">// Other terrains...</span>
 <span class="p">};</span>
@@ -184,7 +187,6 @@
   <span class="p">{</span>
     <span class="k">case</span> <span class="n">TERRAIN_GRASS</span>: <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
     <span class="k">case</span> <span class="n">TERRAIN_FOREST</span>: <span class="k">return</span> <span class="mi">3</span><span class="p">;</span>
-    <span class="k">case</span> <span class="n">TERRAIN_HILL</span>: <span class="k">return</span> <span class="mi">4</span><span class="p">;</span>
     <span class="k">case</span> <span class="n">TERRAIN_RIVER</span>: <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
       <span class="c1">// Other terrains...</span>
   <span class="p">}</span>
@@ -196,7 +198,6 @@
   <span class="p">{</span>
     <span class="k">case</span> <span class="n">TERRAIN_GRASS</span>: <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
     <span class="k">case</span> <span class="n">TERRAIN_FOREST</span>: <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="k">case</span> <span class="n">TERRAIN_HILL</span>: <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
     <span class="k">case</span> <span class="n">TERRAIN_RIVER</span>: <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
       <span class="c1">// Other terrains...</span>
   <span class="p">}</span>
@@ -207,6 +208,7 @@
 <p>You get the idea. This works, but I find it a bit ugly. You&#x2019;ve got all of the
 data for a terrain type smeared across a bunch of methods. It would be really nice to keep all of that encapsulated together. After all, that&#x2019;s what objects are designed for.</p>
 <p>It would be great if we could have an actual terrain <em>class</em>, like:</p>
+<p><span name="const"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Terrain</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -234,16 +236,37 @@ data for a terrain type smeared across a bunch of methods. It would be really ni
 </pre></div>
 
 
+<aside name="const">
+
+<p>You&#x2019;ll notice that everything in this class is <code>const</code>. That&#x2019;s no coincidence. Flyweight objects are almost always <em>immutable</em>&thinsp;&mdash;&thinsp;their state doesn&#x2019;t change once created. Since the same object is used in multiple contexts, if you were to modify it, the changes would appear in multiple places simultaneously, exposing the object sharing.</p>
+</aside>
+
 <p>But we don&#x2019;t want to pay the cost of having an instance of that for each tile on the battlefield. If you look at that class, notice that there&#x2019;s actually <em>nothing</em> in there that&#x2019;s specific to <em>where</em> that tile is in the world. Given that, there&#x2019;s no reason to have more than one of each terrain type. Every grass tile in the world is identical to every other one.</p>
-<p>Instead of having the battlefield be a grid of enums, or Terrain objects, it will be a grid of <em>pointers</em> to <code>Terrain</code> objects. Each tile that uses the same terrain will point to the same terrain instance. We could lay out the battlefield something like:</p>
+<p>Instead of having the battlefield be a grid of enums, or Terrain objects, it will be a grid of <em>pointers</em> to <code>Terrain</code> objects. Each tile that uses the same terrain will point to the same terrain instance.</p>
+<p>Since the terrain instances are used in multiple places, their lifetime is a bit more complex to manage if you were to dynamically allocate it. Instead, we&#x2019;ll just store them directly in the battlefield:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Battlefield</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Battlefield</span><span class="p">()</span>
+  <span class="o">:</span> <span class="n">grassTerrain_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">GRASS_TEXTURE</span><span class="p">),</span>
+    <span class="n">forestTerrain_</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">FOREST_TEXTURE</span><span class="p">),</span>
+    <span class="n">riverTerrain_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="n">RIVER_TEXTURE</span><span class="p">)</span>
+  <span class="p">{}</span>
+
+<span class="nl">private:</span>
+  <span class="n">Terrain</span> <span class="n">grassTerrain_</span><span class="p">;</span>
+  <span class="n">Terrain</span> <span class="n">forestTerrain_</span><span class="p">;</span>
+  <span class="n">Terrain</span> <span class="n">riverTerrain_</span><span class="p">;</span>
+
+  <span class="c1">// Other stuff...</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>Then we could use those to lay out the battlefield something like:</p>
 <p><span name="generate"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Battlefield</span><span class="o">::</span><span class="n">generateTerrain</span><span class="p">()</span>
 <span class="p">{</span>
-  <span class="n">Terrain</span><span class="o">*</span> <span class="n">grass</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Terrain</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">GRASS_TEXTURE</span><span class="p">);</span>
-  <span class="n">Terrain</span><span class="o">*</span> <span class="n">forest</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Terrain</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">FOREST_TEXTURE</span><span class="p">);</span>
-  <span class="n">Terrain</span><span class="o">*</span> <span class="n">river</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Terrain</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="n">RIVER_TEXTURE</span><span class="p">);</span>
-  <span class="c1">// TODO(bob): Manage memory!</span>
-
   <span class="c1">// Fill the battlefield with grass.</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">HEIGHT</span><span class="p">;</span> <span class="n">y</span><span class="o">++</span><span class="p">)</span>
   <span class="p">{</span>
@@ -252,11 +275,11 @@ data for a terrain type smeared across a bunch of methods. It would be really ni
       <span class="c1">// Sprinkle some woods.</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">random</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
       <span class="p">{</span>
-        <span class="n">tiles_</span><span class="p">[</span><span class="n">y</span> <span class="o">*</span> <span class="n">WIDTH</span> <span class="o">+</span> <span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">forest</span><span class="p">;</span>
+        <span class="n">tiles_</span><span class="p">[</span><span class="n">y</span> <span class="o">*</span> <span class="n">WIDTH</span> <span class="o">+</span> <span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">forestTerrain_</span><span class="p">;</span>
       <span class="p">}</span>
       <span class="k">else</span>
       <span class="p">{</span>
-        <span class="n">tiles_</span><span class="p">[</span><span class="n">y</span> <span class="o">*</span> <span class="n">WIDTH</span> <span class="o">+</span> <span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">grass</span><span class="p">;</span>
+        <span class="n">tiles_</span><span class="p">[</span><span class="n">y</span> <span class="o">*</span> <span class="n">WIDTH</span> <span class="o">+</span> <span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">grassTerrain_</span><span class="p">;</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -264,7 +287,7 @@ data for a terrain type smeared across a bunch of methods. It would be really ni
   <span class="c1">// Lay a river.</span>
   <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">random</span><span class="p">(</span><span class="n">WIDTH</span><span class="p">);</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">HEIGHT</span><span class="p">;</span> <span class="n">y</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">tiles_</span><span class="p">[</span><span class="n">y</span> <span class="o">*</span> <span class="n">WIDTH</span> <span class="o">+</span> <span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">river</span><span class="p">;</span>
+    <span class="n">tiles_</span><span class="p">[</span><span class="n">y</span> <span class="o">*</span> <span class="n">WIDTH</span> <span class="o">+</span> <span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">riverTerrain_</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -289,78 +312,10 @@ data for a terrain type smeared across a bunch of methods. It would be really ni
 
 
 <p>We&#x2019;re back to the pleasant API of working with real objects, but with almost none of the memory overhead.</p>
-<h3><a href="#what-about-performance" name="what-about-performance">What about performance?</a></h3>
+<h2><a href="#what-about-performance" name="what-about-performance">What About Performance?</a></h2>
 <p>I say "almost" here because the performance bean counters will rightfully want to know how this compares to the perf of using an enum. Storing a pointer to the object implies an indirect lookup: to get to some terrain data like the movement cost, you first have to follow the pointer in the grid to find the terrain object, and then find the movement cost there. Chasing a pointer like this can cause a cache miss, which can slow things down.</p>
 <p>As always, the golden rule of optimization is <em>profile first</em>. Modern computer hardware is too complex for performance to be a game or pure reason anymore. In my tests, there was no noticeable difference between using an enum or a flyweight object. If anything, the latter was a bit faster. But that&#x2019;s entirely dependent on how other stuff was laid out in memory.</p>
-<p>What I <em>am</em> confident is that using flyweight objects shouldn&#x2019;t be dismissed out of hand here. I think they make your code easier to read and maintain. If you need to sacrifice that for speed, at least do the tests yourself to make sure there actually is a speed cost first.</p>
-<p><strong> TODO: talk about immutability, maybe when noting cost stuff in class?</strong></p>
-<p><strong>NOTES, delete when done:</strong></p>
-<ul>
-<li>forest for the trees</li>
-<li>game takes place in woodland wonderland</li>
-<li>forest contains thousands of trees</li>
-<li>each a little different: height, color, location in world</li>
-<li>
-<p>how to render efficiently?</p>
-<ul>
-<li>millions of polys</li>
-<li>can&#x2019;t push across bus</li>
-</ul>
-</li>
-<li>
-<p>talk about perf</p>
-</li>
-</ul>
-<p>http://sourcemaking.com/design_patterns/flyweight</p>
-<p>"Extrinsic state is stored or computed by client objects, and passed to the Flyweight when its operations are invoked."</p>
-<ul>
-<li>
-<p>in other words, can make flyweight operations context-free by passing in context.</p>
-</li>
-<li>
-<p>some overlap with type object. both patterns delegate some of object&#x2019;s definition
-  to other shared object.</p>
-</li>
-</ul>
-<p>http://javapapers.com/design-patterns/flyweight-design-pattern/
-"Flyweight is used when there is a need to create high number of objects of almost similar nature. High number of objects consumes high memory and flyweight design pattern gives a solution to reduce the load on memory by sharing objects. It is achieved by segregating object properties into two types intrinsic and extrinsic."</p>
-<ul>
-<li>pattern is sort of about saving memory, but memory is cheap</li>
-<li>however, cache is not</li>
-</ul>
-<p>gof:
-"Facilitates the reuse of many fine grained objects, making the utilization of large numbers of objects more efficient."</p>
-<ul>
-<li>
-<p>got refers to "instrinsic" and "extrinsic" state. prefer "contextual" and "context-independent".</p>
-</li>
-<li>
-<p>common place where pattern is used in games</p>
-</li>
-<li>explain instanced rendering</li>
-<li>key concepts: separate out data specific to single object in world (transform)
-    from data it has in common with others (mesh)</li>
-<li>then reuse the latter</li>
-<li>talk about how rendering api supports instanced rendering directly: hardware
-    understands flyweight pattern.</li>
-<li>then say, that&#x2019;s general idea, here&#x2019;s other application</li>
-<li>tiles or other places where you&#x2019;d use an enum and lots of switches</li>
-<li>can instead do a pointer</li>
-<li>talk about perf of pointer chasing, field lookup, virtual method invoke</li>
-<li>
-<p>discuss using flyweight both for data and for behavior</p>
-</li>
-<li>
-<p>flyweights almost always immutable: if you change it, everything that uses it
-  will change</p>
-</li>
-<li>
-<p>create them upfront or as needed? if latter, think about threading</p>
-</li>
-<li>
-<p>compare to string interning</p>
-</li>
-</ul>
+<p>What I <em>am</em> confident is that using flyweight objects shouldn&#x2019;t be dismissed out of hand here. I think they often give you the advantages of an object-oriented style&thinsp;&mdash;&thinsp;mainly encapsulation&thinsp;&mdash;&thinsp;without the expense of tons of objects. If you find yourself creating an enum and doing lots of switches on it, it&#x2019;s worth trying this pattern instead. If it turns out you need to sacrifice that for speed, at least do the tests yourself to make sure there actually is a speed cost first.</p>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </div>
 </body>

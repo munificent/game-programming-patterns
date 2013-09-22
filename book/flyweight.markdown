@@ -57,9 +57,13 @@ This is all well and good for storing stuff in main memory, but that doesn't hel
 
 To minimize the amount of data we have to push to the GPU, we'd like to send the shared data -- the `SoldierModel` -- *once* and then push over each soldier instance's unique data -- its position, pose, height, and color. Then we'd tell the GPU "use that one model to render each of these instances".
 
-Fortunately, today's graphics APIs support exactly that.
+Fortunately, today's graphics APIs and <span name="hardware">cards</span> support exactly that. The details are fiddly, and out of the scope of this book, but both Direct3D and OpenGL have support for instanced rendering. In both cases, you provide two streams of data. The first is the blob of data that will be rendered multiple times: the mesh, texture and other details. The second is the sequence of instances and their parameters that will be used to tweak that first chunk of data each time it's drawn.
 
-**TODO: Show D3D and GL APIs.**
+<aside name="hardware">
+
+This fact means that the Flyweight pattern may be the only Gang of Four design pattern to have actual hardware support.
+
+</aside>
 
 ## The Flyweight Pattern
 
@@ -113,11 +117,25 @@ data for a terrain type smeared across a bunch of methods. It would be really ni
 
 It would be great if we could have an actual terrain *class*, like:
 
+<span name="const"></span>
+
 ^code terrain-class
+
+<aside name="const">
+
+You'll notice that everything in this class is `const`. That's no coincidence. Flyweight objects are almost always *immutable* -- their state doesn't change once created. Since the same object is used in multiple contexts, if you were to modify it, the changes would appear in multiple places simultaneously, exposing the object sharing.
+
+</aside>
 
 But we don't want to pay the cost of having an instance of that for each tile on the battlefield. If you look at that class, notice that there's actually *nothing* in there that's specific to *where* that tile is in the world. Given that, there's no reason to have more than one of each terrain type. Every grass tile in the world is identical to every other one.
 
-Instead of having the battlefield be a grid of enums, or Terrain objects, it will be a grid of *pointers* to `Terrain` objects. Each tile that uses the same terrain will point to the same terrain instance. We could lay out the battlefield something like:
+Instead of having the battlefield be a grid of enums, or Terrain objects, it will be a grid of *pointers* to `Terrain` objects. Each tile that uses the same terrain will point to the same terrain instance.
+
+Since the terrain instances are used in multiple places, their lifetime is a bit more complex to manage if you were to dynamically allocate it. Instead, we'll just store them directly in the battlefield:
+
+^code battlefield-terrain
+
+Then we could use those to lay out the battlefield something like:
 
 <span name="generate"></span>
 
@@ -139,70 +157,10 @@ And if you want some property of the tile, you can get it right from that object
 
 We're back to the pleasant API of working with real objects, but with almost none of the memory overhead.
 
-### What about performance?
+## What About Performance?
 
 I say "almost" here because the performance bean counters will rightfully want to know how this compares to the perf of using an enum. Storing a pointer to the object implies an indirect lookup: to get to some terrain data like the movement cost, you first have to follow the pointer in the grid to find the terrain object, and then find the movement cost there. Chasing a pointer like this can cause a cache miss, which can slow things down.
 
 As always, the golden rule of optimization is *profile first*. Modern computer hardware is too complex for performance to be a game or pure reason anymore. In my tests, there was no noticeable difference between using an enum or a flyweight object. If anything, the latter was a bit faster. But that's entirely dependent on how other stuff was laid out in memory.
 
-What I *am* confident is that using flyweight objects shouldn't be dismissed out of hand here. I think they make your code easier to read and maintain. If you need to sacrifice that for speed, at least do the tests yourself to make sure there actually is a speed cost first.
-
-
-
-** TODO: talk about immutability, maybe when noting cost stuff in class?**
-
-**NOTES, delete when done:**
-
-- forest for the trees
-  - game takes place in woodland wonderland
-  - forest contains thousands of trees
-  - each a little different: height, color, location in world
-  - how to render efficiently?
-    - millions of polys
-    - can't push across bus
-
-
-- talk about perf
-
-http://sourcemaking.com/design_patterns/flyweight
-
-"Extrinsic state is stored or computed by client objects, and passed to the Flyweight when its operations are invoked."
-
-- in other words, can make flyweight operations context-free by passing in context.
-
-- some overlap with type object. both patterns delegate some of object's definition
-  to other shared object.
-
-http://javapapers.com/design-patterns/flyweight-design-pattern/
-"Flyweight is used when there is a need to create high number of objects of almost similar nature. High number of objects consumes high memory and flyweight design pattern gives a solution to reduce the load on memory by sharing objects. It is achieved by segregating object properties into two types intrinsic and extrinsic."
-
-
-- pattern is sort of about saving memory, but memory is cheap
-  - however, cache is not
-
-
-gof:
-"Facilitates the reuse of many fine grained objects, making the utilization of large numbers of objects more efficient."
-
-
-- got refers to "instrinsic" and "extrinsic" state. prefer "contextual" and "context-independent".
-
-- common place where pattern is used in games
-  - explain instanced rendering
-  - key concepts: separate out data specific to single object in world (transform)
-    from data it has in common with others (mesh)
-  - then reuse the latter
-  - talk about how rendering api supports instanced rendering directly: hardware
-    understands flyweight pattern.
-- then say, that's general idea, here's other application
-- tiles or other places where you'd use an enum and lots of switches
-- can instead do a pointer
-- talk about perf of pointer chasing, field lookup, virtual method invoke
-- discuss using flyweight both for data and for behavior
-
-- flyweights almost always immutable: if you change it, everything that uses it
-  will change
-
-- create them upfront or as needed? if latter, think about threading
-
-- compare to string interning
+What I *am* confident is that using flyweight objects shouldn't be dismissed out of hand here. I think they often give you the advantages of an object-oriented style -- mainly encapsulation -- without the expense of tons of objects. If you find yourself creating an enum and doing lots of switches on it, it's worth trying this pattern instead. If it turns out you need to sacrifice that for speed, at least do the tests yourself to make sure there actually is a speed cost first.

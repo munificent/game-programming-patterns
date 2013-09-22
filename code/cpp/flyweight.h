@@ -76,7 +76,6 @@ namespace Flyweight
     {
       TERRAIN_GRASS,
       TERRAIN_FOREST,
-      TERRAIN_HILL,
       TERRAIN_RIVER
       // Other terrains...
     };
@@ -101,7 +100,6 @@ namespace Flyweight
       {
         case TERRAIN_GRASS: return 1;
         case TERRAIN_FOREST: return 3;
-        case TERRAIN_HILL: return 4;
         case TERRAIN_RIVER: return 2;
           // Other terrains...
       }
@@ -113,7 +111,6 @@ namespace Flyweight
       {
         case TERRAIN_GRASS: return false;
         case TERRAIN_FOREST: return false;
-        case TERRAIN_HILL: return false;
         case TERRAIN_RIVER: return true;
           // Other terrains...
       }
@@ -150,16 +147,23 @@ namespace Flyweight
     };
     //^terrain-class
 
-
     class Battlefield
     {
       //^omit
     public:
+      Battlefield()
+      : grassTerrain_(1, 0, false, GRASS_TEXTURE),
+        forestTerrain_(3, 5, false, FOREST_TEXTURE),
+        riverTerrain_(1, 0, true, RIVER_TEXTURE)
+      {}
       const Terrain& getTile(int x, int y) const;
       //^omit
     private:
       Terrain* tiles_[WIDTH * HEIGHT];
       //^omit
+      Terrain grassTerrain_;
+      Terrain forestTerrain_;
+      Terrain riverTerrain_;
       void generateTerrain();
       //^omit
     };
@@ -167,11 +171,6 @@ namespace Flyweight
     //^generate
     void Battlefield::generateTerrain()
     {
-      Terrain* grass = new Terrain(1, 0, false, GRASS_TEXTURE);
-      Terrain* forest = new Terrain(3, 5, false, FOREST_TEXTURE);
-      Terrain* river = new Terrain(1, 0, true, RIVER_TEXTURE);
-      // TODO(bob): Manage memory!
-
       // Fill the battlefield with grass.
       for (int y = 0; y < HEIGHT; y++)
       {
@@ -180,11 +179,11 @@ namespace Flyweight
           // Sprinkle some woods.
           if (random(10) == 0)
           {
-            tiles_[y * WIDTH + x] = forest;
+            tiles_[y * WIDTH + x] = &forestTerrain_;
           }
           else
           {
-            tiles_[y * WIDTH + x] = grass;
+            tiles_[y * WIDTH + x] = &grassTerrain_;
           }
         }
       }
@@ -192,7 +191,7 @@ namespace Flyweight
       // Lay a river.
       int x = random(WIDTH);
       for (int y = 0; y < HEIGHT; y++) {
-        tiles_[y * WIDTH + x] = river;
+        tiles_[y * WIDTH + x] = &riverTerrain_;
       }
     }
     //^generate
@@ -213,6 +212,53 @@ namespace Flyweight
       //^use-get-tile
       use(cost);
     }
+  }
+
+  namespace BattlefieldTerrain
+  {
+    class Terrain
+    {
+    public:
+      Terrain(int movementCost,
+              int opacity,
+              bool isWater,
+              Texture texture)
+      : movementCost_(movementCost),
+      opacity_(opacity),
+      isWater_(isWater),
+      texture_(texture)
+      {}
+
+      int getMovementCost() const { return movementCost_; }
+      int getOpacity() const { return opacity_; }
+      bool isWater() const { return isWater_; }
+      const Texture& getTexture() const { return texture_; }
+
+    private:
+      int movementCost_;
+      int opacity_;
+      bool isWater_;
+      Texture texture_;
+    };
+    
+    //^battlefield-terrain
+    class Battlefield
+    {
+    public:
+      Battlefield()
+      : grassTerrain_(1, 0, false, GRASS_TEXTURE),
+        forestTerrain_(3, 5, false, FOREST_TEXTURE),
+        riverTerrain_(1, 0, true, RIVER_TEXTURE)
+      {}
+
+    private:
+      Terrain grassTerrain_;
+      Terrain forestTerrain_;
+      Terrain riverTerrain_;
+
+      // Other stuff...
+    };
+    //^battlefield-terrain
   }
 }
 
