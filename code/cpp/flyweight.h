@@ -22,51 +22,53 @@ namespace Flyweight
   static const int HEIGHT = 1024;
 
   static Texture GRASS_TEXTURE;
-  static Texture FOREST_TEXTURE;
+  static Texture SWAMP_TEXTURE;
   static Texture RIVER_TEXTURE;
 
   int random(int max) { return 0; }
   
-  namespace HeavySoldier
+  namespace HeavyTree
   {
-    //^heavy-soldier
-    class Soldier
+    //^heavy-tree
+    class Tree
     {
     private:
       Mesh mesh_;
-      Skeleton skeleton_;
-      Texture texture_;
-      Pose pose_;
+      Texture bark_;
+      Texture leaves_;
       Vector position_;
       double height_;
-      Color skinTone_;
+      double thickness_;
+      Color barkTint_;
+      Color leafTint_;
     };
-    //^heavy-soldier
+    //^heavy-tree
   }
 
-  namespace SplitSoldier
+  namespace SplitTree
   {
-    //^soldier-model
-    class SoldierModel
+    //^tree-model
+    class TreeModel
     {
     private:
       Mesh mesh_;
-      Skeleton skeleton_;
-      Texture texture_;
+      Texture bark_;
+      Texture leaves_;
     };
-    //^soldier-model
+    //^tree-model
 
-    //^split-soldier
-    class Soldier
+    //^split-tree
+    class Tree
     {
     private:
-      SoldierModel* model_;
-      Pose pose_;
+      TreeModel* model_;
       Vector position_;
       double height_;
-      Color skinTone_;
+      double thickness_;
+      Color barkTint_;
+      Color leafTint_;
     };
-    //^split-soldier
+    //^split-tree
   }
 
   namespace TerrainEnum
@@ -75,14 +77,14 @@ namespace Flyweight
     enum Terrain
     {
       TERRAIN_GRASS,
-      TERRAIN_FOREST,
+      TERRAIN_SWAMP,
       TERRAIN_RIVER
       // Other terrains...
     };
     //^terrain-enum
 
-    //^enum-battlefield
-    class Battlefield
+    //^enum-world
+    class World
     {
     private:
       Terrain tiles_[WIDTH * HEIGHT];
@@ -91,26 +93,26 @@ namespace Flyweight
       bool isWater(int x, int y);
       //^omit
     };
-    //^enum-battlefield
+    //^enum-world
 
     //^enum-data
-    int Battlefield::getMovementCost(int x, int y)
+    int World::getMovementCost(int x, int y)
     {
       switch (tiles_[y * WIDTH + x])
       {
         case TERRAIN_GRASS: return 1;
-        case TERRAIN_FOREST: return 3;
+        case TERRAIN_SWAMP: return 3;
         case TERRAIN_RIVER: return 2;
           // Other terrains...
       }
     }
 
-    bool Battlefield::isWater(int x, int y)
+    bool World::isWater(int x, int y)
     {
       switch (tiles_[y * WIDTH + x])
       {
         case TERRAIN_GRASS: return false;
-        case TERRAIN_FOREST: return false;
+        case TERRAIN_SWAMP: return false;
         case TERRAIN_RIVER: return true;
           // Other terrains...
       }
@@ -125,36 +127,32 @@ namespace Flyweight
     {
     public:
       Terrain(int movementCost,
-              int opacity,
               bool isWater,
               Texture texture)
       : movementCost_(movementCost),
-        opacity_(opacity),
         isWater_(isWater),
         texture_(texture)
       {}
 
       int getMovementCost() const { return movementCost_; }
-      int getOpacity() const { return opacity_; }
       bool isWater() const { return isWater_; }
       const Texture& getTexture() const { return texture_; }
 
     private:
       int movementCost_;
-      int opacity_;
       bool isWater_;
       Texture texture_;
     };
     //^terrain-class
 
-    class Battlefield
+    class World
     {
       //^omit
     public:
-      Battlefield()
-      : grassTerrain_(1, 0, false, GRASS_TEXTURE),
-        forestTerrain_(3, 5, false, FOREST_TEXTURE),
-        riverTerrain_(1, 0, true, RIVER_TEXTURE)
+      World()
+      : grassTerrain_(1, false, GRASS_TEXTURE),
+        swampTerrain_(3, false, SWAMP_TEXTURE),
+        riverTerrain_(1, true, RIVER_TEXTURE)
       {}
       const Terrain& getTile(int x, int y) const;
       //^omit
@@ -162,24 +160,24 @@ namespace Flyweight
       Terrain* tiles_[WIDTH * HEIGHT];
       //^omit
       Terrain grassTerrain_;
-      Terrain forestTerrain_;
+      Terrain swampTerrain_;
       Terrain riverTerrain_;
       void generateTerrain();
       //^omit
     };
 
     //^generate
-    void Battlefield::generateTerrain()
+    void World::generateTerrain()
     {
       // Fill the battlefield with grass.
       for (int y = 0; y < HEIGHT; y++)
       {
         for (int x = 0; x < WIDTH; x++)
         {
-          // Sprinkle some woods.
+          // Sprinkle some swamps.
           if (random(10) == 0)
           {
-            tiles_[y * WIDTH + x] = &forestTerrain_;
+            tiles_[y * WIDTH + x] = &swampTerrain_;
           }
           else
           {
@@ -197,7 +195,7 @@ namespace Flyweight
     //^generate
 
     //^get-tile
-    const Terrain& Battlefield::getTile(int x, int y) const
+    const Terrain& World::getTile(int x, int y) const
     {
       return *tiles_[y * WIDTH + x];
     }
@@ -205,60 +203,56 @@ namespace Flyweight
 
     void foo()
     {
-      Battlefield battlefield;
+      World world;
 
       //^use-get-tile
-      int cost = battlefield.getTile(2, 3).getMovementCost();
+      int cost = world.getTile(2, 3).getMovementCost();
       //^use-get-tile
       use(cost);
     }
   }
 
-  namespace BattlefieldTerrain
+  namespace WorldTerrain
   {
     class Terrain
     {
     public:
       Terrain(int movementCost,
-              int opacity,
               bool isWater,
               Texture texture)
       : movementCost_(movementCost),
-      opacity_(opacity),
-      isWater_(isWater),
-      texture_(texture)
+        isWater_(isWater),
+        texture_(texture)
       {}
 
       int getMovementCost() const { return movementCost_; }
-      int getOpacity() const { return opacity_; }
       bool isWater() const { return isWater_; }
       const Texture& getTexture() const { return texture_; }
 
     private:
       int movementCost_;
-      int opacity_;
       bool isWater_;
       Texture texture_;
     };
     
-    //^battlefield-terrain
-    class Battlefield
+    //^world-terrain
+    class World
     {
     public:
-      Battlefield()
-      : grassTerrain_(1, 0, false, GRASS_TEXTURE),
-        forestTerrain_(3, 5, false, FOREST_TEXTURE),
-        riverTerrain_(1, 0, true, RIVER_TEXTURE)
+      World()
+      : grassTerrain_(1, false, GRASS_TEXTURE),
+        swampTerrain_(3, false, SWAMP_TEXTURE),
+        riverTerrain_(1, true, RIVER_TEXTURE)
       {}
 
     private:
       Terrain grassTerrain_;
-      Terrain forestTerrain_;
+      Terrain swampTerrain_;
       Terrain riverTerrain_;
 
       // Other stuff...
     };
-    //^battlefield-terrain
+    //^world-terrain
   }
 }
 

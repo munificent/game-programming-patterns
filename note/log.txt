@@ -1,3 +1,4 @@
+2013-09-23 - add 298 words to flyweight, revise 1084 words to different example
 2013-09-22 - finish first draft of flyweight
 2013-09-21 - create real code for code samples for flyweight
 2013-09-20 - 618 words, first draft flyweight
