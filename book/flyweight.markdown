@@ -1,29 +1,28 @@
 ^title Flyweight
 ^section Design Patterns Revisited
 
-As the fog lifts, the player's brave hero looks out across a majestic forest. Huge trees, countless in number, tower over him in a cathedral of greenery. Between giant trunks, he can barely make out the forest spreading out of sight.
+The fog lifts, revealing a majestic old growth forest. Huge trees, countless in number, tower over the player forming a cathedral of greenery. The stained glass canopy of leaves fragments the sunlight into golden shafts of glimmering dust. Between giant trunks, he can make out the massive forest receding into the distance.
 
-This is the kind of otherworldly setting we dream of as game developers, and scenes like this are often enabled by a pattern whose name couldn't possibly be more modest: the humble Flyweight.
+This is the kind of otherworldly setting we dream of as game developers, and scenes like these are often enabled by a pattern whose name couldn't possibly be more modest: the humble Flyweight.
 
 ## Forest for the Trees
 
-I can describe a scene like the above with just a few sentences, but actually *implementing* it in a realtime game is enough to make a seasoned graphics programmer blanch. When you've got an entire forest of individual trees filling the screen, all they see is the millions of polygons they'll have to somehow cram onto the GPU in less than a sixtieth of a second.
+I can describe an enormous forest with just a few sentences, but actually *implementing* it in a realtime game is enough to make a seasoned graphics programmer blanch. When you've got an entire forest of individual trees filling the screen, all they see is the millions of polygons they'll have to somehow shove onto the GPU in less than a sixtieth of a second.
 
-You've got thousands of trees, each with detailed geometry containing thousands of polygons. Even though you might have enough *memory* to hold that forest, in order to render it, that has to get pushed from the CPU over the bus to the GPU.
+You've got thousands of trees, each with detailed geometry containing thousands of polygons. Even though you might have enough *memory* to describe that forest, in order to render it, that has to get pushed from the CPU over the bus to the GPU.
 
-Each tree in the wood has a bunch of data associated with it:
+Each tree has a bunch of data associated with it:
 
-* A mesh of polygons that define the shape and details of the trunk, branches, and greenery
-* A few textures for the bark and leaves
-* The location and orientation in the forest
-* Tuning parameters like size and tint to add some visual
-  variety to the woods.
+* A mesh of polygons that define the shape of the trunk, branches, and greenery.
+* A few textures for the bark and leaves.
+* The location and orientation in the forest.
+* Tuning parameters like size and tint so that each tree looks different.
 
 If you were to sketch it out in code, you'd have something like this:
 
 ^code heavy-tree
 
-Many of those fields are themselves pretty large objects: the mesh and textures in particular are a handful. Fortunately, there's a time-honored trick to handling this.
+Many of those fields are themselves pretty large objects, in particular the mesh and textures. An entire forest of these large objects would be too much to throw at the GPU in one frame. Fortunately, there's a time-honored trick to handling this.
 
 The key observation is that even though there may be thousands of trees in the forest, they mostly look similar. They will likely all use the <span name="same">same</span> mesh and textures. That means most of the data in that class is the *same* between all of those objects.
 
@@ -33,7 +32,7 @@ You'd have to be crazy or a billionaire (or both) to budget for the artists to i
 
 </aside>
 
-We can show that explicitly be tweaking our object model. We'll split our class in half. First, we take the data that all trees have <span name="type">in common</span> and move that into a separate class:
+We can model that explicitly by splitting our class in half. First, we take the data that all trees have <span name="type">in common</span> with each other and move that into a separate class:
 
 ^code tree-model
 
@@ -47,17 +46,17 @@ This looks a lot like the <a href="type-object.html" class="pattern">Type Object
 
 With a Type Object, the goal is to be able to define many different types of objects without having to define different *classes*. Even though a single instance of the type object will be shared across multiple objects, there are still *other* type objects used by other instances. Type objects make it easier to have many different types.
 
-This pattern is purely about sharing resources: it is most often used with only a single instance of the shared state.
+This pattern is purely about sharing resources: it is often used with only a single instance of the shared state.
 
 </aside>
 
-This is all well and good for storing stuff in main memory, but that doesn't help rendering. Before the forest gets onscreen, it's got to work it's way over to the GPU's memory. We need a way to express this that the graphics card understands. The answer is *instanced rendering*.
+This is all well and good for storing stuff in main memory, but that doesn't help rendering. Before the forest gets onscreen, it's got to work its way over to the GPU's memory. We need a way to express this data sharing that the graphics card understands.
 
 ## A Thousand Instances
 
-To minimize the amount of data we have to push to the GPU, we'd like to send the shared data -- the `TreeModel` -- *once* and then push over each tree instance's unique data -- its position, color, and scale. Then we'd tell the GPU "use that one model to render each of these instances".
+To minimize the amount of data we have to push to the GPU, we want to send the shared data, the `TreeModel`, just *once*. Separately, we push over every tree instance's unique data, its position, color, and scale. Then we tell the GPU "use that one model to render each of these instances".
 
-Fortunately, today's graphics APIs and <span name="hardware">cards</span> support exactly that. The details are fiddly, and out of the scope of this book, but both Direct3D and OpenGL have support for instanced rendering. In both cases, you provide two streams of data. The first is the blob of reusable data that will be rendered multiple times: the mesh, textures and other details. The second is the sequence of instances and their parameters that will be used to tweak that first chunk of data each time it's drawn.
+Fortunately, today's graphics APIs and <span name="hardware">cards</span> support exactly that. The details are fiddly, and out of the scope of this book, but both Direct3D and OpenGL have support for *instanced rendering*. In both APIs, you provide two streams of data. The first is the blob of common data that will be rendered multiple times: the mesh and textures. The second is the sequence of instances and their parameters that will be used to vary that first chunk of data each time it's drawn.
 
 <aside name="hardware">
 
@@ -69,11 +68,11 @@ This graphics card API means that the Flyweight pattern may be the only Gang of 
 
 Now that we've got one concrete example under our belts, I can walk you through the general pattern. Flyweight, like its name implies, comes into play when you have objects that you need to be more lightweight, generally because you have too many of them.
 
-With instanced rendering, it's not so much that they take up too much memory as it is they take too much *time* to push each separate soldier over the bus to the GPU. But the basic idea is the same.
+With instanced rendering, it's not so much that they take up too much memory as it is they take too much *time* to push each separate tree over the bus to the GPU. But the basic idea is the same.
 
-The pattern solves that issue by separating out the object's data into two kinds: The first kind of data is the stuff that's not specific to a single *instance* of that object. It's the stuff that's shared across all objects. The Gang of Four calls this the *extrinsic* state, but I like to think of it as the "context-free" stuff. In the example here, this is the geometry and textures for the tree.
+The pattern solves that issue by separating out an object's data into two kinds: The first kind of data is the stuff that's not specific to a single *instance* of that object. It's the stuff that's shared across all objects. The Gang of Four calls this the *extrinsic* state, but I like to think of it as the "context-free" stuff. In the example here, this is the geometry and textures for the tree.
 
-The rest of the data is the *intrinsic* state, the stuff that is unique to that instance. In this case, that's each tree's position, scale, and color.
+The rest of the data is the *intrinsic* state, the stuff that is unique to that instance. In this case, that is each tree's position, scale, and color.
 
 Just like in the chunk of sample code up there, this pattern saves memory by moving the extrinsic state *out* of the main object and into something shared. It separates an object from *the context where it is used*.
 
