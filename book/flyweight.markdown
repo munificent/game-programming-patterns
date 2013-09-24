@@ -164,3 +164,17 @@ I say "almost" here because the performance bean counters will rightfully want t
 As always, the golden rule of optimization is *profile first*. Modern computer hardware is too complex for performance to be a game or pure reason anymore. In my tests, there was no noticeable difference between using an enum or a flyweight object. If anything, the latter was a bit faster. But that's entirely dependent on how other stuff was laid out in memory.
 
 What I *am* confident is that using flyweight objects shouldn't be dismissed out of hand here. I think they often give you the advantages of an object-oriented style -- mainly encapsulation -- without the expense of tons of objects. If you find yourself creating an enum and doing lots of switches on it, it's worth trying this pattern instead. If it turns out you need to sacrifice that for speed, at least do the tests yourself to make sure there actually is a speed cost first.
+
+## See Also
+
+ *  In the tile example, we just eagerly created an instance for each terrain type and stored it in `Battlefield`. That made it easy to find and reuse the one shared instance. In many cases, though, you won't want to create all of the flyweights up front.
+
+    If you don't know which ones you'll actually need, it's better to create them as needed. To get the advantage of sharing, when you go to "create" one, you'll first see if you've already created an identical one. If so, you just return that instance.
+
+    This usually means that you'll have to encapsulate construction behind some interface that can first look for an existing object. Hiding a constructor like this is an example of the <a href="http://en.wikipedia.org/wiki/Factory_method_pattern" class="gof-pattern">Factory Method</a> pattern.
+
+    In order to return a previously created flyweight, you'll have to keep track of the pool of them that you've already instantiated. As the name implies, that means that an <a href="object-pool.html" class="pattern">Object Pool</a> might be a helpful place to store them.
+
+ *  When you're using the <a class="pattern" href="state.html">State</a>, you sometimes have state objects that don't have any, uh, state, that's specific to the machine that the state is being used in. The state's identity alone is enough to be useful. In that case, you can apply this pattern and reuse that same state instance in multiple state machines at the same time without any problems.
+
+ *  This pattern requires the flyweight object not have any state specific to the context in which it appears. Sometimes that's easy, but other times there's a *little* bit of context that it would be useful for a method in the flyweight object to have access to. Since it can't *store* that data, the only option is to pass it into the method. When you do, that's the <a href="context-parameter.html" class="pattern">Context Parameter</a> pattern.
