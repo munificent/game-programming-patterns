@@ -227,7 +227,7 @@ This lets each FSM have its own instance of the state. When I can, I prefer to u
 
 <aside name="fragment">
 
-When you dynamically allocate states, you may have to worry about fragmentation. An <a href="object-pool.html" class="pattern">Object Pool</a> can help.
+When you dynamically allocate states, you may have to worry about fragmentation and memory usage. The <a href="flyweight.html" class="gof-pattern">Flyweight</a> and <a href="object-pool.html" class="pattern">Object Pool</a> patterns can help.
 
 </aside>
 

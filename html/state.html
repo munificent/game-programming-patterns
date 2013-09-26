@@ -481,7 +481,7 @@
 <p>This lets each FSM have its own instance of the state. When I can, I prefer to use static states since they don&#x2019;t burn memory and CPU cycles allocating objects each state change. For states that are more, uh, <em>stateful</em>, though, this is the way to go.</p>
 <aside name="fragment">
 
-<p>When you dynamically allocate states, you may have to worry about fragmentation. An <a href="object-pool.html" class="pattern">Object Pool</a> can help.</p>
+<p>When you dynamically allocate states, you may have to worry about fragmentation and memory usage. The <a href="flyweight.html" class="gof-pattern">Flyweight</a> and <a href="object-pool.html" class="pattern">Object Pool</a> patterns can help.</p>
 </aside>
 
 <h2><a href="#enter-and-exit-actions" name="enter-and-exit-actions">Enter and Exit Actions</a></h2>
