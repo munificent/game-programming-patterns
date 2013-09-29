@@ -202,17 +202,12 @@ dragon in the game is an instance of this dragon &ldquo;class.&rdquo;
 Defining each breed as a subclass of an abstract base Monster class,
 and having each monster in the game be an instance of that derived
 breed class mirrors that. We end up with a class hierarchy like this:</p>
-<div class="codehilite"><pre>                +---------+
-             +--| Dragon  | arrows mean &quot;inherits from&quot;
-+---------+  |  +---------+
-| Monster |&lt;-+
-+---------+  |  +---------+
-             +--| Troll   |
-             |  +---------+
-             |
-             &amp;hellip; lots more subclasses&amp;hellip;
-</pre></div>
+<p><span name="inherits-arrow"></span></p>
+<p><img src="images/type-object-subclasses.png" /></p>
+<aside name="inherits-arrow">
 
+<p>Here, the <img src="images/arrow-inherits.png" class="arrow" /> means "inherits from".</p>
+</aside>
 
 <p>Each instance of a monster in the game will be of one of the derived
 monster types. The more breeds we have, the bigger the class hierarchy. That&#x2019;s the problem of course: adding new breeds means
@@ -221,11 +216,12 @@ adding new code, and each breed has to be compiled in as its own type.</p>
 code so that each monster <em>has</em> a breed. Instead of subclassing
 Monster for each breed, we have a single Monster class and a single
 Breed class:</p>
-<div class="codehilite"><pre>+---------+   +---------+
-| Monster |--&gt;| Breed   | now the arrow means
-+---------+   +---------+ &quot;has a reference to an instance of&quot;
-</pre></div>
+<p><span name="references-arrow"></span></p>
+<p><img src="images/type-object-breed.png" /></p>
+<aside name="references-arrow">
 
+<p>Here, the <img src="images/arrow-references.png" class="arrow" /> means "is referenced by".</p>
+</aside>
 
 <p>That&#x2019;s it. Two classes. Notice that there&#x2019;s no inheritance at all.
 With this system, each monster in the game is simply an instance of

@@ -123,16 +123,15 @@ Defining each breed as a subclass of an abstract base Monster class,
 and having each monster in the game be an instance of that derived
 breed class mirrors that. We end up with a class hierarchy like this:
 
-    :::text
-                    +---------+
-                 +--| Dragon  | arrows mean "inherits from"
-    +---------+  |  +---------+
-    | Monster |<-+
-    +---------+  |  +---------+
-                 +--| Troll   |
-                 |  +---------+
-                 |
-                 ... lots more subclasses...
+<span name="inherits-arrow"></span>
+
+<img src="images/type-object-subclasses.png" />
+
+<aside name="inherits-arrow">
+
+Here, the <img src="images/arrow-inherits.png" class="arrow" /> means "inherits from".
+
+</aside>
 
 Each instance of a monster in the game will be of one of the derived
 monster types. The more breeds we have, the bigger the class hierarchy. That's the problem of course: adding new breeds means
@@ -143,10 +142,15 @@ code so that each monster *has* a breed. Instead of subclassing
 Monster for each breed, we have a single Monster class and a single
 Breed class:
 
-    :::text
-    +---------+   +---------+
-    | Monster |-->| Breed   | now the arrow means
-    +---------+   +---------+ "has a reference to an instance of"
+<span name="references-arrow"></span>
+
+<img src="images/type-object-breed.png" />
+
+<aside name="references-arrow">
+
+Here, the <img src="images/arrow-references.png" class="arrow" /> means "is referenced by".
+
+</aside>
 
 That's it. Two classes. Notice that there's no inheritance at all.
 With this system, each monster in the game is simply an instance of

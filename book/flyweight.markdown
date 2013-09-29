@@ -28,7 +28,17 @@ The key observation is that even though there may be thousands of trees in the f
 
 <aside name="same">
 
-You'd have to be crazy or a billionaire (or both: a "crazillionaire") to budget for the artists to individually model each tree in an entire forest.
+You'd have to be crazy or a billionaire to budget for the artists to individually model each tree in an entire forest.
+
+</aside>
+
+<span name="trees"></span>
+
+<img src="images/flyweight-trees.png" />
+
+<aside name="trees">
+
+Note that the stuff in the small boxes is the same for each tree.
 
 </aside>
 
@@ -39,6 +49,10 @@ We can model that explicitly by splitting the object in half. First, we pull out
 The game only needs a single one of these, since there's no reason to have the same meshes and textures in memory a thousand times. Then, each *instance* of a tree in the world has a *reference* to that shared `TreeModel`. What remains in `Tree` is the state that is instance-specific:
 
 ^code split-tree
+
+You can visualize it like this:
+
+<img src="images/flyweight-tree-model.png" />
 
 <aside name="type">
 
@@ -135,6 +149,8 @@ That's probably not what you want. Sharing objects to save memory should be an o
 But we don't want to pay the cost of having an instance of that for each tile in the world. If you look at that class, you'll notice that there's actually *nothing* in there that's specific to *where* that tile is. In flyweight terms, *all* of a terrain's state is "extrinsic" or "context-free".
 
 Given that, there's no reason to have more than one of each terrain type. Every grass tile on the ground is identical to every other one. Instead of having the world be a grid of enums or Terrain objects, it will be a grid of *pointers* to `Terrain` objects. Each tile that uses the same terrain will point to the same terrain instance.
+
+<img src="images/flyweight-tiles.png" />
 
 Since the terrain instances are used in multiple places, their lifetimes would be a little more complex to manage if you were to dynamically allocate them. Instead, we'll just store them directly in the world:
 

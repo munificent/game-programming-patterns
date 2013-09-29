@@ -40,6 +40,8 @@ In Big-O terms, though, this is still *O(n&sup2;)*.
 
 The problem we're running into is that there's no underlying order to the array of units. To find a unit near some location, we have to walk the entire array. Now imagine we simplify our game a bit. Instead of a 2D battle*field*, imagine it's a 1D battle *line*.
 
+<img src="images/spatial-partition-battle-line.png" />
+
 In that case, we could make things easier on ourselves by *sorting* the array of units by their position on the battleline. Once we do that, we can use something <span name="array">like</span> a [binary search](http://en.wikipedia.org/wiki/Binary_search) to find nearby units without having to scan the entire array.
 
 <aside name="array">
@@ -88,6 +90,8 @@ See the last section of this chapter for a list of some of the most common spati
 
 Here's the basic idea: imagine the entire field of battle. Now superimpose a grid of fixed-size squares onto it, like a sheet of graph paper. Instead of storing our units in a single array, we put them in the cells of this grid. Each cell stores the list of units whose position is within that cell's boundary.
 
+<img src="images/spatial-partition-grid.png" />
+
 When we handle combat, we only consider units within the same cell. Instead of comparing every unit in the game with every other one, we've *partitioned* the battlefield into a bunch of smaller mini-battlefields, each with many fewer units.
 
 ### A grid of linked units
@@ -106,7 +110,11 @@ Note that each cell is just a <span name="stl">pointer</span> to a unit. Next, w
 
 ^code unit-linked
 
-This lets us organize units into a [doubly-linked list](http://en.wikipedia.org/wiki/Doubly_linked_list), instead of an array. Each cell in the grid points to the first unit in the list of units within that cell and each unit has pointers to the ones before and after it in the list. We'll see why soon.
+This lets us organize units into a [doubly-linked list](http://en.wikipedia.org/wiki/Doubly_linked_list), instead of an array.
+
+<img src="images/spatial-partition-linked-list.png" />
+
+Each cell in the grid points to the first unit in the list of units within that cell and each unit has pointers to the ones before and after it in the list. We'll see why soon.
 
 <aside name="stl">
 
@@ -178,13 +186,7 @@ This pattern still works fine. Instead of just checking for an exact location ma
 
 When range gets involved, though, there's a corner case you need to consider: units in different cells may still be close enough to interact.
 
-    +-------+-------+
-    |      _|       |
-    |     / |\      |
-    |    | A|B|     |
-    |     \_|/      |
-    |       |       |
-    +-------+-------+
+<img src="images/spatial-partition-adjacent.png" />
 
 Here, B is within A's attack radius even through their centerpoints are in different cells. To handle this, you will need to compare units not just in the same cell, but in neighboring cells too. To do this, first we'll split the inner loop out of `handleCell()`:
 
@@ -204,23 +206,13 @@ Those additional `handleUnit()` calls look for hits between the current unit and
 
 The cell with the unit is `U`, and the neighboring cells it looks at are `X`:
 
-    +---+---+---+
-    | X | X |   |
-    +---+---+---+
-    | X | U |   |
-    +---+---+---+
-    | X |   |   |
-    +---+---+---+
+<img src="images/spatial-partition-neighbors.png" width="240" />
 
 </aside>
 
-We only look at *half* of the neighbors for the same reason that the inner loop starts *after* the current unit: to avoid comparing each pair of units twice. Consider what would happen if we did check all eight neighboring cells. Let's say we have two units in adjacent cells, close enough to hit each other, like this:
+We only look at *half* of the neighbors for the same reason that the inner loop starts *after* the current unit: to avoid comparing each pair of units twice. Consider what would happen if we did check all eight neighboring cells.
 
-    +---+---+
-    |  A|B  |
-    +---+---+
-
-If, for each unit, we looked at all eight cells surrounding it, here's what would happen:
+Let's say we have two units in adjacent cells, close enough to hit each other, like the previous example. If, for each unit, we looked at all eight cells surrounding it, here's what would happen:
 
 1. When we are finding hits for A, we would look at its neighbor on the right and find B. So we'd register an attack between A and B.
 2. Then, when we are finding hits for B, we would look at its neighbor on the *left* and find A. So we'd register a *second* attack between A and B.

@@ -22,7 +22,7 @@ namespace Flyweight
   static const int HEIGHT = 1024;
 
   static Texture GRASS_TEXTURE;
-  static Texture SWAMP_TEXTURE;
+  static Texture HILL_TEXTURE;
   static Texture RIVER_TEXTURE;
 
   int random(int max) { return 0; }
@@ -78,7 +78,7 @@ namespace Flyweight
     enum Terrain
     {
       TERRAIN_GRASS,
-      TERRAIN_SWAMP,
+      TERRAIN_HILL,
       TERRAIN_RIVER
       // Other terrains...
     };
@@ -102,7 +102,7 @@ namespace Flyweight
       switch (tiles_[y][x])
       {
         case TERRAIN_GRASS: return 1;
-        case TERRAIN_SWAMP: return 3;
+        case TERRAIN_HILL:  return 3;
         case TERRAIN_RIVER: return 2;
           // Other terrains...
       }
@@ -113,7 +113,7 @@ namespace Flyweight
       switch (tiles_[y][x])
       {
         case TERRAIN_GRASS: return false;
-        case TERRAIN_SWAMP: return false;
+        case TERRAIN_HILL:  return false;
         case TERRAIN_RIVER: return true;
           // Other terrains...
       }
@@ -152,7 +152,7 @@ namespace Flyweight
     public:
       World()
       : grassTerrain_(1, false, GRASS_TEXTURE),
-        swampTerrain_(3, false, SWAMP_TEXTURE),
+        hillTerrain_(3, false, HILL_TEXTURE),
         riverTerrain_(1, true, RIVER_TEXTURE)
       {}
       const Terrain& getTile(int x, int y) const;
@@ -161,7 +161,7 @@ namespace Flyweight
       Terrain* tiles_[HEIGHT][WIDTH];
       //^omit
       Terrain grassTerrain_;
-      Terrain swampTerrain_;
+      Terrain hillTerrain_;
       Terrain riverTerrain_;
       void generateTerrain();
       //^omit
@@ -175,10 +175,10 @@ namespace Flyweight
       {
         for (int x = 0; x < WIDTH; x++)
         {
-          // Sprinkle some swamps.
+          // Sprinkle some hills.
           if (random(10) == 0)
           {
-            tiles_[y][x] = &swampTerrain_;
+            tiles_[y][x] = &hillTerrain_;
           }
           else
           {
@@ -242,13 +242,13 @@ namespace Flyweight
     public:
       World()
       : grassTerrain_(1, false, GRASS_TEXTURE),
-        swampTerrain_(3, false, SWAMP_TEXTURE),
+        hillTerrain_(3, false, HILL_TEXTURE),
         riverTerrain_(1, true, RIVER_TEXTURE)
       {}
 
     private:
       Terrain grassTerrain_;
-      Terrain swampTerrain_;
+      Terrain hillTerrain_;
       Terrain riverTerrain_;
 
       // Other stuff...

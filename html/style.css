@@ -56,6 +56,12 @@ a {
 img {
   max-width: 100%; }
 
+img.arrow {
+  vertical-align: middle;
+  margin-top: -2px;
+  width: 30px;
+  height: 20px; }
+
 blockquote {
   padding: 0 12px; }
 

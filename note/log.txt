@@ -1,3 +1,5 @@
+2013-09-28 - scan and process 10 illustrations
+2013-09-27 - three illustrations for flyweight
 2013-09-26 - revise all 2193 words, finish third draft of flyweight
 2013-09-25 - revise all 2178 words, finish second draft flyweight
 2013-09-24 - finish converting to tree then revise 965 words

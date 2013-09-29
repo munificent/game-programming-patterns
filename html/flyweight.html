@@ -93,7 +93,14 @@
 <p>The key observation is that even though there may be thousands of trees in the forest, they mostly look similar. They will likely all use the <span name="same">same</span> mesh and textures. That means most of the fields in these objects are the <em>same</em> between all of those instances.</p>
 <aside name="same">
 
-<p>You&#x2019;d have to be crazy or a billionaire (or both: a "crazillionaire") to budget for the artists to individually model each tree in an entire forest.</p>
+<p>You&#x2019;d have to be crazy or a billionaire to budget for the artists to individually model each tree in an entire forest.</p>
+</aside>
+
+<p><span name="trees"></span></p>
+<p><img src="images/flyweight-trees.png" /></p>
+<aside name="trees">
+
+<p>Note that the stuff in the small boxes is the same for each tree.</p>
 </aside>
 
 <p>We can model that explicitly by splitting the object in half. First, we pull out the data that all trees have <span name="type">in common</span> and move it into a separate class:</p>
@@ -122,6 +129,8 @@
 </pre></div>
 
 
+<p>You can visualize it like this:</p>
+<p><img src="images/flyweight-tree-model.png" /></p>
 <aside name="type">
 
 <p>This looks a lot like the <a href="type-object.html" class="pattern">Type Object</a> pattern. Both involve delegating part of an object&#x2019;s state to some other object shared between a number of instances. However, the intent behind the patterns differs.</p>
@@ -162,7 +171,7 @@
 <div class="codehilite"><pre><span class="k">enum</span> <span class="n">Terrain</span>
 <span class="p">{</span>
   <span class="n">TERRAIN_GRASS</span><span class="p">,</span>
-  <span class="n">TERRAIN_SWAMP</span><span class="p">,</span>
+  <span class="n">TERRAIN_HILL</span><span class="p">,</span>
   <span class="n">TERRAIN_RIVER</span>
   <span class="c1">// Other terrains...</span>
 <span class="p">};</span>
@@ -191,7 +200,7 @@
   <span class="k">switch</span> <span class="p">(</span><span class="n">tiles_</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">])</span>
   <span class="p">{</span>
     <span class="k">case</span> <span class="n">TERRAIN_GRASS</span>: <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">case</span> <span class="n">TERRAIN_SWAMP</span>: <span class="k">return</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">TERRAIN_HILL</span>:  <span class="k">return</span> <span class="mi">3</span><span class="p">;</span>
     <span class="k">case</span> <span class="n">TERRAIN_RIVER</span>: <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
       <span class="c1">// Other terrains...</span>
   <span class="p">}</span>
@@ -202,7 +211,7 @@
   <span class="k">switch</span> <span class="p">(</span><span class="n">tiles_</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">])</span>
   <span class="p">{</span>
     <span class="k">case</span> <span class="n">TERRAIN_GRASS</span>: <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="k">case</span> <span class="n">TERRAIN_SWAMP</span>: <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">TERRAIN_HILL</span>:  <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
     <span class="k">case</span> <span class="n">TERRAIN_RIVER</span>: <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
       <span class="c1">// Other terrains...</span>
   <span class="p">}</span>
@@ -244,19 +253,20 @@
 
 <p>But we don&#x2019;t want to pay the cost of having an instance of that for each tile in the world. If you look at that class, you&#x2019;ll notice that there&#x2019;s actually <em>nothing</em> in there that&#x2019;s specific to <em>where</em> that tile is. In flyweight terms, <em>all</em> of a terrain&#x2019;s state is "extrinsic" or "context-free".</p>
 <p>Given that, there&#x2019;s no reason to have more than one of each terrain type. Every grass tile on the ground is identical to every other one. Instead of having the world be a grid of enums or Terrain objects, it will be a grid of <em>pointers</em> to <code>Terrain</code> objects. Each tile that uses the same terrain will point to the same terrain instance.</p>
+<p><img src="images/flyweight-tiles.png" /></p>
 <p>Since the terrain instances are used in multiple places, their lifetimes would be a little more complex to manage if you were to dynamically allocate them. Instead, we&#x2019;ll just store them directly in the world:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">World</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="n">World</span><span class="p">()</span>
   <span class="o">:</span> <span class="n">grassTerrain_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">GRASS_TEXTURE</span><span class="p">),</span>
-    <span class="n">swampTerrain_</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">SWAMP_TEXTURE</span><span class="p">),</span>
+    <span class="n">hillTerrain_</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">HILL_TEXTURE</span><span class="p">),</span>
     <span class="n">riverTerrain_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="n">RIVER_TEXTURE</span><span class="p">)</span>
   <span class="p">{}</span>
 
 <span class="nl">private:</span>
   <span class="n">Terrain</span> <span class="n">grassTerrain_</span><span class="p">;</span>
-  <span class="n">Terrain</span> <span class="n">swampTerrain_</span><span class="p">;</span>
+  <span class="n">Terrain</span> <span class="n">hillTerrain_</span><span class="p">;</span>
   <span class="n">Terrain</span> <span class="n">riverTerrain_</span><span class="p">;</span>
 
   <span class="c1">// Other stuff...</span>
@@ -273,10 +283,10 @@
   <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">WIDTH</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
     <span class="p">{</span>
-      <span class="c1">// Sprinkle some swamps.</span>
+      <span class="c1">// Sprinkle some hills.</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">random</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
       <span class="p">{</span>
-        <span class="n">tiles_</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">swampTerrain_</span><span class="p">;</span>
+        <span class="n">tiles_</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">hillTerrain_</span><span class="p">;</span>
       <span class="p">}</span>
       <span class="k">else</span>
       <span class="p">{</span>

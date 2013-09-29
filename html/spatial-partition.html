@@ -101,6 +101,7 @@ a performance bottleneck.</p>
 
 <h3><a href="#drawing-battle-lines" name="drawing-battle-lines">Drawing battle lines</a></h3>
 <p>The problem we&#x2019;re running into is that there&#x2019;s no underlying order to the array of units. To find a unit near some location, we have to walk the entire array. Now imagine we simplify our game a bit. Instead of a 2D battle<em>field</em>, imagine it&#x2019;s a 1D battle <em>line</em>.</p>
+<p><img src="images/spatial-partition-battle-line.png" /></p>
 <p>In that case, we could make things easier on ourselves by <em>sorting</em> the array of units by their position on the battleline. Once we do that, we can use something <span name="array">like</span> a <a href="http://en.wikipedia.org/wiki/Binary_search">binary search</a> to find nearby units without having to scan the entire array.</p>
 <aside name="array">
 
@@ -131,6 +132,7 @@ a performance bottleneck.</p>
 
 <h3><a href="#a-sheet-of-graph-paper" name="a-sheet-of-graph-paper">A sheet of graph paper</a></h3>
 <p>Here&#x2019;s the basic idea: imagine the entire field of battle. Now superimpose a grid of fixed-size squares onto it, like a sheet of graph paper. Instead of storing our units in a single array, we put them in the cells of this grid. Each cell stores the list of units whose position is within that cell&#x2019;s boundary.</p>
+<p><img src="images/spatial-partition-grid.png" /></p>
 <p>When we handle combat, we only consider units within the same cell. Instead of comparing every unit in the game with every other one, we&#x2019;ve <em>partitioned</em> the battlefield into a bunch of smaller mini-battlefields, each with many fewer units.</p>
 <h3><a href="#a-grid-of-linked-units" name="a-grid-of-linked-units">A grid of linked units</a></h3>
 <p>OK, let&#x2019;s get coding. First, some prep work. Here&#x2019;s our basic unit class:</p>
@@ -190,7 +192,9 @@ a performance bottleneck.</p>
 </pre></div>
 
 
-<p>This lets us organize units into a <a href="http://en.wikipedia.org/wiki/Doubly_linked_list">doubly-linked list</a>, instead of an array. Each cell in the grid points to the first unit in the list of units within that cell and each unit has pointers to the ones before and after it in the list. We&#x2019;ll see why soon.</p>
+<p>This lets us organize units into a <a href="http://en.wikipedia.org/wiki/Doubly_linked_list">doubly-linked list</a>, instead of an array.</p>
+<p><img src="images/spatial-partition-linked-list.png" /></p>
+<p>Each cell in the grid points to the first unit in the list of units within that cell and each unit has pointers to the ones before and after it in the list. We&#x2019;ll see why soon.</p>
 <aside name="stl">
 
 <p>Throughout this book, I&#x2019;ve avoided using any of the built-in collection types in the C++ standard library. I want to require as little external knowledge as possible to understand the example, and, like a magician&#x2019;s "nothing up my sleeve", I want to make it clear <em>exactly</em> what&#x2019;s going on in the code. Details are important, especially with performance-related patterns.</p>
@@ -341,16 +345,7 @@ a performance bottleneck.</p>
 
 
 <p>When range gets involved, though, there&#x2019;s a corner case you need to consider: units in different cells may still be close enough to interact.</p>
-<div class="codehilite"><pre><span class="o">+-------+-------+</span>
-<span class="o">|</span>      <span class="n">_</span><span class="o">|</span>       <span class="o">|</span>
-<span class="o">|</span>     <span class="o">/</span> <span class="o">|</span><span class="err">\</span>      <span class="o">|</span>
-<span class="o">|</span>    <span class="o">|</span> <span class="n">A</span><span class="o">|</span><span class="n">B</span><span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span>     <span class="err">\</span><span class="n">_</span><span class="o">|/</span>      <span class="o">|</span>
-<span class="o">|</span>       <span class="o">|</span>       <span class="o">|</span>
-<span class="o">+-------+-------+</span>
-</pre></div>
-
-
+<p><img src="images/spatial-partition-adjacent.png" /></p>
 <p>Here, B is within A&#x2019;s attack radius even through their centerpoints are in different cells. To handle this, you will need to compare units not just in the same cell, but in neighboring cells too. To do this, first we&#x2019;ll split the inner loop out of <code>handleCell()</code>:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Grid</span><span class="o">::</span><span class="n">handleUnit</span><span class="p">(</span><span class="n">Unit</span><span class="o">*</span> <span class="n">unit</span><span class="p">,</span> <span class="n">Unit</span><span class="o">*</span> <span class="n">other</span><span class="p">)</span>
 <span class="p">{</span>
@@ -410,26 +405,11 @@ a performance bottleneck.</p>
 <aside name="neighbor">
 
 <p>The cell with the unit is <code>U</code>, and the neighboring cells it looks at are <code>X</code>:</p>
-<div class="codehilite"><pre><span class="o">+---+---+---+</span>
-<span class="o">|</span> <span class="n">X</span> <span class="o">|</span> <span class="n">X</span> <span class="o">|</span>   <span class="o">|</span>
-<span class="o">+---+---+---+</span>
-<span class="o">|</span> <span class="n">X</span> <span class="o">|</span> <span class="n">U</span> <span class="o">|</span>   <span class="o">|</span>
-<span class="o">+---+---+---+</span>
-<span class="o">|</span> <span class="n">X</span> <span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>
-<span class="o">+---+---+---+</span>
-</pre></div>
-
-
+<p><img src="images/spatial-partition-neighbors.png" width="240" /></p>
 </aside>
 
-<p>We only look at <em>half</em> of the neighbors for the same reason that the inner loop starts <em>after</em> the current unit: to avoid comparing each pair of units twice. Consider what would happen if we did check all eight neighboring cells. Let&#x2019;s say we have two units in adjacent cells, close enough to hit each other, like this:</p>
-<div class="codehilite"><pre><span class="o">+---+---+</span>
-<span class="o">|</span>  <span class="n">A</span><span class="o">|</span><span class="n">B</span>  <span class="o">|</span>
-<span class="o">+---+---+</span>
-</pre></div>
-
-
-<p>If, for each unit, we looked at all eight cells surrounding it, here&#x2019;s what would happen:</p>
+<p>We only look at <em>half</em> of the neighbors for the same reason that the inner loop starts <em>after</em> the current unit: to avoid comparing each pair of units twice. Consider what would happen if we did check all eight neighboring cells.</p>
+<p>Let&#x2019;s say we have two units in adjacent cells, close enough to hit each other, like the previous example. If, for each unit, we looked at all eight cells surrounding it, here&#x2019;s what would happen:</p>
 <ol>
 <li>When we are finding hits for A, we would look at its neighbor on the right and find B. So we&#x2019;d register an attack between A and B.</li>
 <li>Then, when we are finding hits for B, we would look at its neighbor on the <em>left</em> and find A. So we&#x2019;d register a <em>second</em> attack between A and B.</li>
