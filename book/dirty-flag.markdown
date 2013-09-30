@@ -56,7 +56,7 @@ But to actually draw the parrot on screen, we need to know its absolute position
 
 ### Local and world transforms
 
-Calculating an object's world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other worlds, the parrot's world transform is:
+Calculating an object's world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other words, the parrot's world transform is:
 
 <span name="degenerate"></span>
 <img src="images/dirty-flag-multiply.png" />
@@ -204,7 +204,7 @@ Phil Karlton famously said, "There are only two hard things in Computer Science:
 
 Miss it in one place, and your program will incorrectly use stale derived data. This leads to confused players and very hard to track down bugs. When you use this pattern, you'll have to take care that any code that modifies the primary state also sets the dirty flag.
 
-One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes a single narrow API, you can set the dirty bit there and rest assurred that it won't be missed.
+One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes through a single narrow API, you can set the dirty bit there and rest assured that it won't be missed.
 
 ### You have to keep the previous derived data in memory
 
