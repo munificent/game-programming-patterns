@@ -65,11 +65,11 @@
 <p>This is the kind of otherworldly setting we dream of as game developers, and scenes like these are often enabled by a pattern whose name couldn&#x2019;t possibly be more modest: the humble Flyweight.</p>
 <h2><a href="#forest-for-the-trees" name="forest-for-the-trees">Forest for the Trees</a></h2>
 <p>I can describe a sprawling woodland with just a few sentences, but actually <em>implementing</em> it in a realtime game is another story. When you&#x2019;ve got an entire forest of individual trees filling the screen, all a graphics programmer sees is the millions of polygons they&#x2019;ll have to somehow shovel onto the GPU every sixtieth of a second.</p>
-<p>You&#x2019;ve got thousands of trees, each with detailed geometry containing thousands of polygons. Even though you might have enough <em>memory</em> to describe that forest, in order to render it, that data has to make its way over the bus from the CPU to the GPU.</p>
+<p>We&#x2019;re talking thousands of trees, each with detailed geometry containing thousands of polygons. Even if you have enough <em>memory</em> to describe that forest, in order to render it, that data has to make its way over the bus from the CPU to the GPU.</p>
 <p>Each tree has a bunch of data associated with it:</p>
 <ul>
 <li>A mesh of polygons that define the shape of the trunk, branches, and greenery.</li>
-<li>A few textures for the bark and leaves.</li>
+<li>Textures for the bark and leaves.</li>
 <li>Its location and orientation in the forest.</li>
 <li>Tuning parameters like size and tint so that each tree looks different.</li>
 </ul>

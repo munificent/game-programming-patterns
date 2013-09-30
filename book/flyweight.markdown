@@ -9,12 +9,12 @@ This is the kind of otherworldly setting we dream of as game developers, and sce
 
 I can describe a sprawling woodland with just a few sentences, but actually *implementing* it in a realtime game is another story. When you've got an entire forest of individual trees filling the screen, all a graphics programmer sees is the millions of polygons they'll have to somehow shovel onto the GPU every sixtieth of a second.
 
-You've got thousands of trees, each with detailed geometry containing thousands of polygons. Even though you might have enough *memory* to describe that forest, in order to render it, that data has to make its way over the bus from the CPU to the GPU.
+We're talking thousands of trees, each with detailed geometry containing thousands of polygons. Even if you have enough *memory* to describe that forest, in order to render it, that data has to make its way over the bus from the CPU to the GPU.
 
 Each tree has a bunch of data associated with it:
 
 * A mesh of polygons that define the shape of the trunk, branches, and greenery.
-* A few textures for the bark and leaves.
+* Textures for the bark and leaves.
 * Its location and orientation in the forest.
 * Tuning parameters like size and tint so that each tree looks different.
 
