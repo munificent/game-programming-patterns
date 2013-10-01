@@ -97,7 +97,7 @@
 
 <p>But to actually draw the parrot on screen, we need to know its absolute position in the world. I&#x2019;ll call the parent-relative transform the object&#x2019;s <em>local transform</em>. To render an object, we need to know its <em>world transform</em>.</p>
 <h3><a href="#local-and-world-transforms" name="local-and-world-transforms">Local and world transforms</a></h3>
-<p>Calculating an object&#x2019;s world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other worlds, the parrot&#x2019;s world transform is:</p>
+<p>Calculating an object&#x2019;s world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other words, the parrot&#x2019;s world transform is:</p>
 <p><span name="degenerate"></span>
 <img src="images/dirty-flag-multiply.png" /></p>
 <aside name="degenerate">
@@ -202,7 +202,7 @@ turn up uses of this pattern.</p>
 </aside>
 
 <p>Miss it in one place, and your program will incorrectly use stale derived data. This leads to confused players and very hard to track down bugs. When you use this pattern, you&#x2019;ll have to take care that any code that modifies the primary state also sets the dirty flag.</p>
-<p>One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes a single narrow API, you can set the dirty bit there and rest assurred that it won&#x2019;t be missed.</p>
+<p>One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes through a single narrow API, you can set the dirty bit there and rest assured that it won&#x2019;t be missed.</p>
 <h3><a href="#you-have-to-keep-the-previous-derived-data-in-memory" name="you-have-to-keep-the-previous-derived-data-in-memory">You have to keep the previous derived data in memory</a></h3>
 <p><span name="sync"></span></p>
 <p>When the derived data is needed and the dirty flag <em>isn&#x2019;t</em> set, it uses the previously calculated data. This is obvious, but that does imply that you have to keep that derived data around in memory in case you end up needing it later.</p>
