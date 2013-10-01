@@ -1,3 +1,5 @@
+2013-09-30 - reddit comments, fix #27, #28, #31, #32, #33
+2013-09-29 - tweak flyweight, fix #26 and #30, upload, email, social
 2013-09-28 - scan and process 10 illustrations
 2013-09-27 - three illustrations for flyweight
 2013-09-26 - revise all 2193 words, finish third draft of flyweight
