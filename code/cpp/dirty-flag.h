@@ -41,26 +41,26 @@ namespace DirtyFlag
     {
     public:
       GraphNode(Mesh* mesh)
-      : _mesh(mesh),
-        _local(Transform::origin())
+      : mesh_(mesh),
+        local_(Transform::origin())
       {}
       
     private:
-      Transform _local;
-      Mesh* _mesh;
+      Transform local_;
+      Mesh* mesh_;
 
-      GraphNode* _children[MAX_CHILDREN];
-      int _numChildren;
+      GraphNode* children_[MAX_CHILDREN];
+      int numChildren_;
     };
     //^graph-node
 
     void root()
     {
       //^scene-graph
-      GraphNode* _graph = new GraphNode(NULL);
+      GraphNode* graph_ = new GraphNode(NULL);
       // Add children to root graph node...
       //^scene-graph
-      use(_graph);
+      use(graph_);
     }
   }
 
@@ -81,38 +81,37 @@ namespace DirtyFlag
     {
     public:
       GraphNode(Mesh* mesh)
-      : _mesh(mesh),
-      _local(Transform::origin())
+      : mesh_(mesh),
+        local_(Transform::origin())
       {}
 
       void render(Transform parentWorld);
       
     private:
-      Transform _local;
-      Mesh* _mesh;
+      Transform local_;
+      Mesh* mesh_;
 
-      GraphNode* _children[MAX_CHILDREN];
-      int _numChildren;
+      GraphNode* children_[MAX_CHILDREN];
+      int numChildren_;
     };
 
     //^render-on-fly
     void GraphNode::render(Transform parentWorld) {
-      Transform world = _local.combine(parentWorld);
+      Transform world = local_.combine(parentWorld);
 
-      if (_mesh) renderMesh(_mesh, world);
+      if (mesh_) renderMesh(mesh_, world);
 
-      for (int i = 0; i < _numChildren; i++) {
-        _children[i]->render(world);
+      for (int i = 0; i < numChildren_; i++) {
+        children_[i]->render(world);
       }
     }
     //^render-on-fly
 
-
     void root()
     {
-      GraphNode* _graph = new GraphNode(NULL);
+      GraphNode* graph_ = new GraphNode(NULL);
       //^render-root
-      _graph->render(Transform::origin());
+      graph_->render(Transform::origin());
       //^render-root
     }
   }
@@ -124,9 +123,9 @@ namespace DirtyFlag
     {
     public:
       GraphNode(Mesh* mesh)
-      : _mesh(mesh),
-        _local(Transform::origin()),
-        _dirty(true)
+      : mesh_(mesh),
+        local_(Transform::origin()),
+        dirty_(true)
       {}
       //^omit
       void setTransform(Transform local);
@@ -136,39 +135,39 @@ namespace DirtyFlag
       // Other methods...
 
     private:
-      Transform _world;
-      bool _dirty;
+      Transform world_;
+      bool dirty_;
       // Other fields...
       //^omit
-      Transform _local;
-      Mesh* _mesh;
+      Transform local_;
+      Mesh* mesh_;
 
       static const int MAX_CHILDREN = 16;
-      GraphNode* _children[MAX_CHILDREN];
-      int _numChildren;
+      GraphNode* children_[MAX_CHILDREN];
+      int numChildren_;
       //^omit
     };
     //^dirty-graph-node
 
     //^set-transform
     void GraphNode::setTransform(Transform local) {
-      _local = local;
-      _dirty = true;
+      local_ = local;
+      dirty_ = true;
     }
     //^set-transform
 
     //^dirty-render
     void GraphNode::render(Transform parentWorld, bool dirty) {
-      dirty |= _dirty;
+      dirty |= dirty_;
       if (dirty) {
-        _world = _local.combine(parentWorld);
-        _dirty = false;
+        world_ = local_.combine(parentWorld);
+        dirty_ = false;
       }
 
-      if (_mesh) renderMesh(_mesh, _world);
+      if (mesh_) renderMesh(mesh_, world_);
 
-      for (int i = 0; i < _numChildren; i++) {
-        _children[i]->render(_world, dirty);
+      for (int i = 0; i < numChildren_; i++) {
+        children_[i]->render(world_, dirty);
       }
     }
     //^dirty-render

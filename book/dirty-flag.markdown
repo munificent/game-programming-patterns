@@ -240,7 +240,7 @@ Next, we'll sketch out the class for an object in the scene graph. This is the b
 
 ^code graph-node
 
-Each node has a local transform which describes where it is relative to its parent. It has a mesh which is the actual graphic for the object. (We'll allow `_mesh` to be `NULL` too to handle non-visual nodes that are used just to group their children.) Finally, each node has a possibly empty collection of child nodes.
+Each node has a local transform which describes where it is relative to its parent. It has a mesh which is the actual graphic for the object. (We'll allow `mesh_` to be `NULL` too to handle non-visual nodes that are used just to group their children.) Finally, each node has a possibly empty collection of child nodes.
 
 With this, a "scene graph" is really just a single root `GraphNode` whose children (and grandchildren, etc.) are all of the objects in the world:
 
@@ -268,11 +268,11 @@ To draw an entire scene graph, we kick off the process at the root node:
 
 ### Let's get dirty
 
-So this code does the right thing -- renders all the meshes in the right place -- but it doesn't do it efficiently. It's calling `_local.combine(parentWorld)` on every node in the graph, every frame. Let's see how this pattern fixes that. First, we need to add two fields to `GraphNode`:
+So this code does the right thing -- renders all the meshes in the right place -- but it doesn't do it efficiently. It's calling `local_.combine(parentWorld)` on every node in the graph, every frame. Let's see how this pattern fixes that. First, we need to add two fields to `GraphNode`:
 
 ^code dirty-graph-node
 
-The `_world` field caches the previously-calculated world transform, and `_dirty`, of course, is the dirty flag. Note that the flag starts out `true`. When we create a new node, we haven't calculated it's world transform yet, so at birth it's already out of sync with the local transform.
+The `world_` field caches the previously-calculated world transform, and `dirty_`, of course, is the dirty flag. Note that the flag starts out `true`. When we create a new node, we haven't calculated it's world transform yet, so at birth it's already out of sync with the local transform.
 
 The only reason we need this pattern is because objects can *move*, so let's add support for that:
 
@@ -296,11 +296,11 @@ As always, the golden rule of optimization: *profile first*.
 
 </aside>
 
-This is similar to the original naïve implementation. The key changes are that we check to see if the node is dirty before calculating the world transform, and we store the result in a field instead of a local variable. When the node is clean, we skip `combine()` completely and use the old but still correct `_world` value.
+This is similar to the original naïve implementation. The key changes are that we check to see if the node is dirty before calculating the world transform, and we store the result in a field instead of a local variable. When the node is clean, we skip `combine()` completely and use the old but still correct `world_` value.
 
 The <span name="clever">clever</span> bit is that `dirty` parameter. That will be `true` if any node above this node in the parent chain was dirty. In much the same way that `parentWorld` updates the world transform incrementally as we traverse down the hierarchy, `dirty` tracks the dirtiness of the parent chain.
 
-This lets us avoid having to actually recursively set each child's `_dirty` flag in `setTransform()`. Instead, we just pass the parent's dirty flag down to its children when we render and look at that too to see if we need to recalculate the world transform.
+This lets us avoid having to actually recursively set each child's `dirty_` flag in `setTransform()`. Instead, we just pass the parent's dirty flag down to its children when we render and look at that too to see if we need to recalculate the world transform.
 
 The end result here is exactly what we want: changing a node's local transform is just a couple of assignments, and rendering the world calculates the exact minimum number of world transforms that have changed since the last frame.
 

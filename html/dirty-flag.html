@@ -236,23 +236,23 @@ turn up uses of this pattern.</p>
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="n">GraphNode</span><span class="p">(</span><span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh</span><span class="p">)</span>
-  <span class="o">:</span> <span class="n">_mesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span>
-    <span class="n">_local</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">())</span>
+  <span class="o">:</span> <span class="n">mesh_</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span>
+    <span class="n">local_</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">())</span>
   <span class="p">{}</span>
 
 <span class="nl">private:</span>
-  <span class="n">Transform</span> <span class="n">_local</span><span class="p">;</span>
-  <span class="n">Mesh</span><span class="o">*</span> <span class="n">_mesh</span><span class="p">;</span>
+  <span class="n">Transform</span> <span class="n">local_</span><span class="p">;</span>
+  <span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh_</span><span class="p">;</span>
 
-  <span class="n">GraphNode</span><span class="o">*</span> <span class="n">_children</span><span class="p">[</span><span class="n">MAX_CHILDREN</span><span class="p">];</span>
-  <span class="kt">int</span> <span class="n">_numChildren</span><span class="p">;</span>
+  <span class="n">GraphNode</span><span class="o">*</span> <span class="n">children_</span><span class="p">[</span><span class="n">MAX_CHILDREN</span><span class="p">];</span>
+  <span class="kt">int</span> <span class="n">numChildren_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
 
-<p>Each node has a local transform which describes where it is relative to its parent. It has a mesh which is the actual graphic for the object. (We&#x2019;ll allow <code>_mesh</code> to be <code>NULL</code> too to handle non-visual nodes that are used just to group their children.) Finally, each node has a possibly empty collection of child nodes.</p>
+<p>Each node has a local transform which describes where it is relative to its parent. It has a mesh which is the actual graphic for the object. (We&#x2019;ll allow <code>mesh_</code> to be <code>NULL</code> too to handle non-visual nodes that are used just to group their children.) Finally, each node has a possibly empty collection of child nodes.</p>
 <p>With this, a "scene graph" is really just a single root <code>GraphNode</code> whose children (and grandchildren, etc.) are all of the objects in the world:</p>
-<div class="codehilite"><pre><span class="n">GraphNode</span><span class="o">*</span> <span class="n">_graph</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GraphNode</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+<div class="codehilite"><pre><span class="n">GraphNode</span><span class="o">*</span> <span class="n">graph_</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GraphNode</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
 <span class="c1">// Add children to root graph node...</span>
 </pre></div>
 
@@ -266,12 +266,12 @@ turn up uses of this pattern.</p>
 <h3><a href="#an-unoptimized-traversal" name="an-unoptimized-traversal">An unoptimized traversal</a></h3>
 <p>To get our hands dirty, let&#x2019;s throw together a basic traversal for rendering the scene graph that calculates the world positions on the fly. It won&#x2019;t be optimal, but it will be simple. We&#x2019;ll add a new method to <code>GraphNode</code>:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">GraphNode</span><span class="o">::</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span> <span class="n">parentWorld</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">Transform</span> <span class="n">world</span> <span class="o">=</span> <span class="n">_local</span><span class="p">.</span><span class="n">combine</span><span class="p">(</span><span class="n">parentWorld</span><span class="p">);</span>
+  <span class="n">Transform</span> <span class="n">world</span> <span class="o">=</span> <span class="n">local_</span><span class="p">.</span><span class="n">combine</span><span class="p">(</span><span class="n">parentWorld</span><span class="p">);</span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="n">_mesh</span><span class="p">)</span> <span class="n">renderMesh</span><span class="p">(</span><span class="n">_mesh</span><span class="p">,</span> <span class="n">world</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">mesh_</span><span class="p">)</span> <span class="n">renderMesh</span><span class="p">(</span><span class="n">mesh_</span><span class="p">,</span> <span class="n">world</span><span class="p">);</span>
 
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">_numChildren</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">_children</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numChildren_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">children_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -280,36 +280,36 @@ turn up uses of this pattern.</p>
 <p>We pass the world transform of the node&#x2019;s parent into this using <code>parentWorld</code>. With that, all that&#x2019;s left to get the correct world transform of <em>this</em> node is to combine that with its own local transform. We don&#x2019;t have to walk <em>up</em> the parent chain to calculate world transforms because we calculate as we go while walking <em>down</em> the chain.</p>
 <p>We calculate the node&#x2019;s world transform and store it in <code>world</code>, then we render the mesh if we have one. Finally, we recurse into the child nodes, passing in <em>this</em> node&#x2019;s world transform. All in all, it&#x2019;s nice tight, simple recursive method.</p>
 <p>To draw an entire scene graph, we kick off the process at the root node:</p>
-<div class="codehilite"><pre><span class="n">_graph</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">());</span>
+<div class="codehilite"><pre><span class="n">graph_</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">());</span>
 </pre></div>
 
 
 <h3><a href="#let&#x2019;s-get-dirty" name="let&#x2019;s-get-dirty">Let&#x2019;s get dirty</a></h3>
-<p>So this code does the right thing&thinsp;&mdash;&thinsp;renders all the meshes in the right place&thinsp;&mdash;&thinsp;but it doesn&#x2019;t do it efficiently. It&#x2019;s calling <code>_local.combine(parentWorld)</code> on every node in the graph, every frame. Let&#x2019;s see how this pattern fixes that. First, we need to add two fields to <code>GraphNode</code>:</p>
+<p>So this code does the right thing&thinsp;&mdash;&thinsp;renders all the meshes in the right place&thinsp;&mdash;&thinsp;but it doesn&#x2019;t do it efficiently. It&#x2019;s calling <code>local_.combine(parentWorld)</code> on every node in the graph, every frame. Let&#x2019;s see how this pattern fixes that. First, we need to add two fields to <code>GraphNode</code>:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">GraphNode</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="n">GraphNode</span><span class="p">(</span><span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh</span><span class="p">)</span>
-  <span class="o">:</span> <span class="n">_mesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span>
-    <span class="n">_local</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">()),</span>
-    <span class="n">_dirty</span><span class="p">(</span><span class="nb">true</span><span class="p">)</span>
+  <span class="o">:</span> <span class="n">mesh_</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span>
+    <span class="n">local_</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">()),</span>
+    <span class="n">dirty_</span><span class="p">(</span><span class="nb">true</span><span class="p">)</span>
   <span class="p">{}</span>
 
   <span class="c1">// Other methods...</span>
 
 <span class="nl">private:</span>
-  <span class="n">Transform</span> <span class="n">_world</span><span class="p">;</span>
-  <span class="kt">bool</span> <span class="n">_dirty</span><span class="p">;</span>
+  <span class="n">Transform</span> <span class="n">world_</span><span class="p">;</span>
+  <span class="kt">bool</span> <span class="n">dirty_</span><span class="p">;</span>
   <span class="c1">// Other fields...</span>
 <span class="p">};</span>
 </pre></div>
 
 
-<p>The <code>_world</code> field caches the previously-calculated world transform, and <code>_dirty</code>, of course, is the dirty flag. Note that the flag starts out <code>true</code>. When we create a new node, we haven&#x2019;t calculated it&#x2019;s world transform yet, so at birth it&#x2019;s already out of sync with the local transform.</p>
+<p>The <code>world_</code> field caches the previously-calculated world transform, and <code>dirty_</code>, of course, is the dirty flag. Note that the flag starts out <code>true</code>. When we create a new node, we haven&#x2019;t calculated it&#x2019;s world transform yet, so at birth it&#x2019;s already out of sync with the local transform.</p>
 <p>The only reason we need this pattern is because objects can <em>move</em>, so let&#x2019;s add support for that:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">GraphNode</span><span class="o">::</span><span class="n">setTransform</span><span class="p">(</span><span class="n">Transform</span> <span class="n">local</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">_local</span> <span class="o">=</span> <span class="n">local</span><span class="p">;</span>
-  <span class="n">_dirty</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="n">local_</span> <span class="o">=</span> <span class="n">local</span><span class="p">;</span>
+  <span class="n">dirty_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -318,16 +318,16 @@ turn up uses of this pattern.</p>
 <p>When a parent node moves, all of its children&#x2019;s world coordinates are invalidated too. But here we aren&#x2019;t setting their dirty flags. We <em>could</em> do that, but that&#x2019;s recursive and slow. Instead we&#x2019;ll do something clever when we go to render. Let&#x2019;s see:</p>
 <p><span name="branch"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">GraphNode</span><span class="o">::</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span> <span class="n">parentWorld</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">dirty</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">dirty</span> <span class="o">|=</span> <span class="n">_dirty</span><span class="p">;</span>
+  <span class="n">dirty</span> <span class="o">|=</span> <span class="n">dirty_</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">dirty</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">_world</span> <span class="o">=</span> <span class="n">_local</span><span class="p">.</span><span class="n">combine</span><span class="p">(</span><span class="n">parentWorld</span><span class="p">);</span>
-    <span class="n">_dirty</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="n">world_</span> <span class="o">=</span> <span class="n">local_</span><span class="p">.</span><span class="n">combine</span><span class="p">(</span><span class="n">parentWorld</span><span class="p">);</span>
+    <span class="n">dirty_</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
   <span class="p">}</span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="n">_mesh</span><span class="p">)</span> <span class="n">renderMesh</span><span class="p">(</span><span class="n">_mesh</span><span class="p">,</span> <span class="n">_world</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">mesh_</span><span class="p">)</span> <span class="n">renderMesh</span><span class="p">(</span><span class="n">mesh_</span><span class="p">,</span> <span class="n">world_</span><span class="p">);</span>
 
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">_numChildren</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">_children</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">_world</span><span class="p">,</span> <span class="n">dirty</span><span class="p">);</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numChildren_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">children_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">world_</span><span class="p">,</span> <span class="n">dirty</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -340,9 +340,9 @@ turn up uses of this pattern.</p>
 <p>As always, the golden rule of optimization: <em>profile first</em>.</p>
 </aside>
 
-<p>This is similar to the original na&iuml;ve implementation. The key changes are that we check to see if the node is dirty before calculating the world transform, and we store the result in a field instead of a local variable. When the node is clean, we skip <code>combine()</code> completely and use the old but still correct <code>_world</code> value.</p>
+<p>This is similar to the original na&iuml;ve implementation. The key changes are that we check to see if the node is dirty before calculating the world transform, and we store the result in a field instead of a local variable. When the node is clean, we skip <code>combine()</code> completely and use the old but still correct <code>world_</code> value.</p>
 <p>The <span name="clever">clever</span> bit is that <code>dirty</code> parameter. That will be <code>true</code> if any node above this node in the parent chain was dirty. In much the same way that <code>parentWorld</code> updates the world transform incrementally as we traverse down the hierarchy, <code>dirty</code> tracks the dirtiness of the parent chain.</p>
-<p>This lets us avoid having to actually recursively set each child&#x2019;s <code>_dirty</code> flag in <code>setTransform()</code>. Instead, we just pass the parent&#x2019;s dirty flag down to its children when we render and look at that too to see if we need to recalculate the world transform.</p>
+<p>This lets us avoid having to actually recursively set each child&#x2019;s <code>dirty_</code> flag in <code>setTransform()</code>. Instead, we just pass the parent&#x2019;s dirty flag down to its children when we render and look at that too to see if we need to recalculate the world transform.</p>
 <p>The end result here is exactly what we want: changing a node&#x2019;s local transform is just a couple of assignments, and rendering the world calculates the exact minimum number of world transforms that have changed since the last frame.</p>
 <aside name="clever">
 
