@@ -216,6 +216,7 @@ a performance bottleneck.</p>
 
 
 <p>This <code>add()</code> method is defined like so:</p>
+<p><span name="floor"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Grid</span><span class="o">::</span><span class="n">add</span><span class="p">(</span><span class="n">Unit</span><span class="o">*</span> <span class="n">unit</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Determine which grid cell it&#39;s in.</span>
@@ -234,6 +235,11 @@ a performance bottleneck.</p>
 <span class="p">}</span>
 </pre></div>
 
+
+<aside name="floor">
+
+<p>Dividing by the cell size maps world coordinates to cell space. Then casting to an <code>int</code> truncates the fractional part so we get the cell index.</p>
+</aside>
 
 <p>It&#x2019;s a little finicky, like linked list code always is, but the basic idea is pretty simple. We find the cell the unit is sitting in and then add it to the front of that list. If there is already a list of units there, we link it in after the new unit.</p>
 <h3><a href="#a-clash-of-swords" name="a-clash-of-swords">A clash of swords</a></h3>

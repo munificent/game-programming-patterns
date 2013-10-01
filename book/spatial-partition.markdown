@@ -132,7 +132,15 @@ The first thing we need to do is make sure new units are actually placed into th
 
 This `add()` method is defined like so:
 
+<span name="floor"></span>
+
 ^code add
+
+<aside name="floor">
+
+Dividing by the cell size maps world coordinates to cell space. Then casting to an `int` truncates the fractional part so we get the cell index.
+
+</aside>
 
 It's a little finicky, like linked list code always is, but the basic idea is pretty simple. We find the cell the unit is sitting in and then add it to the front of that list. If there is already a list of units there, we link it in after the new unit.
 
