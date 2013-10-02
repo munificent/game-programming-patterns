@@ -121,14 +121,11 @@ namespace Singleton3
   //^4
   IFileSystem& IFileSystem::instance()
   {
-    if (instance_ == NULL)
-    {
-      #if PLATFORM == PLAYSTATION3
-        static IFileSystem *instance_ = new PS3FileSystem();
-      #elif PLATFORM == WII
-        static IFileSystem *instance_ = new WiiFileSystem();
-      #endif
-    }
+    #if PLATFORM == PLAYSTATION3
+      static IFileSystem *instance_ = new PS3FileSystem();
+    #elif PLATFORM == WII
+      static IFileSystem *instance_ = new WiiFileSystem();
+    #endif
 
     return *instance_;
   }
