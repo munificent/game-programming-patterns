@@ -9,19 +9,15 @@ namespace Singleton1
     static FileSystem& instance()
     {
       // Lazy initialize.
-      if (instance_ == NULL) instance_ = new FileSystem();
+      static FileSystem *instance_ = new FileSystem();
 
       return *instance_;
     }
 
   private:
     FileSystem() {}
-
-    static FileSystem *instance_;
   };
   //^1
-
-  FileSystem *FileSystem::instance_ = NULL;
 
   void test()
   {
@@ -99,8 +95,6 @@ namespace Singleton3
 
   protected:
     IFileSystem() {}
-
-    static IFileSystem *instance_;
   };
   //^3
 
@@ -130,17 +124,15 @@ namespace Singleton3
     if (instance_ == NULL)
     {
       #if PLATFORM == PLAYSTATION3
-        instance_ = new PS3FileSystem();
+        static IFileSystem *instance_ = new PS3FileSystem();
       #elif PLATFORM == WII
-        instance_ = new WiiFileSystem();
+        static IFileSystem *instance_ = new WiiFileSystem();
       #endif
     }
 
     return *instance_;
   }
   //^4
-
-  IFileSystem *IFileSystem::instance_ = NULL;
 }
 
 namespace Singleton4
