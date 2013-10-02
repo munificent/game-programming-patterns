@@ -1,0 +1,11 @@
+instead of separate "message" chapter, talk about this as command.
+
+basic idea is representing a verb (method call) as a noun (object). making this
+first class can help you have an "operation" span multiple objects. for example,
+in combat you can have the attacker create a "hit" object that represents the
+attack. this is basically a command.
+
+that gets passed to the defender which then completes the attack.
+
+this way, neither the attacking or defending class has to totally own the attack
+logic.

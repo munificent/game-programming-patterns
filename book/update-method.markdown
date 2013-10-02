@@ -111,7 +111,7 @@ What you need is a system that lets you have multiple "threads" of execution goi
 
 Actual threads are usually too heavyweight for this to work well, but if your language supports lightweight concurrency constructs like generators, coroutines, or fibers, you may be able to use those.
 
-The <a href="virtual-machine.html" class="pattern">Virtual Machine pattern</a> is another option that creates threads of execution at the application level.
+The <a href="bytecode.html" class="pattern">Bytecode</a> pattern is another option that creates threads of execution at the application level.
 
 </aside>
 

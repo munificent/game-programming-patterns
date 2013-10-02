@@ -19,7 +19,7 @@ often means a data-driven approach is better. Instead of lots of
 *code* for defining different powers, try finding a way to define that behavior
 in *data* instead.
 
-Patterns like <a class="pattern" href="type-object.html">Type Object</a>, <a class="pattern" href="virtual-machine.html">Virtual Machine</a>, and <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Interpreter_pattern">Interpreter</a> can all help.
+Patterns like <a class="pattern" href="type-object.html">Type Object</a>, <a class="pattern" href="bytecode.html">Bytecode</a>, and <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Interpreter_pattern">Interpreter</a> can all help.
 
 </aside>
 

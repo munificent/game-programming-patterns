@@ -1,4 +1,4 @@
 ^title Context Parameter
-^section Behaving Patterns
+^section Communicating Patterns
 
 *Sorry, this chapter hasn't been written yet!*

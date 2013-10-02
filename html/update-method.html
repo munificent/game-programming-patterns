@@ -199,7 +199,7 @@
 <p>I say "almost" here because sometimes you can have your cake and eat it too. You can have straight-line code that never returns for your object behavior, while simultaneously having a number of them running concurrently and coordinating with the game loop.</p>
 <p>What you need is a system that lets you have multiple "threads" of execution going on at the same time. If the code for an object can just pause and resume in the middle of what it&#x2019;s doing, instead of having to <em>return</em> completely, you can write it in a more imperative form.</p>
 <p>Actual threads are usually too heavyweight for this to work well, but if your language supports lightweight concurrency constructs like generators, coroutines, or fibers, you may be able to use those.</p>
-<p>The <a href="virtual-machine.html" class="pattern">Virtual Machine pattern</a> is another option that creates threads of execution at the application level.</p>
+<p>The <a href="bytecode.html" class="pattern">Bytecode</a> pattern is another option that creates threads of execution at the application level.</p>
 </aside>
 
 <h3><a href="#you-have-to-store-state-to-resume-where-you-left-off-each-frame" name="you-have-to-store-state-to-resume-where-you-left-off-each-frame">You have to store state to resume where you left off each frame</a></h3>
