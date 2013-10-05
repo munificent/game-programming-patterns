@@ -153,39 +153,97 @@
     - ok, actually, much harder when you think about latency, ordering, etc.
     - but it's a start
 
-
-
-
-
-
-**random notes:**
-
-- "reified method call"
-  - larger theme of how making something first class gives you lot of power
-- closures and partial application
-- similar to callbacks
-- GoF: "Commands are an object-oriented replacement for callbacks."
-
-- GoF: "Encapsulate a request as an object, thereby letting users parameterize clients with different requests, queue or log requests, and support undoable operations."
-
-- core command interface just has one method, `execute()`. in languages with
-  closures or function objects, can often just use a function for this.
-  - Action<T> in .net
-
-- talk about whether the same command object can be executed more than once.
-  - with things like input handling, may be able to reuse commands
-  - with undo, can't
+- attackers and defenders
+  - here's different motivation for using this pattern
+  - previous examples were for decoupling when/where/who initiates a command
+    from who performs it
+  - this is example is more about *sharing* responsibility for an operation
+    between two objects
+  - say we're implementing combat
+  - have attacker and defender
+  - lots of combat rules on both sides
+  - attacker has weapon, strength bonus, spells that boost attack power, etc.
+  - defender has armor, dexterity bonus, spells, resistances, weaknesses, etc.
+  - to handle a single attack, all of that has to come into play
+  - have different objects for attacker and defender, isn't obvious who should
+    actually contain method to handle hit
+  - if attacker has it, have to pass all this stuff from defender in. couples
+    it to lots of defense details.
+  - same problem if do it other way
+  - particularly bad if you have different classes for different kinds of combatants
+    in game world
+  - really don't want some Hero class coupled to details of Monster or Boss class
+    or vice versa
+  - command pattern can help
+  - define class representing the attack itself
+  - attacker creates this and populates it with its details
+  - then give it to defender
+  - defender finishes filling it out with its details
+  - then tells the attack object to resolve the hit
+  - this way, neither attacker nor deferender is coupled to each other
+  - key idea is have class representing the attack -- the verb -- itself, which
+    is exactly what command is about
 
 - undo
-  - for undo, have always needed a composite command that is a command that
-    contains a bunch of other commands. that way a bunch of operations can be
-    undone in one step. example of composite pattern.
-  - in theory, memento is helpful here
-    - in practice, never used it. instead of capturing object's entire previous
-      state, usually just want delta in command object
+  - last example: undo/redo
+  - super common in tools like level editors used to make games
+  - also used in some more strategic games
+  - say we're making a solitaire game and want to let users undo moves in case
+    they back themselves into a corner
+  - already using command pattern to abstract input handling
+  - every action that changes game state is already a command: move piles,
+    draw card, etc.
 
-- instant replay
-- scripting
+    ...sample code...
+
+  - to support undo, we just extend command class with another operation: undo
+  - does exact opposite of what command does
+  - if command moves card from stack one to two, undo moves it from two to one
+  - means command needs more state: needs to store what state was in before
+    move
+  - many moves are destructive, so command needs to store that destroyed state
+    so it can be restored
+  - (aside: sometimes memento helps here, but usually too heavyweight. instead
+     commands usually just store minimal state required to describe change.)
+
+    ...code...
+
+  - to support one level of undo, just remember last performed command. if
+    player chooses undo, call its undo method.
+  - to support multiple undo, need list of commands and pointer to current
+    command
+  - every new command is added to list
+  - to undo, undo most recent command, then move pointer back one
+  - to redo, move pointer forward then do that command
+  - if player does a new command after some commands have been undone,
+    every command after that is discarded
+  - subtle architectural difference with commands in this example and others
+    - with previous examples, commands were mostly stateless
+    - described abstract "thing that can be done" like jump or move
+    - could execute the same command object repeatedly
+    - with this example, each command object needs to store chunk of game state
+      that existed before command was performed
+    - that state is relative to *point in time when that command was performed*
+    - means these commands are basically single-use, every time you perform
+      command, will be creating new command instance
+    - if we are also using command pattern for input handler, can't just store
+      a command object in there and keep reusing it
+    - instead, input handler will have object that *creates* commands each time
+    - in other words, factory
+
+- so much code
+  - earlier, described commands as similar to closures, but examples here don't
+    use any first class functions
+  - c++ has very limited support for this, functors are weird, pointers to
+    members are fiddly, new lambdas in c++11 are tricky with memory
+  - if writing game in other language, though, feel free to actually use fns for
+    commands
+  - for example, if we were doing this in js, input handler could be:
+    ...
+  - in fact, if using language with first class fns and closures, probably
+    already naturally doing this
+  - in a way, command pattern being so useful just shows how useful the
+    functional paradigm is
 
 - see also
   - executing a command often requires some context: see context param
@@ -195,17 +253,10 @@
     - for example, a PauseGame command has no state, just method to pause
     - in this case, can make them flyweight or even <shudder> singleton
 
-instead of separate "message" chapter, talk about this as command.
+**random notes:**
 
-basic idea is representing a verb (method call) as a noun (object). making this
-first class can help you have an "operation" span multiple objects. for example,
-in combat you can have the attacker create a "hit" object that represents the
-attack. this is basically a command.
+- GoF: "Commands are an object-oriented replacement for callbacks."
 
-that gets passed to the defender which then completes the attack.
-
-this way, neither the attacking or defending class has to totally own the attack
-logic.
-
+- GoF: "Encapsulate a request as an object, thereby letting users parameterize clients with different requests, queue or log requests, and support undoable operations."
 
 http://steveproxna.blogspot.com/2009/12/command-design-pattern.html
