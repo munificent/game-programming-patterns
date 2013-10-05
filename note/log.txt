@@ -1,3 +1,6 @@
+2013-10-04 - 622 words outline command pattern
+2013-10-03 - ~300 words real outline for command pattern
+2013-10-02 - notes for command pattern
 2013-10-01 - reorganize table of contents, ditch message chapter
 2013-09-30 - reddit comments, fix #27, #28, #31, #32, #33
 2013-09-29 - tweak flyweight, fix #26 and #30, upload, email, social

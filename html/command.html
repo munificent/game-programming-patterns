@@ -62,6 +62,171 @@
   </table>
 </div>
 <p><em>Sorry, this chapter hasn&#x2019;t been written yet!</em></p>
+<p><strong>outline:</strong></p>
+<ul>
+<li>intro</li>
+<li>GoF: "Encapsulate a request as an object, thereby letting users parameterize clients with different requests, queue or log requests, and support undoable operations."</li>
+<li>prose like this why people don&#x2019;t read design patterns</li>
+<li>opaque, mixes metaphors: "clients" are people, can&#x2019;t parameterize people!</li>
+<li>my pithy take: "commands are reified method calls"</li>
+<li>reify means "make real"<ul>
+<li>in context of oop, means "make into a first-class object"</li>
+<li>first-class means, can store in variable, pass to fn, etc.</li>
+<li>reification is common theme in sw eng for making something more powerful</li>
+<li>making something first class means can now use existing language
+    features on it</li>
+<li>reflection = reified type system</li>
+<li>closures = reified local scope</li>
+</ul>
+</li>
+<li>pithy, but maybe not clear</li>
+<li>can think of oop code as mix of nouns and verbs</li>
+<li>nouns are objects, things, you create, stuff in variables and pass around</li>
+<li>verbs are method calls, things you do to objects</li>
+<li>reified method call means making noun out of verb<ul>
+<li>so commands are like gerunds</li>
+</ul>
+</li>
+<li>
+<p>in other words, its a first class function</p>
+<ul>
+<li>in particular, command is lot like partially applied fn</li>
+<li>indeed, closures are a poor man&#x2019;s command pattern</li>
+<li>command pattern is a poor man&#x2019;s closure!</li>
+<li>GoF: "Commands are an object-oriented replacement for callbacks."</li>
+</ul>
+</li>
+<li>
+<p>examples</p>
+</li>
+<li>ok, that was high level abstract and confusing</li>
+<li>try not to start chapters like that, got carried away</li>
+<li>let&#x2019;s get concrete</li>
+<li>find command pattern to be one of most useful patterns in design patterns<ul>
+<li>almost every non-trivial prog i write ends up using it somewhere</li>
+</ul>
+</li>
+<li>run through grab bag of useful places for it</li>
+</ul>
+<p><strong>random notes:</strong></p>
+<ul>
+<li>"reified method call"</li>
+<li>larger theme of how making something first class gives you lot of power</li>
+<li>closures and partial application</li>
+<li>similar to callbacks</li>
+<li>
+<p>GoF: "Commands are an object-oriented replacement for callbacks."</p>
+</li>
+<li>
+<p>GoF: "Encapsulate a request as an object, thereby letting users parameterize clients with different requests, queue or log requests, and support undoable operations."</p>
+</li>
+<li>
+<p>commands often manipulate state of some object.</p>
+</li>
+<li>specific concrete command class is usually tailored to some receiver class</li>
+<li>may be friend of it</li>
+<li>have to do decide how much state logic lives in class and lives in command</li>
+<li>one extreme is command is outsider, can only make a single public method
+    call on receiver, really is just reified method call</li>
+<li>other extreme is that all state manipulation logic is in commands and class
+    itself has no public interface<ul>
+<li>ensures go through command system to manipulate</li>
+<li>spreads logic around bunch of command classes</li>
+<li>can make it hard to reuse logic across commands</li>
+</ul>
+</li>
+<li>
+<p>right answer is usually in middle (right answer is almost always between
+    two extremes)</p>
+<ul>
+<li>give class enough logic to manipulate itself at high level and maintain
+  internal consistency</li>
+<li>have commands use that</li>
+</ul>
+</li>
+<li>
+<p>core command interface just has one method, <code>execute()</code>. in languages with
+  closures or function objects, can often just use a function for this.</p>
+</li>
+<li>
+<p>Action<T> in .net</p>
+</li>
+<li>
+<p>talk about whether the same command object can be executed more than once.</p>
+</li>
+<li>with things like input handling, may be able to reuse commands</li>
+<li>
+<p>with undo, can&#x2019;t</p>
+</li>
+<li>
+<p>undo</p>
+</li>
+<li>for undo, have always needed a composite command that is a command that
+    contains a bunch of other commands. that way a bunch of operations can be
+    undone in one step. example of composite pattern.</li>
+<li>
+<p>in theory, memento is helpful here</p>
+<ul>
+<li>in practice, never used it. instead of capturing object&#x2019;s entire previous
+  state, usually just want delta in command object</li>
+</ul>
+</li>
+<li>
+<p>ai</p>
+</li>
+<li>ask ai for action, returns command</li>
+<li>allows you to separate how behavior is <em>chosen</em> from how behavior is
+    <em>performed</em></li>
+<li>this separation lets you do stuff like:<ul>
+<li>have player-controlled and ai-controlled entities of same demo</li>
+<li>run the player automatically in demo mode</li>
+<li>swap out ai algorithms easily for different ai personalities</li>
+</ul>
+</li>
+<li>input handling</li>
+<li>instead of immediately performing game action in raw input handler
+    (if keydown then fire missile), have raw input handler create game command
+    object, then send that to game</li>
+<li>that way, can define new keybindings easily</li>
+<li>gives you abstraction layer between physical inputs and logical actions</li>
+<li>
+<p>increasingly important given multiplatform games and mobile devices with
+    different input types</p>
+</li>
+<li>
+<p>networking</p>
+</li>
+<li>server sends game commands</li>
+<li>
+<p>some docs say command always binds its receiver. others don&#x2019;t</p>
+</li>
+<li>
+<p>instant replay</p>
+</li>
+<li>
+<p>scripting</p>
+</li>
+<li>
+<p>see also</p>
+</li>
+<li>executing a command often requires some context: see context param</li>
+<li>chain of responsibility is often used with this: give command to one object
+    which may then hand it off</li>
+<li>sometimes commands are stateless: just have pure behavior<ul>
+<li>for example, a PauseGame command has no state, just method to pause</li>
+<li>in this case, can make them flyweight or even <shudder> singleton</li>
+</ul>
+</li>
+</ul>
+<p>instead of separate "message" chapter, talk about this as command.</p>
+<p>basic idea is representing a verb (method call) as a noun (object). making this
+first class can help you have an "operation" span multiple objects. for example,
+in combat you can have the attacker create a "hit" object that represents the
+attack. this is basically a command.</p>
+<p>that gets passed to the defender which then completes the attack.</p>
+<p>this way, neither the attacking or defending class has to totally own the attack
+logic.</p>
+<p>http://steveproxna.blogspot.com/2009/12/command-design-pattern.html</p>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </div>
 </body>
