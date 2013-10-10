@@ -9,6 +9,7 @@
 - Prefer "we" over "you" or "I".
 - Use *O(n&sup2;)* for Big-O notation, not `O(n^2)`.
 - Put class name in `CodeFont` when referring to the class itself.
+- It's "Foo pattern", not "Foo Pattern", and the link just surrounds, "Foo".
   Ex: "Add a method to `Foo`."
 - Use normal font and lowercase when referring to objects of the class.
   Ex: "Create a new foo and pass it to `bar()`."

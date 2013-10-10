@@ -13,6 +13,10 @@ namespace CommandPattern
 {
   enum Button
   {
+    BUTTON_UP,
+    BUTTON_DOWN,
+    BUTTON_LEFT,
+    BUTTON_RIGHT,
     BUTTON_X,
     BUTTON_Y,
     BUTTON_A,
@@ -168,7 +172,114 @@ namespace CommandPattern
         command->execute(hero);
       }
       //^call-actor-command
-      use(player);
+      use(hero);
+    }
+  }
+
+  namespace Undo
+  {
+    class Unit {
+    public:
+      int x() { return 0; }
+      int y() { return 0; }
+
+      void moveTo(int x, int y) {}
+    };
+
+    namespace UndoBefore
+    {
+      class Command
+      {
+      public:
+        virtual ~Command() {}
+        virtual void execute() = 0;
+      };
+
+      //^move-unit
+      class MoveUnitCommand : public Command
+      {
+      public:
+        MoveUnitCommand(Unit* unit, int x, int y)
+        : unit_(unit),
+          x_(x),
+          y_(y)
+        {}
+
+        virtual void execute()
+        {
+          unit_->moveTo(x_, y_);
+        }
+
+      private:
+        Unit* unit_;
+        int x_, y_;
+      };
+      //^move-unit
+
+      Unit* selectedUnit;
+
+      //^get-move
+      Command* handleInput()
+      {
+        if (isPressed(BUTTON_UP)) {
+          // Move the unit up one.
+          int destY = selectedUnit->y() - 1;
+          return new MoveUnitCommand(selectedUnit, selectedUnit->x(), destY);
+        }
+
+        if (isPressed(BUTTON_DOWN)) {
+          // Move the unit down one.
+          int destY = selectedUnit->y() + 1;
+          return new MoveUnitCommand(selectedUnit, selectedUnit->x(), destY);
+        }
+
+        // Other moves...
+
+        return NULL;
+      }
+      //^get-move
+    }
+
+    namespace UndoAfter
+    {
+      //^undo-command
+      class Command
+      {
+      public:
+        virtual ~Command() {}
+        virtual void execute() = 0;
+        virtual void undo() = 0;
+      };
+      //^undo-command
+
+      //^undo-move-unit
+      class MoveUnitCommand : public Command
+      {
+      public:
+        MoveUnitCommand(Unit* unit, int x, int y)
+        : unit_(unit),
+          xBefore_(unit->x()),
+          yBefore_(unit->y()),
+          x_(x),
+          y_(y)
+        {}
+
+        virtual void execute()
+        {
+          unit_->moveTo(x_, y_);
+        }
+
+        virtual void undo()
+        {
+          unit_->moveTo(xBefore_, yBefore_);
+        }
+
+      private:
+        Unit* unit_;
+        int xBefore_, yBefore_;
+        int x_, y_;
+      };
+      //^undo-move-unit
     }
   }
 }

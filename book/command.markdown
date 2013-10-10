@@ -120,133 +120,108 @@ That's one important piece of making a networked multi-player game and this patt
 
 </aside>
 
-## Attackers and Defenders
+## Undo and Redo
 
-Now let's change directions a bit. This is a different use for commands than the typical producer-consumer stream of operations. I haven't seen them used as often for this problem, but I think it's a cool use.
+The last example is the most well-known use of this pattern. If a command object can *do* things, it's a small step to let it be able to *undo* things. Undo is used in some more strategic games where you can roll back moves that you didn't like. It's, of course, required in tools that people use to *create* games. The <span name="hate">surest way</span> to make your game designers hate you is giving them a level editor that can't undo their fat-fingered mistakes.
 
-Most uses of the command pattern are for *decoupling* the code selecting or creating the command from the code invoking or performing it. In this example, the goal is to *share* the responsibility for the command across two classes.
+<aside name="hate">
 
-Let's say we're implementing the combat system in our game. We have an attacker and a defender. Each side has a bunch of combat rules. The attacker has a weapon, a strength bonus, maybe some spells that temporarily boost their attack power, range, etc. Meanwhile, the defender has their armor, evasiveness, defensive spells, and cover.
-
-To resolve a single attack, all of those rules have to come into play and be resolved. Since the attacker and defender are different objects, it isn't clear which class should actually contain the method to handle a round of combat. If we put it in the attacker, we have to pass all of this defender-specific state in and it has to muck around with it. We have the opposite problem if we lump it all in the defender.
-
-Exacerbating this is the fact that the attacker and defender may even be different *classes*. You can imagine different kinds of combatants having different classes encoding different combat rules. You really wouldn't <span name="every">want every</span> combatant class coupled to details of every other one.
-
-<aside name="every">
-
-If you have *n* classes where each one knows details of every other one, that's *n &times; (n - 1)* connections to maintain. That quadratic number scales quickly out of hand when the number of classes increases.
+I may be speaking from experience here.
 
 </aside>
 
-The Command pattern can help here. We'll define a class representing a round of combat itself. Instead of "handle hit" being a *verb*, a single operation, we'll make a "hit" a *noun*, an instantiated class.
+Without the command pattern, implementing undo is surprisingly hard. With it, it's a piece of cake. For our example, let's say we're making a single player turn-based game and we want to let users be able to undo moves so they can focus more on strategy and less on chance.
 
-    class Hit
-    {
-      // Stuff...
-    };
+We're conveniently already using the command pattern to abstract input handling, so every move the player makes that changes the state of the game is already encapsulated in a command. For example, moving a unit may look like:
 
-It will form a bridge between the attacker and
+^code move-unit
 
-**TODO: aside, similar to mediator pattern**
+Note this is a little different from our previous commands. In the last example, we wanted to decouple the command from the actor it affected. In this case, we specifically want to *bind* it to the unit being moved.
 
-- here's different motivation for using this pattern
-- previous examples were for decoupling when/where/who initiates a command
-  from who performs it
-- this is example is more about *sharing* responsibility for an operation
-  between two objects
-- say we're implementing combat
-- have attacker and defender
-- lots of combat rules on both sides
-- attacker has weapon, strength bonus, spells that boost attack power, etc.
-- defender has armor, dexterity bonus, spells, resistances, weaknesses, etc.
-- to handle a single attack, all of that has to come into play
-- have different objects for attacker and defender, isn't obvious who should
-  actually contain method to handle hit
-- if attacker has it, have to pass all this stuff from defender in. couples
-  it to lots of defense details.
-- same problem if do it other way
-- particularly bad if you have different classes for different kinds of combatants
-  in game world
-- really don't want some Hero class coupled to details of Monster or Boss class
-  or vice versa
-- command pattern can help
-- define class representing the attack itself
-- attacker creates this and populates it with its details
-- then give it to defender
-- defender finishes filling it out with its details
-- then tells the attack object to resolve the hit
-- this way, neither attacker nor deferender is coupled to each other
-- key idea is have class representing the attack -- the verb -- itself, which
-  is exactly what command is about
+An instance of this command isn't a general "move something" operation that you could use in a bunch of contexts, it's a specific concrete move in the game's sequence of turns.
 
-## Undo and Redo
+This highlights a variation in how the command pattern gets implemented. In some cases, like our first couple of examples, a command is a reusable object that represents a *thing that can be done*. Our earlier input handler held on to a single command object and called its `execute()` method anytime the right button is pressed.
 
-- last example: undo/redo
-- super common in tools like level editors used to make games
-- also used in some more strategic games
-- say we're making a solitaire game and want to let users undo moves in case
-  they back themselves into a corner
-- already using command pattern to abstract input handling
-- every action that changes game state is already a command: move piles,
-  draw card, etc.
+Here, the commands are more specific. They represent a thing that can be done at a specific point in time. This means that the input handling code will be *creating* an instance of this every time the player chooses a move. You can imagine something like:
 
-  ...sample code...
+^code get-move
 
-- to support undo, we just extend command class with another operation: undo
-- does exact opposite of what command does
-- if command moves card from stack one to two, undo moves it from two to one
-- means command needs more state: needs to store what state was in before
-  move
-- many moves are destructive, so command needs to store that destroyed state
-  so it can be restored
-- (aside: sometimes memento helps here, but usually too heavyweight. instead
-   commands usually just store minimal state required to describe change.)
+The fact that commands are one-use-only here will come to our advantage in a second. To make commands undoable, we define another operation each command class needs to support:
 
-  ...code...
+^code undo-command
 
-- to support one level of undo, just remember last performed command. if
-  player chooses undo, call its undo method.
-- to support multiple undo, need list of commands and pointer to current
-  command
-- every new command is added to list
-- to undo, undo most recent command, then move pointer back one
-- to redo, move pointer forward then do that command
-- if player does a new command after some commands have been undone,
-  every command after that is discarded
-- subtle architectural difference with commands in this example and others
-  - with previous examples, commands were mostly stateless
-  - described abstract "thing that can be done" like jump or move
-  - could execute the same command object repeatedly
-  - with this example, each command object needs to store chunk of game state
-    that existed before command was performed
-  - that state is relative to *point in time when that command was performed*
-  - means these commands are basically single-use, every time you perform
-    command, will be creating new command instance
-  - if we are also using command pattern for input handler, can't just store
-    a command object in there and keep reusing it
-  - instead, input handler will have object that *creates* commands each time
-  - in other words, factory
+Each implementation of this reverses the game state changed by the corresponding `execute()` method. An undoable unit move looks like:
+
+^code undo-move-unit
+
+Note that we've added some <span name="memento">more state</span> to this class. When we've moved a unit, the unit itself has no recollection of where it used to be. If we want to be able to undo that move, we have to remember its old position ourselves, which is what `xBefore_` and `yBefore_` in the command are.
+
+<aside name="memento">
+
+This "previous state of an object" is an obvious place to use the <a href="http://en.wikipedia.org/wiki/Memento_pattern" class="gof-pattern">Memento pattern</a>. Right before you perform the command, capture a memento of the object you're about to change. To undo, just restore the object from its memento.
+
+If that works for you, great. In practice, I haven't used this. Most commands tend to be pretty minor modifications of a small part of an object's state. For example, here we're just changing a coordinate. Stuffing all of the rest of the object's unchanged state is a waste of time and memory. It's more efficient (if more tedious) to just manually store only the bits of data you change.
+
+Another option is to make your data model use <a href="http://en.wikipedia.org/wiki/Persistent_data_structure">*persistent data structures*</a>. With these, the object is immutable (unchanging), and modifying it actually returns a new object. Through clever implementation, these new objects share much of the same state as the previous ones, so this is much cheaper than cloning the entire object.
+
+Using this, each command can simply store a reference the object before the command was performed, and undo means just switching back to the old object.
+
+</aside>
+
+Now to let the player undo moves, we just keep around the last command they performed. When they bang on Control-Z, we undo that command. (If they've already undone, then it becomes "redo" and we execute the command again.)
+
+Supporting multiple levels of undo isn't much harder. Instead of remembering the last command, we keep around a list of commands and a reference to the current command. Every new command is added to the end of the list and the reference is bumped with it.
+
+When the player chooses undo, we undo the current command and move the pointer back one. When they choose redo, we advance the pointer and then execute that command. If they choose a new command after undoing some, everything in the list after the current command is discarded.
+
+Maybe I'm just easily impressed, but when I first implemented this in a level editor, I was as giddy as a school girl at how straightforward this was and how well it worked. It takes a little discipline to make sure every modification to your state goes through a command, but if you do that, the rest is easy.
 
 ## Classy and Dysfunctional?
 
-- earlier, described commands as similar to closures, but examples here don't
-  use any first class functions
-- c++ has very limited support for this, functors are weird, pointers to
-  members are fiddly, new lambdas in c++11 are tricky with memory
-- if writing game in other language, though, feel free to actually use fns for
-  commands
-- for example, if we were doing this in js, input handler could be:
-  ...
-- in fact, if using language with first class fns and closures, probably
-  already naturally doing this
-- in a way, command pattern being so useful just shows how useful the
-  functional paradigm is
+Earlier, I said commands are similar to first class functions or closures, but every example I showed was using class definitions. If you're familiar with functional programming, wading through all of this boilerplate code has been an <span name="smug">exercise</span> in pain.
+
+<aside name="smug">
+
+Or perhaps just a chance to feel smug at how much better these examples would look in your preferred language.
+
+</aside>
+
+I wrote the examples this way because C++ has pretty limited support for first-class functions. Functors are weird and still require defining a class, function pointers are stateless, and the new lambdas in C++11 are tricky to work with because of manual memory management.
+
+That's *not* to say you shouldn't use functions for the command pattern in other languages. If you have the luxury of a language with real closures, by all means use them! In <span name="some">some</span> ways, the command pattern is really about emulating closures in languages that don't have them.
+
+<aside name="some">
+
+I say "some" here because building actual classes or structures for commands can still be useful even in languages that have closures. If your command has multiple operations (like undoable commands), mapping that to a single function is awkward.
+
+Defining an actual object with structure also helps readers easily tell what state the command is holding onto. Closures are a wonderfully terse way of automatically wrapping up some state, but they can be so automatic that it's hard to see what state they're actually holding.
+
+</aside>
+
+For example, if we were building a game in JavaScript, we could create a move unit command just like this:
+
+    function makeMoveUnitCommand(unit, x, y) {
+      // This function here is the command object:
+      return function() {
+        unit.moveTo(x, y);
+      }
+    }
+
+If you're comfortable with a functional style, this way of doing things is probably obvious. If you aren't, this chapter may have helped you along the way a bit without you realizing it. For me, the lesson here is that the usefulness of the command pattern is really a sign of how useful the functional paradigm is for many problems.
 
 ## See Also
 
-- executing a command often requires some context: see context param
-- chain of responsibility is often used with this: give command to one object
-  which may then hand it off
-- sometimes commands are stateless: just have pure behavior
-  - for example, a PauseGame command has no state, just method to pause
-  - in this case, can make them flyweight or even <shudder> singleton
+- Command object almost always modify some state. They often store a reference to the state they touch directly, but sometimes there's a larger context that they need access to execute. Think the entire chessboard when the command is for moving a piece.
+
+    The command could store a reference to that too, but that can be a waste
+    of space when every command will end up using the same context. A lighter-weight option is to just pass that in when you execute the command. This is what the <a class="pattern" href="context-parameter.html">Context Parameter</a> pattern is about.
+
+- In our examples, we always knew which actor would be handling the command. In some cases, especially where your object model is hierarchical, it may not be so cut and dried. An object may respond to a command, or it may hand it off to some subordinate object. If you do that, you've got yourself the <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">Chain of Responsibility</a> pattern.
+
+- Some of the first command examples in this chapter were stateless: the `JumpCommand` in the first example just wrapped a method call. In cases like that, having <span name="singleton">more</span> than one instance of that class wastes memory, since all instances are equivalent. The <a class="gof-pattern" href="flyweight.html">Flyweight</a> can make that cheaper.
+
+<aside name="singleton">
+
+You could make it a <a href="singleton.html" class="gof-pattern">Singleton</a> too, but friends don't let friends create singletons.
+
+</aside>
