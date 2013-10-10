@@ -14,6 +14,7 @@
 #include "update-method.h"
 #include "dirty-flag.h"
 #include "flyweight.h"
+#include "command.h"
 
 int main (int argc, char * const argv[]) {
   UnbufferedSlapstick::testComedy();

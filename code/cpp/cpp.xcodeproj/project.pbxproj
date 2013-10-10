@@ -34,6 +34,7 @@
 		2924A07B16E63F1D00515661 /* type-object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "type-object.h"; sourceTree = SOURCE_ROOT; };
 		2924A07C16E63F5400515661 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = SOURCE_ROOT; };
 		2924A07E16E63FB300515661 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = SOURCE_ROOT; };
+		292FD0FD180392A6003CE36E /* command.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = command.h; sourceTree = SOURCE_ROOT; };
 		29360F5A177949FD0005D95F /* spatial-partition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "spatial-partition.h"; sourceTree = SOURCE_ROOT; };
 		2947E82C17C32E3500257E9B /* introduction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = introduction.h; sourceTree = SOURCE_ROOT; };
 		294AEA8E16E792ED004E3BD0 /* game-loop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "game-loop.h"; sourceTree = SOURCE_ROOT; };
@@ -92,6 +93,7 @@
 				2947E82C17C32E3500257E9B /* introduction.h */,
 				299FBF6F17D988660018EFD3 /* dirty-flag.h */,
 				29FA84A017EDEC6D00D5519E /* flyweight.h */,
+				292FD0FD180392A6003CE36E /* command.h */,
 			);
 			name = cpp;
 			path = gpp;

@@ -37,12 +37,15 @@ If you reduce videogames to some Skinner-esque minimum, the basic idea is the us
 
 Somewhere in every game codebase is some code that reads in raw user input, button presses, keyboard events, mouse clicks, whatever. For each input, it triggers some meaningful action in the game. Something like this:
 
-    handleInput() {
-      if (isPressed(BUTTON_X)) jump();
-      if (isPressed(BUTTON_Y)) fireGun();
-      if (isPressed(BUTTON_A)) swapWeapon();
-      if (isPressed(BUTTON_B)) stumbleAroundIneffectively();
-    }
+<span name="lurch"></span>
+
+^code handle-input
+
+<aside name="lurch">
+
+Pro tip: Don't press B very often.
+
+</aside>
 
 This function usually gets called once per frame by the <a class="pattern" href="game-loop.html">Game Loop</a> and you can figure out what it does. This works if we're willing to hardwire user inputs to game actions. But many games let the use *configure* how their inputs are wired up.
 
@@ -50,49 +53,21 @@ To support that, we need to replace those direct calls to `jump()` and `fireGun(
 
 We define a base class that represents a triggerable game command:
 
-    class Command {
-      virtual ~Command();
-      virtual void execute();
-    };
+^code command
 
-Then we create subclasses that invoke each of the different game actions:
+Then we create a subclasse for each of the different game actions:
 
-    class JumpCommand : public Command {
-      virtual ~Command();
-      virtual void execute() {
-        jump();
-      }
-    };
-
-    class FireCommand : public Command {
-      virtual ~Command();
-      virtual void execute() {
-        fireGun();
-      }
-    };
-
-    // You get the idea...
+^code command-classes
 
 In our input handler, we'll have a pointer to a command for each button:
 
-    class InputHandler {
-    private:
-      Command* xButtonCommand_;
-      Command* yButtonCommand_;
-      Command* aButtonCommand_;
-      Command* bButtonCommand_;
-    };
+^code input-handler-class
 
 Now the input handling just delegates to those:
 
 <span name="null"></span>
 
-    handleInput() {
-      if (isPressed(BUTTON_X)) xButtonCommand_->execute();
-      if (isPressed(BUTTON_Y)) yButtonCommand_->execute();
-      if (isPressed(BUTTON_A)) aButtonCommand_->execute();
-      if (isPressed(BUTTON_B)) bButtonCommand_->execute();
-    }
+^code handle-input-commands
 
 <aside name="null">
 
@@ -102,86 +77,77 @@ It does the same thing, but doesn't require a check. This is an example of a pat
 
 </aside>
 
-## A Script for Game Actors
+This is the command pattern in a nutshell. If you can see the utility of this now, consider the rest of this chapter bonus.
 
-- in previous example commands just did thing, jump, etc.
-- the actual in game character, the player's avatar was implicit
-- often, better to make that explicit
-- have commands for jump and move, etc, but command doesn't know *who* should
-  do that
-- instead, pass that into command
+## Directing Game Actors
 
-        class JumpCommand : public Command
-        {
-        public:
-          virtual void execute(GameEntity* entity) {
-            entity.jump();
-          }
-        }
+The command classes we just defined work for that example, but they're a bit limited. The problem is that they assume there are these *global* `jump()`, `fireGun()`, etc. functions that they can call which presumably know how to find the player's avatar and make him dance like the puppet he is.
 
-- now can tell any entity in game to jump with one command
-- note that jump command is intimitely tied to game entity
-- brings up interesting design question for commands
-    - usually have some object being commanded
-    - have to decide how close command object and commanded object are to each
-      other
-    - and have to decide where behavior is implemented
-    - at one level, command is just wrapper around call to public api in
-      commanded class, like we saw
-        - commanded class doesn't even know its being commanded
-        - all behavior is still in main class
-    - other end of spectrum, all behavior is in command itself
-    - commands are public api for class
+That implicit coupling limits the usefulness of those commands. The *only* thing the `JumpCommand` can make jump is the player. Let's loosen the restriction. Instead of calling functions that find the commanded object directly, we'll *pass in* the object that we want to order around:
 
-            class JumpCommand : public Command
-            {
-            public:
-              virtual void execute(GameEntity* entity) {
-                entity.velocity.y = -JUMP_VELOCITY;
-              }
-            }
+^code actor-command
 
-        - usually means commanded class gives special access to commands, think
-          friend in c++
-        - class itself just maintains state and methods for code reuse
-        - ensures all modifcations go through command system
-        - can mean spreading behavior across a bunch of classes
-    - any point on continuum can work, just see what makes sense for you
+Here, `GameActor` is our main "game object" class that represents a character in the game world. We pass it in to `execute()` so that the derived command can invoke methods on any object of our choice, like so:
 
-- with this, now we have input handler creating commands and then we throw
-  them at actors
-- gives us interesting new ability: any actor in the game can be controlled
-  by player: just throw commands at different actors. could be fun game
-  mechanic
-- not used widely, but other angle is
-- don't have to use input handler to select commands
-- instead, ai system does
-- ai in game basically becomes chunk of code that selects commands for an
-  actor each frame
-- by having common command api, can use different ai systems
-- can have different ai personalities for different actors
-- can swap them out, mix and match, whatever
-- one example is using ai to control player character in demo mode
-- command stream is basically communication channel that decouples thing
-  producing commands from thing obeying them
+^code jump-actor
 
-- networking [aside?]
+Now we can use this one class to make any character in the game hop around. The missing piece is a little bit of code between the input handler and the command that can take the command and invoke it on the right object. First, we'll change `handleInput()` so that it *returns* commands:
 
-    - "command stream is communication channel" makes me think of networking
-    - indeed that's place where commands can be really helpful
-    - when playing online, all machines need to have state updated
-    - when you move, that move needs to be sent over network so other players
-      see it too
-    - when other players move, you need to see it
-    - if all input is going through commands, then that stream of data exactly
-      captures the information that needs to be sent to other players
-    - make those command objects serializable
-    - push them down the wire
-    - like magic!
-      - ok, actually, much harder when you think about latency, ordering, etc.
-      - but it's a start
+^code handle-input-return
+
+Instead of executing the command immediately (which it can't do, since it doesn't know what actor to pass in), it just returns it. As you can see, we're taking advantage of the fact that the command is a reified call, by *delaying* when the call is performed.
+
+Then we need some code that can take that command and run it on the actor representing the player. Something like:
+
+^code call-actor-command
+
+Assuming `hero` is a reference to the player's character, this will correctly drive him based on the user's input. This simple code has given us a neat little ability for free: we could let the player control any actor in the game now just by changing the object we perform the commands on.
+
+In practice, that's a pretty uncommon feature. But there is a similar use case that's more common. So far, the only thing that's provided commands is the input handler. That's correct for the player's character, but what about all of the other actors in the world?
+
+Those will be driven by the game's AI system. By using the Command pattern, we now have a great interface between the AI engine and the actors: the AI code just chooses and returns `Command` objects.
+
+The decoupling here between the AI code that selects commands, and the actor code that performs them gives us a lot of flexibility. We can use different AI engines for different actors. Or we can mix and match AI for different kinds of behavior. Want a more aggressive opponent? Just plug-in a more aggressive AI to generate commands for it. In fact, we can even bolt AI onto the *player's* character, which can be useful for things like demo mode where the game needs to run on auto-pilot.
+
+By making the commands that control an actor first class objects, we've removed the tight coupling of a direct method call. Instead, you can think of it as a <span name="queue">queue</span> or stream of commands. Some code (the input handler or AI) produces commands and places them in the stream. Other code (the dispatcher or actor itself) consumes commands and invokes them. By having that queue in the middle, the producer on one end and the consumer on the other are decoupled from each other.
+
+<aside name="queue">
+
+Here's another example where this pattern is useful. If we take those commands in the queue and make them *serializable*, we can send them over the network. That means we can take the player's input, push it over the network to another machine, and then replay it.
+
+If the game is deterministic (which it should be!), the only state that you need to transmit to keep the two versions of it running on different machines in sync is the external input from the player, and this command stream captures exactly that for us.
+That's one important piece of making a networked multi-player game and this pattern can help.
+
+</aside>
 
 ## Attackers and Defenders
+
+Now let's change directions a bit. This is a different use for commands than the typical producer-consumer stream of operations. I haven't seen them used as often for this problem, but I think it's a cool use.
+
+Most uses of the command pattern are for *decoupling* the code selecting or creating the command from the code invoking or performing it. In this example, the goal is to *share* the responsibility for the command across two classes.
+
+Let's say we're implementing the combat system in our game. We have an attacker and a defender. Each side has a bunch of combat rules. The attacker has a weapon, a strength bonus, maybe some spells that temporarily boost their attack power, range, etc. Meanwhile, the defender has their armor, evasiveness, defensive spells, and cover.
+
+To resolve a single attack, all of those rules have to come into play and be resolved. Since the attacker and defender are different objects, it isn't clear which class should actually contain the method to handle a round of combat. If we put it in the attacker, we have to pass all of this defender-specific state in and it has to muck around with it. We have the opposite problem if we lump it all in the defender.
+
+Exacerbating this is the fact that the attacker and defender may even be different *classes*. You can imagine different kinds of combatants having different classes encoding different combat rules. You really wouldn't <span name="every">want every</span> combatant class coupled to details of every other one.
+
+<aside name="every">
+
+If you have *n* classes where each one knows details of every other one, that's *n &times; (n - 1)* connections to maintain. That quadratic number scales quickly out of hand when the number of classes increases.
+
+</aside>
+
+The Command pattern can help here. We'll define a class representing a round of combat itself. Instead of "handle hit" being a *verb*, a single operation, we'll make a "hit" a *noun*, an instantiated class.
+
+    class Hit
+    {
+      // Stuff...
+    };
+
+It will form a bridge between the attacker and
+
+**TODO: aside, similar to mediator pattern**
 
 - here's different motivation for using this pattern
 - previous examples were for decoupling when/where/who initiates a command
