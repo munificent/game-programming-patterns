@@ -191,6 +191,9 @@ a.outline:after {
 .codehilite .k {
   color: #3366cc; }
 
+.codehilite .kd {
+  color: #3366cc; }
+
 .codehilite .kt {
   color: #09a; }
 

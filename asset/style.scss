@@ -276,6 +276,7 @@ a.outline:after {
 
 // Syntax highlighting.
 .codehilite .k  { color: $primary; } // keyword
+.codehilite .kd { color: $primary; } // keyword declaration
 .codehilite .kt { color: #09a; }     // keyword type
 .codehilite .s  { color: #c70; }     // string
 .codehilite .sc { color: #c70; }     // string
