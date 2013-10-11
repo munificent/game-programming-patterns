@@ -144,17 +144,22 @@ def formatfile(path, nav, skip_up_to_date):
     global empty_chapters
 
     word_count = len(contents.split(None))
-    num_chapters += 1
-    if word_count < 50:
-        empty_chapters += 1
-        print "  {}".format(basename)
-    elif word_count < 2000:
-        empty_chapters += 1
-        print "{}-{} {} ({} words)".format(
-            YELLOW, DEFAULT, basename, word_count)
+    if section:
+        num_chapters += 1
+        if word_count < 50:
+            empty_chapters += 1
+            print "  {}".format(basename)
+        elif word_count < 2000:
+            empty_chapters += 1
+            print "{}-{} {} ({} words)".format(
+                YELLOW, DEFAULT, basename, word_count)
+        else:
+            total_words += word_count
+            print "{}✓{} {} ({} words)".format(
+                GREEN, DEFAULT, basename, word_count)
     else:
-        total_words += word_count
-        print "{}✓{} {} ({} words)".format(
+        # Section header chapters aren't counted like regular chapters.
+        print "{}•{} {} ({} words)".format(
             GREEN, DEFAULT, basename, word_count)
 
 
