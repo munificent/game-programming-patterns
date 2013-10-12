@@ -87,7 +87,7 @@ namespace CommandPattern
     public:
       void handleInput();
 
-      // Methods to set commands...
+      // Methods to bind commands...
 
     private:
       Command* buttonX_;
@@ -121,7 +121,6 @@ namespace CommandPattern
     {
     public:
       virtual ~Command() {}
-
       virtual void execute(GameActor& actor) = 0;
     };
     //^actor-command
