@@ -41,6 +41,10 @@ That would be a much better slugline for the pattern than the one they chose. Bu
 
 Somewhere in every game codebase is some code that reads in raw user input -- button presses, keyboard events, mouse clicks, whatever. It takes each input and translates it to a meaningful action in the game. Something like this:
 
+<img src="images/command-buttons-one.png" />
+
+A dead simple implementation looks like:
+
 <span name="lurch"></span>
 
 ^code handle-input
@@ -55,6 +59,8 @@ This function typically gets called once per frame by the <a class="pattern" hre
 
 To support that, we need to turn those direct calls to `jump()` and `fireGun()` into something that we can swap out. "Swapping out" sounds a lot like assigning a variable, so we need a value that we can use to represent a game action. Enter: the Command pattern.
 
+<img src="images/command-buttons-two.png" />
+
 We define a base class that represents a triggerable game command:
 
 <span name="one-method"></span>
@@ -67,7 +73,7 @@ When you have an interface with a single method that doesn't return anything, th
 
 </aside>
 
-Then we create a subclasse for each of the different game actions:
+Then we create a subclass for each of the different game actions:
 
 ^code command-classes
 
@@ -116,6 +122,16 @@ Assuming `hero` is a reference to the player's character, this correctly drives 
 In practice, that's not a common feature. But there is a similar use case that *does* pop up frequently. So far, we've only considered the player-driven character, but what about all of the other actors in the world? Those are driven by the game's AI. We can use this same command pattern as the interface between the AI engine and the actors: the AI code just chooses and returns `Command` objects.
 
 The decoupling here between the AI code that selects commands, and the actor code that performs them gives us a lot of flexibility. We can use different AI modules for different actors. Or we can mix and match AI for different kinds of behavior. Want a more aggressive opponent? Just plug-in a more aggressive AI to generate commands for it. In fact, we can even bolt AI onto the *player's* character, which can be useful for things like demo mode where the game needs to run on auto-pilot.
+
+<span name="stream"></span>
+
+<img src="images/command-stream.png" />
+
+<aside name="stream">
+
+Why did I feel the need to draw a picture of a "stream" for you? And why does it look like a tube?
+
+</aside>
 
 By making the commands that control an actor first class objects, we've removed the tight coupling of a direct method call. Instead, think of it as a <span name="queue">queue</span> or stream of commands. Some code (the input handler or AI) produces commands and places them in the stream. Other code (the dispatcher or actor itself) consumes commands and invokes them. By sticking that queue in the middle, we've decoupled the producer on one end from the consumer on the other.
 
@@ -180,6 +196,8 @@ Another option is to use <a href="http://en.wikipedia.org/wiki/Persistent_data_s
 To let the player undo a move, we keep around the last command they performed. When they bang on Control-Z, we call that command's `undo()` method. (If they've already undone, then it becomes "redo" and we execute the command again.)
 
 Supporting multiple levels of undo isn't much harder. Instead of remembering the last command, we keep a list of commands and a reference to the "current" command. Each command the player performs is added to the end of the list and "current" is set to point to it.
+
+<img src="images/command-undo.png" />
 
 When the player chooses "Undo", we undo the current command and move the current pointer back. When they redo, we advance the pointer and then execute that command. If they choose a new command after undoing some, everything in the list after the current command is discarded.
 

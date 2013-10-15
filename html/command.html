@@ -89,6 +89,8 @@
 
 <h2><a href="#configuring-input" name="configuring-input">Configuring Input</a></h2>
 <p>Somewhere in every game codebase is some code that reads in raw user input&thinsp;&mdash;&thinsp;button presses, keyboard events, mouse clicks, whatever. It takes each input and translates it to a meaningful action in the game. Something like this:</p>
+<p><img src="images/command-buttons-one.png" /></p>
+<p>A dead simple implementation looks like:</p>
 <p><span name="lurch"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">InputHandler</span><span class="o">::</span><span class="n">handleInput</span><span class="p">()</span>
 <span class="p">{</span>
@@ -107,6 +109,7 @@
 
 <p>This function typically gets called once per frame by the <a class="pattern" href="game-loop.html">Game Loop</a>. You can figure out what it does. This works if we&#x2019;re willing to hardwire user inputs to game actions, but many games let the user <em>configure</em> how their inputs are wired up.</p>
 <p>To support that, we need to turn those direct calls to <code>jump()</code> and <code>fireGun()</code> into something that we can swap out. "Swapping out" sounds a lot like assigning a variable, so we need a value that we can use to represent a game action. Enter: the Command pattern.</p>
+<p><img src="images/command-buttons-two.png" /></p>
 <p>We define a base class that represents a triggerable game command:</p>
 <p><span name="one-method"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Command</span>
@@ -123,7 +126,7 @@
 <p>When you have an interface with a single method that doesn&#x2019;t return anything, there&#x2019;s a good chance it&#x2019;s a command pattern.</p>
 </aside>
 
-<p>Then we create a subclasse for each of the different game actions:</p>
+<p>Then we create a subclass for each of the different game actions:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">JumpCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -232,6 +235,13 @@
 <p>Assuming <code>hero</code> is a reference to the player&#x2019;s character, this correctly drives him based on the user&#x2019;s input, so we&#x2019;re back to the same behavior we had in the first example. But adding a layer of indirection between the command and the actor that performs it has given us a neat little ability: we could let the player control any actor in the game now by just changing the actor we execute the commands on.</p>
 <p>In practice, that&#x2019;s not a common feature. But there is a similar use case that <em>does</em> pop up frequently. So far, we&#x2019;ve only considered the player-driven character, but what about all of the other actors in the world? Those are driven by the game&#x2019;s AI. We can use this same command pattern as the interface between the AI engine and the actors: the AI code just chooses and returns <code>Command</code> objects.</p>
 <p>The decoupling here between the AI code that selects commands, and the actor code that performs them gives us a lot of flexibility. We can use different AI modules for different actors. Or we can mix and match AI for different kinds of behavior. Want a more aggressive opponent? Just plug-in a more aggressive AI to generate commands for it. In fact, we can even bolt AI onto the <em>player&#x2019;s</em> character, which can be useful for things like demo mode where the game needs to run on auto-pilot.</p>
+<p><span name="stream"></span></p>
+<p><img src="images/command-stream.png" /></p>
+<aside name="stream">
+
+<p>Why did I feel the need to draw a picture of a "stream" for you? And why does it look like a tube?</p>
+</aside>
+
 <p>By making the commands that control an actor first class objects, we&#x2019;ve removed the tight coupling of a direct method call. Instead, think of it as a <span name="queue">queue</span> or stream of commands. Some code (the input handler or AI) produces commands and places them in the stream. Other code (the dispatcher or actor itself) consumes commands and invokes them. By sticking that queue in the middle, we&#x2019;ve decoupled the producer on one end from the consumer on the other.</p>
 <aside name="queue">
 
@@ -349,6 +359,7 @@
 
 <p>To let the player undo a move, we keep around the last command they performed. When they bang on Control-Z, we call that command&#x2019;s <code>undo()</code> method. (If they&#x2019;ve already undone, then it becomes "redo" and we execute the command again.)</p>
 <p>Supporting multiple levels of undo isn&#x2019;t much harder. Instead of remembering the last command, we keep a list of commands and a reference to the "current" command. Each command the player performs is added to the end of the list and "current" is set to point to it.</p>
+<p><img src="images/command-undo.png" /></p>
 <p>When the player chooses "Undo", we undo the current command and move the current pointer back. When they redo, we advance the pointer and then execute that command. If they choose a new command after undoing some, everything in the list after the current command is discarded.</p>
 <p>Maybe I&#x2019;m just easily impressed, but when I first implemented this in a level editor, I was as giddy as a school girl at how straightforward this was and how well it worked. It takes discipline to make sure every data modification goes through a command, but once you do that, the rest is easy.</p>
 <h2><a href="#classy-and-dysfunctional" name="classy-and-dysfunctional">Classy and Dysfunctional?</a></h2>
