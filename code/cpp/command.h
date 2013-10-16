@@ -63,19 +63,13 @@ namespace CommandPattern
     class JumpCommand : public Command
     {
     public:
-      void execute()
-      {
-        jump();
-      }
+      void execute() { jump(); }
     };
 
     class FireCommand : public Command
     {
     public:
-      void execute()
-      {
-        fireGun();
-      }
+      void execute() { fireGun(); }
     };
 
     // You get the idea...
@@ -223,13 +217,15 @@ namespace CommandPattern
         if (isPressed(BUTTON_UP)) {
           // Move the unit up one.
           int destY = selectedUnit->y() - 1;
-          return new MoveUnitCommand(selectedUnit, selectedUnit->x(), destY);
+          return new MoveUnitCommand(
+              selectedUnit, selectedUnit->x(), destY);
         }
 
         if (isPressed(BUTTON_DOWN)) {
           // Move the unit down one.
           int destY = selectedUnit->y() + 1;
-          return new MoveUnitCommand(selectedUnit, selectedUnit->x(), destY);
+          return new MoveUnitCommand(
+              selectedUnit, selectedUnit->x(), destY);
         }
 
         // Other moves...

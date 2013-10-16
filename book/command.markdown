@@ -1,19 +1,17 @@
 ^title Command
 ^section Design Patterns Revisited
 
-I'm pumped about this chapter because Command is one of the most useful patterns in my arsenal. Most large programs I write, games or otherwise, end up using it somewhere. Using it in the right place has very neatly untangled some really gnarly code.
+I'm pumped about this chapter because Command is one of my favorite patterns. Most large programs I write, games or otherwise, end up using it somewhere. When I've used it in the right place, it's neatly untangled some really gnarly code.
 
-For such a cool pattern, the Gang of Four has a predicatably abstruse description:
+For such a swell pattern, the Gang of Four has a predictably abstruse description:
 
 > Encapsulate a request as an object, thereby letting users parameterize clients with different requests, queue or log requests, and support undoable operations.
 
-Can we agree that that's a terrible sentence? First of all, it mangles whatever metaphor its trying to establish. Outside of the weird world of software where words can mean anything, a "client" is a *person* -- someone you do business with. Last I checked, people can't be "parameterized".
+Can we agree that that's a terrible sentence? First of all, it mangles whatever metaphor it's trying to establish. Outside of the weird world of software where words can mean anything, a "client" is a *person* -- someone you do business with. Last I checked, people can't be "parameterized".
 
-Then, the rest of that sentence is just a list of stuff you could maybe possibly use the pattern for. Not very illuminating unless your use case happens to be on that list. *My* pithy tagline the command pattern is:
+Then, the rest of that sentence is just a list of stuff you could maybe possibly use the pattern for. Not very illuminating unless your use case happens to be in that list. *My* pithy tagline the command pattern is:
 
-**A command is a *reified method call*.**
-
-Of course, "pithy" often means "impenetrably terse", so this may not be much of an improvement. Let me unpack that a bit. <span name="latin">"Reify"</span>, in case you've never heard it, means "make real".
+**A command is a *<span name="latin">reified</span> method call*.**
 
 <aside name="latin">
 
@@ -21,25 +19,27 @@ Of course, "pithy" often means "impenetrably terse", so this may not be much of 
 
 </aside>
 
-Another term for reifying in programming is making something "first class". Both mean taking some *concept* and turning it into an actual piece of real data -- an object -- that you can store in memory, stick in variables, pass to functions, return from functions, etc.
+Of course, "pithy" often means "impenetrably terse", so this may not be much of an improvement. Let me unpack that a bit. "Reify", in case you've never heard it, means "make real".
 
-Unlike "second-class" things that you can't deal with directly, <span name="reflection">first class</span> objects have handles that you can grab onto and manipulate from code. So by saying the command pattern is a "reified method call", what I mean is that it's a method call wrapped in an object.
+Another term for reifying is making something <span name="reflection">"first class"</span>. Both mean taking some *concept* and turning it into a piece of data -- an object -- that you can stick in a variable, pass to a function, etc. So by saying the command pattern is a "reified method call", what I mean is that it's a method call wrapped in an object.
 
-That sounds a lot like a "callback", first class function" or a "function pointer", or a "closure", or a "partially applied function", depending on which language you're coming from, and indeed those are all in the same ballpark. The Gang of Four later says:
+That sounds a lot like a "callback", "first class function", "function pointer", "closure", or "partially applied function", depending on which language you're coming from, and indeed those are all in the same ballpark. The Gang of Four later says:
 
 > Commands are an object-oriented replacement for callbacks.
 
-That would be a much better slugline for the pattern than the one they chose. But all of this is abstract and nebulous. I like to start chapters with something concrete, and I blew that here. To make up for it, the rest of the chapter is nothing but concrete examples where I think the command pattern is a brilliant fit.
+That would be a much better slugline for the pattern than the one they chose.
+
+But all of this is abstract and nebulous. I like to start chapters with something concrete, and I blew that. To make up for it, from here on out it's all examples where commands are a brilliant fit.
 
 <aside name="reflection">
 
-*Reflection systems* in some languages let you work with the types in your program imperatively at runtime. You can get an object that represents the class or type of some other object, and you can play with that to see what the type can do. In other words, reflection is a *reified type system*.
+*Reflection systems* in some languages let you work with the types in your program imperatively at runtime. You can get an object that represents the class of some other object, and you can play with that to see what the type can do. In other words, reflection is a *reified type system*.
 
 </aside>
 
 ## Configuring Input
 
-Somewhere in every game codebase is some code that reads in raw user input -- button presses, keyboard events, mouse clicks, whatever. It takes each input and translates it to a meaningful action in the game. Something like this:
+Somewhere in every game is a chunk of code that reads in raw user input -- button presses, keyboard events, mouse clicks, whatever. It takes each input and translates it to a meaningful action in the game.
 
 <img src="images/command-buttons-one.png" />
 
@@ -55,11 +55,9 @@ Pro tip: Don't press B very often.
 
 </aside>
 
-This function typically gets called once per frame by the <a class="pattern" href="game-loop.html">Game Loop</a>. You can figure out what it does. This works if we're willing to hardwire user inputs to game actions, but many games let the user *configure* how their inputs are wired up.
+This function typically gets called once per frame by the <a class="pattern" href="game-loop.html">Game Loop</a>. You can figure out what it does. This works if we're willing to hardwire user inputs to game actions, but many games let the user *configure* how their buttons are mapped.
 
-To support that, we need to turn those direct calls to `jump()` and `fireGun()` into something that we can swap out. "Swapping out" sounds a lot like assigning a variable, so we need a value that we can use to represent a game action. Enter: the Command pattern.
-
-<img src="images/command-buttons-two.png" />
+To support that, we need to turn those direct calls to `jump()` and `fireGun()` into something that we can swap out. "Swapping out" sounds a lot like assigning a variable, so we need an *object* that we can use to represent a game action. Enter: the Command pattern.
 
 We define a base class that represents a triggerable game command:
 
@@ -69,11 +67,11 @@ We define a base class that represents a triggerable game command:
 
 <aside name="one-method">
 
-When you have an interface with a single method that doesn't return anything, there's a good chance it's a command pattern.
+When you have an interface with a single method that doesn't return anything, there's a good chance it's the Command pattern.
 
 </aside>
 
-Then we create a subclass for each of the different game actions:
+Then we create subclasses for each of the different game actions:
 
 ^code command-classes
 
@@ -89,9 +87,15 @@ Now the input handling just delegates to those:
 
 <aside name="null">
 
-Notice how we don't check for `null` here? We assume each button will have *some* command wired up to it. If we want to be able to have buttons do nothing, but don't want to explicitly check for `null`, we can define a command class whose `execute()` method does nothing. Then, instead of setting a button handler to `null`, we point it to that object. This is a pattern called [Null Object](http://en.wikipedia.org/wiki/Null_Object_pattern).
+Notice how we don't check for `null` here? This assumes each button will have *some* command wired up to it.
+
+If we want to be able to have buttons do nothing, without having to explicitly check for `null`, we can define a command class whose `execute()` method does nothing. Then, instead of setting a button handler to `null`, we point it to that object. This is a pattern called [Null Object](http://en.wikipedia.org/wiki/Null_Object_pattern).
 
 </aside>
+
+Where each input used to directly call a function, now there's a layer of indirection:
+
+<img src="images/command-buttons-two.png" />
 
 This is the Command pattern in a nutshell. If you can see the merit of it already, consider the rest of this chapter bonus.
 
@@ -99,11 +103,11 @@ This is the Command pattern in a nutshell. If you can see the merit of it alread
 
 The command classes we just defined work for the previous example, but they're pretty limited. The problem is that they assume there are these top-level `jump()`, `fireGun()`, etc. functions that implicitly know how to find the player's avatar and make him dance like the puppet he is.
 
-That assumed coupling limits the usefulness of those commands. The *only* thing the `JumpCommand` can make jump is the player. Let's loosen the restriction. Instead of calling functions that find the commanded object themselves, we'll *pass in* the object that we want to order around:
+That assumed coupling limits the usefulness of those commands. The *only* thing the `JumpCommand` can make jump is the player. Let's loosen that restriction. Instead of calling functions that find the commanded object themselves, we'll *pass in* the object that we want to order around:
 
 ^code actor-command
 
-Here, `GameActor` is our main "game object" class that represents a character in the game world. We pass it in to `execute()` so that the derived command can invoke methods on an actor of our choice, like so:
+Here, `GameActor` is our "game object" class that represents a character in the game world. We pass it in to `execute()` so that the derived command can invoke methods on an actor of our choice, like so:
 
 ^code jump-actor
 
@@ -111,7 +115,7 @@ Now we can use this one class to make any character in the game hop around. We'r
 
 ^code handle-input-return
 
-It can't execute the command immediately since it doesn't know what actor to pass in. Here's where we take advantage of the fact that the command is a reified call: we can *delay* when the call is performed.
+It can't execute the command immediately since it doesn't know what actor to pass in. Here's where we take advantage of the fact that the command is a reified call: we can *delay* when the call is executed.
 
 Then we need some code that takes that command and runs it on the actor representing the player. Something like:
 
@@ -119,9 +123,11 @@ Then we need some code that takes that command and runs it on the actor represen
 
 Assuming `hero` is a reference to the player's character, this correctly drives him based on the user's input, so we're back to the same behavior we had in the first example. But adding a layer of indirection between the command and the actor that performs it has given us a neat little ability: we could let the player control any actor in the game now by just changing the actor we execute the commands on.
 
-In practice, that's not a common feature. But there is a similar use case that *does* pop up frequently. So far, we've only considered the player-driven character, but what about all of the other actors in the world? Those are driven by the game's AI. We can use this same command pattern as the interface between the AI engine and the actors: the AI code just chooses and returns `Command` objects.
+In practice, that's not a common feature. But there is a similar use case that *does* pop up frequently. So far, we've only considered the player-driven character, but what about all of the other actors in the world? Those are driven by the game's AI. We can use this same command pattern as the interface between the AI engine and the actors: the AI code just emits `Command` objects.
 
-The decoupling here between the AI code that selects commands, and the actor code that performs them gives us a lot of flexibility. We can use different AI modules for different actors. Or we can mix and match AI for different kinds of behavior. Want a more aggressive opponent? Just plug-in a more aggressive AI to generate commands for it. In fact, we can even bolt AI onto the *player's* character, which can be useful for things like demo mode where the game needs to run on auto-pilot.
+The decoupling here between the AI that selects commands, and the actor code that performs them gives us a lot of flexibility. We can use different AI modules for different actors. Or we can mix and match AI for different kinds of behavior. Want a more aggressive opponent? Just plug-in a more aggressive AI to generate commands for it. In fact, we can even bolt AI onto the *player's* character, which can be useful for things like demo mode where the game needs to run on auto-pilot.
+
+By making the commands that control an actor first class objects, we've removed the tight coupling of a direct method call. Instead, think of it as a queue or stream of commands.
 
 <span name="stream"></span>
 
@@ -133,7 +139,7 @@ Why did I feel the need to draw a picture of a "stream" for you? And why does it
 
 </aside>
 
-By making the commands that control an actor first class objects, we've removed the tight coupling of a direct method call. Instead, think of it as a <span name="queue">queue</span> or stream of commands. Some code (the input handler or AI) produces commands and places them in the stream. Other code (the dispatcher or actor itself) consumes commands and invokes them. By sticking that queue in the middle, we've decoupled the producer on one end from the consumer on the other.
+Some code (the input handler or AI) <span name="queue">produces</span> commands and places them in the stream. Other code (the dispatcher or actor itself) consumes commands and invokes them. By sticking that queue in the middle, we've decoupled the producer on one end from the consumer on the other.
 
 <aside name="queue">
 
@@ -151,7 +157,7 @@ I may be speaking from experience here.
 
 </aside>
 
-Without the command pattern, implementing undo is surprisingly hard. With it, it's a piece of cake. For our example, let's say we're making a single player turn-based game and we want to let users undo moves so they can focus more on strategy and less on chance.
+Without the command pattern, implementing undo is surprisingly hard. With it, it's a piece of cake. For our example, let's say we're making a single player turn-based game and we want to let users undo moves so they can focus more on strategy and less on guesswork.
 
 We're conveniently already using commands to abstract input handling, so every move the player makes is already encapsulated in them. For example, moving a unit may look like:
 
@@ -187,21 +193,23 @@ Note that we added some <span name="memento">more state</span> to the class. Aft
 
 This "previous state of an object" is an obvious place to use the <a href="http://en.wikipedia.org/wiki/Memento_pattern" class="gof-pattern">Memento pattern</a>. Capture a memento before you perform the command, and restore from it to undo it.
 
-If that works for you, great. In practice, I haven't used this. Commands tend to modify a small part of an object's state. Snapshotting the rest of the object's unchanged state is a waste of memory. It's cheaper to just manually store only the bits of data you change.
+If that works for you, great. In practice, I haven't used it. Commands tend to modify a small part of an object's state. Snapshotting the rest of the object's unchanged data is a waste of memory. It's cheaper to just manually store only the bits of data you change.
 
-Another option is to use <a href="http://en.wikipedia.org/wiki/Persistent_data_structure">*persistent data structures*</a>. With these, every modification to an object actually returns a new one, leaving the old one unchanged. Through clever implementation, these new objects share data with the previous ones, so it's cheaper than cloning the entire object. Using this, each command stores a reference the object before the command was performed, and undo just means switching back to the old object.
+Another option is to use <a href="http://en.wikipedia.org/wiki/Persistent_data_structure">*persistent data structures*</a>. With these, every modification to an object actually returns a new one, leaving the old one unchanged. Through clever implementation, these new objects share data with the previous ones, so it's much cheaper than cloning the entire object.
+
+Using this, each command stores a reference to the object before the command was performed, and undo just means switching back to the old object.
 
 </aside>
 
-To let the player undo a move, we keep around the last command they performed. When they bang on Control-Z, we call that command's `undo()` method. (If they've already undone, then it becomes "redo" and we execute the command again.)
+To let the player undo a move, we keep around the last command they executed. When they bang on Control-Z, we call that command's `undo()` method. (If they've already undone, then it becomes "redo" and we execute the command again.)
 
-Supporting multiple levels of undo isn't much harder. Instead of remembering the last command, we keep a list of commands and a reference to the "current" command. Each command the player performs is added to the end of the list and "current" is set to point to it.
+Supporting multiple levels of undo isn't much harder. Instead of remembering the last command, we keep a list of commands and a reference to the "current" one. When the player executes a command, we append it to the list and point "current" at it.
 
 <img src="images/command-undo.png" />
 
 When the player chooses "Undo", we undo the current command and move the current pointer back. When they redo, we advance the pointer and then execute that command. If they choose a new command after undoing some, everything in the list after the current command is discarded.
 
-Maybe I'm just easily impressed, but when I first implemented this in a level editor, I was as giddy as a school girl at how straightforward this was and how well it worked. It takes discipline to make sure every data modification goes through a command, but once you do that, the rest is easy.
+Maybe I'm just easily impressed, but when I first implemented this in a level editor, I was as giddy as a schoolgirl at how straightforward it was and how well it worked. It takes discipline to make sure every data modification goes through a command, but once you do that, the rest is easy.
 
 ## Classy and Dysfunctional?
 
@@ -215,7 +223,7 @@ That's *not* to say you shouldn't use functions for the command pattern in other
 
 I say *some* ways here because building actual classes or structures for commands is still useful even in languages that have closures. If your command has multiple operations (like undoable commands), mapping that to a single function is awkward.
 
-Defining an actual object with structure also helps readers easily tell what data the command contains. Closures are a wonderfully terse way of automatically wrapping up some state, but they can be so automatic that it's hard to see what state they're actually holding.
+Defining an actual class with fields also helps readers easily tell what data the command contains. Closures are a wonderfully terse way of automatically wrapping up some state, but they can be so automatic that it's hard to see what state they're actually holding.
 
 </aside>
 
@@ -233,14 +241,14 @@ If you're comfortable with a functional style, this way of doing things is natur
 
 ## See Also
 
-- Command objects almost always modify some state. They often store a reference to the state they change, but sometimes they need access to a larger context. Think the entire chessboard when the command moves a single piece.
+- Command objects almost always modify some state. They often store a reference to the state they change, but sometimes they need access to a larger context. Think seeing the entire chessboard for a command that moves a single piece.
 
     The command could store a reference to that too, but that can be a waste
     of space when every command will end up using the same context. A lighter-weight option is to pass it in when you execute the command. This is what the <a class="pattern" href="context-parameter.html">Context Parameter</a> pattern is about.
 
-- In our examples, we explicitly chose which actor would handle a command. In some cases, especially where your object model is hierarchical, it may not be so cut-and-dried. An object may respond to a command, or it may hand it off to some subordinate object. If you do that, you've got yourself a <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">Chain of Responsibility</a>.
+- In our examples, we explicitly chose which actor would handle a command. In some cases, especially where your object model is hierarchical, it may not be so cut-and-dried. An object may respond to a command, or it may decide to pawn it off on some subordinate object. If you do that, you've got yourself a <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">Chain of Responsibility</a>.
 
-- Some commands are stateless chunks of pure behavior like the `JumpCommand` in the first example. In cases like that, having <span name="singleton">more</span> than one instance of that class wastes memory, since all instances are equivalent. The <a class="gof-pattern" href="flyweight.html">Flyweight</a> can make that cheaper.
+- Some commands are stateless chunks of pure behavior like the `JumpCommand` in the first example. In cases like that, having <span name="singleton">more</span> than one instance of that class wastes memory, since all instances are equivalent. The <a class="gof-pattern" href="flyweight.html">Flyweight</a> pattern addresses that.
 
 <aside name="singleton">
 
