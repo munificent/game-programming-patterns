@@ -324,14 +324,19 @@
 <span class="nl">public:</span>
   <span class="n">MoveUnitCommand</span><span class="p">(</span><span class="n">Unit</span><span class="o">*</span> <span class="n">unit</span><span class="p">,</span> <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">unit_</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span>
-    <span class="n">xBefore_</span><span class="p">(</span><span class="n">unit</span><span class="o">-&gt;</span><span class="n">x</span><span class="p">()),</span>
-    <span class="n">yBefore_</span><span class="p">(</span><span class="n">unit</span><span class="o">-&gt;</span><span class="n">y</span><span class="p">()),</span>
+    <span class="n">xBefore_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">yBefore_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
     <span class="n">x_</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
     <span class="n">y_</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
   <span class="p">{}</span>
 
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">execute</span><span class="p">()</span>
   <span class="p">{</span>
+    <span class="c1">// Remember the unit&#39;s position before the move</span>
+    <span class="c1">// so we can restore it.</span>
+    <span class="n">xBefore_</span> <span class="o">=</span> <span class="n">unit_</span><span class="o">-&gt;</span><span class="n">x</span><span class="p">();</span>
+    <span class="n">yBefore_</span> <span class="o">=</span> <span class="n">unit_</span><span class="o">-&gt;</span><span class="n">y</span><span class="p">();</span>
+
     <span class="n">unit_</span><span class="o">-&gt;</span><span class="n">moveTo</span><span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">);</span>
   <span class="p">}</span>
 
