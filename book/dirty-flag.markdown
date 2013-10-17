@@ -7,7 +7,7 @@
 
 ## Motivation
 
-"Flag" and "bit" are synonymous in programming: they both mean a single micron of data that can be in one of two states. With bits we call them "true" and "false". For flags, you sometimes hear "set" and "cleared". I'll use all of these interchangeably. "Dirty bit" is an equally <span name="specific">common</span> name for this pattern, but I figured I'd stick with the name that didn't seem as prurient.
+"Flag" and "bit" are synonymous in programming: they both mean a single micron of data that can be in one of two states. We call those "true" and "false", or sometimes "set" and "cleared". I'll use all of these interchangeably. "Dirty bit" is an equally <span name="specific">common</span> name for this pattern, but I figured I'd stick with the name that didn't seem as prurient.
 
 <aside name="specific">
 
