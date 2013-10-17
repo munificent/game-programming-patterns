@@ -424,9 +424,23 @@ are inherited from its parent and which it overrides and specifies
 itself. For our example system, we'll say that a breed overrides the
 monster's health by having a non-zero value, and overrides the attack
 by having a non-`NULL` string. Otherwise, the attribute will be
-inherited from its parent. Like so:
+inherited from its parent.
+
+There are two ways we can implement this. One is to handle the delegation dynamically, every time the attribute is requested, like this:
 
 ^code 10
+
+This has the advantage of doing the right thing if a breed is modified at runtime to no longer override, or no longer inherit some attribute. On the other hand, it takes a bit more memory (it has to retain a pointer to its parent), and it's slower. It has to walk the inheritance chain each time you look up an attribute.
+
+If we can rely on a breed's attributes not changing, a faster solution is to apply the inheritance at *construction time*. This is called "copy-down" delegation because we *copy* inherited attributes *down* into the derived type when it's created. It looks like this:
+
+^code copy-down
+
+Note that we no longer need a field for the parent breed. Once the constructor is done, we can forget the parent since we've already copied all of its attributes in. To access a breed's attribute, now we just return the field:
+
+^code copy-down-access
+
+Nice and fast!
 
 Let's say our game engine is set up to create the breeds by loading a JSON
 file that defines them. It could look like:

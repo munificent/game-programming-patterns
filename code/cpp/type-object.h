@@ -188,7 +188,7 @@ namespace Inheritance
   int Breed::getHealth()
   {
     // Override.
-    if ((health_ != 0) || (parent_ == NULL)) return health_;
+    if (health_ != 0 || parent_ == NULL) return health_;
 
     // Inherit.
     return parent_->getHealth();
@@ -197,12 +197,42 @@ namespace Inheritance
   const char* Breed::getAttack()
   {
     // Override.
-    if ((attack_ != NULL) || (parent_ == NULL)) return attack_;
+    if (attack_ != NULL || parent_ == NULL) return attack_;
 
     // Inherit.
     return parent_->getAttack();
   }
   //^10
+}
+
+namespace CopyDown
+{
+  class Breed
+  {
+  public:
+    //^copy-down
+    Breed(Breed* parent, int health, const char* attack)
+    : health_(health),
+      attack_(attack)
+    {
+      // Inherit non-overridden attributes.
+      if (parent != NULL)
+      {
+        if (health == 0) health_ = parent->getHealth();
+        if (attack == NULL) attack_ = parent->getAttack();
+      }
+    }
+    //^copy-down
+
+    //^copy-down-access
+    int         getHealth() { return health_; }
+    const char* getAttack() { return attack_; }
+    //^copy-down-access
+
+  private:
+    int         health_; // Starting health.
+    const char* attack_;
+  };
 }
 
 namespace ExposeBreed

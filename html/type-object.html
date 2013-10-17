@@ -531,11 +531,12 @@ are inherited from its parent and which it overrides and specifies
 itself. For our example system, we&#x2019;ll say that a breed overrides the
 monster&#x2019;s health by having a non-zero value, and overrides the attack
 by having a non-<code>NULL</code> string. Otherwise, the attribute will be
-inherited from its parent. Like so:</p>
+inherited from its parent.</p>
+<p>There are two ways we can implement this. One is to handle the delegation dynamically, every time the attribute is requested, like this:</p>
 <div class="codehilite"><pre><span class="kt">int</span> <span class="n">Breed</span><span class="o">::</span><span class="n">getHealth</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="c1">// Override.</span>
-  <span class="k">if</span> <span class="p">((</span><span class="n">health_</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">parent_</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">))</span> <span class="k">return</span> <span class="n">health_</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">health_</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">parent_</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="n">health_</span><span class="p">;</span>
 
   <span class="c1">// Inherit.</span>
   <span class="k">return</span> <span class="n">parent_</span><span class="o">-&gt;</span><span class="n">getHealth</span><span class="p">();</span>
@@ -544,7 +545,7 @@ inherited from its parent. Like so:</p>
 <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">Breed</span><span class="o">::</span><span class="n">getAttack</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="c1">// Override.</span>
-  <span class="k">if</span> <span class="p">((</span><span class="n">attack_</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">parent_</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">))</span> <span class="k">return</span> <span class="n">attack_</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">attack_</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">parent_</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="n">attack_</span><span class="p">;</span>
 
   <span class="c1">// Inherit.</span>
   <span class="k">return</span> <span class="n">parent_</span><span class="o">-&gt;</span><span class="n">getAttack</span><span class="p">();</span>
@@ -552,6 +553,29 @@ inherited from its parent. Like so:</p>
 </pre></div>
 
 
+<p>This has the advantage of doing the right thing if a breed is modified at runtime to no longer override, or no longer inherit some attribute. On the other hand, it takes a bit more memory (it has to retain a pointer to its parent), and it&#x2019;s slower. It has to walk the inheritance chain each time you look up an attribute.</p>
+<p>If we can rely on a breed&#x2019;s attributes not changing, a faster solution is to apply the inheritance at <em>construction time</em>. This is called "copy-down" delegation because we <em>copy</em> inherited attributes <em>down</em> into the derived type when it&#x2019;s created. It looks like this:</p>
+<div class="codehilite"><pre><span class="n">Breed</span><span class="p">(</span><span class="n">Breed</span><span class="o">*</span> <span class="n">parent</span><span class="p">,</span> <span class="kt">int</span> <span class="n">health</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">attack</span><span class="p">)</span>
+<span class="o">:</span> <span class="n">health_</span><span class="p">(</span><span class="n">health</span><span class="p">),</span>
+  <span class="n">attack_</span><span class="p">(</span><span class="n">attack</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">// Inherit non-overridden attributes.</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">parent</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">health</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="n">health_</span> <span class="o">=</span> <span class="n">parent</span><span class="o">-&gt;</span><span class="n">getHealth</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">attack</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="n">attack_</span> <span class="o">=</span> <span class="n">parent</span><span class="o">-&gt;</span><span class="n">getAttack</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Note that we no longer need a field for the parent breed. Once the constructor is done, we can forget the parent since we&#x2019;ve already copied all of its attributes in. To access a breed&#x2019;s attribute, now we just return the field:</p>
+<div class="codehilite"><pre><span class="kt">int</span>         <span class="nf">getHealth</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">health_</span><span class="p">;</span> <span class="p">}</span>
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="nf">getAttack</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">attack_</span><span class="p">;</span> <span class="p">}</span>
+</pre></div>
+
+
+<p>Nice and fast!</p>
 <p>Let&#x2019;s say our game engine is set up to create the breeds by loading a JSON
 file that defines them. It could look like:</p>
 <div class="codehilite"><pre><span class="p">{</span>
