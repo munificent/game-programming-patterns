@@ -95,9 +95,9 @@
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">InputHandler</span><span class="o">::</span><span class="n">handleInput</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_X</span><span class="p">))</span> <span class="n">jump</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_Y</span><span class="p">))</span> <span class="n">fireGun</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_A</span><span class="p">))</span> <span class="n">swapWeapon</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_B</span><span class="p">))</span> <span class="n">lurchIneffectively</span><span class="p">();</span>
+  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_Y</span><span class="p">))</span> <span class="n">fireGun</span><span class="p">();</span>
+  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_A</span><span class="p">))</span> <span class="n">swapWeapon</span><span class="p">();</span>
+  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_B</span><span class="p">))</span> <span class="n">lurchIneffectively</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -164,9 +164,9 @@
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">InputHandler</span><span class="o">::</span><span class="n">handleInput</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_X</span><span class="p">))</span> <span class="n">buttonX_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_Y</span><span class="p">))</span> <span class="n">buttonY_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_A</span><span class="p">))</span> <span class="n">buttonA_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_B</span><span class="p">))</span> <span class="n">buttonB_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
+  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_Y</span><span class="p">))</span> <span class="n">buttonY_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
+  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_A</span><span class="p">))</span> <span class="n">buttonA_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
+  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_B</span><span class="p">))</span> <span class="n">buttonB_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -212,7 +212,7 @@
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_A</span><span class="p">))</span> <span class="k">return</span> <span class="n">buttonA_</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_B</span><span class="p">))</span> <span class="k">return</span> <span class="n">buttonB_</span><span class="p">;</span>
 
-  <span class="c1">// Nothing pressed so do nothing.</span>
+  <span class="c1">// Nothing pressed, so do nothing.</span>
   <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>

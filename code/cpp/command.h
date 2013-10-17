@@ -41,9 +41,9 @@ namespace CommandPattern
     void InputHandler::handleInput()
     {
       if (isPressed(BUTTON_X)) jump();
-      if (isPressed(BUTTON_Y)) fireGun();
-      if (isPressed(BUTTON_A)) swapWeapon();
-      if (isPressed(BUTTON_B)) lurchIneffectively();
+      else if (isPressed(BUTTON_Y)) fireGun();
+      else if (isPressed(BUTTON_A)) swapWeapon();
+      else if (isPressed(BUTTON_B)) lurchIneffectively();
     }
     //^handle-input
   }
@@ -95,9 +95,9 @@ namespace CommandPattern
     void InputHandler::handleInput()
     {
       if (isPressed(BUTTON_X)) buttonX_->execute();
-      if (isPressed(BUTTON_Y)) buttonY_->execute();
-      if (isPressed(BUTTON_A)) buttonA_->execute();
-      if (isPressed(BUTTON_B)) buttonB_->execute();
+      else if (isPressed(BUTTON_Y)) buttonY_->execute();
+      else if (isPressed(BUTTON_A)) buttonA_->execute();
+      else if (isPressed(BUTTON_B)) buttonB_->execute();
     }
     //^handle-input-commands
   }
@@ -149,7 +149,7 @@ namespace CommandPattern
       if (isPressed(BUTTON_A)) return buttonA_;
       if (isPressed(BUTTON_B)) return buttonB_;
 
-      // Nothing pressed so do nothing.
+      // Nothing pressed, so do nothing.
       return NULL;
     }
     //^handle-input-return
