@@ -57,7 +57,7 @@ it).
 A **service** class defines an abstract interface to a set of
 operations. A concrete **service provider** implements this interface.
 A separate **service locator** provides access to the service by
-finding an appropriate provider while hiding from both the provider's
+finding an appropriate provider while hiding both the provider's
 concrete type and the process used to locate it.
 
 ## When to Use It
