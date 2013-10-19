@@ -1,3 +1,5 @@
+2013-10-18 - 387 words outline context parameter
+2013-10-17 - fix four bugs
 2013-10-16 - upload chapter, send to list, tweet, reddit, etc.
 2013-10-15 - complete third draft for command
 2013-10-14 - scan and photoshop command illustrations
