@@ -61,7 +61,292 @@
     </tr>
   </table>
 </div>
-<p><em>Sorry, this chapter hasn&#x2019;t been written yet!</em></p>
+<ul>
+<li>chapter ostensibly about prototype design pattern, but hard for me to not
+  talk about lang paradigm too</li>
+<li>get grounded, here&#x2019;s example of design pattern first</li>
+<li>imagine making game like gauntlet</li>
+<li>lots of different monsters</li>
+<li>and generators in level that pump out monsters of different types</li>
+<li>for purposes of example, say we have different classes for each kind of
+  monster</li>
+<li>in practice, probably use type object or components or something</li>
+<li>(in fact, type object is alternative to prototype)</li>
+<li>need a generator for each class of monster</li>
+<li>brute force solution is separate class for each kind of generator</li>
+<li>then use factory pattern to have each one create the right kind of monster</li>
+<li>of course, could just use callback instead</li>
+<li>still need callback fn for each class</li>
+<li>other option is prototype pattern</li>
+<li>add abstract Clone() method to monster base class</li>
+<li>each monster must implement this and return copy of itself</li>
+<li>when we create generator, we give it instance of monster</li>
+<li>this monster is prototypical monster</li>
+<li>when generator needs to create monster, it clones prototype</li>
+<li>now only need one generator class, and no callbacks</li>
+<li>of course, do have to implement clone in each monster class</li>
+<li>one neat thing about this is generators can vary not just on class of monster
+  but on <em>attributes</em> too</li>
+<li>could create generator with protypical goblin with tons of health or just a
+  little</li>
+<li>assuming clone clones health, each generator will produce matching goblins</li>
+<li>lots of flexibility</li>
+<li>
+<p>basically lets you use an actual instance of some class, and all of the
+  detailed state that object has and turn around and use it as a template to
+  stamp out other similar objects</p>
+</li>
+<li>
+<p>that&#x2019;s prototype <em>pattern</em>. even if you&#x2019;ve heard of "prototypes" before, good
+  chance didn&#x2019;t know the pattern, so now you do</p>
+</li>
+<li>kind of interesting, but not that useful pattern for code, honestly</li>
+<li>
+<p>implementing clone isn&#x2019;t much less work than implementing a factory for each
+  class</p>
+</li>
+<li>
+<p>as a design pattern for code, not too useful, but it crops up in other places</p>
+</li>
+<li>first is programming languages</li>
+<li>some oop languages aren&#x2019;t class-based, instead they are prototype-based</li>
+</ul>
+<h2><a href="#what-are-classes-and-prototypes-for" name="what-are-classes-and-prototypes-for">what are classes and prototypes for?</a></h2>
+<ul>
+<li>
+<p>can look at class-based languages and prototype-based languages as competing
+  approaches to solving problems</p>
+</li>
+<li>
+<p>both based on observation that in a program</p>
+</li>
+<li>
+<p>have lots of objects that are similar: same structure, same behavior, often
+    even similar state</p>
+</li>
+<li>
+<p>need way to make objects of a given flavor like this</p>
+</li>
+<li>
+<p>class based languages say:</p>
+</li>
+<li>
+<p>objects are similar because you explicitly define a class that defines the
+    behavior and sometimes structures of all of those objects</p>
+</li>
+<li>any given object is explicitly a member of some class</li>
+<li>
+<p>the class itself is the mechanism for creating new objects of that type</p>
+<ul>
+<li>whatever the language, always mention class name when creating new
+  instance</li>
+</ul>
+</li>
+<li>
+<p>prototype-based languages say:</p>
+</li>
+<li>
+<p>objects are similar because they all came from the same prototypical
+    instance. (or came from things that did.)</p>
+</li>
+<li>any given object has no explicit class or type. it&#x2019;s ad-hoc</li>
+<li>
+<p>to create new objects of a given type, you just find one that&#x2019;s already
+    similar to what you want and clone it.</p>
+</li>
+<li>
+<p>cloning is the fundamental idea behind prototypes. if you want an object
+    like X, find X and copy it</p>
+</li>
+<li>
+<p>prototypes have lot going for them</p>
+</li>
+<li>any object can become effectively like a "class"</li>
+<li>don&#x2019;t have ceremony and boilerplate of defining classes up front</li>
+<li>especially in languages like c++ and java, can spend a lot of time just
+  writing all of the scaffolding required to define classes</li>
+<li>because cloning clones an object&#x2019;s <em>current</em> state, not only can any object
+  define a "kind" of thing that you can create more of, but an object can define
+  different kinds of things over time as its state changes.</li>
+<li>really flexible, really powerful</li>
+<li>at same time, really simple</li>
+<li>if you&#x2019;re doing language design, you can make a minimal prototype-based
+    language much more easily than a minimal class-based one</li>
+<li>class-based languages need a lot of features: syntax for defining classes,
+    instantiating them, defining constructors, static properties, etc.</li>
+<li>with prototypes, you just need a way to modify objects and a clone operation</li>
+</ul>
+<h2><a href="#how-well-does-it-work" name="how-well-does-it-work">how well does it work?</a></h2>
+<ul>
+<li>
+<p>sounds like a win win: simple language, super powerful. we should all be
+  using prototype-based languages, right?</p>
+</li>
+<li>
+<p>well, as it turns out, most of us are these days</p>
+</li>
+<li>
+<p>but we aren&#x2019;t actually using the prototype paradigm, and the reason we&#x2019;re
+  using a prototype-based language is mostly a historical accident</p>
+</li>
+<li>
+<p>the prototype concept is virtually as old as software. ivan sutherland&#x2019;s
+  sketchpad demo in the sixties (!) showed it in beautifully intuitive graphic
+  form.</p>
+</li>
+<li>
+<p>design pattern has been known and used since then</p>
+</li>
+<li>
+<p>but first <em>language</em> to try to double down on this model was self</p>
+</li>
+<li>
+<p>self is fascinating, really unique language</p>
+</li>
+<li>
+<p>also spawned the careers of many of the brilliant vm hackers who&#x2019;ve made the languages we love today run as fast as lightning. self was so hard to optimize, they had to invent all sorts of techiniques to make it go fast, and it turns out those techniques work equally well in lots of other languages</p>
+</li>
+<li>
+<p>but self itself is virtually dead. great research vehicle, but no one uses it.</p>
+</li>
+<li>
+<p>have heard secondhand that even many of the original people on self team came to conclusion that it just wasn&#x2019;t a good way to write programs.</p>
+</li>
+<li>
+<p>turns out too much flexibility can be a good thing.</p>
+</li>
+<li>
+<p>seems like people like to think in terms of well-defined kinds of things.</p>
+</li>
+<li>
+<p>(just look at how many games have "classes", and differently sharply codified kinds of characters, moves, creatures, etc.)</p>
+</li>
+<li>
+<p>the pure prototype model of "just beat an object into some shape and then make a bunch of copies of it" never seem to catch on for code</p>
+</li>
+</ul>
+<h2><a href="#javascript" name="javascript">javascript</a></h2>
+<ul>
+<li>
+<p>said most of use are using a prototype-based language but it&#x2019;s not self. it&#x2019;s javascript. eich was inspired directly by self when he created js.</p>
+</li>
+<li>
+<p>said prototype languages are simpler and he took full advantage of that fact and created js in just ten days.</p>
+</li>
+<li>
+<p>but js isn&#x2019;t a pure prototype-based language. in fact, i&#x2019;d argue it&#x2019;s closer to class-based.</p>
+</li>
+<li>
+<p>there isn&#x2019;t a clone method in site. to define kinds of objects in js, you usually define a "constructor function" that works much like a class. and to create new instances you use "new" just in like C++ or Java.</p>
+</li>
+<li>
+<p>there is some prototypal machinery hiding under the hood, but it&#x2019;s often not visible, and, in practice, coding in js often feels more like using a particularly dynamic and flexible but still class-based language.</p>
+</li>
+<li>
+<p>there are some who feel js&#x2019;s prototype underpinnings should be brought to the fore and used more, and small amount of js code is in that style.</p>
+</li>
+<li>
+<p>others feel js should follow other languages and be more class-like.</p>
+</li>
+<li>
+<p>[if want modern language that is fully proto based, see io]</p>
+</li>
+</ul>
+<h2><a href="#data-pattern" name="data-pattern">data pattern</a></h2>
+<ul>
+<li>
+<p>personally don&#x2019;t feel prototypes are great for a <em>programming language</em>, but i do think they&#x2019;re cool for something else: <em>data</em>.</p>
+</li>
+<li>
+<p>games increasingly data-driven</p>
+</li>
+<li>
+<p>big games have tons of data: hundreds of enemies, items, skills, events, levels, etc. data data data</p>
+</li>
+<li>
+<p>volume is large enough that really need more than just "uh, you can write xml files".</p>
+</li>
+<li>
+<p>many programming language features exist to get rid of duplication.</p>
+</li>
+<li>for example, can create procedures so that you can call it from multiple
+  places, instead of having to copy the code</li>
+<li>
+<p>when you have enough data, start to want similar features</p>
+</li>
+<li>
+<p>prototypes are a great one to consider</p>
+</li>
+<li>
+<p>say we&#x2019;re designing data model for game at beginning of chapter</p>
+</li>
+<li>can define attributes for monsters and items</li>
+<li>
+<p>each entity is property bag: map of key value pairs</p>
+</li>
+<li>
+<p>for example, here&#x2019;s different kinds of goblins in game</p>
+<p>{
+  &#x2019;name&#x2019;: &#x2019;goblin grunt&#x2019;,
+  &#x2019;minHealth&#x2019;: 20,
+  &#x2019;maxHealth&#x2019;: 30,
+  &#x2019;resists&#x2019;: [&#x2019;cold&#x2019;, &#x2019;poison&#x2019;],
+  &#x2019;weaknesses&#x2019;: [&#x2019;fire&#x2019;, &#x2019;light&#x2019;],
+}</p>
+<p>{
+  &#x2019;name&#x2019;: &#x2019;goblin wizard&#x2019;,
+  &#x2019;minHealth&#x2019;: 20,
+  &#x2019;maxHealth&#x2019;: 30,
+  &#x2019;resists&#x2019;: [&#x2019;cold&#x2019;, &#x2019;poison&#x2019;],
+  &#x2019;weaknesses&#x2019;: [&#x2019;fire&#x2019;, &#x2019;light&#x2019;],
+  &#x2019;spells&#x2019;: [&#x2019;fire ball&#x2019;, &#x2019;lightning bolt&#x2019;]
+}</p>
+<p>{
+  &#x2019;name&#x2019;: &#x2019;goblin archer&#x2019;,
+  &#x2019;minHealth&#x2019;: 20,
+  &#x2019;maxHealth&#x2019;: 30,
+  &#x2019;resists&#x2019;: [&#x2019;cold&#x2019;, &#x2019;poison&#x2019;],
+  &#x2019;weaknesses&#x2019;: [&#x2019;fire&#x2019;, &#x2019;light&#x2019;],
+  &#x2019;attacks&#x2019;: [&#x2019;short bow&#x2019;]
+}</p>
+</li>
+<li>
+<p>bunch of duplication there</p>
+</li>
+<li>would be cool to be able to abstract that in one place</li>
+<li>idea is to let any kind be a prototype for others</li>
+<li>can define new kind as a clone of another</li>
+<li>it defines its own properties that override the cloned ones</li>
+<li>but anything not changed is the same as the prototype</li>
+<li>
+<p>then just:</p>
+<p>{
+  &#x2019;name&#x2019;: &#x2019;goblin grunt&#x2019;,
+  &#x2019;minHealth&#x2019;: 20,
+  &#x2019;maxHealth&#x2019;: 30,
+  &#x2019;resists&#x2019;: [&#x2019;cold&#x2019;, &#x2019;poison&#x2019;],
+  &#x2019;weaknesses&#x2019;: [&#x2019;fire&#x2019;, &#x2019;light&#x2019;],
+}</p>
+<p>{
+  &#x2019;name&#x2019;: &#x2019;goblin wizard&#x2019;,
+  &#x2019;extends&#x2019;: &#x2019;goblin grunt&#x2019;,
+  &#x2019;spells&#x2019;: [&#x2019;fire ball&#x2019;, &#x2019;lightning bolt&#x2019;]
+}</p>
+<p>{
+  &#x2019;name&#x2019;: &#x2019;goblin archer&#x2019;,
+  &#x2019;extends&#x2019;: &#x2019;goblin grunt&#x2019;,
+  &#x2019;attacks&#x2019;: [&#x2019;short bow&#x2019;]
+}</p>
+</li>
+<li>
+<p>here &#x2019;extends&#x2019; is sort of metaprogramming (metadata)</p>
+</li>
+<li>says name of kind this one is clone of</li>
+<li>really simple</li>
+<li>really effective</li>
+<li>just like single inheritance has proven a good fit for bunch of languages,
+  think this can work well for a lot of data uses</li>
+</ul>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </div>
 </body>
