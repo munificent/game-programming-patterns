@@ -1,48 +1,99 @@
 ^title Prototype
 ^section Design Patterns Revisited
 
-- chapter ostensibly about prototype design pattern, but hard for me to not
-  talk about lang paradigm too
-- get grounded, here's example of design pattern first
-- imagine making game like gauntlet
-- lots of different monsters
-- and generators in level that pump out monsters of different types
-- for purposes of example, say we have different classes for each kind of
-  monster
-- in practice, probably use type object or components or something
-- (in fact, type object is alternative to prototype)
-- need a generator for each class of monster
-- brute force solution is separate class for each kind of generator
-- then use factory pattern to have each one create the right kind of monster
-- of course, could just use callback instead
-- still need callback fn for each class
-- other option is prototype pattern
-- add abstract Clone() method to monster base class
-- each monster must implement this and return copy of itself
-- when we create generator, we give it instance of monster
-- this monster is prototypical monster
-- when generator needs to create monster, it clones prototype
-- now only need one generator class, and no callbacks
-- of course, do have to implement clone in each monster class
-- one neat thing about this is generators can vary not just on class of monster
-  but on *attributes* too
-- could create generator with protypical goblin with tons of health or just a
-  little
-- assuming clone clones health, each generator will produce matching goblins
-- lots of flexibility
-- basically lets you use an actual instance of some class, and all of the
-  detailed state that object has and turn around and use it as a template to
-  stamp out other similar objects
+Ostensibly, we'll just be talking about the Gang of Four's "Prototype" design pattern here. But "prototype" these days means a good bit more than that pattern, and, as we'll see, the design pattern itself is just about the least interesting use of the term. We'll talk about prototypes as a programming language paradigm, as well as applying it an increasingly important part of games: data modelling.
 
-- that's prototype *pattern*. even if you've heard of "prototypes" before, good
-  chance didn't know the pattern, so now you do
-- kind of interesting, but not that useful pattern for code, honestly
-- implementing clone isn't much less work than implementing a factory for each
-  class
+## The Prototype Design Pattern
 
-- as a design pattern for code, not too useful, but it crops up in other places
-- first is programming languages
-- some oop languages aren't class-based, instead they are prototype-based
+But first, let's go over the <span name="original">original</span> design pattern to see what it is.
+
+<aside name="original">
+
+I don't say "original" lightly here. Design Pattern's cite Ivan Sutherland's legendary Sketchpad project in *1963* as one of the first examples of this pattern in the wild. While everyone else was listening to Dylan and the Beatles, he was busy just, you know, inventing the basic concepts of CAD, interactive graphics, and object-oriented programming.
+
+Watch [the demo](http://www.youtube.com/watch?v=USyoT_Ha_bA) and prepare to be blown away.
+
+</aside>
+
+Lets say we're making a game roughly in the vein of Gauntlet. You've got tons of different kinds of creatures and fiends vying for their share of the hero's flesh. These beasties enter the dungeon by way of generators, and there is a generator for each kind of monster.
+
+For the sake of this example, let's say we have different classes for each kind of monster in the game. We'll have actual C++ classes for `Ghost`, `Demon`, `Sorceror`, etc., like:
+
+^code monster-classes
+
+The generator for each kind of monster needs to construct instances of the different classes. A brute-force solution would be just have a generator class for each monster class, so a parallel class hierarchy like so:
+
+^code generator-classes
+
+Unless you get paid by the line of code, this is pretty obviously not a fun way to solve this problem. Lots of classes, lots of boilerplate.
+
+The prototype pattern offers a solution to this. The key idea is to allow *an object to be a generator of other objects similar to itself*. If you have a ghost, you can make more ghosts from it. If you have a demon, you can make other demons. Any monster can be treated as a *prototypical* monster used to spawn other versions of itself.
+
+Mechanically, the way this pattern works is that your base class -- here `Monster` -- defines a `clone()` method:
+
+^code virtual-clone
+
+Each subclass implements that to return a new object that's identical in class and state to itself. For example:
+
+^code clone-ghost
+
+Once all our monsters support that, we only need a single generator class:
+
+^code generator-clone
+
+The generator internally holds a monster. This isn't a monster that's running around in the level. Instead, it's a hidden monster whose sole purpose is to be used by the generator as a template to stamp out more monsters like itself.
+
+To create a ghost generator, we just create this prototypical ghost instance, and then create a generator using that prototype. One neat part about this pattern is that it doesn't just clone the *class* of the prototype, it clones its *state* too. This means we could make a generator of fast ghosts, or weak ones, or slow ones, just by creating an appropriate prototype ghost.
+
+It's a neat idea. It has a sort of surprising elegance to it, and I can't imagine coming up with it myself. So it's great, right?
+
+## How Useful Is It?
+
+Well, not quite. Sure, we don't have to create a separate generator class for each monster now, but we still have to implement `clone()` in each monster class. That's just about the same amount of boilerplate when you look at it. There are also some really nasty semantic ratholes when you sit down to actually try to write a correct clone. Does it do a deep clone or shallow one? (I.e. when a field is itself a reference to an object, do we clone that object, or just the reference?)
+
+And, of course, to even get this far, we've presumed that we have a bunch of separate classes for each monster. These days, that's definitely *not* the way most game architectures roll. Most of us have learned the hard way that big class hierarchies like this are a pain to manage, which is why we instead use patterns like <a href="component.html" class="pattern">Component</a> and <a href="type-object.html" class="pattern">Type Object</a> to model different kinds of behavior without enshrining each in its own class.
+
+### Generator functions
+
+Even if you do have different classes for each monster, there are other ways to skin this cat. Instead of making separate generator *classes* for each monster, you could make generator *functions*, like so:
+
+^code callback
+
+Then the one generator class can just store a function pointer:
+
+^code generator-callback
+
+To create a generator for ghosts, you just do:
+
+^code generate-ghost-callback
+
+### Templates
+
+By now, most C++ developers are at least a little familiar with templates. Our generator class needs to construct instances of some type, but we don't want to hard code some specific monster type name. The obvious solution then is to make it a type parameter, which is what templates let us do:
+
+^code templates
+
+Using it looks like:
+
+<span name="base"></span>
+
+^code use-templates
+
+<aside name="base">
+
+The pair of classes here -- `Generator` and `GeneratorFor` -- are so that you can have non-templated code that works with a Generator of any type. If we only had the templated `GeneratorFor` class, there'd be no way to write code that accepts a "vanilla" generator of any kind of monster.
+
+`Generator` gives us that single base class that every type-specific generator is derived from. Code that doesn't care what kind of monster a generator emits can just use that and not have to worry about template shenanigans.
+
+</aside>
+
+### First-class types
+
+All of these dance around the basic problem which is that we have a class, `Generator` that we need to parameterize by a type. Templates are how you do that in C++ because types aren't generally first-class. But if you happen to be using a dynamically-typed language like Smalltalk or Ruby where classes *are* just regular objects you can pass around, then the natural solution is to do that.
+
+When you make a generator, just pass in the class of monster that it should construct -- literally the actual runtime object that represents the monster's class. Easy as pie.
+
+With all of those other options, I honestly can't say I've found a case where I felt the prototype *pattern* was the right answer. So let's put that in our Box of Clever but Not Useful Ideas and talk about something else: prototypes as a *language paradigm*.
 
 ## what are classes and prototypes for?
 

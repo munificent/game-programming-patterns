@@ -61,56 +61,186 @@
     </tr>
   </table>
 </div>
-<ul>
-<li>chapter ostensibly about prototype design pattern, but hard for me to not
-  talk about lang paradigm too</li>
-<li>get grounded, here&#x2019;s example of design pattern first</li>
-<li>imagine making game like gauntlet</li>
-<li>lots of different monsters</li>
-<li>and generators in level that pump out monsters of different types</li>
-<li>for purposes of example, say we have different classes for each kind of
-  monster</li>
-<li>in practice, probably use type object or components or something</li>
-<li>(in fact, type object is alternative to prototype)</li>
-<li>need a generator for each class of monster</li>
-<li>brute force solution is separate class for each kind of generator</li>
-<li>then use factory pattern to have each one create the right kind of monster</li>
-<li>of course, could just use callback instead</li>
-<li>still need callback fn for each class</li>
-<li>other option is prototype pattern</li>
-<li>add abstract Clone() method to monster base class</li>
-<li>each monster must implement this and return copy of itself</li>
-<li>when we create generator, we give it instance of monster</li>
-<li>this monster is prototypical monster</li>
-<li>when generator needs to create monster, it clones prototype</li>
-<li>now only need one generator class, and no callbacks</li>
-<li>of course, do have to implement clone in each monster class</li>
-<li>one neat thing about this is generators can vary not just on class of monster
-  but on <em>attributes</em> too</li>
-<li>could create generator with protypical goblin with tons of health or just a
-  little</li>
-<li>assuming clone clones health, each generator will produce matching goblins</li>
-<li>lots of flexibility</li>
-<li>
-<p>basically lets you use an actual instance of some class, and all of the
-  detailed state that object has and turn around and use it as a template to
-  stamp out other similar objects</p>
-</li>
-<li>
-<p>that&#x2019;s prototype <em>pattern</em>. even if you&#x2019;ve heard of "prototypes" before, good
-  chance didn&#x2019;t know the pattern, so now you do</p>
-</li>
-<li>kind of interesting, but not that useful pattern for code, honestly</li>
-<li>
-<p>implementing clone isn&#x2019;t much less work than implementing a factory for each
-  class</p>
-</li>
-<li>
-<p>as a design pattern for code, not too useful, but it crops up in other places</p>
-</li>
-<li>first is programming languages</li>
-<li>some oop languages aren&#x2019;t class-based, instead they are prototype-based</li>
-</ul>
+<p>Ostensibly, we&#x2019;ll just be talking about the Gang of Four&#x2019;s "Prototype" design pattern here. But "prototype" these days means a good bit more than that pattern, and, as we&#x2019;ll see, the design pattern itself is just about the least interesting use of the term. We&#x2019;ll talk about prototypes as a programming language paradigm, as well as applying it an increasingly important part of games: data modelling.</p>
+<h2><a href="#the-prototype-design-pattern" name="the-prototype-design-pattern">The Prototype Design Pattern</a></h2>
+<p>But first, let&#x2019;s go over the <span name="original">original</span> design pattern to see what it is.</p>
+<aside name="original">
+
+<p>I don&#x2019;t say "original" lightly here. Design Pattern&#x2019;s cite Ivan Sutherland&#x2019;s legendary Sketchpad project in <em>1963</em> as one of the first examples of this pattern in the wild. While everyone else was listening to Dylan and the Beatles, he was busy just, you know, inventing the basic concepts of CAD, interactive graphics, and object-oriented programming.</p>
+<p>Watch <a href="http://www.youtube.com/watch?v=USyoT_Ha_bA">the demo</a> and prepare to be blown away.</p>
+</aside>
+
+<p>Lets say we&#x2019;re making a game roughly in the vein of Gauntlet. You&#x2019;ve got tons of different kinds of creatures and fiends vying for their share of the hero&#x2019;s flesh. These beasties enter the dungeon by way of generators, and there is a generator for each kind of monster.</p>
+<p>For the sake of this example, let&#x2019;s say we have different classes for each kind of monster in the game. We&#x2019;ll have actual C++ classes for <code>Ghost</code>, <code>Demon</code>, <code>Sorceror</code>, etc., like:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
+<span class="p">{</span>
+  <span class="c1">// Stuff...</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">Ghost</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span> <span class="p">{};</span>
+<span class="k">class</span> <span class="nc">Demon</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span> <span class="p">{};</span>
+<span class="k">class</span> <span class="nc">Sorceror</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span> <span class="p">{};</span>
+</pre></div>
+
+
+<p>The generator for each kind of monster needs to construct instances of the different classes. A brute-force solution would be just have a generator class for each monster class, so a parallel class hierarchy like so:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Generator</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Generator</span><span class="p">()</span> <span class="p">{}</span>
+  <span class="k">virtual</span> <span class="n">Monster</span><span class="o">*</span> <span class="n">generateMonster</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">GhostGenerator</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Generator</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Monster</span><span class="o">*</span> <span class="n">generateMonster</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">Ghost</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">DemonGenerator</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Generator</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Monster</span><span class="o">*</span> <span class="n">generateMonster</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">Demon</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// You get the idea...</span>
+</pre></div>
+
+
+<p>Unless you get paid by the line of code, this is pretty obviously not a fun way to solve this problem. Lots of classes, lots of boilerplate.</p>
+<p>The prototype pattern offers a solution to this. The key idea is to allow <em>an object to be a generator of other objects similar to itself</em>. If you have a ghost, you can make more ghosts from it. If you have a demon, you can make other demons. Any monster can be treated as a <em>prototypical</em> monster used to spawn other versions of itself.</p>
+<p>Mechanically, the way this pattern works is that your base class&thinsp;&mdash;&thinsp;here <code>Monster</code>&thinsp;&mdash;&thinsp;defines a <code>clone()</code> method:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Monster</span><span class="p">()</span> <span class="p">{}</span>
+  <span class="k">virtual</span> <span class="n">Monster</span><span class="o">*</span> <span class="n">clone</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="c1">// Other stuff...</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>Each subclass implements that to return a new object that&#x2019;s identical in class and state to itself. For example:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Ghost</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span> <span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Ghost</span><span class="p">(</span><span class="kt">int</span> <span class="n">health</span><span class="p">,</span> <span class="kt">int</span> <span class="n">speed</span><span class="p">)</span>
+  <span class="o">:</span> <span class="n">health_</span><span class="p">(</span><span class="n">health</span><span class="p">),</span>
+    <span class="n">speed_</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+  <span class="p">{}</span>
+
+  <span class="n">Monster</span><span class="o">*</span> <span class="n">clone</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">Ghost</span><span class="p">(</span><span class="n">health_</span><span class="p">,</span> <span class="n">speed_</span><span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="nl">private:</span>
+  <span class="kt">int</span> <span class="n">health_</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">speed_</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>Once all our monsters support that, we only need a single generator class:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Generator</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Generator</span><span class="p">(</span><span class="n">Monster</span><span class="o">*</span> <span class="n">prototype</span><span class="p">)</span>
+  <span class="o">:</span> <span class="n">prototype_</span><span class="p">(</span><span class="n">prototype</span><span class="p">)</span>
+  <span class="p">{}</span>
+
+  <span class="n">Monster</span><span class="o">*</span> <span class="n">generateMonster</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">prototype_</span><span class="o">-&gt;</span><span class="n">clone</span><span class="p">();</span>
+  <span class="p">}</span>
+
+<span class="nl">private:</span>
+  <span class="n">Monster</span><span class="o">*</span> <span class="n">prototype_</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>The generator internally holds a monster. This isn&#x2019;t a monster that&#x2019;s running around in the level. Instead, it&#x2019;s a hidden monster whose sole purpose is to be used by the generator as a template to stamp out more monsters like itself.</p>
+<p>To create a ghost generator, we just create this prototypical ghost instance, and then create a generator using that prototype. One neat part about this pattern is that it doesn&#x2019;t just clone the <em>class</em> of the prototype, it clones its <em>state</em> too. This means we could make a generator of fast ghosts, or weak ones, or slow ones, just by creating an appropriate prototype ghost.</p>
+<p>It&#x2019;s a neat idea. It has a sort of surprising elegance to it, and I can&#x2019;t imagine coming up with it myself. So it&#x2019;s great, right?</p>
+<h2><a href="#how-useful-is-it" name="how-useful-is-it">How Useful Is It?</a></h2>
+<p>Well, not quite. Sure, we don&#x2019;t have to create a separate generator class for each monster now, but we still have to implement <code>clone()</code> in each monster class. That&#x2019;s just about the same amount of boilerplate when you look at it. There are also some really nasty semantic ratholes when you sit down to actually try to write a correct clone. Does it do a deep clone or shallow one? (I.e. when a field is itself a reference to an object, do we clone that object, or just the reference?)</p>
+<p>And, of course, to even get this far, we&#x2019;ve presumed that we have a bunch of separate classes for each monster. These days, that&#x2019;s definitely <em>not</em> the way most game architectures roll. Most of us have learned the hard way that big class hierarchies like this are a pain to manage, which is why we instead use patterns like <a href="component.html" class="pattern">Component</a> and <a href="type-object.html" class="pattern">Type Object</a> to model different kinds of behavior without enshrining each in its own class.</p>
+<h3><a href="#generator-functions" name="generator-functions">Generator functions</a></h3>
+<p>Even if you do have different classes for each monster, there are other ways to skin this cat. Instead of making separate generator <em>classes</em> for each monster, you could make generator <em>functions</em>, like so:</p>
+<div class="codehilite"><pre><span class="n">Monster</span><span class="o">*</span> <span class="nf">generateGhost</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="n">Ghost</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Then the one generator class can just store a function pointer:</p>
+<div class="codehilite"><pre><span class="k">typedef</span> <span class="n">Monster</span><span class="o">*</span> <span class="p">(</span><span class="o">*</span><span class="n">GenerateCallback</span><span class="p">)();</span>
+
+<span class="k">class</span> <span class="nc">Generator</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Generator</span><span class="p">(</span><span class="n">GenerateCallback</span> <span class="n">generate</span><span class="p">)</span>
+  <span class="o">:</span> <span class="n">generate_</span><span class="p">(</span><span class="n">generate</span><span class="p">)</span>
+  <span class="p">{}</span>
+
+  <span class="n">Monster</span><span class="o">*</span> <span class="n">generateMonster</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">generate_</span><span class="p">();</span>
+  <span class="p">}</span>
+
+<span class="nl">private:</span>
+  <span class="n">GenerateCallback</span> <span class="n">generate_</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>To create a generator for ghosts, you just do:</p>
+<div class="codehilite"><pre><span class="n">Generator</span><span class="o">*</span> <span class="n">ghostGenerator</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Generator</span><span class="p">(</span><span class="n">generateGhost</span><span class="p">);</span>
+</pre></div>
+
+
+<h3><a href="#templates" name="templates">Templates</a></h3>
+<p>By now, most C++ developers are at least a little familiar with templates. Our generator class needs to construct instances of some type, but we don&#x2019;t want to hard code some specific monster type name. The obvious solution then is to make it a type parameter, which is what templates let us do:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Generator</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Generator</span><span class="p">()</span> <span class="p">{}</span>
+  <span class="k">virtual</span> <span class="n">Monster</span><span class="o">*</span> <span class="n">generateMonster</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">GeneratorFor</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Generator</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Monster</span><span class="o">*</span> <span class="n">generateMonster</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="k">new</span> <span class="n">T</span><span class="p">();</span> <span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>Using it looks like:</p>
+<p><span name="base"></span></p>
+<div class="codehilite"><pre><span class="n">Generator</span><span class="o">*</span> <span class="n">ghostGenerator</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GeneratorFor</span><span class="o">&lt;</span><span class="n">Ghost</span><span class="o">&gt;</span><span class="p">();</span>
+</pre></div>
+
+
+<aside name="base">
+
+<p>The pair of classes here&thinsp;&mdash;&thinsp;<code>Generator</code> and <code>GeneratorFor</code>&thinsp;&mdash;&thinsp;are so that you can have non-templated code that works with a Generator of any type. If we only had the templated <code>GeneratorFor</code> class, there&#x2019;d be no way to write code that accepts a "vanilla" generator of any kind of monster.</p>
+<p><code>Generator</code> gives us that single base class that every type-specific generator is derived from. Code that doesn&#x2019;t care what kind of monster a generator emits can just use that and not have to worry about template shenanigans.</p>
+</aside>
+
+<h3><a href="#first-class-types" name="first-class-types">First-class types</a></h3>
+<p>All of these dance around the basic problem which is that we have a class, <code>Generator</code> that we need to parameterize by a type. Templates are how you do that in C++ because types aren&#x2019;t generally first-class. But if you happen to be using a dynamically-typed language like Smalltalk or Ruby where classes <em>are</em> just regular objects you can pass around, then the natural solution is to do that.</p>
+<p>When you make a generator, just pass in the class of monster that it should construct&thinsp;&mdash;&thinsp;literally the actual runtime object that represents the monster&#x2019;s class. Easy as pie.</p>
+<p>With all of those other options, I honestly can&#x2019;t say I&#x2019;ve found a case where I felt the prototype <em>pattern</em> was the right answer. So let&#x2019;s put that in our Box of Clever but Not Useful Ideas and talk about something else: prototypes as a <em>language paradigm</em>.</p>
 <h2><a href="#what-are-classes-and-prototypes-for" name="what-are-classes-and-prototypes-for">what are classes and prototypes for?</a></h2>
 <ul>
 <li>

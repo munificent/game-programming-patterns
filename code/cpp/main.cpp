@@ -16,13 +16,12 @@
 #include "flyweight.h"
 #include "command.h"
 #include "observer.h"
+#include "prototype.h"
 
 int main (int argc, char * const argv[])
 {
-  /*
   UnbufferedSlapstick::testComedy();
   SpatialPartition::test();
-  */
   ObserverPattern::test();
   return 0;
 }

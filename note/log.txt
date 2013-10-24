@@ -1,3 +1,5 @@
+2013-10-23 - 1040 words, first draft prototype
+2013-10-22 - 115 lines of code for prototype
 2013-10-21 - 547 words, finish outline for prototype
 2013-10-20 - 898 words outline for prototype
 2013-10-19 - 89 loc and notes for observer
