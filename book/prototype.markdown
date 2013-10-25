@@ -3,7 +3,7 @@
 
 Ostensibly, we'll just be talking about the Gang of Four's "Prototype" design pattern here. But "prototype" these days means a good bit more than that pattern, and, as we'll see, the design pattern itself is just about the least interesting use of the term. We'll talk about prototypes as a programming language paradigm, as well as applying it an increasingly important part of games: data modelling.
 
-## The Prototype Design Pattern
+## Prototype as a Design Pattern
 
 But first, let's go over the <span name="original">original</span> design pattern to see what it is.
 
@@ -41,9 +41,9 @@ Once all our monsters support that, we only need a single generator class:
 
 ^code generator-clone
 
-The generator internally holds a monster. This isn't a monster that's running around in the level. Instead, it's a hidden monster whose sole purpose is to be used by the generator as a template to stamp out more monsters like itself.
+The generator internally holds a monster. This isn't a monster that's running around in the level. Instead, it's a hidden monster whose sole purpose is to be used by the generator as a template to stamp out more monsters like itself, sort of like a queen bee who never leaves the hive.
 
-To create a ghost generator, we just create this prototypical ghost instance, and then create a generator using that prototype. One neat part about this pattern is that it doesn't just clone the *class* of the prototype, it clones its *state* too. This means we could make a generator of fast ghosts, or weak ones, or slow ones, just by creating an appropriate prototype ghost.
+To create a ghost generator, we just create a prototypical ghost instance, and then create a generator using that prototype. One neat part about this pattern is that it doesn't just clone the *class* of the prototype, it clones its *state* too. This means we could make a generator of fast ghosts, or weak ones, or slow ones, just by creating an appropriate prototype ghost.
 
 It's a neat idea. It has a sort of surprising elegance to it, and I can't imagine coming up with it myself. So it's great, right?
 
@@ -59,7 +59,7 @@ Even if you do have different classes for each monster, there are other ways to 
 
 ^code callback
 
-Then the one generator class can just store a function pointer:
+This is less boilerplate than rolling a whole *class* for constructing a monster of some class. Then the one generator class can just store a function pointer:
 
 ^code generator-callback
 
@@ -69,13 +69,19 @@ To create a generator for ghosts, you just do:
 
 ### Templates
 
-By now, most C++ developers are at least a little familiar with templates. Our generator class needs to construct instances of some type, but we don't want to hard code some specific monster type name. The obvious solution then is to make it a type parameter, which is what templates let us do:
+By <span name="templates">now</span>, most C++ developers are at least a little familiar with templates. Our generator class needs to construct instances of some type, but we don't want to hard code some specific monster type name. The obvious solution then is to make it a type parameter, which is what templates let us do:
+
+<aside name="templates">
+
+It's hard to tell if C++ programmers have learned to love templates, or if templates have just scared some people off C++ completely. Either way, these days everyone I see using C++ uses templates too.
+
+</aside>
+
+<span name="base"></span>
 
 ^code templates
 
 Using it looks like:
-
-<span name="base"></span>
 
 ^code use-templates
 
@@ -89,93 +95,72 @@ The pair of classes here -- `Generator` and `GeneratorFor` -- are so that you ca
 
 ### First-class types
 
-All of these dance around the basic problem which is that we have a class, `Generator` that we need to parameterize by a type. Templates are how you do that in C++ because types aren't generally first-class. But if you happen to be using a dynamically-typed language like Smalltalk or Ruby where classes *are* just regular objects you can pass around, then the natural solution is to do that.
+All of these dance around the basic problem which is that we have a class, `Generator`, that we need to parameterize by a type. Templates are how you do that in C++ because types aren't generally first-class. But if you happen to be using a dynamically-typed language like Smalltalk or Ruby where classes *are* just regular objects you can pass around, then the natural solution is to do that.
 
 When you make a generator, just pass in the class of monster that it should construct -- literally the actual runtime object that represents the monster's class. Easy as pie.
 
 With all of those other options, I honestly can't say I've found a case where I felt the prototype *pattern* was the right answer. So let's put that in our Box of Clever but Not Useful Ideas and talk about something else: prototypes as a *language paradigm*.
 
-## what are classes and prototypes for?
+## Prototypes as a Language Paradigm
 
-- can look at class-based languages and prototype-based languages as competing
-  approaches to solving problems
+Many people think "object-oriented programming" is synonymous with "classes". While definitions of OOP are subject to endless flamewars, one rough approximation is that it lets you define "objects" which contain both data and behavior. Compared to structured languages like C and functional languages like ML, the defining characteristic of OOP is that it tightly binds state and behavior together.
 
-- both based on observation that in a program
+You may think classes are the one and only way to do that, but a handful of guys in the 80s including Dave Ungar and Randall Smith would beg to differ. They created a language called Self. While as OOP as can be, it had no classes.
 
-  - have lots of objects that are similar: same structure, same behavior, often
-    even similar state
-  - need way to make objects of a given flavor like this
+### Self
 
-- class based languages say:
+In many ways, Self is *more* object-oriented than a class-based language in some pure philosophical sense. We think of OOP as marrying state and behavior, but class based languages actually have a line of separation there.
 
-  - objects are similar because you explicitly define a class that defines the
-    behavior and sometimes structures of all of those objects
-  - any given object is explicitly a member of some class
-  - the class itself is the mechanism for creating new objects of that type
-    - whatever the language, always mention class name when creating new
-      instance
+Consider the semantics of a class-based language. To access some state on an object, you look in the memory for the instance itself. Each instance has the state. To invoke a method, though, you look up the instance's class, and then you look up the method *there*. State lives in instances, and behavior lives in classes. There's always a level of indirection for the latter.
 
-- prototype-based languages say:
+Self eliminated that distinction. To look up *anything*, you just look on the object. An instance can contain both state and behavior. You can have a single object that has a method completely unique to it.
 
-  - objects are similar because they all came from the same prototypical
-    instance. (or came from things that did.)
-  - any given object has no explicit class or type. it's ad-hoc
-  - to create new objects of a given type, you just find one that's already
-    similar to what you want and clone it.
+If that was all Self did, it would be hard to use. Inheritance in class-based languages (despite its faults) enables code reuse and lets you avoid code duplication. To do the same without classes, Self has *delegation*.
 
-  - cloning is the fundamental idea behind prototypes. if you want an object
-    like X, find X and copy it
+To access a field or call a method on some object, we first look in the object itself. If it has it, we're done. If it doesn't, we look at the object's <span name="parent">*parent*</span>. Each object can have a "parent", which is a reference to another object. When we fail to find a property on the object, we try its parent (and its parent, and so on). In other words, failed lookups are *delegated* to an object's parent.
 
-- prototypes have lot going for them
-- any object can become effectively like a "class"
-- don't have ceremony and boilerplate of defining classes up front
-- especially in languages like c++ and java, can spend a lot of time just
-  writing all of the scaffolding required to define classes
-- because cloning clones an object's *current* state, not only can any object
-  define a "kind" of thing that you can create more of, but an object can define
-  different kinds of things over time as its state changes.
-- really flexible, really powerful
-- at same time, really simple
-  - if you're doing language design, you can make a minimal prototype-based
-    language much more easily than a minimal class-based one
-  - class-based languages need a lot of features: syntax for defining classes,
-    instantiating them, defining constructors, static properties, etc.
-  - with prototypes, you just need a way to modify objects and a clone operation
+<aside name="parent">
 
-## how well does it work?
+I'm simplifying here. This is a crappy tutorial on Self, but hopefully an OK introduction to prototypes.
 
-- sounds like a win win: simple language, super powerful. we should all be
-  using prototype-based languages, right?
+</aside>
 
-- well, as it turns out, most of us are these days
-- but we aren't actually using the prototype paradigm, and the reason we're
-  using a prototype-based language is mostly a historical accident
+Parent objects give us a way to reuse behavior (and state!) across multiple objects, so we've got half of what classes cover here. The other key thing classes do is give us a mechanism to create new instances. When you need a new Thingamabob, you can just do `new Thingabob` (or whatever your preferred language's syntax is). The class is implicitly a factory for instances of itself.
 
-- the prototype concept is virtually as old as software. ivan sutherland's
-  sketchpad demo in the sixties (!) showed it in beautifully intuitive graphic
-  form.
+Without classes, how do we make new things? In particular, how do we make new things that all have stuff in common? As you can guess by the chapter, the way you do this in Self is by *cloning*.
 
-- design pattern has been known and used since then
+In Self, it's as if *every* object supports the Prototype design pattern implicitly. Any object can be cloned. To make a bunch of similar objects, you just:
 
-- but first *language* to try to double down on this model was self
+1. Make one object that looks like you want. You can just clone the base `Object` built into the system and then add whatever properties you want.
+2. Clone it to make as many... uh... clones as you want.
 
-- self is fascinating, really unique language
+This gives us the cleverness of the Prototype design pattern without the headache of having to implement `clone()` ourselves. It's just built into the system.
 
-- also spawned the careers of many of the brilliant vm hackers who've made the languages we love today run as fast as lightning. self was so hard to optimize, they had to invent all sorts of techiniques to make it go fast, and it turns out those techniques work equally well in lots of other languages
+This is such a beautiful, clever, minimal system that as soon as I learned about this, <span name="finch">I started building</span> an interpreter for a prototype-based language just to get more experience with it. A minimal but complete prototype-based language is much simpler than an equally minimal class-based one.
 
-- but self itself is virtually dead. great research vehicle, but no one uses it.
+<aside name="finch">
 
-- have heard secondhand that even many of the original people on self team came to conclusion that it just wasn't a good way to write programs.
+I realize this reaction may not be normal for most people. If you're curious, the language is called [Finch](http://finch.stuffwithstuff.com/).
 
-- turns out too much flexibility can be a good thing.
+</aside>
 
-- seems like people like to think in terms of well-defined kinds of things.
+### How Did it Go?
 
-- (just look at how many games have "classes", and differently sharply codified kinds of characters, moves, creatures, etc.)
+I was super excited to play with a pure prototype-based language, but once I had mine up and running, I discovered an unpleasant fact: it just wasn't that <span name="no-fun">fun</span> to program in.
 
-- the pure prototype model of "just beat an object into some shape and then make a bunch of copies of it" never seem to catch on for code
+<aside name="no-fun">
 
-## javascript
+I've since heard through the grapevine that many of the Self programmers came to the same conclusion. The project was far from a loss, though. Self was so dynamic that it needed all sorts of virtual machine innovations in order to run fast enough. The ideas they came up with in Self for just-in-time compilation, garbage collection, and optimizing method dispatch are the exact same techniques (often implemented by the same people!) that now make many of the world's dynamically-typed languages faster than they've ever been.
+
+</aside>
+
+Sure, the language was simple, but that was because it punted the complexity onto the user. As soon as I started trying to use it, the first thing I did was try to come up with a pattern for defining classes.
+
+My hunch is that most people just like well-defined "kinds of things". In addition to the runaway success of classes-based languages, look at how many games have character classes, and a precise roster of different sorts of enemies, items, and skills, each neatly labelled, icon-ified, and lovingly documented. You don't see many games where each monster is a unique snowflake, like "sort of halfway between a troll and a goblin with a bit of snake mixed in".
+
+While prototypes are a really really cool paradigm, and one that I wish more people knew about, I'm glad that most of us aren't actually programming using them every day. The code I've seen that really tries to fully embrace prototypes has a weird shapelessness to it that I find really hard to work with.
+
+### What about JavaScript?
 
 - said most of use are using a prototype-based language but it's not self. it's javascript. eich was inspired directly by self when he created js.
 
