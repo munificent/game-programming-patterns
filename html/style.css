@@ -203,6 +203,9 @@ a.outline:after {
 .codehilite .sc {
   color: #c70; }
 
+.codehilite .s2 {
+  color: #c70; }
+
 .codehilite .c {
   color: #999; }
 
@@ -216,6 +219,9 @@ a.outline:after {
   color: #594; }
 
 .codehilite .nl {
+  color: #3366cc; }
+
+.codehilite .nt {
   color: #3366cc; }
 
 #mc_embed_signup table {

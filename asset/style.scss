@@ -280,11 +280,13 @@ a.outline:after {
 .codehilite .kt { color: #09a; }     // keyword type
 .codehilite .s  { color: #c70; }     // string
 .codehilite .sc { color: #c70; }     // string
+.codehilite .s2 { color: #c70; }     // string
 .codehilite .c  { color: #999; }     // comment
 .codehilite .c1 { color: #999; }     // comment
 .codehilite .cm { color: #999; }     // comment
 .codehilite .cp { color: #594; }     // preprocessor
 .codehilite .nl { color: $primary; } // keyword label (private: etc.)
+.codehilite .nt { color: $primary; } // json key
 
 // Based on MailChimp Form Embed Code - Slim - 08/17/2011
 #mc_embed_signup table {
