@@ -96,6 +96,15 @@ namespace PrototypePattern
       Monster* prototype_;
     };
     //^generator-clone
+
+    void test()
+    {
+      //^generate-ghost-clone
+      Monster* ghostPrototype = new Ghost(15, 3);
+      Generator* ghostGenerator = new Generator(ghostPrototype);
+      //^generate-ghost-clone
+      use(ghostGenerator);
+    }
   }
 
   namespace Callbacks
