@@ -3,7 +3,7 @@
 
 Given that this chapter lives under "Design Patterns Revisited", you wouldn't be foolish for assuming this chapter will be all about the <a href="http://en.wikipedia.org/wiki/Prototype_pattern" class="gof-pattern">Prototype design pattern</a>. You would be mistaken, though. Sure, I'll go over that too, but I think prototypes show up in some much more interesting corners of programming these days.
 
-## Prototype as a Design Pattern
+## The Prototype Design Pattern
 
 But before we wander abroad, let's cover the <span name="original">original</span> pattern.
 
@@ -103,57 +103,65 @@ The pair of classes here -- `Generator` and `GeneratorFor` -- are so you can hav
 
 ### First-class types
 
-All of these dance around the basic problem which is that we have a class, `Generator`, that we need to parameterize by a type. Templates are how you do that in C++ because types aren't generally first-class. But if you happen to be using a dynamically-typed language like Smalltalk or Ruby where classes *are* just regular objects you can pass around, then the natural solution is to do that.
+The previous two solutions address the need to have a class, `Generator`, which is parameterized by a type. In C++, types aren't generally first-class, so that requires some <span name="type-obj">gymnastics</span>. If you're using a dynamically-typed language like JavaScript, Python or Ruby where classes *are* just regular objects you can pass around, you can solve this much more directly.
+
+<aside name="type-obj">
+
+In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pattern is another workaround for the lack of first-class types. That pattern can still be useful even in languages with first-class types, though, because it lets *you* define what a "type" is. You may need something different than the language's idea of a type.
+
+</aside>
 
 When you make a generator, just pass in the class of monster that it should construct -- literally the actual runtime object that represents the monster's class. Easy as pie.
 
-With all of those other options, I honestly can't say I've found a case where I felt the prototype *pattern* was the right answer. So let's put that in our Box of Clever but Not Useful Ideas and talk about something else: prototypes as a *language paradigm*.
+With all of those other options, I honestly can't say I've found a case where I felt the prototype *design pattern* was the right answer. Maybe your experience will be different, but for now let's put that away and talk about something else: prototypes as a *language paradigm*.
 
-## Prototypes as a Language Paradigm
+## The Prototype Language Paradigm
 
-Many people think "object-oriented programming" is synonymous with "classes". While definitions of OOP are subject to endless flamewars, one rough approximation is that it lets you define "objects" which contain both data and behavior. Compared to structured languages like C and functional languages like ML, the defining characteristic of OOP is that it tightly binds state and behavior together.
+Many people think "object-oriented programming" is synonymous with "classes". While determining the definition of OOP has the flavor of a religious debate, one rough approximation is that it *lets you define "objects" which contain both data and behavior.* Compared to structured languages like C and functional languages like Scheme, the defining characteristic of OOP is that it tightly binds state and behavior together.
 
-You may think classes are the one and only way to do that, but a handful of guys in the 80s including Dave Ungar and Randall Smith would beg to differ. They created a language called Self. While as OOP as can be, it had no classes.
+You may think classes are the one and only way to do that, but a handful of guys including Dave Ungar and Randall Smith beg to differ. They created a language in the 80s called Self. While as OOP as can be, it has no classes.
 
 ### Self
 
-In many ways, Self is *more* object-oriented than a class-based language in some pure philosophical sense. We think of OOP as marrying state and behavior, but class based languages actually have a line of separation there.
+In a pure sense, Self is *more* object-oriented than a class-based language. We think of OOP as marrying state and behavior, but languages with classes actually have a line of separation between them.
 
-Consider the semantics of a class-based language. To access some state on an object, you look in the memory for the instance itself. Each instance has the state. To invoke a <span name="vtable">method</span>, though, you look up the instance's class, and then you look up the method *there*. State lives in instances, and behavior lives in classes. There's always a level of indirection for the latter.
+Consider the semantics of your favorite class-based language. To access some state on an object, you look in the memory for the instance itself. State is *contained* in the instance.
+
+To invoke a <span name="vtable">method</span>, though, you look up the instance's class, and then you look up the method *there*. Behavior is contained in the *class*. The instance just has a references to its class. There's always that level of indirection to get to a method.
 
 <aside name="vtable">
 
 For example, to invoke a virtual method in C++, you:
 
-1. Find the pointer to the vtable in the object's memory.
+1. Look in the instance's memory for the pointer to its vtable.
 2. From there, look up the method in the vtable.
 
 </aside>
 
 Self eliminates that distinction. To look up *anything*, you just look on the object. An instance can contain both state and behavior. You can have a single object that has a method completely unique to it.
 
-If that was all Self did, it would be hard to use. Inheritance in class-based languages (despite its faults) enables code reuse and lets you avoid code duplication. To do the same without classes, Self has *delegation*.
+If that was all Self did, it would be hard to use. Inheritance in class-based languages (despite its faults) gives you a useful mechanism for reusing polymorphic code and avoiding code duplication. To do the same without classes, Self has *delegation*.
 
-To access a field or call a method on some object, we first look in the object itself. If it has it, we're done. If it doesn't, we look at the object's <span name="parent">*parent*</span>. Each object can have a "parent", which is a reference to another object. When we fail to find a property on the object, we try its parent (and its parent, and so on). In other words, failed lookups are *delegated* to an object's parent.
+To find a field or call a method on some object, we first look in the object itself. If it has it, we're done. If it doesn't, we look at the object's <span name="parent">*parent*</span>. This is just is a reference to some other object. When we fail to find a property on the object, we try its parent (and its parent, and so on). In other words, failed lookups are *delegated* to an object's parent.
 
 <aside name="parent">
 
-I'm simplifying here. This is a crappy tutorial on Self, but hopefully an OK introduction to prototypes.
+I'm simplifying here. Self actually supports multiple parents. Parents are just specially marked fields, which means you can do things like inherit parents, or change them at runtime.
 
 </aside>
 
-Parent objects give us a way to reuse behavior (and state!) across multiple objects, so we've got half of what classes cover here. The other key thing classes do is give us a mechanism to create new instances. When you need a new Thingamabob, you can just do `new Thingabob` (or whatever your preferred language's syntax is). The class is implicitly a factory for instances of itself.
+Parent objects let us reuse behavior (and state!) across multiple objects, so we've covered part of the utility of classes. The other key thing classes do is give us a way to create instances. When you need a new Thingamabob, you can just do `new Thingamabob` (or whatever your preferred language's syntax is). A class is implicitly a factory for instances of itself.
 
 Without classes, how do we make new things? In particular, how do we make a bunch of new things that all have stuff in common? Just like the design pattern, the way you do this in Self is by *cloning*.
 
-In Self, it's as if *every* object supports the Prototype design pattern implicitly. Any object can be cloned. To make a bunch of similar objects, you just:
+In Self, it's as if *every* object supports the Prototype design pattern automatically. Any object can be cloned. To make a bunch of similar objects, you just:
 
-1. Make one object that looks like you want. You can just clone the base `Object` built into the system and then add whatever properties you want.
+1. Make one object that looks like you want. You can just clone the base `Object` built into the system and then stuff properties and methods into it.
 2. Clone it to make as many... uh... clones as you want.
 
-This gives us the cleverness of the Prototype design pattern without the headache of having to implement `clone()` ourselves. It's just built into the system.
+This gives us the elegance of the Prototype design pattern without the tedium of having to implement `clone()` ourselves. It's just built into the system.
 
-This is such a beautiful, clever, minimal system that as soon as I learned about this, <span name="finch">I started building</span> an interpreter for a prototype-based language just to get more experience with it. A minimal but complete prototype-based language is much simpler than an equally minimal class-based one.
+This is such a beautiful, clever, minimal system that as soon as I learned about it, <span name="finch">I started</span> creating a prototype-based language just to get more experience with it.
 
 <aside name="finch">
 
@@ -173,31 +181,37 @@ The ideas they came up with in Self for just-in-time compilation, garbage collec
 
 </aside>
 
-Sure, the language was simple, but that was because it punted the complexity onto the user. As soon as I started trying to use it, the first thing I did was try to come up with a pattern for defining classes.
+Sure, the language was simple to implement, but that was because it punted the complexity onto the user. As soon as I started trying to use it, I found myself trying to recapitulate the structure that classes give you at the library level since the language didn't have it.
 
-My hunch is that most people just like well-defined "kinds of things". In addition to the runaway success of classes-based languages, look at how many games have character classes, and a precise roster of different sorts of enemies, items, and skills, each neatly labelled. We love baseball cards and stamp collecting. You don't see many games where each monster is a unique snowflake, like "sort of halfway between a troll and a goblin with a bit of snake mixed in".
+Maybe this is just because most of my prior experience is in class-based languages, so my mind has been tainted by that paradigm. But my hunch is that most people just like well-defined "kinds of things". We love baseball cards and stamp collecting.
 
-While prototypes are a really really cool paradigm, and one that I wish more people knew about, I'm glad that most of us aren't actually programming using them every day. The code I've seen that really tries to fully embrace prototypes has a weird mushiness to it that I find really hard to work with.
+In addition to the runaway success of classes-based languages, look at how many games have explicit character classes, and a precise roster of different sorts of enemies, items, and skills, each neatly labelled. You don't see many games where each monster is a unique snowflake, like "sort of halfway between a troll and a goblin with a bit of snake mixed in".
 
-### What about JavaScript?
+While prototypes are a really cool paradigm, and one that I wish more people knew about, I'm glad that most of us aren't actually programming using them every day. <span name="telling">The code</span> I've seen that fully embraces prototypes has a weird mushiness to it that I find hard to wrap my head around.
 
-Readers who know what's what are ready to pounce now. If prototype-based languages are so unfriendly, explain JavaScript: a language with prototypes that's used by millions of people every day. More computers run JavaScript than any other language on Earth.
+<aside name="telling">
 
-<span name="ten">Brendan Eich</span>, the creator of JavaScript, took inspiration directly from Self, and many of its internal semantics are prototype-based. Each object can have an arbitrary set of properties, both fields and "methods" (which are really just functions stored as fields). Every object can also have another object (called its "prototype") that it delegates to if a field access fails.
-
-<aside name="ten">
-
-When I said you can implement a prototype-based language more quickly than a class-based one, I meant it: Eich famously got the first version of JavaScript out the door in ten days.
+It's also telling how *little* code there actually is written in a prototypal style.
 
 </aside>
 
-But, despite that, I will argue is that using JavaScript in practice is more like using a class-based language than a prototype-based one.
+### What about JavaScript?
 
-One hint that JavaScript has taken steps away from Self is that the core operation in a prototype-based language, cloning, is nowhere to be seen. There is no method to clone an object (create a new object with the same properties) in JavaScript.
+OK, if prototype-based languages are so unfriendly, how do I explain JavaScript? That's a language with prototypes used by millions of people every day. More computers run JavaScript than any other language on Earth.
 
-The closest it has is `Object.create` which lets you create a new object that delegates to an existing one. That wasn't added until ECMAScript 5 a few years ago well after JavaScript was established, and it isn't commonly used.
+<span name="ten">Brendan Eich</span>, the creator of JavaScript, took inspiration directly from Self, and many of JavaScript's semantics are prototype-based. Each object can have an arbitrary set of properties, both fields and "methods" (which are really just functions stored as fields). An object can also have another object, called its "prototype", that it delegates to if a field access fails.
 
-Instead, let me walk you through the typical way you define and create types of objects in JavaScript. You start with a *constructor function*:
+<aside name="ten">
+
+As a language designer, one appealing thing about prototypes is that they are simpler to implement than classes. Eich took full advantage of this: the first version of JavaScript was created in ten days.
+
+</aside>
+
+But, despite that, I believe that JavaScript in practice has more in common with class-based language than with prototypal ones. One hint that JavaScript has taken steps away from Self is that the core operation in a prototype-based language, *cloning*, is nowhere to be seen. There is no method to clone an object in JavaScript.
+
+The closest it has is `Object.create` which lets you create a new object that delegates to an existing one. Even that wasn't added until ECMAScript 5, fourteen years after JavaScript came out, and it isn't commonly used.
+
+Instead, let me walk you through the typical way you define types and create objects in JavaScript. You start with a *constructor function*:
 
     :::javascript
     function Weapon(range, damage) {
@@ -210,13 +224,13 @@ This creates a new object and initializes its fields. You invoke it like:
     :::javascript
     var sword = new Weapon(10, 16);
 
-The `new` here creates a new, empty object, then invokes the body of the `Weapon` function with `this` bound to that object. The body adds a bunch of fields to it, then it's implicitly returned. So now we've got a little object with some state.
+The `new` here invokes the body of the `Weapon` function with `this` bound to a new empty object. The body adds a bunch of fields to it, then it's implicitly returned. So now we've got a little object with some state.
 
-The `new` also does one other thing for you. When it creates that blank object, it automatically wires it up to a prototype object. You can access that object using `Weapon.prototype`.
+The `new` also does one other thing for you. When it creates that blank object, it automatically sets its prototype (or parent in Self terms) to a prototype object. You can get that object directly using `Weapon.prototype`.
 
 **TODO: whoa this needs some illustrations**
 
-To define behavior, you usually add methods to that prototype object. So we could do something like this:
+To define behavior, you usually add methods to the prototype object. Something like this:
 
     :::javascript
     Weapon.prototype.attack = function(target) {
@@ -233,17 +247,11 @@ Since every object returned by `new Weapon()` delegates to `Weapon.prototype`, y
 
 * State is stored on the instance itself.
 
-* Behavior goes through a level of indirection and is stored on a separate object that represents the set of methods shared by all objects of a certain type.
+* Behavior goes through a level of indirection (delegating to the prototype) and is stored on a separate object that represents the set of methods shared by all objects of a certain type.
 
-Call me crazy, but that sounds a lot like my description of classes above. Yes, you *can* write prototype-style code in JavaScript (sort of, without cloning), but the syntax and idioms of the language encourage a much more class-based approach.
+Call me crazy, but that sounds a lot like my description of classes above. You *can* write prototype-style code in JavaScript (*sans* cloning), but the syntax and idioms of the language encourage a class-based approach.
 
-Personally, I think that's a <span name="good">good thing</span>. Like I've said, I think doubling down on prototypes actually makes code harder to work with, so I like that JavaScript wraps the core semantics in something a little more structured and "classy".
-
-<aside name="good">
-
-Others in the JS community disagree vehemently. There are strong forces pulling JavaScript to evolve both towards and away from classes and it will be interesting to see which way it goes in the next few years.
-
-</aside>
+Personally, I think that's a <span name="good">good thing</span>. Like I've said, I find doubling down on prototypes actually makes code harder to work with, so I like that JavaScript wraps the core semantics in something a little more classy.
 
 ## Prototypes for Data Modeling
 
