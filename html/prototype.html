@@ -83,7 +83,9 @@
 </pre></div>
 
 
-<p>A generator constructs instances of some monster class. To support every monster in the game, a brute-force solution would be have a generator class for each monster class, leading to a parallel class hierarchy like so:</p>
+<p>A generator constructs instances of some monster class. To support every monster in the game, a brute-force solution would be have a generator class for each monster class, leading to a parallel class hierarchy:</p>
+<p><img src="images/prototype-hierarchies.png" /></p>
+<p>Coding that up looks like this:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Generator</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -113,7 +115,7 @@
 </pre></div>
 
 
-<p>Unless you get paid by the line of code, this is pretty obviously not a fun way to solve this problem. Lots of classes, lots of boilerplate, lots of redundancy, lots of duplication, lots of repeating myself&hellip;</p>
+<p>Unless you get paid by the line, this is pretty obviously not a fun way to solve this problem. Lots of classes, lots of boilerplate, lots of redundancy, lots of duplication, lots of repeating myself&hellip;</p>
 <p>The prototype pattern offers a solution. The key idea is that <em>an object can be a generator of other objects similar to itself</em>. If you have a ghost, you can make more ghosts from it. If you have a demon, you can make other demons. Any monster can be treated as a <em>prototypical</em> monster used to spawn other versions of itself.</p>
 <p>To implement this, we give our base class, <code>Monster</code>, an abstract <code>clone()</code> method:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
@@ -167,6 +169,7 @@
 
 
 <p>It internally holds a monster, a hidden one whose sole purpose is to be used by the generator as a template to stamp out more monsters like itself, sort of like a queen bee who never leaves the hive.</p>
+<p><img src="images/prototype-generator.png" /></p>
 <p>To create a ghost generator, we just create a prototypical ghost instance, and then create a generator using that prototype:</p>
 <div class="codehilite"><pre><span class="n">Monster</span><span class="o">*</span> <span class="n">ghostPrototype</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Ghost</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
 <span class="n">Generator</span><span class="o">*</span> <span class="n">ghostGenerator</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Generator</span><span class="p">(</span><span class="n">ghostPrototype</span><span class="p">);</span>
@@ -266,16 +269,20 @@
 <p>In a pure sense, Self is <em>more</em> object-oriented than a class-based language. We think of OOP as marrying state and behavior, but languages with classes actually have a line of separation between them.</p>
 <p>Consider the semantics of your favorite class-based language. To access some state on an object, you look in the memory for the instance itself. State is <em>contained</em> in the instance.</p>
 <p>To invoke a <span name="vtable">method</span>, though, you look up the instance&#x2019;s class, and then you look up the method <em>there</em>. Behavior is contained in the <em>class</em>. The instance just has a references to its class. There&#x2019;s always that level of indirection to get to a method.</p>
+<p><img src="images/prototype-class.png" /></p>
 <aside name="vtable">
 
-<p>For example, to invoke a virtual method in C++, you:</p>
-<ol>
-<li>Look in the instance&#x2019;s memory for the pointer to its vtable.</li>
-<li>From there, look up the method in the vtable.</li>
-</ol>
+<p>For example, to invoke a virtual method in C++, you look in the instance for the pointer to its vtable, then look up the method there.</p>
 </aside>
 
 <p>Self eliminates that distinction. To look up <em>anything</em>, you just look on the object. An instance can contain both state and behavior. You can have a single object that has a method completely unique to it.</p>
+<p><span name="island"></span></p>
+<p><img src="images/prototype-object.png" /></p>
+<aside name="island">
+
+<p>No man is an island, but this object is.</p>
+</aside>
+
 <p>If that was all Self did, it would be hard to use. Inheritance in class-based languages (despite its faults) gives you a useful mechanism for reusing polymorphic code and avoiding code duplication. To do the same without classes, Self has <em>delegation</em>.</p>
 <p>To find a field or call a method on some object, we first look in the object itself. If it has it, we&#x2019;re done. If it doesn&#x2019;t, we look at the object&#x2019;s <span name="parent"><em>parent</em></span>. This is just is a reference to some other object. When we fail to find a property on the object, we try its parent (and its parent, and so on). In other words, failed lookups are <em>delegated</em> to an object&#x2019;s parent.</p>
 <aside name="parent">
@@ -283,6 +290,7 @@
 <p>I&#x2019;m simplifying here. Self actually supports multiple parents. Parents are just specially marked fields, which means you can do things like inherit parents, or change them at runtime.</p>
 </aside>
 
+<p><img src="images/prototype-delegate.png" /></p>
 <p>Parent objects let us reuse behavior (and state!) across multiple objects, so we&#x2019;ve covered part of the utility of classes. The other key thing classes do is give us a way to create instances. When you need a new Thingamabob, you can just do <code>new Thingamabob</code> (or whatever your preferred language&#x2019;s syntax is). A class is implicitly a factory for instances of itself.</p>
 <p>Without classes, how do we make new things? In particular, how do we make a bunch of new things that all have stuff in common? Just like the design pattern, the way you do this in Self is by <em>cloning</em>.</p>
 <p>In Self, it&#x2019;s as if <em>every</em> object supports the Prototype design pattern automatically. Any object can be cloned. To make a bunch of similar objects, you just:</p>
@@ -339,7 +347,6 @@
 
 <p>The <code>new</code> here invokes the body of the <code>Weapon</code> function with <code>this</code> bound to a new empty object. The body adds a bunch of fields to it, then it&#x2019;s implicitly returned. So now we&#x2019;ve got a little object with some state.</p>
 <p>The <code>new</code> also does one other thing for you. When it creates that blank object, it automatically sets its prototype (or parent in Self terms) to a prototype object. You can get that object directly using <code>Weapon.prototype</code>.</p>
-<p><strong>TODO: whoa this needs some illustrations</strong></p>
 <p>To define behavior, you usually add methods to the prototype object. Something like this:</p>
 <div class="codehilite"><pre><span class="nx">Weapon</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">attack</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">distanceTo</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="o">&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">range</span><span class="p">)</span> <span class="p">{</span>
@@ -351,7 +358,9 @@
 </pre></div>
 
 
-<p>Since every object returned by <code>new Weapon()</code> delegates to <code>Weapon.prototype</code>, you can now call <code>sword.attack()</code> and it will call that function. So here we&#x2019;ve got:</p>
+<p>Since every object returned by <code>new Weapon()</code> delegates to <code>Weapon.prototype</code>, you can now call <code>sword.attack()</code> and it will call that function. It looks a bit like this:</p>
+<p><img src="images/prototype-weapon.png" /></p>
+<p>So here we&#x2019;ve got:</p>
 <ul>
 <li>
 <p>The way you create objects is by a "new" operation that you invoke on an object that represents the type (the constructor function).</p>

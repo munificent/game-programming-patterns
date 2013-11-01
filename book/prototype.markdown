@@ -21,11 +21,15 @@ For the sake of this example, let's say we have different classes for each kind 
 
 ^code monster-classes
 
-A generator constructs instances of some monster class. To support every monster in the game, a brute-force solution would be have a generator class for each monster class, leading to a parallel class hierarchy like so:
+A generator constructs instances of some monster class. To support every monster in the game, a brute-force solution would be have a generator class for each monster class, leading to a parallel class hierarchy:
+
+<img src="images/prototype-hierarchies.png" />
+
+Coding that up looks like this:
 
 ^code generator-classes
 
-Unless you get paid by the line of code, this is pretty obviously not a fun way to solve this problem. Lots of classes, lots of boilerplate, lots of redundancy, lots of duplication, lots of repeating myself...
+Unless you get paid by the line, this is pretty obviously not a fun way to solve this problem. Lots of classes, lots of boilerplate, lots of redundancy, lots of duplication, lots of repeating myself...
 
 The prototype pattern offers a solution. The key idea is that *an object can be a generator of other objects similar to itself*. If you have a ghost, you can make more ghosts from it. If you have a demon, you can make other demons. Any monster can be treated as a *prototypical* monster used to spawn other versions of itself.
 
@@ -42,6 +46,8 @@ Once all our monsters support that, we no longer need generator classes for each
 ^code generator-clone
 
 It internally holds a monster, a hidden one whose sole purpose is to be used by the generator as a template to stamp out more monsters like itself, sort of like a queen bee who never leaves the hive.
+
+<img src="images/prototype-generator.png" />
 
 To create a ghost generator, we just create a prototypical ghost instance, and then create a generator using that prototype:
 
@@ -129,16 +135,25 @@ Consider the semantics of your favorite class-based language. To access some sta
 
 To invoke a <span name="vtable">method</span>, though, you look up the instance's class, and then you look up the method *there*. Behavior is contained in the *class*. The instance just has a references to its class. There's always that level of indirection to get to a method.
 
+<img src="images/prototype-class.png" />
+
 <aside name="vtable">
 
-For example, to invoke a virtual method in C++, you:
-
-1. Look in the instance's memory for the pointer to its vtable.
-2. From there, look up the method in the vtable.
+For example, to invoke a virtual method in C++, you look in the instance for the pointer to its vtable, then look up the method there.
 
 </aside>
 
 Self eliminates that distinction. To look up *anything*, you just look on the object. An instance can contain both state and behavior. You can have a single object that has a method completely unique to it.
+
+<span name="island"></span>
+
+<img src="images/prototype-object.png" />
+
+<aside name="island">
+
+No man is an island, but this object is.
+
+</aside>
 
 If that was all Self did, it would be hard to use. Inheritance in class-based languages (despite its faults) gives you a useful mechanism for reusing polymorphic code and avoiding code duplication. To do the same without classes, Self has *delegation*.
 
@@ -149,6 +164,8 @@ To find a field or call a method on some object, we first look in the object its
 I'm simplifying here. Self actually supports multiple parents. Parents are just specially marked fields, which means you can do things like inherit parents, or change them at runtime.
 
 </aside>
+
+<img src="images/prototype-delegate.png" />
 
 Parent objects let us reuse behavior (and state!) across multiple objects, so we've covered part of the utility of classes. The other key thing classes do is give us a way to create instances. When you need a new Thingamabob, you can just do `new Thingamabob` (or whatever your preferred language's syntax is). A class is implicitly a factory for instances of itself.
 
@@ -228,8 +245,6 @@ The `new` here invokes the body of the `Weapon` function with `this` bound to a 
 
 The `new` also does one other thing for you. When it creates that blank object, it automatically sets its prototype (or parent in Self terms) to a prototype object. You can get that object directly using `Weapon.prototype`.
 
-**TODO: whoa this needs some illustrations**
-
 To define behavior, you usually add methods to the prototype object. Something like this:
 
     :::javascript
@@ -241,7 +256,11 @@ To define behavior, you usually add methods to the prototype object. Something l
       }
     }
 
-Since every object returned by `new Weapon()` delegates to `Weapon.prototype`, you can now call `sword.attack()` and it will call that function. So here we've got:
+Since every object returned by `new Weapon()` delegates to `Weapon.prototype`, you can now call `sword.attack()` and it will call that function. It looks a bit like this:
+
+<img src="images/prototype-weapon.png" />
+
+So here we've got:
 
 * The way you create objects is by a "new" operation that you invoke on an object that represents the type (the constructor function).
 
