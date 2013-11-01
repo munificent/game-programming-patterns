@@ -251,23 +251,35 @@ Since every object returned by `new Weapon()` delegates to `Weapon.prototype`, y
 
 Call me crazy, but that sounds a lot like my description of classes above. You *can* write prototype-style code in JavaScript (*sans* cloning), but the syntax and idioms of the language encourage a class-based approach.
 
-Personally, I think that's a <span name="good">good thing</span>. Like I've said, I find doubling down on prototypes actually makes code harder to work with, so I like that JavaScript wraps the core semantics in something a little more classy.
+Personally, I think that's a <span name="good">good thing</span>. Like I said, I find doubling down on prototypes actually makes code harder to work with, so I like that JavaScript wraps the core semantics in something a little more classy.
 
 ## Prototypes for Data Modeling
 
-OK, I keep talking about things I *don't* like prototypes for, which is making this chapter a real downer. Everybody likes a happy ending, so let's close this out with an area where I *do* think prototypes, or more specifically *delegation*, are a good fit.
+OK, I keep talking about things I *don't* like prototypes for, which is making this chapter a real downer. Everybody likes a happy ending, so let's close this out with an area where I *do* think prototypes, or more specifically *delegation*, can be useful.
 
-If you were to count up all the bytes in a game that are code versus ones that are data, you'd see the ratio of data to code has been increasingly steadily pretty much since day one. Where early games procedurally generated almost everything and had next to no data, today, we typically think of a game codebase as an "engine" that just runs the game itself which is defined entirely in data.
+If you were to count up all the bytes in a game that are code versus ones that are data, you'd see the ratio of code to data has been decreasing steadily since day one. Early games procedurally generated almost everything so they could fit on floppies and old game cartidges. Today, we think of game code as an "engine" that just runs the game itself which is defined entirely in data.
 
-That's great, but just having piles of data doesn't magically solve all of our organizational problems. Programming languages make our jobs easier because they provide lots features that let us get rid of duplication in our code.
+That's great, but pushing piles of content into data files doesn't magically solve the organizational challenges of a large project. If anything, it makes it harder. The reason we use programming languages is because they help us manage complexity.
 
-Instead of having to copy and paste a chunk of code in a bunch of places, we move it into a function that we can refer to by name and call. Instead of copying a method in a bunch of classes, we can put it in a separate class that those classes inherit from or mixin.
+Instead of copying and pasting a chunk of code in ten places, we move it into a function that we can call by name. Instead of copying a method in a bunch of classes, we can put it in a separate class that those classes inherit from or mixin.
 
 When your game's data reaches a certain size, you really start wanting similar features. Data modelling is a deep subject that I couldn't hope to do justice here, but I do want to throw out one feature for you to consider in your own games: using prototypes and delegation for reusing data.
 
-Lets say we're defining the data model for the shameless Gauntlet rip-off I mentioned earlier. The game designers need to be able to specify the attributes for monsters and items in some kind of file.
+Lets say we're defining the data model for the <span name="shameless">shameless Gauntlet rip-off</span> I mentioned earlier. The game designers need to be able to specify the attributes for monsters and items in some kind of file.
 
-One common approach is to use JSON: data entities are basically *maps*, or *property bags* or any of a dozen other terms because there's nothing programmers like more than inventing names for stuff that already exists.
+<aside name="shameless">
+
+I mean completely original title in no way inspired by any previously existing top-down multi-player dungeon crawl arcade games. Please don't sue me.
+
+</aside>
+
+One common approach is to use JSON: data entities are basically *maps*, or *property bags* or any of a dozen other terms because there's nothing programmers like more than <span name="inventing">inventing</span> names for stuff that already exists.
+
+<aside name="inventing">
+
+We've re-invented them so many times that Steve Yegge calls them ["The Universal Design Pattern"](http://steve-yegge.blogspot.com/2008/10/universal-design-pattern.html).
+
+</aside>
 
 So a goblin in the game might be defined something like:
 
@@ -280,7 +292,7 @@ So a goblin in the game might be defined something like:
       "weaknesses": ["fire", "light"],
     }
 
-This is pretty straightforward and even the most text-averse designer can handle that. So you throw in a couple more kinds of monsters:
+This is pretty straightforward and even the most text-averse designer can handle that. So you throw in a couple of sibling branches on the great Goblin Family Tree:
 
     :::json
     {
@@ -301,11 +313,17 @@ This is pretty straightforward and even the most text-averse designer can handle
       "attacks": ["short bow"]
     }
 
-Now, if this was code, our aesthetic sense would be tingling now. There's a lot of duplication between these entities, and well-trained programmers *hate* redundancy. It wastes space and takes more time to author. More importantly, it's a maintenance headache. If we decide to make all of the goblins in the game stronger, we need to remember to update the health of all three of these.
+Now, if this was code, our aesthetic sense would be tingling. There's a lot of duplication between these entities, and well-trained programmers *hate* that. It wastes space and takes more time to author. You have to read carefully to tell if the data even *is* the same. It's a maintenance headache. If we decide to make all of the goblins in the game stronger, we need to remember to update the health of all three of them. Bad bad bad.
 
-If this was code, we'd create an abstraction for a "goblin" and reuse that across the three goblin types. But dumb JSON doesn't know anything about that. So let's make it a bit smarter. We'll add a little meta-programming (metadata?) facility to these bags of properties.
+If this was code, we'd create an abstraction for a "goblin" and reuse that across the three goblin types. But dumb JSON doesn't know anything about that. So let's make it a bit smarter.
 
-If an object has an `'prototype'` field, then that defines the name of some other object that this one is derived from. We'll copy over any fields from that prototype object into the new one. In other words, the new object is a clone of that one, then with modifications applied.
+If an object has a <span name="meta">`"prototype"`</span> field, then that defines the name of another object that this one delegates to. Any properties that don't exist on the first object fall back to being looked up on the prototype.
+
+<aside name="meta">
+
+This makes the `"prototype"` a piece of *meta*data instead of data. Goblins have warty green skin and yellow teeth. They don't have prototypes. Prototypes are a property of the data modelling system, and not the thing being modelled.
+
+</aside>
 
 With that, we can simplify our goblin horde to:
 
@@ -315,7 +333,7 @@ With that, we can simplify our goblin horde to:
       "minHealth": 20,
       "maxHealth": 30,
       "resists": ["cold", "poison"],
-      "weaknesses": ["fire", "light"],
+      "weaknesses": ["fire", "light"]
     }
 
     {
@@ -330,13 +348,13 @@ With that, we can simplify our goblin horde to:
       "attacks": ["short bow"]
     }
 
-Since the archer and wizard have the grunt as their prototype, we don't have to repeat the health, resists and weaknesses in each of them. The semantics we've added to our data model is super simple, just basic delegation, but we've already gotten rid of a bunch of duplication.
+Since the archer and wizard have the grunt as their prototype, we don't have to repeat the health, resists and weaknesses in each of them. The logic we've added to our data model is super simple -- just basic single delegation -- but we've already gotten rid of a bunch of duplication.
 
-One interesting thing to note here is that we didn't set up a separate "base goblin" abstract prototype for the three concrete goblin types to delegate to. Instead, we just picked one of the goblins who was the simplest and delegate to that.
+One interesting thing to note here is that we didn't set up a fourth "base goblin" *abstract* prototype for the three concrete goblin types to delegate to. Instead, we just picked one of the goblins who was the simplest and delegated to it.
 
 That feels natural in a prototype-based system where any object can be used as a clone to create new refined objects, and I think it's equally natural here too. It's a particularly good fit for data in games where you often have one-off special entities in the game world.
 
-Think bosses and unique items. These are often refinements of a more common object in the game, and prototypal delegation is a good fit for defining those. The magic Sword of Head-Detaching, which is really just a longsword with some bonuses can be expressed as that directly:
+Think about bosses and unique items. These are often refinements of a more common object in the game, and prototypal delegation is a good fit for defining those. The magic Sword of Head-Detaching, which is really just a longsword with some bonuses can be expressed as that directly:
 
     :::json
     {
