@@ -61,8 +61,8 @@
     </tr>
   </table>
 </div>
-<p>The first time I heard the word "prototype" was in Design Patterns. Today, it seems like everyone is saying it, but it turns out they aren&#x2019;t the <a href="http://en.wikipedia.org/wiki/Prototype_pattern" class="gof-pattern">design pattern</a>. We&#x2019;ll cover that here, but I&#x2019;ll also show you other, more interesting places where the term "prototype" and the concepts behind it have popped up.</p>
-<p>But first, let&#x2019;s revisit the <span name="original">original</span> pattern.</p>
+<p>The first time I heard the word "prototype" was in <em>Design Patterns</em>. Today, it seems like everyone is saying it, but it turns out they aren&#x2019;t talking about the <a href="http://en.wikipedia.org/wiki/Prototype_pattern" class="gof-pattern">design pattern</a>.</p>
+<p>We&#x2019;ll cover that here, but I&#x2019;ll also show you other, more interesting places where the term "prototype" and the concepts behind it have popped up. But first, let&#x2019;s revisit the <span name="original">original</span> pattern.</p>
 <h2><a href="#the-prototype-design-pattern" name="the-prototype-design-pattern">The Prototype Design Pattern</a></h2>
 <aside name="original">
 
@@ -263,11 +263,11 @@
 <p>When you make a generator, just pass in the class of monster that it should construct&thinsp;&mdash;&thinsp;literally the actual runtime object that represents the monster&#x2019;s class. Easy as pie.</p>
 <p>With all of these options, I honestly can&#x2019;t say I&#x2019;ve found a case where I felt the prototype <em>design pattern</em> was the best answer. Maybe your experience will be different, but for now let&#x2019;s put that away and talk about something else: prototypes as a <em>language paradigm</em>.</p>
 <h2><a href="#the-prototype-language-paradigm" name="the-prototype-language-paradigm">The Prototype Language Paradigm</a></h2>
-<p>Many people think "object-oriented programming" is synonymous with "classes". While determining the definition of OOP has the flavor of a religious debate, one rough approximation is that it <em>lets you define "objects" which contain both data and behavior.</em> Compared to structured languages like C and functional languages like Scheme, the defining characteristic of OOP is that it tightly binds state and behavior together.</p>
+<p>Many people think "object-oriented programming" is synonymous with "classes". Definitions of OOP tend to feel like credos of opposing religious denominations, but a fairly non-contentious take on it is that <em>OOP lets you define "objects" which bundle data and behavior together.</em> Compared to structured languages like C and functional languages like Scheme, the defining characteristic of OOP is that it tightly binds state and behavior together.</p>
 <p>You may think classes are the one and only way to do that, but a handful of guys including Dave Ungar and Randall Smith beg to differ. They created a language in the 80s called Self. While as OOP as can be, it has no classes.</p>
 <h3><a href="#self" name="self">Self</a></h3>
 <p>In a pure sense, Self is <em>more</em> object-oriented than a class-based language. We think of OOP as marrying state and behavior, but languages with classes actually have a line of separation between them.</p>
-<p>Consider the semantics of your favorite class-based language. To access some state on an object, you look in the memory for the instance itself. State is <em>contained</em> in the instance.</p>
+<p>Consider the semantics of your favorite class-based language. To access some state on an object, you look in the memory of the instance itself. State is <em>contained</em> in the instance.</p>
 <p>To invoke a <span name="vtable">method</span>, though, you look up the instance&#x2019;s class, and then you look up the method <em>there</em>. Behavior is contained in the <em>class</em>. The instance just has a references to its class. There&#x2019;s always that level of indirection to get to a method.</p>
 <p><img src="images/prototype-class.png" /></p>
 <aside name="vtable">
@@ -283,26 +283,26 @@
 <p>No man is an island, but this object is.</p>
 </aside>
 
-<p>If that was all Self did, it would be hard to use. Inheritance in class-based languages (despite its faults) gives you a useful mechanism for reusing polymorphic code and avoiding code duplication. To do the same without classes, Self has <em>delegation</em>.</p>
-<p>To find a field or call a method on some object, we first look in the object itself. If it has it, we&#x2019;re done. If it doesn&#x2019;t, we look at the object&#x2019;s <span name="parent"><em>parent</em></span>. This is just is a reference to some other object. When we fail to find a property on the object, we try its parent (and its parent, and so on). In other words, failed lookups are <em>delegated</em> to an object&#x2019;s parent.</p>
+<p>If that was all Self did, it would be hard to use. Inheritance in class-based languages (despite its faults) gives you a useful mechanism for reusing polymorphic code and avoiding duplication. To accomplish something similar without classes, Self has <em>delegation</em>.</p>
+<p>To find a field or call a method on some object, we first look in the object itself. If it has it, we&#x2019;re done. If it doesn&#x2019;t, we look at the object&#x2019;s <span name="parent"><em>parent</em></span>. This is just is a reference to some other object. When we fail to find a property on the first object, we try its parent (and its parent, and so on). In other words, failed lookups are <em>delegated</em> to an object&#x2019;s parent.</p>
 <aside name="parent">
 
-<p>I&#x2019;m simplifying here. Self actually supports multiple parents. Parents are just specially marked fields, which means you can do things like inherit parents, or change them at runtime.</p>
+<p>I&#x2019;m simplifying here. Self actually supports multiple parents. Parents are just specially marked fields, which means you can do things like inherit parents, or change them at runtime, leading to what&#x2019;s called <em>dynamic inheritance</em>.</p>
 </aside>
 
 <p><img src="images/prototype-delegate.png" /></p>
-<p>Parent objects let us reuse behavior (and state!) across multiple objects, so we&#x2019;ve covered part of the utility of classes. The other key thing classes do is give us a way to create instances. When you need a new Thingamabob, you can just do <code>new Thingamabob</code> (or whatever your preferred language&#x2019;s syntax is). A class is implicitly a factory for instances of itself.</p>
+<p>Parent objects let us reuse behavior (and state!) across multiple objects, so we&#x2019;ve covered part of the utility of classes. The other key thing classes do is give us a way to create instances. When you need a new thingamabob, you can just do <code>new Thingamabob</code> (or whatever your preferred language&#x2019;s syntax is). A class is implicitly a factory for instances of itself.</p>
 <p>Without classes, how do we make new things? In particular, how do we make a bunch of new things that all have stuff in common? Just like the design pattern, the way you do this in Self is by <em>cloning</em>.</p>
 <p>In Self, it&#x2019;s as if <em>every</em> object supports the Prototype design pattern automatically. Any object can be cloned. To make a bunch of similar objects, you just:</p>
 <ol>
-<li>Make one object that looks like you want. You can just clone the base <code>Object</code> built into the system and then stuff properties and methods into it.</li>
+<li>Beat one object into the shape you want. You can just clone the base <code>Object</code> built into the system and then stuff fields and methods into it.</li>
 <li>Clone it to make as many&hellip; uh&hellip; clones as you want.</li>
 </ol>
-<p>This gives us the elegance of the Prototype design pattern without the tedium of having to implement <code>clone()</code> ourselves. It&#x2019;s just built into the system.</p>
+<p>This gives us the elegance of the Prototype design pattern without the tedium of having to implement <code>clone()</code> ourselves; it&#x2019;s just built into the system.</p>
 <p>This is such a beautiful, clever, minimal system that as soon as I learned about it, <span name="finch">I started</span> creating a prototype-based language just to get more experience with it.</p>
 <aside name="finch">
 
-<p>I realize building one from scratch is not the most efficient way to learn, but what can I say, I&#x2019;m a bit peculiar. If you&#x2019;re curious, the language is called <a href="http://finch.stuffwithstuff.com/">Finch</a>.</p>
+<p>I realize building a language from scratch is not the most efficient way to learn, but what can I say, I&#x2019;m a bit peculiar. If you&#x2019;re curious, the language is called <a href="http://finch.stuffwithstuff.com/">Finch</a>.</p>
 </aside>
 
 <h3><a href="#how-did-it-go" name="how-did-it-go">How did it go?</a></h3>
@@ -310,29 +310,28 @@
 <aside name="no-fun">
 
 <p>I&#x2019;ve since heard through the grapevine that many of the Self programmers came to the same conclusion. The project was far from a loss, though. Self was so dynamic that it needed all sorts of virtual machine innovations in order to run fast enough.</p>
-<p>The ideas they came up with in Self for just-in-time compilation, garbage collection, and optimizing method dispatch are the exact same techniques (often implemented by the same people!) that now make many of the world&#x2019;s dynamically-typed languages faster than they&#x2019;ve ever been.</p>
+<p>The ideas they invented for just-in-time compilation, garbage collection, and optimizing method dispatch are the exact same techniques (often implemented by the same people!) that now make many of the world&#x2019;s dynamically-typed languages fast enough to use for massively popular applications.</p>
 </aside>
 
-<p>Sure, the language was simple to implement, but that was because it punted the complexity onto the user. As soon as I started trying to use it, I found myself trying to recapitulate the structure that classes give you at the library level since the language didn&#x2019;t have it.</p>
-<p>Maybe this is just because most of my prior experience is in class-based languages, so my mind has been tainted by that paradigm. But my hunch is that most people just like well-defined "kinds of things". We love baseball cards and stamp collecting.</p>
+<p>Sure, the language was simple to implement, but that was because it punted the complexity onto the user. As soon as I started trying to use it, I found myself missing the structure that classes give. I ended up trying to recapitulate it at the library level since the language didn&#x2019;t have it.</p>
+<p>Maybe this is just because my prior experience is in class-based languages, so my mind has been tainted by that paradigm. But my hunch is that most people just like well-defined "kinds of things".</p>
 <p>In addition to the runaway success of classes-based languages, look at how many games have explicit character classes, and a precise roster of different sorts of enemies, items, and skills, each neatly labelled. You don&#x2019;t see many games where each monster is a unique snowflake, like "sort of halfway between a troll and a goblin with a bit of snake mixed in".</p>
 <p>While prototypes are a really cool paradigm, and one that I wish more people knew about, I&#x2019;m glad that most of us aren&#x2019;t actually programming using them every day. <span name="telling">The code</span> I&#x2019;ve seen that fully embraces prototypes has a weird mushiness to it that I find hard to wrap my head around.</p>
 <aside name="telling">
 
-<p>It&#x2019;s also telling how <em>little</em> code there actually is written in a prototypal style.</p>
+<p>It&#x2019;s also telling how <em>little</em> code there actually is written in a prototypal style. I&#x2019;ve looked.</p>
 </aside>
 
 <h3><a href="#what-about-javascript" name="what-about-javascript">What about JavaScript?</a></h3>
-<p>OK, if prototype-based languages are so unfriendly, how do I explain JavaScript? That&#x2019;s a language with prototypes used by millions of people every day. More computers run JavaScript than any other language on Earth.</p>
+<p>OK, if prototype-based languages are so unfriendly, how do I explain JavaScript? Here&#x2019;s a language with prototypes used by millions of people every day. More computers run JavaScript than any other language on Earth.</p>
 <p><span name="ten">Brendan Eich</span>, the creator of JavaScript, took inspiration directly from Self, and many of JavaScript&#x2019;s semantics are prototype-based. Each object can have an arbitrary set of properties, both fields and "methods" (which are really just functions stored as fields). An object can also have another object, called its "prototype", that it delegates to if a field access fails.</p>
 <aside name="ten">
 
 <p>As a language designer, one appealing thing about prototypes is that they are simpler to implement than classes. Eich took full advantage of this: the first version of JavaScript was created in ten days.</p>
 </aside>
 
-<p>But, despite that, I believe that JavaScript in practice has more in common with class-based language than with prototypal ones. One hint that JavaScript has taken steps away from Self is that the core operation in a prototype-based language, <em>cloning</em>, is nowhere to be seen. There is no method to clone an object in JavaScript.</p>
-<p>The closest it has is <code>Object.create</code> which lets you create a new object that delegates to an existing one. Even that wasn&#x2019;t added until ECMAScript 5, fourteen years after JavaScript came out, and it isn&#x2019;t commonly used.</p>
-<p>Instead, let me walk you through the typical way you define types and create objects in JavaScript. You start with a <em>constructor function</em>:</p>
+<p>But, despite that, I believe that JavaScript in practice has more in common with class-based languages than with prototypal ones. One hint that JavaScript has taken steps away from Self is that the core operation in a prototype-based language, <em>cloning</em>, is nowhere to be seen. There is no method to clone an object in JavaScript.</p>
+<p>The closest it has is <code>Object.create</code> which lets you create a new object that delegates to an existing one. Even that wasn&#x2019;t added until ECMAScript 5, fourteen years after JavaScript came out. Instead of cloning, let me walk you through the typical way you define types and create objects in JavaScript. You start with a <em>constructor function</em>:</p>
 <div class="codehilite"><pre><span class="kd">function</span> <span class="nx">Weapon</span><span class="p">(</span><span class="nx">range</span><span class="p">,</span> <span class="nx">damage</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">range</span> <span class="o">=</span> <span class="nx">range</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">damage</span> <span class="o">=</span> <span class="nx">damage</span><span class="p">;</span>
@@ -345,9 +344,9 @@
 </pre></div>
 
 
-<p>The <code>new</code> here invokes the body of the <code>Weapon</code> function with <code>this</code> bound to a new empty object. The body adds a bunch of fields to it, then it&#x2019;s implicitly returned. So now we&#x2019;ve got a little object with some state.</p>
-<p>The <code>new</code> also does one other thing for you. When it creates that blank object, it automatically sets its prototype (or parent in Self terms) to a prototype object. You can get that object directly using <code>Weapon.prototype</code>.</p>
-<p>To define behavior, you usually add methods to the prototype object. Something like this:</p>
+<p>The <code>new</code> here invokes the body of the <code>Weapon</code> function with <code>this</code> bound to a new empty object. The body adds a bunch of fields to it, then the now-filled-in object is automatically returned.</p>
+<p>The <code>new</code> also does one other thing for you. When it creates that blank object, it automatically sets its to delegate to a prototype object. You can get to that object directly using <code>Weapon.prototype</code>.</p>
+<p>While state is added in the constructor body, to define <em>behavior</em>, you usually add methods to the prototype object. Something like this:</p>
 <div class="codehilite"><pre><span class="nx">Weapon</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">attack</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">distanceTo</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="o">&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">range</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Out of range!&quot;</span><span class="p">);</span>
@@ -358,12 +357,12 @@
 </pre></div>
 
 
-<p>Since every object returned by <code>new Weapon()</code> delegates to <code>Weapon.prototype</code>, you can now call <code>sword.attack()</code> and it will call that function. It looks a bit like this:</p>
+<p>This adds an <code>attack</code> property to the weapon prototype whose value is a function. Since every object returned by <code>new Weapon()</code> delegates to <code>Weapon.prototype</code>, you can now call <code>sword.attack()</code> and it will call that function. It looks a bit like this:</p>
 <p><img src="images/prototype-weapon.png" /></p>
-<p>So here we&#x2019;ve got:</p>
+<p>Let&#x2019;s review:</p>
 <ul>
 <li>
-<p>The way you create objects is by a "new" operation that you invoke on an object that represents the type (the constructor function).</p>
+<p>The way you create objects is by a "new" operation that you invoke using an object that represents the type&thinsp;&mdash;&thinsp;the constructor function.</p>
 </li>
 <li>
 <p>State is stored on the instance itself.</p>
@@ -373,14 +372,14 @@
 </li>
 </ul>
 <p>Call me crazy, but that sounds a lot like my description of classes above. You <em>can</em> write prototype-style code in JavaScript (<em>sans</em> cloning), but the syntax and idioms of the language encourage a class-based approach.</p>
-<p>Personally, I think that&#x2019;s a <span name="good">good thing</span>. Like I said, I find doubling down on prototypes actually makes code harder to work with, so I like that JavaScript wraps the core semantics in something a little more classy.</p>
+<p>Personally, I think that&#x2019;s a <span name="good">good thing</span>. Like I said, I find doubling down on prototypes makes code harder to work with, so I like that JavaScript wraps the core semantics in something a little more classy.</p>
 <h2><a href="#prototypes-for-data-modeling" name="prototypes-for-data-modeling">Prototypes for Data Modeling</a></h2>
-<p>OK, I keep talking about things I <em>don&#x2019;t</em> like prototypes for, which is making this chapter a real downer. Everybody likes a happy ending, so let&#x2019;s close this out with an area where I <em>do</em> think prototypes, or more specifically <em>delegation</em>, can be useful.</p>
-<p>If you were to count up all the bytes in a game that are code versus ones that are data, you&#x2019;d see the ratio of code to data has been decreasing steadily since day one. Early games procedurally generated almost everything so they could fit on floppies and old game cartidges. Today, we think of game code as an "engine" that just runs the game itself which is defined entirely in data.</p>
-<p>That&#x2019;s great, but pushing piles of content into data files doesn&#x2019;t magically solve the organizational challenges of a large project. If anything, it makes it harder. The reason we use programming languages is because they help us manage complexity.</p>
-<p>Instead of copying and pasting a chunk of code in ten places, we move it into a function that we can call by name. Instead of copying a method in a bunch of classes, we can put it in a separate class that those classes inherit from or mixin.</p>
-<p>When your game&#x2019;s data reaches a certain size, you really start wanting similar features. Data modelling is a deep subject that I couldn&#x2019;t hope to do justice here, but I do want to throw out one feature for you to consider in your own games: using prototypes and delegation for reusing data.</p>
-<p>Lets say we&#x2019;re defining the data model for the <span name="shameless">shameless Gauntlet rip-off</span> I mentioned earlier. The game designers need to be able to specify the attributes for monsters and items in some kind of file.</p>
+<p>OK, I keep talking about things I <em>don&#x2019;t</em> like prototypes for, which is making this chapter a real downer. I think of this book as more comedy than tragedy, so let&#x2019;s close this out with an area where I <em>do</em> think prototypes, or more specifically <em>delegation</em>, can be useful.</p>
+<p>If you were to count up all the bytes in a game that are code versus ones that are data, you&#x2019;d see the fraction that is data has been increasing steadily since the dawn of programming. Early games procedurally generated almost everything so they could fit on floppies and old game cartidges. Today, we think of game code as an "engine" that just runs the game itself which is defined entirely in reams of "assets".</p>
+<p>That&#x2019;s great, but pushing piles of content into data files doesn&#x2019;t magically solve the organizational challenges of a large project. If anything, it makes it harder. The reason we use programming languages is because they have tools for managing complexity.</p>
+<p>Instead of copying and pasting a chunk of code in ten places, we move it into a function that we can call by name. Instead of copying a method in a bunch of classes, we can put it in a separate class that those classes inherit from or mix in.</p>
+<p>When your game&#x2019;s data reaches a certain size, you really start wanting similar features. Data modelling is a deep subject that I can&#x2019;t hope to do justice here, but I do want to throw out one feature for you to consider in your own games: using prototypes and delegation for reusing data.</p>
+<p>Lets say we&#x2019;re defining the data model for the <span name="shameless">shameless Gauntlet rip-off</span> I mentioned earlier. The game designers need to specify the attributes for monsters and items in some kind of files.</p>
 <aside name="shameless">
 
 <p>I mean completely original title in no way inspired by any previously existing top-down multi-player dungeon crawl arcade games. Please don&#x2019;t sue me.</p>
@@ -392,18 +391,18 @@
 <p>We&#x2019;ve re-invented them so many times that Steve Yegge calls them <a href="http://steve-yegge.blogspot.com/2008/10/universal-design-pattern.html">"The Universal Design Pattern"</a>.</p>
 </aside>
 
-<p>So a goblin in the game might be defined something like:</p>
+<p>So a goblin in the game might be defined something like this:</p>
 <div class="codehilite"><pre><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;goblin grunt&quot;</span><span class="p">,</span>
   <span class="nt">&quot;minHealth&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
   <span class="nt">&quot;maxHealth&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
   <span class="nt">&quot;resists&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cold&quot;</span><span class="p">,</span> <span class="s2">&quot;poison&quot;</span><span class="p">],</span>
-  <span class="nt">&quot;weaknesses&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fire&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">],</span>
+  <span class="nt">&quot;weaknesses&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fire&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 
 
-<p>This is pretty straightforward and even the most text-averse designer can handle that. So you throw in a couple of sibling branches on the great Goblin Family Tree:</p>
+<p>This is pretty straightforward and even the most text-averse designer can handle that. So you throw in a couple of sibling branches on the Great Goblin Family Tree:</p>
 <div class="codehilite"><pre><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;goblin wizard&quot;</span><span class="p">,</span>
   <span class="nt">&quot;minHealth&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
@@ -426,13 +425,13 @@
 
 <p>Now, if this was code, our aesthetic sense would be tingling. There&#x2019;s a lot of duplication between these entities, and well-trained programmers <em>hate</em> that. It wastes space and takes more time to author. You have to read carefully to tell if the data even <em>is</em> the same. It&#x2019;s a maintenance headache. If we decide to make all of the goblins in the game stronger, we need to remember to update the health of all three of them. Bad bad bad.</p>
 <p>If this was code, we&#x2019;d create an abstraction for a "goblin" and reuse that across the three goblin types. But dumb JSON doesn&#x2019;t know anything about that. So let&#x2019;s make it a bit smarter.</p>
-<p>If an object has a <span name="meta"><code>"prototype"</code></span> field, then that defines the name of another object that this one delegates to. Any properties that don&#x2019;t exist on the first object fall back to being looked up on the prototype.</p>
+<p>We&#x2019;ll declare that if an object has a <span name="meta"><code>"prototype"</code></span> field, then that defines the name of another object that this one delegates to. Any properties that don&#x2019;t exist on the first object fall back to being looked up on the prototype.</p>
 <aside name="meta">
 
-<p>This makes the <code>"prototype"</code> a piece of <em>meta</em>data instead of data. Goblins have warty green skin and yellow teeth. They don&#x2019;t have prototypes. Prototypes are a property of the data modelling system, and not the thing being modelled.</p>
+<p>This makes the <code>"prototype"</code> a piece of <em>meta</em>data instead of data. Goblins have warty green skin and yellow teeth. They don&#x2019;t have prototypes. Prototypes are a property of the <em>data object representing the goblin</em>, and not the goblin itself.</p>
 </aside>
 
-<p>With that, we can simplify our goblin horde to:</p>
+<p>With that, we can simplify the JSON for our goblin horde:</p>
 <div class="codehilite"><pre><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;goblin grunt&quot;</span><span class="p">,</span>
   <span class="nt">&quot;minHealth&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
@@ -458,16 +457,16 @@
 <p>Since the archer and wizard have the grunt as their prototype, we don&#x2019;t have to repeat the health, resists and weaknesses in each of them. The logic we&#x2019;ve added to our data model is super simple&thinsp;&mdash;&thinsp;just basic single delegation&thinsp;&mdash;&thinsp;but we&#x2019;ve already gotten rid of a bunch of duplication.</p>
 <p>One interesting thing to note here is that we didn&#x2019;t set up a fourth "base goblin" <em>abstract</em> prototype for the three concrete goblin types to delegate to. Instead, we just picked one of the goblins who was the simplest and delegated to it.</p>
 <p>That feels natural in a prototype-based system where any object can be used as a clone to create new refined objects, and I think it&#x2019;s equally natural here too. It&#x2019;s a particularly good fit for data in games where you often have one-off special entities in the game world.</p>
-<p>Think about bosses and unique items. These are often refinements of a more common object in the game, and prototypal delegation is a good fit for defining those. The magic Sword of Head-Detaching, which is really just a longsword with some bonuses can be expressed as that directly:</p>
+<p>Think about bosses and unique items. These are often refinements of a more common object in the game, and prototypal delegation is a good fit for defining those. The magic Sword of Head-Detaching, which is really just a longsword with some bonuses, can be expressed as that directly:</p>
 <div class="codehilite"><pre><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Sword of Head-Detaching&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;prototype&quot;</span><span class="p">:</span> <span class="s2">&quot;sword&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;prototype&quot;</span><span class="p">:</span> <span class="s2">&quot;longsword&quot;</span><span class="p">,</span>
   <span class="nt">&quot;damage-bonus&quot;</span><span class="p">:</span> <span class="s2">&quot;20d8&quot;</span>
 <span class="p">}</span>
 </pre></div>
 
 
-<p>A little extra power in your game engine&#x2019;s data modelling system can make it easier for designers to add lots of little variations to the armaments and beastiers populating your game world, and that richness is exactly what delights players.</p>
+<p>A little extra power in your game engine&#x2019;s data modelling system can make it easier for designers to add lots of little variations to the armaments and beasties populating your game world, and that richness is exactly what delights players.</p>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </div>
 </body>

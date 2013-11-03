@@ -13,6 +13,7 @@
   Ex: "Add a method to `Foo`."
 - Use normal font and lowercase when referring to objects of the class.
   Ex: "Create a new foo and pass it to `bar()`."
+- Design Patterns and other book titles are *italicized*.
 - Q: Use parentheses when referring to methods/functions? `foo` or `foo()`?
 - Q: `true` or true?
 - Q: Are "enum", "struct", "int", etc. normal words or `code font`?
