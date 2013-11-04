@@ -13,7 +13,7 @@ namespace PrototypePattern
 
     class Ghost : public Monster {};
     class Demon : public Monster {};
-    class Sorceror : public Monster {};
+    class Sorcerer : public Monster {};
     //^monster-classes
 
     //^generator-classes

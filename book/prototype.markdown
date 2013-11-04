@@ -17,7 +17,7 @@ Watch [the demo](http://www.youtube.com/watch?v=USyoT_Ha_bA) and prepare to be b
 
 Pretend we're making a game roughly in the style of Gauntlet. We've got different creatures and fiends swarming around the hero, vying for their share of his flesh. These unsavory dinner companions enter the dungeon by way of generators, and there is a different generator for each kind of monster.
 
-For the sake of this example, let's say we have different classes for each kind of monster in the game. We'll have actual C++ classes for `Ghost`, `Demon`, `Sorceror`, etc., like:
+For the sake of this example, let's say we have different classes for each kind of monster in the game. We'll have actual C++ classes for `Ghost`, `Demon`, `Sorcerer`, etc., like:
 
 ^code monster-classes
 
@@ -276,7 +276,7 @@ Personally, I think that's a <span name="good">good thing</span>. Like I said, I
 
 OK, I keep talking about things I *don't* like prototypes for, which is making this chapter a real downer. Everybody likes a happy ending, so let's close this out with an area where I *do* think prototypes, or more specifically *delegation*, can be useful.
 
-If you were to count up all the bytes in a game that are code versus ones that are data, you'd see the ratio of code to data has been decreasing steadily since day one. Early games procedurally generated almost everything so they could fit on floppies and old game cartidges. Today, we think of game code as an "engine" that just runs the game itself which is defined entirely in data.
+If you were to count up all the bytes in a game that are code versus ones that are data, you'd see the ratio of code to data has been decreasing steadily since day one. Early games procedurally generated almost everything so they could fit on floppies and old game cartridges. Today, we think of game code as an "engine" that just runs the game itself which is defined entirely in data.
 
 That's great, but pushing piles of content into data files doesn't magically solve the organizational challenges of a large project. If anything, it makes it harder. The reason we use programming languages is because they help us manage complexity.
 
