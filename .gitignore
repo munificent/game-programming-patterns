@@ -1,7 +1,6 @@
 code/cpp/build/
-code/cpp/cpp.xcodeproj/project.xcworkspace/
-code/cpp/cpp.xcodeproj/xcuserdata/
-code/flyweight/tiles/tiles.xcodeproj/project.xcworkspace/
-code/flyweight/tiles/tiles.xcodeproj/xcuserdata/
 code/flyweight/tiles/Build/
 .sass-cache/
+xcuserdata/
+*.xcuserstate
+project.xcworkspace/

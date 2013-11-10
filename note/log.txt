@@ -1,4 +1,10 @@
-2013-11-03 - 1126 words, finish third draft prototype
+2013-11-09 - component comparison benchmark
+2013-11-08 - benchmarking, got array access one working
+2013-11-07 - ugh more research
+2013-11-06 - research and benchmarks, get cachegrind
+2013-11-05 - research and benchmark for structure of arrays
+2013-11-04 - post chapter to /r/gamedev
+2013-11-03 - 1126 words, finish third draft prototype, publish
 2013-11-02 - 1355 words, third draft prototype
 2013-11-01 - 1110 words, third draft prototype
 2013-10-31 - photoshop 6 images for prototype
