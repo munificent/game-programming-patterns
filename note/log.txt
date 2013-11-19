@@ -1,3 +1,11 @@
+2013-11-17 - ugh more work trying to get a clean benchmark sample
+2013-11-16 - work on sample code benchmark code
+2013-11-15 - 92 lines of sample code, more outlining
+2013-11-14 - 453 words, outline structure of arrays
+2013-11-13 - 1059 words, outline structure of arrays
+2013-11-12 - 394 words, outline structure of arrays
+2013-11-11 - 672 words, outline structure of arrays
+2013-11-10 - more research, benchmark with actors changing active state
 2013-11-09 - component comparison benchmark
 2013-11-08 - benchmarking, got array access one working
 2013-11-07 - ugh more research

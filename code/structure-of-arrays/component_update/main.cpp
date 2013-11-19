@@ -49,7 +49,7 @@ public:
   int update()
   {
     int sum = 0;
-    for (int i = 0; i < NUM_FIELDS; i++) sum += data[i];
+    for (int i = 0; i < NUM_FIELDS; i++) sum += data[i]++;
     return sum;
   }
 };
@@ -284,7 +284,7 @@ void testRandomActors(float best)
 
 int main(int argc, const char * argv[])
 {
-  for (int i = 0; i < 6; i++)
+  for (int i = 0; i < 4; i++)
   {
     float components = testComponents();
     testWrongOrder(components);

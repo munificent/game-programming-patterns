@@ -43,6 +43,7 @@
 		299FBF6F17D988660018EFD3 /* dirty-flag.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "dirty-flag.h"; sourceTree = SOURCE_ROOT; };
 		29AB1F331817291A004B501E /* prototype.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = prototype.h; sourceTree = SOURCE_ROOT; };
 		29BC60121779DA6C00C5D616 /* expect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = expect.h; sourceTree = SOURCE_ROOT; };
+		29C816321834981000FEF156 /* structure-of-arrays.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "structure-of-arrays.h"; sourceTree = SOURCE_ROOT; };
 		29F2A2A616E63EBB005803DA /* gpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = gpp; path = cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		29FA84A017EDEC6D00D5519E /* flyweight.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flyweight.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -98,6 +99,7 @@
 				292FD0FD180392A6003CE36E /* command.h */,
 				298A366118134C080009A9D6 /* observer.h */,
 				29AB1F331817291A004B501E /* prototype.h */,
+				29C816321834981000FEF156 /* structure-of-arrays.h */,
 			);
 			name = cpp;
 			path = gpp;
@@ -129,7 +131,7 @@
 		29F2A29E16E63EBB005803DA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Bob Nystrom";
 			};
 			buildConfigurationList = 29F2A2A116E63EBB005803DA /* Build configuration list for PBXProject "cpp" */;
@@ -165,7 +167,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -197,7 +198,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;

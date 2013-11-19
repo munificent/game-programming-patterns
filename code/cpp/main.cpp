@@ -17,11 +17,15 @@
 #include "command.h"
 #include "observer.h"
 #include "prototype.h"
+#include "structure-of-arrays.h"
 
 int main (int argc, char * const argv[])
 {
+  StructureOfArrays::test();
+  /*
   UnbufferedSlapstick::testComedy();
   SpatialPartition::test();
   ObserverPattern::test();
+  */
   return 0;
 }

@@ -67,3 +67,15 @@ int* shuffledArray(int length)
 
   return array;
 }
+
+template <class T>
+void shuffle(T* array, int length)
+{
+  for (int i = 0; i < length; i++)
+  {
+    int j = randRange(i, length);
+    T temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+}

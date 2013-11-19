@@ -61,7 +61,441 @@
     </tr>
   </table>
 </div>
-<p><em>Sorry, this chapter hasn&#x2019;t been written yet!</em></p>
+<h2><a href="#intent" name="intent">Intent</a></h2>
+<p><em>Optimize processor cache utilization by organizing data in memory in the order that its processed.</em></p>
+<h2><a href="#motivation" name="motivation">Motivation</a></h2>
+<p>been lied to</p>
+<p>told that moore&#x2019;s law has been going strong for decades</p>
+<p>every year our code all gets faster without any work</p>
+<p>but the hardware folks left a little something out</p>
+<p>sure, can process data much faster</p>
+<p>but can&#x2019;t <em>get</em> data faster</p>
+<p><em>graph of processor and memory speeds</em></p>
+<h2><a href="#data-warehouse" name="data-warehouse">data warehouse</a></h2>
+<p>cpu instructions operate on data, but data is coming from memory</p>
+<p>before can start doing work, have to pull data out of ram and into registers</p>
+<p>turns out, ram hasn&#x2019;t been keeping up with chip</p>
+<p>can now take hundreds of cycles to fetch byte of data from ram</p>
+<p>long analogy time</p>
+<p>imagine you have little office, job is to take box of papers and go through
+and mark them up or whatever</p>
+<p>been doing job a while and getting really fast at it</p>
+<p>can now do entire box in like a minute, awesome</p>
+<p>so can get through 8 * 60 boxes a day, right?</p>
+<p>problem: boxes are all in shelves in warehouse</p>
+<p>to get a box, have to ask warehouse guy to bring it to you</p>
+<p>he gets forklift and goes and finds box</p>
+<p>takes him an entire day, seriously, to bring you a box</p>
+<p>yeah, not sure how he gets away with slacking this much</p>
+<p>doesn&#x2019;t matter how fast you are, you only get one box a day, so you can only</p>
+<p>process on box a day</p>
+<p>industrial designers obviously not happy about this</p>
+<p>notice a couple of things:
+- pretty often, when you&#x2019;re done with one box, the next box you want is right
+  next to it on the shelf in the warehouse
+- using a forklift to carry a single box is pretty dumb</p>
+<p>come up with clever fix</p>
+<p>whenever warehouse guy gets box, he&#x2019;ll actually bring a pallet of them</p>
+<p>gets the box you asked for and then grabs a bunch of boxes next to it</p>
+<p>loads the whole pallet and brings it to you</p>
+<p>just room enough in your little office for the pallet</p>
+<p>when you finish with one box, if the next one you need is on the palette, you</p>
+<p>can just grab it. takes you a few minutes, but nowhere near as long as getting</p>
+<p>it from the warehouse</p>
+<p>if pallet holds twenty boxes, you can do twenty boxes a day now. 10x better!</p>
+<h2><a href="#ahead-of-the-game" name="ahead-of-the-game">ahead of the game</a></h2>
+<p>id folks notice one more thing</p>
+<p>now that you are kept busy for longer while working on entire pallet of boxes,
+warehouse guy spends a lot of time waiting for orders. doesn&#x2019;t know what to
+bring you until you finish all of your boxes and ask for the next one</p>
+<p>they suggest "pre-fetching". after he brings you pallet of boxes, immediately
+starts getting the pallet of boxes next to it</p>
+<p>if you end up asking for something else, he&#x2019;ll stop doing that, but if you
+ask for something that is on that pallet, he&#x2019;ll be halfway done by the time
+you ask for it</p>
+<p>if you happen to need just the right set of boxes, you can get the whole
+pipeline moving fast enough that youre almost always busy</p>
+<h2><a href="#cpu-cache" name="cpu-cache">cpu cache</a></h2>
+<p>very close analogy for how cpus work today. (why would it be in chapter if
+wasn&#x2019;t good analogy?)</p>
+<p>warehouse is main memory. fetching data from it is slooooow.</p>
+<p>box is amount of data that fits in registers</p>
+<p>but cpus now have a cache. small chunk of mem faster to access than ram.
+fast because on chip. literally in area of computers where physics comes
+into play. faster because electrons have less distance to travel.</p>
+<p>in analogy, cache is pallet of boxes you can fit in your office</p>
+<p>when cpu requests byte from main memory, it automatically grabs a chunk of
+contiguous memory, usually 64 or 128 bytes. called "cache line". pulls that
+whole line of data into cache at once.</p>
+<p>if you read next byte of data after one you just requested, its already in
+cache (on pallet in office) and its superfast.</p>
+<p>actually multiple levels of cache. each bigger and slower and then next: l1,
+l2, etc. different chips different.</p>
+<p>when chip needs byte, if it&#x2019;s in cache, gets it fast. called
+cache hit.</p>
+<p>if not already in cache, have to go to ram (or next cache level). called
+cache miss.</p>
+<p>cache misses are the enemy.</p>
+<p>imagine you&#x2019;re trying to optimize some code like this:</p>
+<p _="
+" actors_i_-_update_="actors[i]-&gt;update();
+" doAbsolutelyNothingFor500Cycles_="doAbsolutelyNothingFor500Cycles();
+">for (int i = 0; i &lt; NUM_ACTORS; i++)</p>
+<p>what&#x2019;s the first thing you&#x2019;re going to do? right. that fn call is a cache
+miss.</p>
+<p>speed difference when reading from cache compared to memory is huge. think
+100x or more. has huge impact on app perf.</p>
+<h2><a href="#memory-=-perf" name="memory-=-perf">memory = perf?</a></h2>
+<p>heard about importance of cache before writing this, but no first-hand
+experience. (most my background higher level).</p>
+<p>did some benchmarks.</p>
+<p>surprisingly hard to write good test program to thrash cache and compare
+worst case to best.</p>
+<p>when i did, really surprised. got little program kind of like game loop.
+(will use this for example later)</p>
+<p>worse case was 50 <em>times</em> slower than best.</p>
+<p>doing exact same computation, exact same data, exact same results</p>
+<p><em>only</em> difference was caching effects</p>
+<p>[ymmv, heavily machine dependent]</p>
+<p>tend to think of optimization on two axes: speed and memory usage</p>
+<p>optimizations like memoization, caching, denormalization, etc. spend extra
+memory to go faster</p>
+<p>optimizations like compression trade in speed to save memory</p>
+<p>sort of orthogonal, can spend one to get other</p>
+<p>but tend to think of code being about speed and data being about memory usage</p>
+<p>but surprising lesson for me here is data is about speed too!</p>
+<p>book tries to be about concrete patterns. simple well-defined recipes.</p>
+<p>optimization for cache usage is big topic. haven&#x2019;t even touched on instruction
+cache - remember code is in ram too and has to be fetched onto cpu. caching
+comes into play there too!</p>
+<p>could write entire book</p>
+<p>hard to come up with something simple for this chapter</p>
+<p>if problem is lots of cache misses, solution is trying to keep the stuff you
+need in cache lines you&#x2019;ve already loaded. [on same pallet in analogy]</p>
+<p>lot of techniques for doing that, mention a couple</p>
+<p>but main one is pretty simple: lay out data contiguously in memory in the
+order you process it</p>
+<p>if code is crunhing on a then b then c, then make your memory look like</p>
+<div class="codehilite"><pre>  <span class="o">+---+---+---+</span>
+  <span class="o">|</span> <span class="n">a</span> <span class="o">|</span> <span class="n">b</span> <span class="o">|</span> <span class="n">c</span> <span class="o">|</span>
+  <span class="o">+---+---+---+</span>
+</pre></div>
+
+
+<p>note, not <em>pointers</em> to a, b, c. actual data, right there. if we just point
+to it, have to follow that pointer, and now we&#x2019;re off in memory that&#x2019;s
+unlikely to be in cache ("pointer chasing")</p>
+<p>sounds easy, but we&#x2019;ll see some challenges</p>
+<h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
+<p>modern cpus are much slower to access memory following memory that was previously accessed. improve performance by organizing data in memory in order you process it.</p>
+<h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
+<p>have code that&#x2019;s performance critical</p>
+<p>touches a lot of data</p>
+<p>accessing main memory is slow</p>
+<p>burning lots of cycles on data cache misses. profile profile profile!</p>
+<p>in other words, make sure you have a real problem and you&#x2019;re certain problem
+is coming from cache. as we&#x2019;ll see, this pattern can be major architectural
+surgery. don&#x2019;t want to operate unless patient is really sick.</p>
+<p>(other way to think about it is good to keep this pattern in mind throughout
+project so don&#x2019;t have to make sweeping changes later for it.)</p>
+<h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
+<p>many optimizations sacrifice abstraction for speed. abstraction is about
+building interfaces to obscure what&#x2019;s going on. that decoupling makes it
+easier to change things without affecting other stuff. abstrction about
+generalization, about being flexible by not making assumptions.</p>
+<p>perf is often about the concrete. opt often starts with "assuming we only need
+x" then takes advantage of that. thrives on specifics.</p>
+<h3><a href="#anti-oop" name="anti-oop">Anti-OOP?</a></h3>
+<p>this pattern in particular fights against encapsulation. in c++ going through
+interfaces implies pointers and references. but this pattern is about putting
+object in memory <em>here</em>, not <em>pointer to it</em>.</p>
+<p>[virtual methods are other half of encapsulation. those cause similar caching
+problems with i cache.]</p>
+<p>works best with objects of same type so they are same size. pattern chews on
+big contiguous homogenous arrays. goes against subclassing where objects may
+be different sizes.</p>
+<h3><a href="#anti-object-but-pro-class" name="anti-object-but-pro-class">Anti-object but pro-class?</a></h3>
+<p>oop is about treating object as independent actor that owns state and behavior.
+naturally optimized for thinking of objects as owners of their own destiny
+and singular.</p>
+<p>this pattern really about aggregates. associates behavior with <em>collection</em>
+of objects.</p>
+<p>may feel unintuitive.</p>
+<p>think we&#x2019;ll see that most of oop principles like data hiding are still there.
+more about hiding data in <em>type</em>, not <em>instance of type</em>, which is actually
+how priv in c++ works anyway.</p>
+<h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
+<p>sample is two-fold demonstration. one goal is to show one way of applying
+pattern by going from a before program that doesn&#x2019;t use it to after one that
+does.</p>
+<p>but program itself is also benchmark for pattern. can run and compare before
+and after versions to see impact of caching. as you&#x2019;ll see, both programs
+do exact same processing, only diff is locality.</p>
+<p>[benchmarking is somewhere between black art and snake oil. just because this
+one does or does not show certain numbers does not mean much for your prog.
+have to decide is benchmark is representative of your prog. caching is
+particularly hard because based on memory layout of entire program. exact same
+benchmark code may have different result just by being put in your app. even
+re-ordering functions in source file can change it!]</p>
+<p>basic idea is we&#x2019;re going to sketch out a sort of minimal game-like program</p>
+<p>it will simulate a fake game as fast as it can for a bunch of frames and we&#x2019;ll
+see how long it takes</p>
+<p>to try to make benchmark representative, we&#x2019;ll use skeletal versions of game
+loop and component patterns.</p>
+<h3><a href="#before" name="before">before</a></h3>
+<p>going bottom up, so start with component. in real game, would be different
+kind of components ai, physics, rendering, etc.</p>
+<p>in real game, component has relatively small amount
+state (few dozen bytes or words). small amount of processing code that modifies
+that state. has to be pretty fast because lots of actors in game each with
+multiple components and need to process all of them each frame.</p>
+<p>for benchmark, just have one type of component and behavior and state is
+totally artificial. basically just monkey with handful of bytes.</p>
+<div class="codehilite"><pre><span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">NUM_FIELDS</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Component</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Component</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_FIELDS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kt">int</span> <span class="n">data</span><span class="p">[</span><span class="n">NUM_FIELDS</span><span class="p">];</span>
+
+  <span class="kt">int</span> <span class="nf">update</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_FIELDS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="n">sum</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="k">return</span> <span class="n">sum</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>important bit is even though just busywork for point of benchmark, have to
+ensure state is actually exposed and used by prog. compilers very good at
+dead code elim. if see code doing work and result never used, aggressively
+remove code. easy to write benchmark that gets compiled to nothing!</p>
+<p>now actor, insead of having behavior and state directly in class, just has a
+few of these.</p>
+<p>actor then has few of these. even though all same type in benchmark, pretend
+each one represent something different</p>
+<div class="codehilite"><pre><span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">NUM_COMPONENTS</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Actor</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Component</span><span class="o">*</span> <span class="n">components</span><span class="p">[</span><span class="n">NUM_COMPONENTS</span><span class="p">];</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>game will have bunch of these. keep things simple, just have array of pointers
+to them.</p>
+<div class="codehilite"><pre><span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">NUM_ACTORS</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">;</span>
+<span class="n">Actor</span><span class="o">*</span> <span class="n">actors</span><span class="p">[</span><span class="n">NUM_ACTORS</span><span class="p">];</span>
+</pre></div>
+
+
+<p>this gets wrapped up in game loop. its job is to update every component for
+every actor. important bit is that all components of one type are updated
+for each actor. update all ai components, then all physics, etc.</p>
+<p>instead of looping through actors then components within loop, do opposite</p>
+<p>means we do multiple passes over actors</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">updateWorld</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_COMPONENTS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">NUM_ACTORS</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="n">sum</span> <span class="o">+=</span> <span class="n">actors</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">components</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>then wrap this in loop to keep game running. in real game loop would have
+stuff here to control timing so game runs at predictable speed. here, want it
+to go as fast as possible, so we just loop.</p>
+<div class="codehilite"><pre><span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">NUM_FRAMES</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_FRAMES</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">updateWorld</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">sum</span><span class="p">);</span>
+</pre></div>
+
+
+<p>then bail after fixed number of frames so we can get total time. again sum and
+print is to ensure processing doesn&#x2019;t get compiled out.</p>
+<p>[do bunch of frames because always noise in benchmarking: other processes
+taking cpu time, imprecise timers, startup time, etc. longer benchmarks
+average that out]</p>
+<h4><a href="#set-up-in-mem" name="set-up-in-mem">set up in mem</a></h4>
+<p>ok, that&#x2019;s basic structure. before we can get it going, need to populate
+world.</p>
+<p>in real game, actors getting created and destroyed all the time. constantly
+interacting with memory manager (allocator).</p>
+<p>assuming using general purpose allocator (malloc or new) end result is actors
+and components scattered all over in memory.</p>
+<p>for simple benchmark here, won&#x2019;t simulate creating and destroying actors over
+time. [doing so on your own isn&#x2019;t bad idea, though!]</p>
+<p>instead, will simulate "middle" of game: try to set up simulation as if lots
+of creation and destruction has already happened.</p>
+<p>in other words, going to shuffle actors around in memory explicitly</p>
+<h4><a href="#shuffling-the-deck" name="shuffling-the-deck">shuffling the deck</a></h4>
+<p>need bunch of actors and components. will allocate on heap, but who knows
+what built-in new does? to control for that, will allocate big arrays for
+each.</p>
+<p>[yes, contradicts what just said. trust me.]</p>
+<p>need bunch of actors</p>
+<div class="codehilite"><pre>  <span class="n">array</span> <span class="n">of</span> <span class="n">actors</span>
+</pre></div>
+
+
+<p>bunch of components, four for each actor</p>
+<div class="codehilite"><pre>  <span class="n">array</span> <span class="n">of</span> <span class="n">components</span>
+</pre></div>
+
+
+<p>game loop will have list of actors, but won&#x2019;t use array just made. instead,
+like most games, will have list of pointers. (well, array. in real game
+probably actual stl list or vector.)</p>
+<p>here&#x2019;s where we shuffle things in memory, pointers will not point to
+corresponding actor index in array. instead, all shuffled.</p>
+<p>do this by making array of numbers. each slot in array maps index in actor
+pointer list to index of actor in main array that it points to. so if array
+element 2 has value 5, that means the 2nd actor pointer in the game loop&#x2019;s
+array will point to the 5th actor in the big array of actor objects.</p>
+<p>array starts off in order, so we make sure each actor is only pointed to
+once</p>
+<div class="codehilite"><pre>  <span class="n">array</span> <span class="n">of</span> <span class="n">incrementing</span> <span class="n">numbers</span>
+</pre></div>
+
+
+<p>then we shuffle this [fisher-yeats]</p>
+<div class="codehilite"><pre>  <span class="n">shuffle</span>
+</pre></div>
+
+
+<p>by shuffling array instead of just picking random indices, we ensure that
+one pointer points to each actor, and no actor is pointed to more or less than
+once. it&#x2019;s strict one to one mapping, just discombobulated.</p>
+<p>with this, make array to map actor pointers to actors</p>
+<p>then wire them all up</p>
+<div class="codehilite"><pre>  <span class="n">fill</span> <span class="n">actor</span> <span class="n">pointer</span> <span class="n">array</span>
+</pre></div>
+
+
+<p>now we&#x2019;ll do same for components. make big list of ints that map
+component pointers in actors to indices in giant component array. need index
+for each component for each actor.</p>
+<div class="codehilite"><pre>  <span class="n">array</span> <span class="n">of</span> <span class="n">actor</span> <span class="o">*</span> <span class="n">component</span> <span class="n">indices</span>
+</pre></div>
+
+
+<p>now wire up components in each actor</p>
+<div class="codehilite"><pre>  <span class="n">walk</span> <span class="n">actors</span> <span class="n">and</span> <span class="n">components</span> <span class="n">and</span> <span class="n">wire</span> <span class="n">up</span> <span class="n">to</span> <span class="n">array</span>
+</pre></div>
+
+
+<h4><a href="#keep-time" name="keep-time">keep time</a></h4>
+<p>ok, that&#x2019;s a lot of set up, but now we&#x2019;re ready to go. well, almost. we need
+a stopwatch. that bit is platform-specific and i try to avoid that here, so
+just look up your os&#x2019;s fn to get current time. doesn&#x2019;t need to be that
+precise (which is why we sim a lot of frames).</p>
+<p>fns to start and stop timer</p>
+<p>these tell us how much time elapsed between calls.</p>
+<p>[wall time? process time? good question. this is rough benchmark just to give
+you idea. if you want to get more precise, go for it.]</p>
+<p>ok, now can put it all together. set everything up in memory. start clock.</p>
+<p>sim game loop. stop clock and see how long it took. on machine, it ran in
+XXX seconds.</p>
+<h3><a href="#after" name="after">after</a></h3>
+<p>this where it gets interesting. now lets not shuffle. just assign actors
+and components right in order. still use pointers, though.</p>
+<div class="codehilite"><pre>  <span class="n">unshuffled</span> <span class="n">set</span> <span class="n">up</span>
+</pre></div>
+
+
+<p>everything else is same. let &#x2019;er rip!</p>
+<p>&hellip;</p>
+<p>talk about <em>how</em> to keep things in order! object pools</p>
+<p>&hellip;</p>
+<h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
+<p><code>para</code></p>
+<h3><a href="#do-you-own-the-game-loop,-or-does-the-platform" name="do-you-own-the-game-loop,-or-does-the-platform">Do you own the game loop, or does the platform?</a></h3>
+<p><code>para</code></p>
+<ul>
+<li>
+<p><strong>Do blah:</strong></p>
+</li>
+<li>
+<p><em>Pro.</em> &hellip;</p>
+</li>
+<li>
+<p><em>Pro.</em> &hellip;</p>
+</li>
+</ul>
+<h2><a href="#see-also" name="see-also">See Also</a></h2>
+<ul>
+<li>
+<p>http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf</p>
+</li>
+<li>
+<p>http://gamesfromwithin.com/data-oriented-design</p>
+</li>
+<li>
+<p>goes hand in hand with component</p>
+</li>
+<li>
+<p>"flat array of objects of same kind" -&gt; "object pool"</p>
+</li>
+</ul>
+<h2><a href="#random-notes" name="random-notes">random notes</a></h2>
+<p>making your data structures smaller (bit-packing, ordering fields to reduce padding) will fit more into a cache line, that in turn directly makes them faster</p>
+<ul>
+<li>smaller isn&#x2019;t just about saving memory</li>
+<li>but careful about re-ordering fields since that can interfere with access
+    patterns</li>
+</ul>
+<p>avoid loading entire object into cache just for one bit, like:</p>
+<p>every actor:
+    if (actor-&gt;isActive) actor-&gt;update();</p>
+<p>reading memory is slower than processing
+- this means optimization is as much about data as code</p>
+<p>benchmarking notes</p>
+<p>tried a bunch of different stuff. first benchmark looked super promising:
+30% faster to update components when contiguous instead of actor</p>
+<p>apparently completely artifact of how code was organized. commenting stuff out
+or moving code could nullify or reverse change</p>
+<p>(maybe it&#x2019;s an icache miss issue?)</p>
+<p>tried other smaller benchmark and cache grind</p>
+<p>update a bunch of actors with settable amount of padding between them</p>
+<p>as padding increases, can see cache misses go up, which is good</p>
+<p>tops off right at around 64 bytes total for an actor which is expected since
+that&#x2019;s the cache line size</p>
+<p>no noticeable performance difference though</p>
+<p>maybe need to do more fake work with data so there&#x2019;s most instructions that
+could be processed during read if didn&#x2019;t have cache stall?</p>
+<p>"A key reason why data-oriented design is so powerful is because it works very well on large groups of objects. OOP, by definition, works on a single object."</p>
+<p>"In the 80&#x2019;s we had the pleasure of access to main memory being in the order of a single cycle or so - obviously the focus on design in such a system is on the instructions. Do you know what was written in the 80&#x2019;s? C++ (well, started in &#x2019;79 but first released in &#x2019;85)."</p>
+<p>separate out "hot" fields that are used often from "cold" fields that aren&#x2019;t.</p>
+<p>references</p>
+<ul>
+<li>http://seven-degrees-of-freedom.blogspot.com/2009/10/latency-elephant.html</li>
+<li>http://msinilo.pl/blog/?p=614</li>
+<li>http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf</li>
+<li>http://www.microsoft.com/downloads/details.aspx?FamilyId=1643D55A-D252-4717-BC3E-237C2C5295F4&amp;displaylang=en</li>
+<li>http://gamesfromwithin.com/data-oriented-design</li>
+<li>http://dice.se/wp-content/uploads/Introduction_to_Data-Oriented_Design.pdf</li>
+<li>https://docs.google.com/presentation/d/17Bzle0w6jz-1ndabrvC5MXUIQ5jme0M8xBF71oz-0Js/present#slide=id.i0</li>
+<li>http://igoro.com/archive/gallery-of-processor-cache-effects/</li>
+</ul>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </div>
 </body>
