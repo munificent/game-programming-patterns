@@ -3,103 +3,70 @@
 
 ## Intent
 
-*Optimize processor cache utilization by organizing data in memory in the order that its processed.*
+*Optimize processor cache utilization by arranging data in memory in the order that it is used.*
 
 ## Motivation
 
-been lied to
+We've all been lied to. For years, we've been shown charts where CPU speed keeps going up and to the right. Moore's Law isn't just some historical observation, it's some kind of moral imperative. We software folks shouldn't have to lift a finger to see our programs magically speed up every year.
 
-told that moore's law has been going strong for decades
+CPUs have been getting faster (though even that's plateauing now), but the hardware heads failed to mention a little something. Sure, we can process data faster than ever. But we can't *get* that data faster.
 
-every year our code all gets faster without any work
+**TODO: graph of processor and memory speeds**
 
-but the hardware folks left a little something out
+### A data warehouse
 
-sure, can process data much faster
+Before your super fast CPU can blow through a ream of calculations, it actually needs to get the data its working on out of main memory and into registers. It turns out that RAM hasn't been keeping up with increasing CPU speeds. Not even close.
 
-but can't *get* data faster
+With today's typical hardware, it can take *hundreds* of cycles to fetch a byte of data from <span name="ram">RAM</span>. If each instruction needs some data, and it takes hundreds of cycles just to get a byte of data for that instruction, how is that our CPUs aren't just sitting idle 99% of the time waiting for data?
 
-*graph of processor and memory speeds*
+Actually, they *are* stuck waiting on memory an astonishingly large fraction of time these days, but it's not as bad as it could be. To explain how, we're going to take a trip to the Land of Overly Long Analogies...
 
-## data warehouse
+<aside name="ram">
 
-cpu instructions operate on data, but data is coming from memory
+It's called "Random access memory" because, unlike disc drives, you can theoretically access any piece of it as quick as any other. You don't have to worry about reading things consecutively like you do a disc.
 
-before can start doing work, have to pull data out of ram and into registers
+Or, at least, you *didn't*. As we'll see, RAM isn't so random access anymore either.
 
-turns out, ram hasn't been keeping up with chip
+</aside>
 
-can now take hundreds of cycles to fetch byte of data from ram
+Imagine you're an accountant in a tiny little office. Your job is to request a box of papers and go through and do some <span name="accountant">accountant</span>-y stuff with them. Add up a bunch of numbers or something. You do this for specific labeled boxes according to some arcane logic that only makes sense to other accountants.
 
-[random access not so random!]
+<aside name="accountant">
 
-long analogy time
+I probably shouldn't have used a job I know absolutely nothing about in this analogy.
 
-imagine you have little office, job is to take box of papers and go through
-and mark them up or whatever
+</aside>
 
-been doing job a while and getting really fast at it
+You've been working this job for a while and you've gotten pretty awesome at it. You can now finish off an entire box of paper in, say, a minute. Impressive, right? On a good day without too many coffee breaks, you should be able to get through about 480 boxes.
 
-can now do entire box in like a minute, awesome
+There's a little problem though. All of those boxes are stored in a warehouse in a separate building. To get a box, you have to ask the warehouse guy to bring it to you. He goes and gets a forklift and drives around the aisles until he finds the box you want.
 
-so can get through 8 * 60 boxes a day, right?
+It takes him, seriously, an entire day to do this. Not exactly a go-getter. He's the boss's son, so no one's gonna do anything about it. This means that no matter how fast you are, you only get one box a day. The rest of the time, you just sit there and question the life decisions that led to this soul-sucking job instead of following your passion for videogames.
 
-problem: boxes are all in shelves in warehouse
+One day, a couple of industrial designers show up. Their job is to improve the efficiency of operations. They make assembly lines and stuff go faster. The boss has noticed how few boxes get processed and he wants some improvement, so he brought in the experts.
 
-to get a box, have to ask warehouse guy to bring it to you
+After watching you work for a few days, they notice a few things:
 
-he gets forklift and goes and finds box
+- Pretty often, when you're done with one box, the next box you request is right
+  <span name="next">next</span> to it on the same shelf in the warehouse.
+- Using a forklift to carry a single box of papers is pretty dumb.
+- There's actually a little bit of spare room in the corner of your office.
 
-takes him an entire day, seriously, to bring you a box
+<aside name="next">
 
-yeah, not sure how he gets away with slacking this much
+The technical term for often using stuff nearby the thing you just used is *locality of reference*.
 
-doesn't matter how fast you are, you only get one box a day, so you can only
+</aside>
 
-process on box a day
+They come up with a clever fix. Whenever the warehouse guy gets a box, he'll
+actually grab an entire pallet of them. He gets the box you requested, and then
+a bunch of boxes that are next to it. He doesn't know if you want those (and, given his work ethic, clearly doesn't care). He just grabs them.
 
-industrial designers obviously not happy about this
+He loads the whole pallet and brings it to you. Ignoring issues of workplace safety, he drives the forklift right in and drops the pallet in the corner of your office.
 
-notice a couple of things:
-- pretty often, when you're done with one box, the next box you want is right
-  next to it on the shelf in the warehouse
-- using a forklift to carry a single box is pretty dumb
+When you need a new box, now, the first thing you do is see if it's already on the pallet in your office. If it is, great! It just takes you a second to grab it and you're back to crunching numbers. If a pallet holds fifty boxes and you got lucky and all of the boxes you need happen to be on it, you can churn through fifty times more work than you could before.
 
-come up with clever fix
-
-whenever warehouse guy gets box, he'll actually bring a pallet of them
-
-gets the box you asked for and then grabs a bunch of boxes next to it
-
-loads the whole pallet and brings it to you
-
-just room enough in your little office for the pallet
-
-when you finish with one box, if the next one you need is on the pallet, you
-
-can just grab it. takes you a few minutes, but nowhere near as long as getting
-
-it from the warehouse
-
-if pallet holds twenty boxes, you can do twenty boxes a day now. 10x better!
-
-## ahead of the game
-
-id folks notice one more thing
-
-now that you are kept busy for longer while working on entire pallet of boxes,
-warehouse guy spends a lot of time waiting for orders. doesn't know what to
-bring you until you finish all of your boxes and ask for the next one
-
-they suggest "pre-fetching". after he brings you pallet of boxes, immediately
-starts getting the pallet of boxes next to it
-
-if you end up asking for something else, he'll stop doing that, but if you
-ask for something that is on that pallet, he'll be halfway done by the time
-you ask for it
-
-if you happen to need just the right set of boxes, you can get the whole
-pipeline moving fast enough that youre almost always busy
+But, if you need a box that's *not* on the pallet, you're back to square one. You can only fit one pallet in your office, so your warehouse friend will have to come take that one back and then bring you entirely new one. Tomorrow.
 
 ## cpu cache
 
