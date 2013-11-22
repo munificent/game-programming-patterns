@@ -536,6 +536,8 @@ at this point, number 3 is all you need to find all components for an actor. so 
 * pattern usually takes advantage of "flat array of objects of same kind". if
   need to create and destroy them while doing that, see "object pool".
 
+* artemis (http://gamadu.com/artemis/) is well-known framework using pure-id entities
+
 ## random notes
 
 used to bit pack because memory was limited. then had enough memory that speed
