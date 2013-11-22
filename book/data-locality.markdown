@@ -1,4 +1,4 @@
-^title Structure of Arrays
+^title Data Locality
 ^section Optimizing Patterns
 
 ## Intent
@@ -47,10 +47,12 @@ One day, a couple of industrial designers show up. Their job is to improve the e
 
 After watching you work for a few days, they notice a few things:
 
-- Pretty often, when you're done with one box, the next box you request is right
+* Pretty often, when you're done with one box, the next box you request is right
   <span name="next">next</span> to it on the same shelf in the warehouse.
-- Using a forklift to carry a single box of papers is pretty dumb.
-- There's actually a little bit of spare room in the corner of your office.
+
+* Using a forklift to carry a single box of papers is pretty dumb.
+
+* There's actually a little bit of spare room in the corner of your office.
 
 <aside name="next">
 

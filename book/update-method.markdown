@@ -328,7 +328,7 @@ The metric that should guide your approach here is how many inactive objects you
 
 * This pattern is part of a trinity with <a href="game-loop.html" class="pattern">Game Loop</a> and <a href="component.html" class="pattern">Component</a> that often form the nucleus of a game engine.
 
-* When you start caring about the cache performance of updating a bunch of entities or components in a loop each frame, the <a href="structure-of-arrays.html" class="pattern">Structure of Arrays</a> pattern can help make that faster.
+* When you start caring about the cache performance of updating a bunch of entities or components in a loop each frame, the <a href="data-locality.html" class="pattern">Data Locality</a> pattern can help make that faster.
 
 * Microsoft's XNA platform uses this pattern both in the [`Game`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.update.aspx) and [`GameComponent`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gamecomponent.update.aspx) classes.
 

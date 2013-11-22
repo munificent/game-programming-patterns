@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 
-<title>Game Programming Patterns / Optimizing Patterns / Structure of Arrays</title>
+<title>Game Programming Patterns / Optimizing Patterns / Data Locality</title>
 
 <!-- Tell mobile browsers we're optimized for them and they don't need to crop
      the viewport. -->
@@ -23,7 +23,7 @@
 <body id="top">
 <div class="content">
 <h1 class="book"><a href="index.html">Game Programming Patterns</a> / Optimizing Patterns</h1>
-<h1>Structure of Arrays</h1>
+<h1>Data Locality</h1>
 <div class="in-progress">
   <span class="dismiss">&times;</span>
   <p><strong>This book is a work in progress!</strong></p>
@@ -62,60 +62,55 @@
   </table>
 </div>
 <h2><a href="#intent" name="intent">Intent</a></h2>
-<p><em>Optimize processor cache utilization by organizing data in memory in the order that its processed.</em></p>
+<p><em>Optimize processor cache utilization by arranging data in memory in the order that it is used.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>been lied to</p>
-<p>told that moore&#x2019;s law has been going strong for decades</p>
-<p>every year our code all gets faster without any work</p>
-<p>but the hardware folks left a little something out</p>
-<p>sure, can process data much faster</p>
-<p>but can&#x2019;t <em>get</em> data faster</p>
-<p><em>graph of processor and memory speeds</em></p>
-<h2><a href="#data-warehouse" name="data-warehouse">data warehouse</a></h2>
-<p>cpu instructions operate on data, but data is coming from memory</p>
-<p>before can start doing work, have to pull data out of ram and into registers</p>
-<p>turns out, ram hasn&#x2019;t been keeping up with chip</p>
-<p>can now take hundreds of cycles to fetch byte of data from ram</p>
-<p>[random access not so random!]</p>
-<p>long analogy time</p>
-<p>imagine you have little office, job is to take box of papers and go through
-and mark them up or whatever</p>
-<p>been doing job a while and getting really fast at it</p>
-<p>can now do entire box in like a minute, awesome</p>
-<p>so can get through 8 * 60 boxes a day, right?</p>
-<p>problem: boxes are all in shelves in warehouse</p>
-<p>to get a box, have to ask warehouse guy to bring it to you</p>
-<p>he gets forklift and goes and finds box</p>
-<p>takes him an entire day, seriously, to bring you a box</p>
-<p>yeah, not sure how he gets away with slacking this much</p>
-<p>doesn&#x2019;t matter how fast you are, you only get one box a day, so you can only</p>
-<p>process on box a day</p>
-<p>industrial designers obviously not happy about this</p>
-<p>notice a couple of things:
-- pretty often, when you&#x2019;re done with one box, the next box you want is right
-  next to it on the shelf in the warehouse
-- using a forklift to carry a single box is pretty dumb</p>
-<p>come up with clever fix</p>
-<p>whenever warehouse guy gets box, he&#x2019;ll actually bring a pallet of them</p>
-<p>gets the box you asked for and then grabs a bunch of boxes next to it</p>
-<p>loads the whole pallet and brings it to you</p>
-<p>just room enough in your little office for the pallet</p>
-<p>when you finish with one box, if the next one you need is on the pallet, you</p>
-<p>can just grab it. takes you a few minutes, but nowhere near as long as getting</p>
-<p>it from the warehouse</p>
-<p>if pallet holds twenty boxes, you can do twenty boxes a day now. 10x better!</p>
-<h2><a href="#ahead-of-the-game" name="ahead-of-the-game">ahead of the game</a></h2>
-<p>id folks notice one more thing</p>
-<p>now that you are kept busy for longer while working on entire pallet of boxes,
-warehouse guy spends a lot of time waiting for orders. doesn&#x2019;t know what to
-bring you until you finish all of your boxes and ask for the next one</p>
-<p>they suggest "pre-fetching". after he brings you pallet of boxes, immediately
-starts getting the pallet of boxes next to it</p>
-<p>if you end up asking for something else, he&#x2019;ll stop doing that, but if you
-ask for something that is on that pallet, he&#x2019;ll be halfway done by the time
-you ask for it</p>
-<p>if you happen to need just the right set of boxes, you can get the whole
-pipeline moving fast enough that youre almost always busy</p>
+<p>We&#x2019;ve all been lied to. For years, we&#x2019;ve been shown charts where CPU speed keeps going up and to the right. Moore&#x2019;s Law isn&#x2019;t just some historical observation, it&#x2019;s some kind of moral imperative. We software folks shouldn&#x2019;t have to lift a finger to see our programs magically speed up every year.</p>
+<p>CPUs have been getting faster (though even that&#x2019;s plateauing now), but the hardware heads failed to mention a little something. Sure, we can process data faster than ever. But we can&#x2019;t <em>get</em> that data faster.</p>
+<p><strong>TODO: graph of processor and memory speeds</strong></p>
+<h3><a href="#a-data-warehouse" name="a-data-warehouse">A data warehouse</a></h3>
+<p>Before your super fast CPU can blow through a ream of calculations, it actually needs to get the data its working on out of main memory and into registers. It turns out that RAM hasn&#x2019;t been keeping up with increasing CPU speeds. Not even close.</p>
+<p>With today&#x2019;s typical hardware, it can take <em>hundreds</em> of cycles to fetch a byte of data from <span name="ram">RAM</span>. If each instruction needs some data, and it takes hundreds of cycles just to get a byte of data for that instruction, how is that our CPUs aren&#x2019;t just sitting idle 99% of the time waiting for data?</p>
+<p>Actually, they <em>are</em> stuck waiting on memory an astonishingly large fraction of time these days, but it&#x2019;s not as bad as it could be. To explain how, we&#x2019;re going to take a trip to the Land of Overly Long Analogies&hellip;</p>
+<aside name="ram">
+
+<p>It&#x2019;s called "Random access memory" because, unlike disc drives, you can theoretically access any piece of it as quick as any other. You don&#x2019;t have to worry about reading things consecutively like you do a disc.</p>
+<p>Or, at least, you <em>didn&#x2019;t</em>. As we&#x2019;ll see, RAM isn&#x2019;t so random access anymore either.</p>
+</aside>
+
+<p>Imagine you&#x2019;re an accountant in a tiny little office. Your job is to request a box of papers and go through and do some <span name="accountant">accountant</span>-y stuff with them. Add up a bunch of numbers or something. You do this for specific labeled boxes according to some arcane logic that only makes sense to other accountants.</p>
+<aside name="accountant">
+
+<p>I probably shouldn&#x2019;t have used a job I know absolutely nothing about in this analogy.</p>
+</aside>
+
+<p>You&#x2019;ve been working this job for a while and you&#x2019;ve gotten pretty awesome at it. You can now finish off an entire box of paper in, say, a minute. Impressive, right? On a good day without too many coffee breaks, you should be able to get through about 480 boxes.</p>
+<p>There&#x2019;s a little problem though. All of those boxes are stored in a warehouse in a separate building. To get a box, you have to ask the warehouse guy to bring it to you. He goes and gets a forklift and drives around the aisles until he finds the box you want.</p>
+<p>It takes him, seriously, an entire day to do this. Not exactly a go-getter. He&#x2019;s the boss&#x2019;s son, so no one&#x2019;s gonna do anything about it. This means that no matter how fast you are, you only get one box a day. The rest of the time, you just sit there and question the life decisions that led to this soul-sucking job instead of following your passion for videogames.</p>
+<p>One day, a couple of industrial designers show up. Their job is to improve the efficiency of operations. They make assembly lines and stuff go faster. The boss has noticed how few boxes get processed and he wants some improvement, so he brought in the experts.</p>
+<p>After watching you work for a few days, they notice a few things:</p>
+<ul>
+<li>
+<p>Pretty often, when you&#x2019;re done with one box, the next box you request is right
+  <span name="next">next</span> to it on the same shelf in the warehouse.</p>
+</li>
+<li>
+<p>Using a forklift to carry a single box of papers is pretty dumb.</p>
+</li>
+<li>
+<p>There&#x2019;s actually a little bit of spare room in the corner of your office.</p>
+</li>
+</ul>
+<aside name="next">
+
+<p>The technical term for often using stuff nearby the thing you just used is <em>locality of reference</em>.</p>
+</aside>
+
+<p>They come up with a clever fix. Whenever the warehouse guy gets a box, he&#x2019;ll
+actually grab an entire pallet of them. He gets the box you requested, and then
+a bunch of boxes that are next to it. He doesn&#x2019;t know if you want those (and, given his work ethic, clearly doesn&#x2019;t care). He just grabs them.</p>
+<p>He loads the whole pallet and brings it to you. Ignoring issues of workplace safety, he drives the forklift right in and drops the pallet in the corner of your office.</p>
+<p>When you need a new box, now, the first thing you do is see if it&#x2019;s already on the pallet in your office. If it is, great! It just takes you a second to grab it and you&#x2019;re back to crunching numbers. If a pallet holds fifty boxes and you got lucky and all of the boxes you need happen to be on it, you can churn through fifty times more work than you could before.</p>
+<p>But, if you need a box that&#x2019;s <em>not</em> on the pallet, you&#x2019;re back to square one. You can only fit one pallet in your office, so your warehouse friend will have to come take that one back and then bring you entirely new one. Tomorrow.</p>
 <h2><a href="#cpu-cache" name="cpu-cache">cpu cache</a></h2>
 <p>very close analogy for how cpus work today. (why would it be in chapter if
 wasn&#x2019;t good analogy?)</p>
@@ -447,6 +442,9 @@ actual actor object is less important during core game loop. still useful in oth
 <li>
 <p>pattern usually takes advantage of "flat array of objects of same kind". if
   need to create and destroy them while doing that, see "object pool".</p>
+</li>
+<li>
+<p>artemis (http://gamadu.com/artemis/) is well-known framework using pure-id entities</p>
 </li>
 </ul>
 <h2><a href="#random-notes" name="random-notes">random notes</a></h2>

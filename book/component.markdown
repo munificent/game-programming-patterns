@@ -251,10 +251,10 @@ pointer following may lead to poor performance.
 <aside name="perf">
 
 There's a flip side to this coin. The Component pattern can often
-*improve* performance and cache coherence. Components are a prime
-candidate for use in the <a class="pattern"
-href="structure-of-arrays.html">Structure of Arrays</a> pattern, which
-addresses a performance problem caused by monolithic objects.
+*improve* performance and cache coherence. Components make it
+easier to use the <a class="pattern" href="data-locality.html">
+Data Locality</a> pattern to organize your data in the order
+that the CPU wants it.
 
 </aside>
 
@@ -683,12 +683,12 @@ communication paths if you need them.
 ## See Also
 
 *   This pattern goes hand in hand with the <a class="pattern"
-    href="structure-of-arrays">Structure of Arrays</a> pattern.
+    href="data-locality.html">Data Locality</a> pattern.
     Components split a monolithic object into separate smaller
     objects for each domain being used. If you get all of the
     components of the same type and put them in an array, now you've
-    got them laid out in memory just the way the Structure of Arrays
-    pattern needs to improve your game's performance.
+    got them laid out in memory in the most efficient way for your
+    CPU to read them.
 
     This is a rare hat trick in architecture: your code is both more
     maintainable *and* faster.

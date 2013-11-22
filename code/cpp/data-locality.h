@@ -1,7 +1,7 @@
 #include <time.h>
 
-#ifndef cpp_structure_of_arrays_h
-#define cpp_structure_of_arrays_h
+#ifndef cpp_data_locality_h
+#define cpp_data_locality_h
 
 // TODO(bob):
 //
@@ -13,7 +13,7 @@
 //   them out more.
 // - adding padding to component magnifies it too, but also punishes best case
 
-namespace StructureOfArrays
+namespace DataLocality
 {
   clock_t startTime;
 
