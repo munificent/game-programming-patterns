@@ -15,6 +15,28 @@
 
 namespace DataLocality
 {
+  void doAbsolutelyNothingFor500Cycles() {}
+
+  struct Thing
+  {
+    void doStuff() {}
+  };
+
+  static const int NUM_THINGS = 3;
+
+  void callDoNothing()
+  {
+    Thing things[NUM_THINGS];
+
+    //^do-nothing
+    for (int i = 0; i < NUM_THINGS; i++)
+    {
+      doAbsolutelyNothingFor500Cycles();
+      things[i].doStuff();
+    }
+    //^do-nothing
+  }
+
   clock_t startTime;
 
   void startProfile()

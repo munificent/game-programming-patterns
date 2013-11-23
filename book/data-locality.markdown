@@ -70,7 +70,7 @@ When you need a new box, now, the first thing you do is see if it's already on t
 
 But, if you need a box that's *not* on the pallet, you're back to square one. You can only fit one pallet in your office, so your warehouse friend will have to come take that one back and then bring you entirely new one. Tomorrow.
 
-## CPU Cache
+### A pallet for your CPU
 
 That's a pretty close <span name="analogy">analogy</span> for how CPUs in modern computers work. In case it isn't obvious, you play the role of the CPU. Your desk is the CPU's registers, and the box of papers is the data you can fit in them. The warehouse is your machine's RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.
 
@@ -98,79 +98,51 @@ So, whenever the CPU needs some data, it looks to see if a cache line containing
 
 Our mission for the rest of this chapter is to figure out how to minimize that happening. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
 
-    for (int i = 0; i < NUM_ACTORS; i++)
-    {
-      doAbsolutelyNothingFor500Cycles();
-      actors[i]->update();
-    }
+^code do-nothing
 
 What's the first change you're going to make to that code? Right. Take out that pointless function, expensive call. That functional call is equivalent to the performance hit of a cache miss. Every time you bounce to main memory, it's like you put a `sleep()` call in your code.
 
-## memory = perf?
+### Wait, data is performance?
 
-heard about importance of cache before writing this, but no first-hand
-experience. (most my background higher level).
+Now, I've known about CPU caching and optimizing for it for a long time. It's one of those ideas that I sort of absorbed through osmosis just by being around other programmers. But I didn't have any first-hand experience with it.
 
-did some benchmarks.
+Most of my programming background is higher level: I've done gameplay, a bit of AI, and tons of UI, tools, and shared library kind of stuff. But I'm generally not one of those people who spends three weeks squeezing another 3 FPS out of the rendering engine. I try to keep myself out of the hot path of the game loop most of the time.
 
-surprisingly hard to write good test program to thrash cache and compare
-worst case to best.
+Don't get me wrong, I do care about performance too. So when I started to work on this chapter, I spend some time putting together little mini-game-like programs to try to trigger best case and worst case cache usage. I wanted to write benchmarks that would thrash the cache so I could see first-hand how much bloodshed it causes.
 
-when i did, really surprised. got couple little programs and did variations of
-them to change how they interacted with cache. worse case was 50 *times* slower than best.
+The first thing I learned is that it's surprisingly hard to get a clear window into what your cache is doing. Many basic profilers won't show it and since it's just memory access, it doesn't stick out in the profile. It just looks like every line of code is kind of slow.
 
-doing exact same computation, exact same data, exact same results
+When I finally got some stuff working, though, I was surprised. Even after hearing of how big a deal it is, there's nothing quite like seeing it with your own eyes. <span name="ymmv">I got a few programs</span> that did the *exact same* computation. The only difference was how many cache misses and memory thrashing they caused. The worst case was fifty *times* slower than the best case.
 
-*only* difference was caching effects
+<aside name="ymmv">
 
-[ymmv, heavily machine dependent]
+There's a lot of caveats here. In particular, different computers have different cache setups so my machine may be different from yours, and dedicated game consoles are very different from PCs which are quite different from mobile devices.
 
-tend to think of optimization on two axes: speed and memory usage
+Your mileage will vary.
 
-optimizations like memoization, caching, denormalization, etc. spend extra
-memory to go faster
+</aside>
 
-optimizations like compression trade in speed to save memory
+This was a real eye-opener to me. I'm used to thinking of performance being an aspect of *code* not *data*. A byte isn't slow or fast, it's just a static thing sitting there. But, because of caching, *the way you organize things directly impacts performance.*
 
-sort of orthogonal, can spend one to get other
+The challenge for me now is to wrap that concept up into something that fits into a chapter here. This book tries to be about simple, concrete patterns. It's a recipe book for code.
 
-but tend to think of code being about speed and data being about memory usage
+But optimization for cache usage is a huge topic. I haven't even touched on *instruction caching*. Remember, code is in memory too and has to be loaded onto the CPU before it can be executed. Someone more versed on the subject could write an entire book on it.
 
-but surprising lesson for me here is data is about speed too!
+Until you get your hands on that, though, I do think there are a few basic techniques that I can fit in here that will get you started along the path of thinking about how your data structures impact your performance.
 
-book tries to be about concrete patterns. simple well-defined recipes.
+What it all boils down to is something pretty simple: Whenever the chip reads some memory, it gets a whole cache line. The more you can use stuff in that cache line, the faster you go. So the goal then is to *organize your data structures so that the things you're processing are next to each other in memory*.
 
-optimization for cache usage is big topic. haven't even touched on instruction
-cache - remember code is in ram too and has to be fetched onto cpu. caching
-comes into play there too!
+If your code is crunching on A then B then C, you want them laid out in memory like this:
 
-could write entire book
+    +---+---+---+
+    | a | b | c |
+    +---+---+---+
 
-hard to come up with something simple for this chapter
-
-if problem is lots of cache misses, solution is trying to keep the stuff you
-need in cache lines you've already loaded. [on same pallet in analogy]
-
-lot of concrete ways for doing that, mention a couple. basic common idea idea
-is to lay out data contiguously in memory in the
-order you process it
-
-if code is crunhing on a then b then c, then make your memory look like
-
-      +---+---+---+
-      | a | b | c |
-      +---+---+---+
-
-note, not *pointers* to a, b, c. actual data, right there. if we just point
-to it, have to follow that pointer, and now we're off in memory that's
-unlikely to be in cache ("pointer chasing")
-
-goal is to feed as many bytes to cpu in one contiguous chunk as possible.
-sounds easy, but we'll see some challenges.
+Note, these aren't *pointers* to A, B, and C. It's the data for them, right there, all lined up next to each other. As soon as the CPU reads in A, it will start to get B and C too (depending on how big they and how big a cache line is). Since you're working on those next, you're chip is happy and you're happy.
 
 ## The Pattern
 
-modern cpus are much slower to access memory following memory that was previously accessed. improve performance by organizing data contiguously in memory in order you process it.
+Modern CPUs have **caches to speed up memory access.** These can access memory **adjacent to recently accessed memory much quicker**. Take advantage of that to improve performance by organizing data in **contiguous memory in the order that you process it.**
 
 ## When to Use It
 

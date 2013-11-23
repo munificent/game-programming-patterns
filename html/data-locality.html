@@ -111,7 +111,7 @@ a bunch of boxes that are next to it. He doesn&#x2019;t know if you want those (
 <p>He loads the whole pallet and brings it to you. Ignoring issues of workplace safety, he drives the forklift right in and drops the pallet in the corner of your office.</p>
 <p>When you need a new box, now, the first thing you do is see if it&#x2019;s already on the pallet in your office. If it is, great! It just takes you a second to grab it and you&#x2019;re back to crunching numbers. If a pallet holds fifty boxes and you got lucky and all of the boxes you need happen to be on it, you can churn through fifty times more work than you could before.</p>
 <p>But, if you need a box that&#x2019;s <em>not</em> on the pallet, you&#x2019;re back to square one. You can only fit one pallet in your office, so your warehouse friend will have to come take that one back and then bring you entirely new one. Tomorrow.</p>
-<h2><a href="#cpu-cache" name="cpu-cache">CPU Cache</a></h2>
+<h3><a href="#a-pallet-for-your-cpu" name="a-pallet-for-your-cpu">A pallet for your CPU</a></h3>
 <p>That&#x2019;s a pretty close <span name="analogy">analogy</span> for how CPUs in modern computers work. In case it isn&#x2019;t obvious, you play the role of the CPU. Your desk is the CPU&#x2019;s registers, and the box of papers is the data you can fit in them. The warehouse is your machine&#x2019;s RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.</p>
 <aside name="analogy">
 
@@ -129,58 +129,42 @@ a bunch of boxes that are next to it. He doesn&#x2019;t know if you want those (
 <p>There&#x2019;s one important detail I glossed over in the analogy. In the accountant&#x2019;s office, there was only room for one pallet, or one cache line. In a real cache, it has room for a number of cache lines. It&#x2019;s a relatively smaller, fixed number, but it&#x2019;s more than <em>one</em>. The details about how those work is unfortunately out of scope here, but Google "cache associativity" if you want to feed your brain.</p>
 <p>So, whenever the CPU needs some data, it looks to see if a cache line containing it is already in the cache. When that fails, and a cache miss occurs, the CPU <em>stalls</em>: it can&#x2019;t process the next instruction because needs data. So it just sits there, spinning its cycles all bored and lonely, for a few hundred cycles until the fetch completes.</p>
 <p>Our mission for the rest of this chapter is to figure out how to minimize that happening. Imagine you&#x2019;re trying to optimize some performance critical piece of game code and it looks like this:</p>
-<div class="codehilite"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_ACTORS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<div class="codehilite"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_THINGS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">doAbsolutelyNothingFor500Cycles</span><span class="p">();</span>
-  <span class="n">actors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">();</span>
+  <span class="n">things</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">doStuff</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 
 
 <p>What&#x2019;s the first change you&#x2019;re going to make to that code? Right. Take out that pointless function, expensive call. That functional call is equivalent to the performance hit of a cache miss. Every time you bounce to main memory, it&#x2019;s like you put a <code>sleep()</code> call in your code.</p>
-<h2><a href="#memory-=-perf" name="memory-=-perf">memory = perf?</a></h2>
-<p>heard about importance of cache before writing this, but no first-hand
-experience. (most my background higher level).</p>
-<p>did some benchmarks.</p>
-<p>surprisingly hard to write good test program to thrash cache and compare
-worst case to best.</p>
-<p>when i did, really surprised. got couple little programs and did variations of
-them to change how they interacted with cache. worse case was 50 <em>times</em> slower than best.</p>
-<p>doing exact same computation, exact same data, exact same results</p>
-<p><em>only</em> difference was caching effects</p>
-<p>[ymmv, heavily machine dependent]</p>
-<p>tend to think of optimization on two axes: speed and memory usage</p>
-<p>optimizations like memoization, caching, denormalization, etc. spend extra
-memory to go faster</p>
-<p>optimizations like compression trade in speed to save memory</p>
-<p>sort of orthogonal, can spend one to get other</p>
-<p>but tend to think of code being about speed and data being about memory usage</p>
-<p>but surprising lesson for me here is data is about speed too!</p>
-<p>book tries to be about concrete patterns. simple well-defined recipes.</p>
-<p>optimization for cache usage is big topic. haven&#x2019;t even touched on instruction
-cache - remember code is in ram too and has to be fetched onto cpu. caching
-comes into play there too!</p>
-<p>could write entire book</p>
-<p>hard to come up with something simple for this chapter</p>
-<p>if problem is lots of cache misses, solution is trying to keep the stuff you
-need in cache lines you&#x2019;ve already loaded. [on same pallet in analogy]</p>
-<p>lot of concrete ways for doing that, mention a couple. basic common idea idea
-is to lay out data contiguously in memory in the
-order you process it</p>
-<p>if code is crunhing on a then b then c, then make your memory look like</p>
-<div class="codehilite"><pre>  <span class="o">+---+---+---+</span>
-  <span class="o">|</span> <span class="n">a</span> <span class="o">|</span> <span class="n">b</span> <span class="o">|</span> <span class="n">c</span> <span class="o">|</span>
-  <span class="o">+---+---+---+</span>
+<h3><a href="#wait,-data-is-performance" name="wait,-data-is-performance">Wait, data is performance?</a></h3>
+<p>Now, I&#x2019;ve known about CPU caching and optimizing for it for a long time. It&#x2019;s one of those ideas that I sort of absorbed through osmosis just by being around other programmers. But I didn&#x2019;t have any first-hand experience with it.</p>
+<p>Most of my programming background is higher level: I&#x2019;ve done gameplay, a bit of AI, and tons of UI, tools, and shared library kind of stuff. But I&#x2019;m generally not one of those people who spends three weeks squeezing another 3 FPS out of the rendering engine. I try to keep myself out of the hot path of the game loop most of the time.</p>
+<p>Don&#x2019;t get me wrong, I do care about performance too. So when I started to work on this chapter, I spend some time putting together little mini-game-like programs to try to trigger best case and worst case cache usage. I wanted to write benchmarks that would thrash the cache so I could see first-hand how much bloodshed it causes.</p>
+<p>The first thing I learned is that it&#x2019;s surprisingly hard to get a clear window into what your cache is doing. Many basic profilers won&#x2019;t show it and since it&#x2019;s just memory access, it doesn&#x2019;t stick out in the profile. It just looks like every line of code is kind of slow.</p>
+<p>When I finally got some stuff working, though, I was surprised. Even after hearing of how big a deal it is, there&#x2019;s nothing quite like seeing it with your own eyes. <span name="ymmv">I got a few programs</span> that did the <em>exact same</em> computation. The only difference was how many cache misses and memory thrashing they caused. The worst case was fifty <em>times</em> slower than the best case.</p>
+<aside name="ymmv">
+
+<p>There&#x2019;s a lot of caveats here. In particular, different computers have different cache setups so my machine may be different from yours, and dedicated game consoles are very different from PCs which are quite different from mobile devices.</p>
+<p>Your mileage will vary.</p>
+</aside>
+
+<p>This was a real eye-opener to me. I&#x2019;m used to thinking of performance being an aspect of <em>code</em> not <em>data</em>. A byte isn&#x2019;t slow or fast, it&#x2019;s just a static thing sitting there. But, because of caching, <em>the way you organize things directly impacts performance.</em></p>
+<p>The challenge for me now is to wrap that concept up into something that fits into a chapter here. This book tries to be about simple, concrete patterns. It&#x2019;s a recipe book for code.</p>
+<p>But optimization for cache usage is a huge topic. I haven&#x2019;t even touched on <em>instruction caching</em>. Remember, code is in memory too and has to be loaded onto the CPU before it can be executed. Someone more versed on the subject could write an entire book on it.</p>
+<p>Until you get your hands on that, though, I do think there are a few basic techniques that I can fit in here that will get you started along the path of thinking about how your data structures impact your performance.</p>
+<p>What it all boils down to is something pretty simple: Whenever the chip reads some memory, it gets a whole cache line. The more you can use stuff in that cache line, the faster you go. So the goal then is to <em>organize your data structures so that the things you&#x2019;re processing are next to each other in memory</em>.</p>
+<p>If your code is crunching on A then B then C, you want them laid out in memory like this:</p>
+<div class="codehilite"><pre><span class="o">+---+---+---+</span>
+<span class="o">|</span> <span class="n">a</span> <span class="o">|</span> <span class="n">b</span> <span class="o">|</span> <span class="n">c</span> <span class="o">|</span>
+<span class="o">+---+---+---+</span>
 </pre></div>
 
 
-<p>note, not <em>pointers</em> to a, b, c. actual data, right there. if we just point
-to it, have to follow that pointer, and now we&#x2019;re off in memory that&#x2019;s
-unlikely to be in cache ("pointer chasing")</p>
-<p>goal is to feed as many bytes to cpu in one contiguous chunk as possible.
-sounds easy, but we&#x2019;ll see some challenges.</p>
+<p>Note, these aren&#x2019;t <em>pointers</em> to A, B, and C. It&#x2019;s the data for them, right there, all lined up next to each other. As soon as the CPU reads in A, it will start to get B and C too (depending on how big they and how big a cache line is). Since you&#x2019;re working on those next, you&#x2019;re chip is happy and you&#x2019;re happy.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
-<p>modern cpus are much slower to access memory following memory that was previously accessed. improve performance by organizing data contiguously in memory in order you process it.</p>
+<p>Modern CPUs have <strong>caches to speed up memory access.</strong> These can access memory <strong>adjacent to recently accessed memory much quicker</strong>. Take advantage of that to improve performance by organizing data in <strong>contiguous memory in the order that you process it.</strong></p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>have code that&#x2019;s performance critical</p>
 <p>touches a lot of data</p>
