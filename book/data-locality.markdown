@@ -70,54 +70,41 @@ When you need a new box, now, the first thing you do is see if it's already on t
 
 But, if you need a box that's *not* on the pallet, you're back to square one. You can only fit one pallet in your office, so your warehouse friend will have to come take that one back and then bring you entirely new one. Tomorrow.
 
-## cpu cache
+## CPU Cache
 
-very close analogy for how cpus work today. (why would it be in chapter if
-wasn't good analogy?)
+That's a pretty close <span name="analogy">analogy</span> for how CPUs in modern computers work. In case it isn't obvious, you play the role of the CPU. Your desk is the CPU's registers, and the box of papers is the data you can fit in them. The warehouse is your machine's RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.
 
-warehouse is main memory. fetching data from it is slooooow.
+<aside name="analogy">
 
-box is amount of data that fits in registers
+Why would it be in this chapter if it wasn't a good analogy?
 
-but cpus now have a cache. small chunk of mem faster to access than ram.
-fast because on chip. literally in area of computers where physics comes
-into play. faster because electrons have less distance to travel.
+</aside>
 
-in analogy, cache is pallet of boxes you can fit in your office
+If I were writing this chapter thirty years ago, the analogy would stop there. But as chips got faster and RAM... didn't... the hardware guys started looking for solutions. What they came up with was *CPU caching*. Modern chips have a <span name="caches">little chunk</span> of memory right inside the chip. It's small because it has to fit in the chip. The CPU can pull data from this much faster than it can main memory in part because it's physically closer to the registers. The electrons have a shorter distance to travel.
 
-when cpu requests byte from main memory, it automatically grabs a chunk of
-contiguous memory, usually 64 or 128 bytes. called "cache line". pulls that
-whole line of data into cache at once.
+<aside name="caches">
 
-if you read next byte of data after one you just requested, its already in
-cache (on pallet in office) and its superfast.
+Modern hardware actually has multiple levels of caching, which is what they mean when you hear "L1", "L2", "L3", etc. Each level is larger but slower than the previous. For this chapter, we won't worry about the fact that memory is actually a hierarchy, but it's important to know.
 
-actually multiple levels of cache. each bigger and slower and then next: l1,
-l2, etc. different chips different.
+</aside>
 
-when chip needs byte, if it's in cache, gets it fast. called
-cache hit.
+This little chunk of memory is called a *cache* (in particular, the chunk on the chip is your *L1 cache*) and in my belabored analogy, its part was played by the pallet of boxes. Whenever your chip reads a byte of data from RAM, it automatically grabs the following chunk of contiguous memory -- usually around 64 to 128 bytes -- too and puts it all in the cache. This strip of contiguous memory is called a *cache line*.
 
-if not already in cache, have to go to ram (or next cache level). called
-cache miss.
+If the next byte of data you need happens to be in that chunk, the CPU reads it straight from the cache, which is *much* faster than hitting RAM. When it looks for a bit of data and finds it, that's called a *cache hit*. If it can't find it in the cache and has to go to main memory, that's a *cache miss*.
 
-cache misses are the enemy.
+There's one important detail I glossed over in the analogy. In the accountant's office, there was only room for one pallet, or one cache line. In a real cache, it has room for a number of cache lines. It's a relatively smaller, fixed number, but it's more than *one*. The details about how those work is unfortunately out of scope here, but Google "cache associativity" if you want to feed your brain.
 
-imagine you're trying to optimize some code like this:
+So, whenever the CPU needs some data, it looks to see if a cache line containing it is already in the cache. When that fails, and a cache miss occurs, the CPU *stalls*: it can't process the next instruction because needs data. So it just sits there, spinning its cycles all bored and lonely, for a few hundred cycles until the fetch completes.
 
-  for (int i = 0; i < NUM_ACTORS; i++)
-  {
-    doAbsolutelyNothingFor500Cycles();
-    actors[i]->update();
-  }
+Our mission for the rest of this chapter is to figure out how to minimize that happening. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
 
-what's the first thing you're going to do? right. that fn call is a cache
-miss.
+    for (int i = 0; i < NUM_ACTORS; i++)
+    {
+      doAbsolutelyNothingFor500Cycles();
+      actors[i]->update();
+    }
 
-speed difference when reading from cache compared to memory is huge. think
-100x or more. has huge impact on app perf.
-
-[asked game dev friend what he knows about cache perf. said he spent most of past two years doing nothing but optimizing games for cache usage.]
+What's the first change you're going to make to that code? Right. Take out that pointless function, expensive call. That functional call is equivalent to the performance hit of a cache miss. Every time you bounce to main memory, it's like you put a `sleep()` call in your code.
 
 ## memory = perf?
 
