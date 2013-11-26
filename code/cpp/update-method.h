@@ -112,7 +112,7 @@ namespace UpdateMethod
       void update() {}
     };
 
-#define MAX_ENTITIES 10
+    static const int MAX_ENTITIES = 10;
     
     void refreshGame() {}
 
@@ -145,6 +145,8 @@ namespace UpdateMethod
 
   namespace SampleCode
   {
+    static const int MAX_ENTITIES = 10;
+    
     //^entity-class
     class Entity
     {

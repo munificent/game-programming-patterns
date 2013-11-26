@@ -1,3 +1,6 @@
+2013-11-25 - 861 words, first draft of data locality
+2013-11-24 - 763 words, first draft of data locality
+2013-11-23 - 798 words, first draft of data locality
 2013-11-22 - 1241 words, first draft of data locality
 2013-11-21 - 877 words, first draft structure of arrays
 2013-11-20 - 677 words, finish outline structure of arrays

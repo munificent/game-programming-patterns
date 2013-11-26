@@ -106,7 +106,13 @@ What's the first change you're going to make to that code? Right. Take out that 
 
 Now, I've known about CPU caching and optimizing for it for a long time. It's one of those ideas that I sort of absorbed through osmosis just by being around other programmers. But I didn't have any first-hand experience with it.
 
-Most of my programming background is higher level: I've done gameplay, a bit of AI, and tons of UI, tools, and shared library kind of stuff. But I'm generally not one of those people who spends three weeks squeezing another 3 FPS out of the rendering engine. I try to keep myself out of the hot path of the game loop most of the time.
+Most of my programming background is higher level: I've done gameplay, a bit of AI, and tons of UI, tools, and shared library kind of stuff. But I'm generally not one of those people who spends <span name="weeks">three weeks</span> squeezing another 3 FPS out of the rendering engine. I try to keep myself out of the hot path of the game loop most of the time.
+
+<aside name="weeks">
+
+I have a ton of respect for them, though!
+
+</aside>
 
 Don't get me wrong, I do care about performance too. So when I started to work on this chapter, I spend some time putting together little mini-game-like programs to try to trigger best case and worst case cache usage. I wanted to write benchmarks that would thrash the cache so I could see first-hand how much bloodshed it causes.
 
@@ -142,187 +148,191 @@ Note, these aren't *pointers* to A, B, and C. It's the data for them, right ther
 
 ## The Pattern
 
-Modern CPUs have **caches to speed up memory access.** These can access memory **adjacent to recently accessed memory much quicker**. Take advantage of that to improve performance by organizing data in **contiguous memory in the order that you process it.**
+Modern CPUs have **caches to speed up memory access.** These can access memory **adjacent to recently accessed memory much quicker**. Take advantage of that to improve performance by **increasing data locality** -- keeping data in **contiguous memory in the order that you process it.**
 
 ## When to Use It
 
-have code that's performance critical
+Like most optimizations, the first guideline for using it is *when you have a performance problem.* There's no point wasting time applying this in code that's way off to the side of your core game loop. In fact, doing so has *negative* value. It makes your code more complex and less flexible.
 
-touches a lot of data
+With this pattern specifically, you'll also want to ensure you reach for it because you have performance problems *caused by cache misses*. If your code is slow for other reasons, this won't help. There are three golden rules for optimization:
 
-accessing main memory is slow
+1. Profile.
+2. Profile.
+3. Profile.
 
-burning lots of cycles on data cache misses. profile profile profile!
+You'll need something a little more sophisticated than manually instrumenting your code with some profile hooks that just see how much time has elapsed. You really need to see how many cache misses are occurring and where. Fortunately, CPUs expose this information and there are profilers out that there can access it. Also, tools like cachegrind can run your code in a way that simulates the cache and report cache misses.
 
-in other words, make sure you have a real problem and you're certain problem
-is coming from cache. as we'll see, this pattern can be major architectural
-surgery. don't want to operate unless patient is really sick.
+It's worth spending the time to get one of these working and make sure you understand the (surprisingly complex) numbers it gives you in return. You really don't want to be fumbling around in the dark here. This pattern may cause you to do some major surgery on your data structures. You need a reliable heart monitor so you can ensure you've actually helped your patient.
 
-(other way to think about it is good to keep this pattern in mind throughout
-project so don't have to make sweeping changes later for it.)
+That being said, designing your data structures to be cache friendly can have speeding affects on your program. Cache misses *will* affect the performance of your game, so it's good to be thinking about how cache-friendly your program is throughout the design process.
 
 ## Keep in Mind
 
-many optimizations sacrifice abstraction for speed. abstraction is about
-building interfaces to obscure what's going on. that decoupling makes it
-easier to change things without affecting other stuff. abstraction about
-generalization, about being flexible by not making assumptions.
+Many optimizations sacrifice flexibility for speed. We use things like interfaces to insulate parts of the codebase from each other. That makes it easier to change one of these parts without affecting the others. The cost is that code on either side of the interface can make fewer assumptions about what the other side is doing. That's the *point*: assumptions are coupling.
 
-perf is often about the concrete. opt often starts with "assuming we only need
-x" then takes advantage of that. thrives on specifics.
+Performance is often about making things *concrete*. Many optimization start with "if we assume X then we can...". Optimizations thrive on specifics. This pattern in particular fights against our desire for abstraction. In C++, using interfaces implies accessing objects through <span name="virtual">pointers or references</span> to objects. But going through a pointer often means hopping across memory, which causes the exact cache misses this pattern tries to avoid. You'll be sacrificing some of your precious interfaces to please this pattern.
 
-### Anti-OOP?
+<aside name="virtual">
 
-this pattern in particular fights against encapsulation. in c++ going through
-interfaces implies pointers and references. but this pattern is about putting
-object in memory *here*, not *pointer to it*.
+The other half of interfaces is *virtual method calls*. Those require the CPU to look up an object's vtable, and then find the pointer to the actual method to call there. So, again, you're chasing a pointer and often causing a cache miss, though this time it's an *instruction* cache miss, since you're loading code onto the CPU.
 
-[virtual methods are other half of encapsulation. those cause similar caching
-problems with i cache.]
+</aside>
 
-to give cpu lots of data to chew, often means large collections of objects.
-to have contiguous, usually need to be same size. means it works best with
-objects of same type so they are same size. goes against subclassing where
-objects may be different sizes.
+Some people feel focusing on data locality also goes against the grain of object-orientation. In their minds, OOP is about each *object* taking care of itself. As we'll see, this pattern thrives on dealing with *collections* of homogenous objects.
 
-### Anti-object but pro-class?
-
-oop is about treating object as independent actor that owns state and behavior.
-naturally optimized for thinking of objects as owners of their own destiny
-and singular.
-
-this pattern really about aggregates. associates behavior with *collection*
-of objects.
-
-may feel unintuitive.
-
-think we'll see that most of oop principles like data hiding are still there.
-more about hiding data in *type*, not *instance of type*, which is actually
-how priv in c++ works anyway.
-
-**todo: above para may not pan out**
-
-**todo: subheader?**
-
-pattern often means moving stuff around in memory to keep stuff contiguous.
-when moving stuff, have to be careful about pointers to things you're moving.
-this is *not* easy pattern to apply.
+Personally, I think OOP is more about each *class* taking care of its instances, so I believe the nice things we get from OOP like data hiding still apply here. There may be times where you need to open up an object's internal structure more than you would like to please outside code wanting to get at its data directly in a certain order, but I'm not enough of an OOP purist to be really bothered like that. As always, there are challenging trade-offs. That's what makes it fun.
 
 ## Sample Code
 
-confession time. wanted to show a single example here that was skeleton of game
-loop processing a bunch of components. was going to show complete worst case
-example with lots of pointer chasing, stuff random in memory. then show
-optimized version so you could run yourself and see perf difference.
+OK, it's time for a confession. My goal for this part of the chapter was to show you a little skeleton of a game loop that was processing a bunch of game objects. I was going to show a complete example that demonstrated worst case cache usage so you could run it and see for yourself. Then we'd optimize so you could see the difference.
 
-ended up being lesson in how tricky this opt. optimizing for cache *highly*
-context-dependent. used to thinking that code composes. if you have piece of
-code exhibits a and other exhibits b, slap together exhibits a and b.
+What I got instead was a lesson in how tricky controlling cache usage is. Every time I tried to rearrange my sample program into pieces that made sense in the context of the chapter, the cache usage changed dramatically. Cache usage is *highly* context dependent. Even the order that functions are written in your source file can affect things. This means that a piece of code can have different caching behavior just by putting it in a program with other code.
 
-but caching relies on big hidden complex chunk of mutable state (cpus caches
-and the mapping it uses from memory to cache, prefetching logic etc.) means
-two unrelated pieces of code can have wildly different cache effects when put
-in program together.
+Instead of trying to shoehorn a teaching sample and a tight benchmark into one single example program, I'm going to do something I think is ultimately more useful. Instead of a monolithic example, we'll walk through a few small examples each showing one common technique used to make code more cache friendly.
 
-good reminder of golden rule of programming: profile in the context of your
-actual program.
+### Contiguous arrays
 
-managed to get some benchmarks that showed drastic effects on my computer, but
-every time tried to put them into form that made sense interleaved with prose
-in chapter, effects dimished. (not disappear! still could manifest 5x worse
-perf.)
+Let's start with the quintessential example of re-organizing a game architecture to be more cache friendly. We'll start with a typical <a href="game-loop.html" class="pattern">Game Loop</a> that processes a bunch of game entities that are organizing using the <a href="component.html" class="pattern">Component</a> pattern.
 
-instead of trying to shoehorn both tight benchmark and good
-teaching example into one program, doing something ultimately better. instead of single monolithic example, do a few
-different smaller examples showing some of various techniques commonly applied
-to make code more cache friendly.
+Each game entity has components for AI, physics, and rendering. So you have a game entity something like this:
 
-### contiguous arrays
+^code game-entity
 
-typical game loop using component pattern. have bunch of actors. each actor has
-ai, physics, and render component. here's what *needs* to happen (in order):
+Each component will have a relatively small amount of state, maybe little more than a few vectors or a matrix, and then a method to <span name="update">update</span> it. The details aren't important here, but imagine something roughly like:
 
-1. update all of ai components.
-2. update all of physics components.
-3. render all render components.
+<aside name="update">
 
-lot of game engines look like:
+Like the name implies, these are a few examples of the <a href="update-method.html" class="pattern">Update Method</a> pattern. Even `render()` is this pattern, just by another name.
 
-    naive pointer chasing
+</aside>
 
-we are murdering cache here. after running this code, cache actively hates us.
-spitting in coffee. here's what doing wrong.
+^code components
 
-1. iterating over list of actors. list of pointers to actors.
-2. for each actor, traverse pointer. CACHE MISS.
-3. now look up physics component in actor.
-4. that's pointer too. traverse CACHE MISS.
-5. update physics component.
-6. go all the way back to list of actor pointers and start again.
+The game maintains a big list of pointers to the entities in the world. Each spin of the game loop, this needs to happen:
 
-since actors and components are pointers, could be scattered all over memory.
-especially since actors created destroyed during game, often are arranged
-randomly.
+1. Update the AI components for all of the entities.
+2. Update the physics components for them.
+3. Render them using their render components.
 
-observe: only reason we look up actor is to get to component. actor itself has
-no interesting data. also, order we update components doesn't usually matter.
-sure, can make difference in game, but not usually one that matters to player.
+Lots of game engines implement that something like this:
 
-instead of huge tree of actors and components spread over memory, simplify:
-one array of components for each type. big array of ai, physics components, etc.
-not array of pointers, array of actual objects. not linked list. ARRAY.
+^code game-loop
 
-game loop tracks arrays directly. when it updates ai, just walks ai component
-array and updates each one in turn. no pointer chasing. no skipping around
-memory. pumping delicious bytes of data directly into cpu's hungry maw. happy
-cpu.
+Before you ever heard of a CPU cache, this looked totally innocuous. But by now you've got an inkling that something isn't right here. This code hates the cache. It is spitting in the cache's coffee. Here's what it's doing:
 
-do this for each component type. then done. in little synthetic benchmark,
-made 50x diff.
+1. We've got a list of *pointers* to game entities. For every game entity in the world, we have to traverse that pointer. That's a cache miss.
 
-interestingly, note that this doesn't break encapsulation. each component still
-owns its data and behavior. data is still private. just changed way its used.
+2. Then the game entity has a pointer to the component. Another cache miss.
 
-actor can even maintain pointers to its components. if you have actor and need
-to get to component from it, can still have that capability. important part is
-that hot processing loop can sidestep and go straight to data.
+3. Then we update the component.
 
-### packed data
+4. Now we go back to step one for *every component of every entity in the game*.
 
-ok, so you reorganize codebase around above pattern. makes lots of sense when
-you have fixed set of actors, but actors come and go. maybe actors far from
-player are deactivated and don't get processed.
+The scary part here is we have no idea how any of this stuff is laid out in memory. We're completely at the mercy of the memory manager and the order that things happened to be allocated, which, after the game has been running for a while, is anything but clear cut.
 
-end up doing
+**TODO: illustration**
 
-    iterate over components and check is active
+If our goal here was to take a whirlwhind tour around the game's address space, sort of a 256MB of RAM in 4 Nights!" cheap European vacation package, it would be a fantastic deal. But our goal is to run the game quickly, and <span name="chase">traipsing</span> all over main memory is *not* the most effective way to do it. Remember that `doAbsolutelyNothingFor500Cycles()` function? Well this code is calling that *all the time*.
 
-two problems. first is now we have to look up actor and check flag. constantly
-switching between reading memory from actor and the memory from component.
-thrash cache.
+<aside name="chase">
 
-second problem is when actor is inactive, end up skipping over component data.
-with lots of inactive actors, constantly blowing cache skipping through memory
-looking for something that actually needs updating.
+The accepted term for spending a lot of cycles traversing pointers is *pointer chasing*.
 
-solution is instead of *checking* active flag, *sort* by it. keep all active
-actors in front of list. then track how many there are. update loop is simple
+</aside>
 
-    loop active components
+Let's do something better. Our first observation is that the only reason we even follow a pointer to get to the game entity is so we can get to a component. `GameEntity` itself has no interesting state and no useful methods. The components are what the game loop cares about. Game entities are just a means to that end.
 
-trick is keeping sorted. actors change active state all time. to keep memory
-packed, can do this:
+So lets cut out the middle man. Instead of a huge tree of game entities and components scattered like stars across the inky darkess of address space, we're going to get back down to Earth. We'll have a big array for each type of component. A flat array of AI components, another for physics, and another for rendering.
 
-    1. when actor is activated, swap memory for its component with first
-    inactive component in list, the inc number of active actors.
-    2. when deactivated, swap memory for its component with last active component
-    then dec num
+Like this:
 
-lots of programmers allergic to moving stuff in memory. feels heavyweight.
-but move is just read and write. not much slower than just reading it, which
-do every frame. if active states change less often than you update, then
-probably quicker to take hit of moving things to keep sorted if it keeps update
-loop fast. profile!
+^code component-arrays
+
+Let me just stress that these are arrays of *components* and not *pointers* to them. The data is all there, nicely lined up. The game loop will then walk these directly:
+
+^code game-loop-arrays
+
+We've ditched all of that <span name="arrow">pointer chasing</span>. Instead of skipping around in memory, we're doing a straight crawl straight through contiguous arrays. We're pumping a solid stream of bytes right into the hungry maw of the CPU. In my little synthetic benchmark programs, this made the update loop fifty *times* faster than the previous example.
+
+**TODO: illustration**
+
+<aside name="arrow">
+
+One hint that we're doing better here is how few `->` operators there are in the new code.
+
+</aside>
+
+Interestingly, we haven't lost much encapsulation here. Sure, the game loop is going straight to the components instead of getting them from game entities. But it was doing that before. It needed to to ensure things were updated in the right order. But each component itself is still nicely encapsulated. It owns its own data and methods. We just changed the way it's used.
+
+This doesn't mean we need to get rid of `GameEntity` either. We can leave it just as it is with pointers to its components. They'll just point into those arrays. This can still be useful for other parts of the codebase where you want to pass around a conceptual "game entity" and everything that goes with it. The important part is that the performance critical game loop sidesteps that and goes straight to the data.
+
+### Packed data
+
+Say we're doing a particle system. Following the advice of the previous section, we've got all of our particles in a nice big contiguous array. Let's wrap it in a little <span name="pool">manager class</span> too:
+
+<aside name="pool">
+
+This is a great example of an <a href="object-pool.html" class="pattern">Object Pool</a> custom built for a single type of object.
+
+</aside>
+
+^code particle-system
+
+A rudimentary update method for the system just looks like this:
+
+^code update-particle-system
+
+But it turns out that we don't actually need to process *all* of them all the time. Sometimes particles are disabled, deactivated, culled, offscreen, or otherwise temporarily out of commission. The easy answer is something like this:
+
+^code particles-is-active
+
+For every particle, we have to check that flag before we update it. (We could move the check inside `update()` but that doesn't actually make a difference.) That probably loads the whole particle into the cache. If the particle *isn't* active, then we just skip over it to the next particle. So loading that particle into the cache was a waste of time.
+
+The more inactive particles there are, the more we're <span name="branch">skipping across memory</span>. The faster we do that, the more cache misses there are between actually doing useful work updating active particles. If that array is large and has *lots* of inactive particles in it, we're back to just thrashing the cache again.
+
+Having objects in a contiguous array doesn't solve everything if the objects we're actually processing aren't contiguous in it. If it's a foam of inactive objects we have to skip past, we're right back to the original problem.
+
+<aside name="branch">
+
+Savvy low-level coders are probably aware of another problem here. Doing an `if` check for every particle can cause a *branch misprediction* and a *pipeline stall*. In modern CPUs a single "instruction" actually takes several clock cycles. To keep the CPU busy, instructions are pipelined such that the next instructions start processing before the previous one finishes.
+
+To do that, the CPU has to guess which instructions it will be executing next. In straight line code, that's easy, but with flow control, it gets harder. While it's executing the jump instruction for the `if`, does it guess that the particle is active and start executing the code for the `update()` call, or does it guess that it isn't?
+
+To handle this, chips do *branch prediction*: they see which branches your code tends to take and guess that it will do that again. But when the loop is constantly toggling between particles that are and aren't active, that prediction will fail.
+
+Every time it does, it has to ditch the instructions it had started speculatively processing and start over after the first jump instruction is done. The performance hit of this varies widely by machine, but this is why you'll see some coders avoid flow control in hot code.
+
+</aside>
+
+Given the subtitle you just read a minute ago, you can probably infer the solution. Instead of *checking* the active flag, we'll *sort* by it. We'll keep all of the active particles in the front of the list. We can also easily keep track of how many active particles there are. Then our update loop is beatiful:
+
+^code update-particles
+
+Now we aren't skipping over any data. Every byte that gets sucked into the cache is a piece of an active particle that we actually need to process.
+
+Of course, I'm not saying you should actually quicksort the entire collection of particles every frame. That would more than eliminate the gains here. What we want to do is *keep* the array sorted.
+
+Obviously, the only time it can become less than perfectly sorted is when a particle has been activated or deactivated. We can handle those two cases pretty easily. When a particle gets activated, we move it to the end of the active particles by swapping it with the first *in*active one:
+
+^code activate-particle
+
+To deactivate a particle, of course, we just do the opposite:
+
+^code deactivate-particle
+
+Lots of programmers (myself included) have developed allergies to moving things around in memory. It just *feels* heavyweight in some sense. Pointers feel lightweight in comparison. But when you add in the cost of *traversing* that pointer, it turns out that your (well, at least my) intuition isn't right on modern hardware any more. In <span name="profile">many cases</span>, it's cheaper to actually move things around in memory so that you can keep the cache full.
+
+<aside name="profile">
+
+This is your friendly reminder to *profile* when making these kinds of decisions.
+
+</aside>
+
+There's a neat consequence of keeping the particles *sorted* by their active state. We no longer need to *store* the active flag at all. It can be determined entirely by its position in the array and the `numActiveParticles_` counter. That's good: it makes our particle objects smaller, which means we can pack more in our cache lines. And that makes them even faster.
+
+It's not all rosy, though. As you can see from the API, we've lost a bit of OOP flavor here. You can no longer just call some `activate()` method on the particle itself since it doesn't know it's index. Instead, the particle *system* has this responsibility.
+
+In this case, I'm OK with `ParticleSystem` and `Particle` being tightly tied like this. I think of them as a single *concept* spread across two physical *classes*. It just means accepting the idea that particles are *only* meaningful in the context of some particle system.
 
 ### hot/cold splitting
 
