@@ -174,6 +174,7 @@ namespace DataLocality
     bool isActive() { return false; }
     //^omit particle-system
     void update() { /* Gravity, etc. ... */ }
+    // Position, velocity, etc. ...
   };
 
   class ParticleSystem
@@ -262,6 +263,74 @@ namespace DataLocality
     particles_[index] = temp;
   }
   //^deactivate-particle
+
+  enum Mood {
+    MOOD_WISTFUL
+  };
+
+  class Animation {};
+  class Vector {};
+  class LootType {};
+
+  namespace HotColdMixed
+  {
+    //^ai-component
+    class AIComponent
+    {
+    public:
+      void update() { /* ... */ }
+
+    private:
+      Animation* animation_;
+      float      energy_;
+      Vector     goalPos_;
+    };
+    //^ai-component
+  }
+
+  namespace HotColdMixedLoot
+  {
+    //^loot-drop
+    class AIComponent
+    {
+    public:
+      void update() { /* ... */ }
+
+    private:
+      // Previous fields...
+      LootType drop_;
+      int      minDrops_;
+      int      maxDrops_;
+      float    chanceOfDrop_;
+    };
+    //^loot-drop
+  }
+
+  namespace HotCold
+  {
+    //^hot-cold
+    class AIComponent
+    {
+    public:
+      // Methods...
+    private:
+      Animation*   animation_;
+      float        energy_;
+      Vector       goalPos_;
+
+      AIComponent* cold_;
+    };
+
+    class AIComponentCold
+    {
+      friend class AIComponent;
+      LootType drop_;
+      int minDrops_;
+      int maxDrops_;
+      float chanceOfDrop_;
+    };
+    //^hot-cold
+  }
 
   /*
 

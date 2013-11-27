@@ -1,3 +1,4 @@
+2013-11-26 - 1189 words, sample code and start design decisions
 2013-11-25 - 861 words, first draft of data locality
 2013-11-24 - 763 words, first draft of data locality
 2013-11-23 - 798 words, first draft of data locality

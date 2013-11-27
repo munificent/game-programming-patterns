@@ -236,7 +236,7 @@ If our goal here was to take a whirlwhind tour around the game's address space, 
 
 <aside name="chase">
 
-The accepted term for spending a lot of cycles traversing pointers is *pointer chasing*.
+The term for burning cycles traversing pointers is *pointer chasing*, which isn't quite as fun as it sounds.
 
 </aside>
 
@@ -304,7 +304,7 @@ Every time it does, it has to ditch the instructions it had started speculativel
 
 </aside>
 
-Given the subtitle you just read a minute ago, you can probably infer the solution. Instead of *checking* the active flag, we'll *sort* by it. We'll keep all of the active particles in the front of the list. We can also easily keep track of how many active particles there are. Then our update loop is beatiful:
+Given the subtitle you just read a minute ago, you can probably infer the solution. Instead of *checking* the active flag, we'll *sort* by it. We'll keep all of the active particles in the front of the list. We can also easily keep track of how many active particles there are. Then our update loop is beautiful:
 
 ^code update-particles
 
@@ -312,7 +312,7 @@ Now we aren't skipping over any data. Every byte that gets sucked into the cache
 
 Of course, I'm not saying you should actually quicksort the entire collection of particles every frame. That would more than eliminate the gains here. What we want to do is *keep* the array sorted.
 
-Obviously, the only time it can become less than perfectly sorted is when a particle has been activated or deactivated. We can handle those two cases pretty easily. When a particle gets activated, we move it to the end of the active particles by swapping it with the first *in*active one:
+Obviously, the only time it can become less than perfectly sorted is when a particle has been activated or deactivated. We can handle those two cases pretty easily. When a particle gets activated, we move it up to the end of the active particles by swapping it with the first *in*active one:
 
 ^code activate-particle
 
@@ -320,7 +320,7 @@ To deactivate a particle, of course, we just do the opposite:
 
 ^code deactivate-particle
 
-Lots of programmers (myself included) have developed allergies to moving things around in memory. It just *feels* heavyweight in some sense. Pointers feel lightweight in comparison. But when you add in the cost of *traversing* that pointer, it turns out that your (well, at least my) intuition isn't right on modern hardware any more. In <span name="profile">many cases</span>, it's cheaper to actually move things around in memory so that you can keep the cache full.
+Lots of programmers (myself included) have developed allergies to moving things around in memory. Schlepping a bunch of bytes around *feels* heavyweight in some sense. Pointers feel lightweight in comparison. But when you add in the cost of *traversing* that pointer, it turns out that your (well, at least my) intuition isn't right on modern hardware any more. In <span name="profile">many cases</span>, it's cheaper to actually move things around in memory so that you can keep the cache full.
 
 <aside name="profile">
 
@@ -330,58 +330,102 @@ This is your friendly reminder to *profile* when making these kinds of decisions
 
 There's a neat consequence of keeping the particles *sorted* by their active state. We no longer need to *store* the active flag at all. It can be determined entirely by its position in the array and the `numActiveParticles_` counter. That's good: it makes our particle objects smaller, which means we can pack more in our cache lines. And that makes them even faster.
 
-It's not all rosy, though. As you can see from the API, we've lost a bit of OOP flavor here. You can no longer just call some `activate()` method on the particle itself since it doesn't know it's index. Instead, the particle *system* has this responsibility.
+It's not all rosy, though. As you can see from the API, we've lost a bit of OOP flavor here. You can no longer just call some `activate()` method on the `Particle` itself since it doesn't know it's index. Instead, the particle *system* has this responsibility.
 
 In this case, I'm OK with `ParticleSystem` and `Particle` being tightly tied like this. I think of them as a single *concept* spread across two physical *classes*. It just means accepting the idea that particles are *only* meaningful in the context of some particle system.
 
-### hot/cold splitting
+### Hot/cold splitting
 
-this is a bit like a finer-grained manifestation of previous example. say we've
-got ai component for actor. has a few fields for basic pathfinding, and which
-target actor is heading towards. stuff it uses every single frame.
+OK, this will be the last example of a simple technique for making your cache happier. It's a bit like a finer-grained manifestion of the previous idea. Say we've got an AI component for some game entity. It has some state in it: the animation it's currently playing, a goal position its heading towards, energy level, etc.. Stuff it checks and tweaks every single frame. Something like:
 
-but also some ai data for less common scenarios. maybe has some data to store
-what item it drops when killed. that state will only come in to play once.
+^code ai-component
 
-if updating bunch of actors ai, walking through nicely packed components, but
-still wasting a bunch of time skipping over state we aren't using every frame.
-all of data for drop is getting loaded into cache for no reason. end up getting
-more cache misses since data we do care about is more spread out.
+But it also has some state for rarer eventualities. It may need to store some data describing what loot it drops when it gets 86'd. That state will only ever be used once by the game entity's lifetime, right at the bitter end.
 
-solution is called hot/cold splitting. slice ai component into two structures.
-first holds "hot data": fields we need every frame. second is cold data.
+^code loot-drop
 
-hot component holds pointer to cold one. when we need cold data, can get to it
-through that. other wise, only have to skip over pointer when iterating over
-components. (if using parallel arrays like first example, could even possible
-ditch pointer.)
+Assuming we've already followed the earlier patterns, when we update these AI components, we'll be walking through a nice packed array of data. But that data includes all of the loot drop information. That makes each component bigger, which reduces the number of them we can fit in a cache line. We get more cache misses because the total memory we walk over is larger. That drop data gets pulled into the cache for every component, every frame, even though we aren't even touching it.
 
-can see how this starts to get fuzzy. deciding which data is hot and cold
-depends a lot on game and how it gets used. more art than science. maybe not
-even art. crapshoot?
+One solution for this is called "hot/cold splitting". The idea is to break our data structure into two separate pieces. The first holds the "hot" data: the state we need to touch every frame. The other piece is the "cold" data: everything else that gets used less frequently.
+
+The hot piece is the *main* AI component. It's the one we need to use the most, so we don't want to hide it behind an indirection. The cold component can be off to the side, but we still need to get to it, so we give the hot component a pointer to it, like so:
+
+^code hot-cold
+
+Now when we're walking the AI components every frame, the only data that gets loaded into the cache is what we really, with the <span name="parallel">exception</span> of that one little pointer to the cold data. But that's still a real improvement over having all of that cold data right there in the way.
+
+<aside name="parallel">
+
+We could conceivably ditch the pointer too by having parallel arrays for the hot and cold components. Then we can find the cold AI data for an actor as long as we know its index since both pieces will be at the same index in their respective arrays.
+
+</aside>
+
+You can see how this starts to get fuzzy though. In my example here, it's pretty obvious which data should be hot and cold, but it's rarely so clear cut. What if you have fields that are used when an entity is in a certain mode but not in others? What if entities use a certain chunk of data only when they're in certain parts of the level.
+
+Doing this kind of optimization is somewhere between a black art and a rathole. It's easy to get sucked in and spend endless time pushing data around to see what speed difference it makes. It will take some practice to get a handle on when and where it's worth it to focus on this stuff.
 
 ## Design Decisions
 
-pattern is really about a mindset: getting you to think about where stuff is in
-memory as a critical piece of performance story. actual concrete design space
-is wide open. can affect every corner of codebase and architect deeply around
-this ("data-oriented design"). or maybe just local opt you do for some key stuff
-like render loop and particles.
+This pattern is really about a mindset: it's getting you to think about where your data is in memory as a critical piece of your game's performance story. The actual concrete design space is wide open. You can let <span name="dod">data locality</span> affect your whole design philosophy, or maybe it's just a localized pattern you apply to a few critical data structures.
 
-### what is granularity of classes?
+The biggest question you'll need to answer is when and where you apply this pattern. But here's a few more concrete ones that may come up, especially if you're using this on your main game entity type.
 
-lot of oop teaches us to define small fine-grained classes with has-a references to other objects. get bit trees or graphs of tiny objects scattered in memory. nice for separation of concerns and reuse. not nice for keeping things contiguous.
+<aside name="dod">
 
-don't have to give up encapsulation, but sometimes makes more sense to think of class as representing collection of homogeneous objects. instead of particle class, have particle *system* class. often what's going on when you see "manager", "system", or "pool": single instance of class that represents large number of things.
+Noel Llopis' [famous article](http://gamesfromwithin.com/data-oriented-design) that got a lot more people thinking about designing games around data locality and cache-friendliness calls this "data-oriented design".
 
-**class = individual object:**
+</aside>
 
-  * *how we've been trained to do object modeling.* lets you bring into play all of powerful abstraction and encapsulation tools oop gives us. makes it easier to reason about behavior and state of small individual entities in isolation. while not perfect, reason this is most successful paradigm in world.
+### How do you handle polymorphism?
 
-  * *perfectly adequate for most of codebase.* opt triggers some weird flaw in brain where once start worrying about perf, hard to *stop* wanting to optimize everything. get obsessed.
-   but opt isn't without cost. get too sucked into perf mindset and can end up sacrificing all manner of things at that altar. like maintainability and flexibility. takes time too. dumb to burn time optimizing 80% of codebase that is not perf critical. your menu screens probably don't need to worry about this.
+One thing I've dodged in this chapter so far is subclassing and virtual methods. We've been assuming we've got nice packed arrays of *homogenous* objects. That way, we know they're all the exact same size. But polymorphism and dynamic dispatch are useful tools, too. How do we merge them?
 
-**manager objects:**
+**Don't:**
+
+The simplest answer is to just avoid subclassing, or at least avoid it in places where you're optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.
+
+  * *It's safe and easy.* You know exactly what class you're dealing with and all objects are obviously the same size. If you don't *need* polymorphism, don't use it.
+
+  * *It's faster.* Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. That can be an *instruction* cache miss. While overhead for this varies widely across different hardware, there is a cost to dynamic dispatch.
+
+  * *It's inflexible.* Of course, the reason we use dynamic dispatch is because it gives us a powerful way to make a bunch of different objects behave differently. If you want different entities in your game to have their own AI styles, their own special moves and attacks, virtual methods are a nice way to model that. Having to instead stuff all of that code into a single non-virtual method that does something like a switch on the AI type gets messy quickly.
+
+**Use separate arrays for each type:**
+
+We use polymorphism so that we can invoke behavior on an object whose type we don't know. In other words, we have a mixed bag of stuff and we want each object in there to do its own thing when we tell it to go.
+
+But that just raises the question of why mix the bag to begin with? Instead, why not just maintain separate homogenous collections for each type?
+
+  * *It keeps objects tightly packed.* Since each array only contains objects of the same type, there's no padding or other weirdness.
+  * *You can statically dispatch* Once you've got objects partitioned by type, you don't actually need polymorphism at all any more. You can use regular non-virtual method calls.
+  * *You have to keep track of a bunch of collections.* If you have a lot of different object types, the overhead and complexity of maintaining separate arrays for each can be a chore.
+
+  * *You have to be aware of every type*. Since you have to maintain seprate collections for each type, you can't be decoupled from them. Part of the magic of polymorphism is that it's *open-ended*: code that works with an interface can be completely decoupled from the potentially large set of types that implement that interface.
+
+**Use a collection of pointers:**
+
+If you weren't worried about caching, this is the natural solution. Just have an array of pointers to some base class or interface type. All the polymorphism you could want, and objects can be whatever size they want.
+
+  * *It's flexible.* The code that consumes the collection can work with objects of any type as long as it supports the interface you care about. It's completely open-ended.
+  * *It's less cache-friendly.* Of course, the whole reason we're discussing other options here is because this means cache-unfriendly pointer indirection. But, remember, if this code isn't performance critical, that probably doesn't matter.
+
+<!--
+
+### What is granularity of a class?
+
+A lot of OOP pedagogy teaches that objects that be as fine-grained and narrowly focused as possible. You hear people spouting craziness like a class shouldn't be longer than a page of code. Conceptually large objects end up being made of just a couple of smaller ones that are in turn made of smaller ones ending in some fractal cloud of tiny objects.
+
+This is great for separation of concerns, but it's not so nice for keeping things straight in memory. We don't have to give up encapsulation, but sometimes it makes more sense to define your class as representation an *aggregation* of objects. Instead of a particle class, you have a particle *system* class.
+
+**If a class represents an individual object:**
+
+  * *It's how we've been trained to model things.* It lets us apply all of powerful abstraction and encapsulation tools OOP hands us. Smaller, more isolated objects are easier to reason about and modify.
+
+  * *It's adequate for most of the codebase.* I find optimization short-circuits some weird corner of my brain. Once I start doing it, I start seeing *everything* as an optimization problem to be solved. The next thing I know, I've sorted and packed my entire sock drawer.
+
+  The truth is, 90% of the codebase is nowhere near performance critical. Time spent optimizing that stuff is time *not* spend making a better game.
+
+**If classes represent:**
 
   * *for lightweight "dumb" objects, don't lose much by having object that represents group of them.* things like particles where behavior of every particle is conceptually same are just as easy to reason about in class that updates a pile of them as they are in class that only deals with one.
 
@@ -398,6 +442,8 @@ classes will likely end up being very closely tied to each other. friend in c++.
   * *gets you back some of encapsulation of individual objects.* at least some of behavior can be scope to single object.
 
   * *most complex.* have two full classes. have to decide which has which parts of responsibility.
+
+-->
 
 ### how are actors defined?
 
