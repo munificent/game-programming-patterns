@@ -114,20 +114,21 @@ how do they get ahold of one?</p>
 <p>Singleton provides a solution to this too. In addition to creating the
 single instance, it also provides a globally-available method to get
 it. This way, anyone anywhere can get their paws on our blessed
-instance. All together, the textbook implementation looks like this:</p>
+instance. All together, the classic implementation looks like this:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">FileSystem</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="k">static</span> <span class="n">FileSystem</span><span class="o">&amp;</span> <span class="n">instance</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="c1">// Lazy initialize.</span>
-    <span class="k">static</span> <span class="n">FileSystem</span> <span class="o">*</span><span class="n">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileSystem</span><span class="p">();</span>
-
-    <span class="k">return</span> <span class="o">*</span><span class="n">instance</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">instance_</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="n">instance_</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileSystem</span><span class="p">();</span>
+    <span class="k">return</span> <span class="o">*</span><span class="n">instance_</span><span class="p">;</span>
   <span class="p">}</span>
 
 <span class="nl">private:</span>
   <span class="n">FileSystem</span><span class="p">()</span> <span class="p">{}</span>
+
+  <span class="k">static</span> <span class="n">FileSystem</span><span class="o">*</span> <span class="n">instance_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
@@ -138,6 +139,33 @@ static <code>instance()</code> method grants access to the instance from anywher
 in the codebase. It is also responsible for creating the instance
 using lazy initialization: it instantiates the Singleton the first
 time someone asks for it.</p>
+<p>A more modern update on this is like so:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">FileSystem</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="k">static</span> <span class="n">FileSystem</span><span class="o">&amp;</span> <span class="n">instance</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">static</span> <span class="n">FileSystem</span> <span class="o">*</span><span class="n">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileSystem</span><span class="p">();</span>
+    <span class="k">return</span> <span class="o">*</span><span class="n">instance</span><span class="p">;</span>
+  <span class="p">}</span>
+
+<span class="nl">private:</span>
+  <span class="n">FileSystem</span><span class="p">()</span> <span class="p">{}</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>C++11 <span name="thread">mandates</span> that the initializer for a
+local static variable is only run once even in the presence of
+concurrency. So, assuming you&#x2019;ve got a modern C++ compiler, this code
+is thread-safe where the first example is not.</p>
+<aside name="thread">
+
+<p>Of course, the thread-safety of your singleton class itself is an
+entirely different question! This just ensures that its
+<em>initialization</em> is.</p>
+</aside>
+
 <h2><a href="#why-we-use-it" name="why-we-use-it">Why We Use It</a></h2>
 <p>It seems we have a winner. Our file system wrapper is available
 wherever we need it without the tedium of passing it around
@@ -213,7 +241,7 @@ another when initializing itself.</p>
 </pre></div>
 
 
-<p>Now we turn <code>IFileSystem</code> into a Singleton:</p>
+<p>Now we turn <code>FileSystem</code> into a Singleton:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">FileSystem</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -245,9 +273,9 @@ another when initializing itself.</p>
 
 <p>With a simple compiler switch, we bind our file system wrapper to
 the appropriate concrete type. Our entire codebase can access the
-file system using <code>IFileSystem::instance()</code> without being coupled
+file system using <code>FileSystem::instance()</code> without being coupled
 to any platform-specific code. That coupling is instead
-encapsulated within the implementation file for the <code>IFileSystem</code>
+encapsulated within the implementation file for the <code>FileSystem</code>
 class itself.</p>
 </li>
 </ul>

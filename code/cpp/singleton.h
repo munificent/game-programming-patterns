@@ -9,15 +9,48 @@ namespace Singleton1
     static FileSystem& instance()
     {
       // Lazy initialize.
-      static FileSystem *instance = new FileSystem();
+      if (instance_ == NULL) instance_ = new FileSystem();
+      return *instance_;
+    }
 
+  private:
+    FileSystem() {}
+
+    static FileSystem* instance_;
+  };
+  //^1
+
+  FileSystem* FileSystem::instance_;
+
+  void test()
+  {
+    if (&FileSystem::instance() == NULL)
+    {
+      std::cout << "singleton is null!" << std::endl;
+    }
+    else
+    {
+      std::cout << "singleton is ok" << std::endl;
+    }
+  }
+}
+
+namespace SingletonStatic
+{
+  //^local-static
+  class FileSystem
+  {
+  public:
+    static FileSystem& instance()
+    {
+      static FileSystem *instance = new FileSystem();
       return *instance;
     }
 
   private:
     FileSystem() {}
   };
-  //^1
+  //^local-static
 
   void test()
   {

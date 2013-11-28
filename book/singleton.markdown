@@ -65,7 +65,7 @@ how do they get ahold of one?
 Singleton provides a solution to this too. In addition to creating the
 single instance, it also provides a globally-available method to get
 it. This way, anyone anywhere can get their paws on our blessed
-instance. All together, the textbook implementation looks like this:
+instance. All together, the classic implementation looks like this:
 
 ^code 1
 
@@ -75,6 +75,23 @@ static `instance()` method grants access to the instance from anywhere
 in the codebase. It is also responsible for creating the instance
 using lazy initialization: it instantiates the Singleton the first
 time someone asks for it.
+
+A more modern update on this is like so:
+
+^code local-static
+
+C++11 <span name="thread">mandates</span> that the initializer for a
+local static variable is only run once even in the presence of
+concurrency. So, assuming you've got a modern C++ compiler, this code
+is thread-safe where the first example is not.
+
+<aside name="thread">
+
+Of course, the thread-safety of your singleton class itself is an
+entirely different question! This just ensures that its
+*initialization* is.
+
+</aside>
 
 ## Why We Use It
 
@@ -115,7 +132,7 @@ nice features too:
 
     ^code 2
 
-    Now we turn `IFileSystem` into a Singleton:
+    Now we turn `FileSystem` into a Singleton:
 
     ^code 3
 
@@ -125,9 +142,9 @@ nice features too:
 
     With a simple compiler switch, we bind our file system wrapper to
     the appropriate concrete type. Our entire codebase can access the
-    file system using `IFileSystem::instance()` without being coupled
+    file system using `FileSystem::instance()` without being coupled
     to any platform-specific code. That coupling is instead
-    encapsulated within the implementation file for the `IFileSystem`
+    encapsulated within the implementation file for the `FileSystem`
     class itself.
 
 This takes us about as far as most of us go when it comes to solving a
