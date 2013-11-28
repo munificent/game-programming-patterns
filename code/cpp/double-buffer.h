@@ -126,6 +126,7 @@ namespace UnbufferedSlapstick
   public:
     Actor() : slapped_(false) {}
 
+    virtual ~Actor() {}
     virtual void update() = 0;
 
     void reset()      { slapped_ = false; }
@@ -259,6 +260,7 @@ namespace BufferedSlapstick
   public:
     Actor() : currentSlapped_(false) {}
 
+    virtual ~Actor() {}
     virtual void update() = 0;
 
     void swap()

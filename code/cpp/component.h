@@ -152,7 +152,7 @@ namespace SplitAIComponent
     int velocity;
     int x, y;
 
-    virtual void update(World& world, Graphics& graphics)
+    void update(World& world, Graphics& graphics)
     {
       //^4
       input_.update(*this);
@@ -262,7 +262,7 @@ namespace ComponentBjorn
     int velocity;
     int x, y;
 
-    virtual void update(World& world, Graphics& graphics)
+    void update(World& world, Graphics& graphics)
     {
       input_.update(*this);
       physics_.update(*this, world);
@@ -290,6 +290,7 @@ namespace AbstractInput
   class InputComponent
   {
   public:
+    virtual ~InputComponent() {}
     virtual void update(Bjorn& bjorn) = 0;
   };
   //^8
@@ -362,7 +363,7 @@ namespace AbstractInputBjorn
     : input_(input)
     {}
 
-    virtual void update(World& world, Graphics& graphics)
+    void update(World& world, Graphics& graphics)
     {
       input_->update(*this);
       physics_.update(*this, world);
@@ -412,6 +413,7 @@ namespace BaseGameObject
   class InputComponent
   {
   public:
+    virtual ~InputComponent() {}
     virtual void update(GameObject& obj) = 0;
   };
 
@@ -427,12 +429,14 @@ namespace BaseGameObject
   class PhysicsComponent
   {
   public:
+    virtual ~PhysicsComponent() {}
     virtual void update(GameObject& obj, World& world) = 0;
   };
 
   class GraphicsComponent
   {
   public:
+    virtual ~GraphicsComponent() {}
     virtual void update(GameObject& obj, Graphics& graphics) = 0;
   };
   //^14
@@ -452,7 +456,7 @@ namespace BaseGameObject
       graphics_(graphics)
     {}
 
-    virtual void update(World& world, Graphics& graphics)
+    void update(World& world, Graphics& graphics)
     {
       input_->update(*this);
       physics_->update(*this, world);
@@ -551,6 +555,7 @@ namespace ComponentMessaging
   class Component
   {
   public:
+    virtual ~Component() {}
     virtual void receive(int message) = 0;
   };
   //^19

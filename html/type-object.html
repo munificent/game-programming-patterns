@@ -101,6 +101,7 @@ way of enshrining a conceptual relation like that into code.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Monster</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
 <span class="nl">protected:</span>

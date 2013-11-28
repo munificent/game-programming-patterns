@@ -154,7 +154,8 @@ namespace UpdateMethod
       Entity()
       : x(0), y(0)
       {}
-      
+
+      virtual ~Entity() {}
       virtual void update() = 0;
 
     protected:

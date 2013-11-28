@@ -17,6 +17,8 @@
 - Q: Use parentheses when referring to methods/functions? `foo` or `foo()`?
 - Q: `true` or true?
 - Q: Are "enum", "struct", "int", etc. normal words or `code font`?
+- Q: Hide fields behind getters (better style) or allow public fields (less
+     boilerplate)?
 
 ## Terminology
 

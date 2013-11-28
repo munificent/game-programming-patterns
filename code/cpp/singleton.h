@@ -39,14 +39,17 @@ namespace Singleton1
 namespace Singleton2
 {
   //^2
-  class IFileSystem
+  class FileSystem
   {
+  public:
+    virtual ~FileSystem() {}
     virtual char* readFile(char* path) = 0;
     virtual void  writeFile(char* path, char* contents) = 0;
   };
 
-  class PS3FileSystem : public IFileSystem
+  class PS3FileSystem : public FileSystem
   {
+  public:
     virtual char* readFile(char* path)
     { 
       // Use Sony file IO API...
@@ -61,8 +64,9 @@ namespace Singleton2
     }
   };
 
-  class WiiFileSystem : public IFileSystem
+  class WiiFileSystem : public FileSystem
   {
+  public:
     virtual char* readFile(char* path)
     { 
       // Use Nintendo file IO API...
@@ -89,22 +93,23 @@ namespace Singleton3
   class WiiFileSystem;
 
   //^3
-  class IFileSystem
+  class FileSystem
   {
   public:
-    static IFileSystem& instance();
+    static FileSystem& instance();
 
+    virtual ~FileSystem() {}
     virtual char* readFile(char* path) = 0;
     virtual void  writeFile(char* path, char* contents) = 0;
 
   protected:
-    IFileSystem() {}
+    FileSystem() {}
 
-    static IFileSystem *instance_;
+    static FileSystem *instance_;
   };
   //^3
 
-  class PS3FileSystem : public IFileSystem
+  class PS3FileSystem : public FileSystem
   {
     virtual char* readFile(char* path)
     { 
@@ -114,7 +119,7 @@ namespace Singleton3
     virtual void writeFile(char* path, char* contents) {}
   };
 
-  class WiiFileSystem : public IFileSystem
+  class WiiFileSystem : public FileSystem
   {
     virtual char* readFile(char* path)
     { 
@@ -125,7 +130,7 @@ namespace Singleton3
   };
 
   //^4
-  IFileSystem& IFileSystem::instance()
+  FileSystem& FileSystem::instance()
   {
     if (instance_ == NULL)
     {
@@ -140,7 +145,7 @@ namespace Singleton3
   }
   //^4
 
-  IFileSystem *IFileSystem::instance_ = NULL;
+  FileSystem *FileSystem::instance_ = NULL;
 }
 
 namespace Singleton4
@@ -254,9 +259,10 @@ namespace Singleton8
 
 namespace Singleton9
 {
-  class ILog
+  class Log
   {
   public:
+    virtual ~Log() {}
     virtual void write(const char* text) = 0;
   };
 
@@ -264,10 +270,10 @@ namespace Singleton9
   class GameObject
   {
   protected:
-    ILog& getLog() { return log_; }
+    Log& getLog() { return log_; }
 
   private:
-    static ILog& log_;
+    static Log& log_;
   };
 
   class Enemy : public GameObject

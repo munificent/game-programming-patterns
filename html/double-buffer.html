@@ -432,6 +432,7 @@ shenanigans. Here&#x2019;s our base actor:</p>
 <span class="nl">public:</span>
   <span class="n">Actor</span><span class="p">()</span> <span class="o">:</span> <span class="n">slapped_</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span> <span class="p">{}</span>
 
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Actor</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
   <span class="kt">void</span> <span class="nf">reset</span><span class="p">()</span>      <span class="p">{</span> <span class="n">slapped_</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="p">}</span>
@@ -603,6 +604,7 @@ at a much finer granularity: each actor&#x2019;s "slapped" state:</p>
 <span class="nl">public:</span>
   <span class="n">Actor</span><span class="p">()</span> <span class="o">:</span> <span class="n">currentSlapped_</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span> <span class="p">{}</span>
 
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Actor</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
   <span class="kt">void</span> <span class="nf">swap</span><span class="p">()</span>

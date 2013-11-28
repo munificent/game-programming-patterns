@@ -137,17 +137,17 @@ service locator you'll see:
 
 The technique this uses is called *dependency injection*, an awkward
 bit of jargon for a very simple idea. Say you have one class
-that depends on another. In our case, our Locator class needs an
-instance of the IAudio service. Normally, the Locator would be
+that depends on another. In our case, our `Locator` class needs an
+instance of the `Audio` service. Normally, the locator would be
 responsible for constructing that itself. Dependency injection
 instead says that outside code is responsible for *giving* that
-dependent object to our Locator (i.e. injecting it into it).
+dependent object to our locator (i.e. injecting it into it).
 
 </aside>
 
 The static `getAudio()` function does the locating -- we can call
 it from anywhere in the codebase and it will give us back an instance
-of our `IAudio` service to use:
+of our `Audio` service to use:
 
 ^code 5
 
@@ -160,12 +160,12 @@ some code like this:
 
 The key part to notice here is that our `someGameCode()` function
 isn't aware of the concrete `ConsoleAudio` class, just the abstract
-`IAudio` interface. Equally important, not even the *locator* class is
+`Audio` interface. Equally important, not even the *locator* class is
 coupled to the concrete service provider. The *only* place in code
 that knows about the actual concrete class is the initialization
 function that registers the service.
 
-There's one more level of decoupling here: the `IAudio` interface
+There's one more level of decoupling here: the `Audio` interface
 isn't aware of the fact that it's being accessed in most places
 through a service locator. As far as it knows, it's just a regular
 abstract base class. This is useful because it means we can apply this

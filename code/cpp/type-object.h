@@ -6,6 +6,7 @@ namespace Subclasses
   class Monster
   {
   public:
+    virtual ~Monster() {}
     virtual const char* getAttack() = 0;
 
   protected:

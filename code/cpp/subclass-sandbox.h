@@ -12,6 +12,9 @@ namespace SimpleExample
   //^1
   class Superpower
   {
+  public:
+    virtual ~Superpower() {}
+    
   protected:
     virtual void activate() = 0;
     

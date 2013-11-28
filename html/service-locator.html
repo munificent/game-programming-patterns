@@ -148,9 +148,10 @@ the system to the rest of the codebase through a service locator.</p>
 <h3><a href="#the-service" name="the-service">The service</a></h3>
 <p>We&#x2019;ll start off with the audio API. This is the interface that our
 service will be exposing:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">IAudio</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Audio</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Audio</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">stopSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">stopAllSounds</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
@@ -166,7 +167,7 @@ abstract interface class with no implementation bound to it.</p>
 implementation. This book isn&#x2019;t about how to write audio code for a
 game console, so you&#x2019;ll have to imagine there&#x2019;s some actual code in
 the bodies of these functions, but you get the idea:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">ConsoleAudio</span> <span class="o">:</span> <span class="k">public</span> <span class="n">IAudio</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">ConsoleAudio</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Audio</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span>
@@ -196,15 +197,15 @@ service locator you&#x2019;ll see:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Locator</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="k">static</span> <span class="n">IAudio</span><span class="o">*</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
+  <span class="k">static</span> <span class="n">Audio</span><span class="o">*</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
 
-  <span class="k">static</span> <span class="kt">void</span> <span class="n">provide</span><span class="p">(</span><span class="n">IAudio</span><span class="o">*</span> <span class="n">service</span><span class="p">)</span>
+  <span class="k">static</span> <span class="kt">void</span> <span class="n">provide</span><span class="p">(</span><span class="n">Audio</span><span class="o">*</span> <span class="n">service</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">service_</span> <span class="o">=</span> <span class="n">service</span><span class="p">;</span>
   <span class="p">}</span>
 
 <span class="nl">private:</span>
-  <span class="k">static</span> <span class="n">IAudio</span><span class="o">*</span> <span class="n">service_</span><span class="p">;</span>
+  <span class="k">static</span> <span class="n">Audio</span><span class="o">*</span> <span class="n">service_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
@@ -213,19 +214,19 @@ service locator you&#x2019;ll see:</p>
 
 <p>The technique this uses is called <em>dependency injection</em>, an awkward
 bit of jargon for a very simple idea. Say you have one class
-that depends on another. In our case, our Locator class needs an
-instance of the IAudio service. Normally, the Locator would be
+that depends on another. In our case, our <code>Locator</code> class needs an
+instance of the <code>Audio</code> service. Normally, the locator would be
 responsible for constructing that itself. Dependency injection
 instead says that outside code is responsible for <em>giving</em> that
-dependent object to our Locator (i.e. injecting it into it).</p>
+dependent object to our locator (i.e. injecting it into it).</p>
 </aside>
 
 <p>The static <code>getAudio()</code> function does the locating&thinsp;&mdash;&thinsp;we can call
 it from anywhere in the codebase and it will give us back an instance
-of our <code>IAudio</code> service to use:</p>
+of our <code>Audio</code> service to use:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="nf">someGameCode</span><span class="p">()</span>
 <span class="p">{</span>
-  <span class="n">IAudio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="n">Locator</span><span class="o">::</span><span class="n">getAudio</span><span class="p">();</span>
+  <span class="n">Audio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="n">Locator</span><span class="o">::</span><span class="n">getAudio</span><span class="p">();</span>
   <span class="n">audio</span><span class="o">-&gt;</span><span class="n">playSound</span><span class="p">(</span><span class="n">VERY_LOUD_BANG</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
@@ -245,11 +246,11 @@ some code like this:</p>
 
 <p>The key part to notice here is that our <code>someGameCode()</code> function
 isn&#x2019;t aware of the concrete <code>ConsoleAudio</code> class, just the abstract
-<code>IAudio</code> interface. Equally important, not even the <em>locator</em> class is
+<code>Audio</code> interface. Equally important, not even the <em>locator</em> class is
 coupled to the concrete service provider. The <em>only</em> place in code
 that knows about the actual concrete class is the initialization
 function that registers the service.</p>
-<p>There&#x2019;s one more level of decoupling here: the <code>IAudio</code> interface
+<p>There&#x2019;s one more level of decoupling here: the <code>Audio</code> interface
 isn&#x2019;t aware of the fact that it&#x2019;s being accessed in most places
 through a service locator. As far as it knows, it&#x2019;s just a regular
 abstract base class. This is useful because it means we can apply this
@@ -278,7 +279,7 @@ the desired object. Its implementation basically does nothing, but
 allows code that receives the object to safely continue on as if it
 had received a "real" one.</p>
 <p>To use this, we&#x2019;ll define another "null" service provider:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">NullAudio</span><span class="o">:</span> <span class="k">public</span> <span class="n">IAudio</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">NullAudio</span><span class="o">:</span> <span class="k">public</span> <span class="n">Audio</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* Do nothing. */</span> <span class="p">}</span>
@@ -296,9 +297,9 @@ actually do anything. Now, we change our locator to this:</p>
 <span class="nl">public:</span>
   <span class="k">static</span> <span class="kt">void</span> <span class="n">initialize</span><span class="p">()</span> <span class="p">{</span> <span class="n">service_</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">nullService_</span><span class="p">;</span> <span class="p">}</span>
 
-  <span class="k">static</span> <span class="n">IAudio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="o">*</span><span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
+  <span class="k">static</span> <span class="n">Audio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="o">*</span><span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
 
-  <span class="k">static</span> <span class="kt">void</span> <span class="n">provide</span><span class="p">(</span><span class="n">IAudio</span><span class="o">*</span> <span class="n">service</span><span class="p">)</span>
+  <span class="k">static</span> <span class="kt">void</span> <span class="n">provide</span><span class="p">(</span><span class="n">Audio</span><span class="o">*</span> <span class="n">service</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">service</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
     <span class="p">{</span>
@@ -312,7 +313,7 @@ actually do anything. Now, we change our locator to this:</p>
   <span class="p">}</span>
 
 <span class="nl">private:</span>
-  <span class="k">static</span> <span class="n">IAudio</span><span class="o">*</span> <span class="n">service_</span><span class="p">;</span>
+  <span class="k">static</span> <span class="n">Audio</span><span class="o">*</span> <span class="n">service_</span><span class="p">;</span>
   <span class="k">static</span> <span class="n">NullAudio</span> <span class="n">nullService_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
@@ -369,10 +370,10 @@ logging at all. If the different systems we want to conditionally log
 are exposed as services, then we can solve this using the <a
 class="gof-pattern" href="decorator.html">Decorator</a> pattern. Let&#x2019;s
 define another audio service provider implementation like this:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">LoggedAudio</span> <span class="o">:</span> <span class="k">public</span> <span class="n">IAudio</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">LoggedAudio</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Audio</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="n">LoggedAudio</span><span class="p">(</span><span class="n">IAudio</span> <span class="o">&amp;</span><span class="n">wrapped</span><span class="p">)</span> <span class="o">:</span> <span class="n">wrapped_</span><span class="p">(</span><span class="n">wrapped</span><span class="p">)</span> <span class="p">{}</span>
+  <span class="n">LoggedAudio</span><span class="p">(</span><span class="n">Audio</span> <span class="o">&amp;</span><span class="n">wrapped</span><span class="p">)</span> <span class="o">:</span> <span class="n">wrapped_</span><span class="p">(</span><span class="n">wrapped</span><span class="p">)</span> <span class="p">{}</span>
 
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span>
   <span class="p">{</span>
@@ -392,10 +393,11 @@ define another audio service provider implementation like this:</p>
     <span class="n">wrapped_</span><span class="p">.</span><span class="n">stopAllSounds</span><span class="p">();</span>
   <span class="p">}</span>
 
+
 <span class="nl">private:</span>
   <span class="kt">void</span> <span class="n">log</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* Code to log message... */</span> <span class="p">}</span>
 
-  <span class="n">IAudio</span> <span class="o">&amp;</span><span class="n">wrapped_</span><span class="p">;</span>
+  <span class="n">Audio</span> <span class="o">&amp;</span><span class="n">wrapped_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
@@ -407,7 +409,7 @@ enable audio logging, they call this:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="nf">enableAudioLogging</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="c1">// Decorate the existing service.</span>
-  <span class="n">IAudio</span> <span class="o">*</span><span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LoggedAudio</span><span class="p">(</span><span class="n">Locator</span><span class="o">::</span><span class="n">getAudio</span><span class="p">());</span>
+  <span class="n">Audio</span> <span class="o">*</span><span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LoggedAudio</span><span class="p">(</span><span class="n">Locator</span><span class="o">::</span><span class="n">getAudio</span><span class="p">());</span>
 
   <span class="c1">// Swap it in.</span>
   <span class="n">Locator</span><span class="o">::</span><span class="n">provide</span><span class="p">(</span><span class="n">service</span><span class="p">);</span>
@@ -476,7 +478,7 @@ compile time using preprocessor macros. Like so:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Locator</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="k">static</span> <span class="n">IAudio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
+  <span class="k">static</span> <span class="n">Audio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
 
 <span class="nl">private:</span>
   <span class="err">#</span><span class="k">if</span> <span class="n">DEBUG</span>
@@ -613,9 +615,9 @@ locator. The simplest way to do this is with an assertion:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Locator</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="k">static</span> <span class="n">IAudio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span>
+  <span class="k">static</span> <span class="n">Audio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span>
   <span class="p">{</span>
-    <span class="n">IAudio</span><span class="o">*</span> <span class="n">service</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">Audio</span><span class="o">*</span> <span class="n">service</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 
     <span class="c1">// Code here to locate service...</span>
 
@@ -725,10 +727,10 @@ class and its descendants, like so:</p>
 
 <span class="nl">protected:</span>
   <span class="c1">// Derived classes can use service</span>
-  <span class="k">static</span> <span class="n">IAudio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="o">*</span><span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
+  <span class="k">static</span> <span class="n">Audio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="o">*</span><span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
 
 <span class="nl">private:</span>
-  <span class="k">static</span> <span class="n">IAudio</span><span class="o">*</span> <span class="n">service_</span><span class="p">;</span>
+  <span class="k">static</span> <span class="n">Audio</span><span class="o">*</span> <span class="n">service_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 

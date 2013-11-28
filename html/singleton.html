@@ -177,14 +177,17 @@ another when initializing itself.</p>
     abstract interface for a file system, with subclasses that
     implement the interface for each platform. Here are the basic
     classes:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">IFileSystem</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">FileSystem</span>
 <span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">FileSystem</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">char</span><span class="o">*</span> <span class="n">readFile</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">path</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="k">virtual</span> <span class="kt">void</span>  <span class="n">writeFile</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">path</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">contents</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
 
-<span class="k">class</span> <span class="nc">PS3FileSystem</span> <span class="o">:</span> <span class="k">public</span> <span class="n">IFileSystem</span>
+<span class="k">class</span> <span class="nc">PS3FileSystem</span> <span class="o">:</span> <span class="k">public</span> <span class="n">FileSystem</span>
 <span class="p">{</span>
+<span class="nl">public:</span>
   <span class="k">virtual</span> <span class="kt">char</span><span class="o">*</span> <span class="n">readFile</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">path</span><span class="p">)</span>
   <span class="p">{</span> 
     <span class="c1">// Use Sony file IO API...</span>
@@ -196,8 +199,9 @@ another when initializing itself.</p>
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="k">class</span> <span class="nc">WiiFileSystem</span> <span class="o">:</span> <span class="k">public</span> <span class="n">IFileSystem</span>
+<span class="k">class</span> <span class="nc">WiiFileSystem</span> <span class="o">:</span> <span class="k">public</span> <span class="n">FileSystem</span>
 <span class="p">{</span>
+<span class="nl">public:</span>
   <span class="k">virtual</span> <span class="kt">char</span><span class="o">*</span> <span class="n">readFile</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">path</span><span class="p">)</span>
   <span class="p">{</span> 
     <span class="c1">// Use Nintendo file IO API...</span>
@@ -212,24 +216,25 @@ another when initializing itself.</p>
 
 
 <p>Now we turn <code>IFileSystem</code> into a Singleton:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">IFileSystem</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">FileSystem</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="k">static</span> <span class="n">IFileSystem</span><span class="o">&amp;</span> <span class="n">instance</span><span class="p">();</span>
+  <span class="k">static</span> <span class="n">FileSystem</span><span class="o">&amp;</span> <span class="n">instance</span><span class="p">();</span>
 
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">FileSystem</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">char</span><span class="o">*</span> <span class="n">readFile</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">path</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="k">virtual</span> <span class="kt">void</span>  <span class="n">writeFile</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">path</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">contents</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
 <span class="nl">protected:</span>
-  <span class="n">IFileSystem</span><span class="p">()</span> <span class="p">{}</span>
+  <span class="n">FileSystem</span><span class="p">()</span> <span class="p">{}</span>
 
-  <span class="k">static</span> <span class="n">IFileSystem</span> <span class="o">*</span><span class="n">instance_</span><span class="p">;</span>
+  <span class="k">static</span> <span class="n">FileSystem</span> <span class="o">*</span><span class="n">instance_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
 
 <p>The clever part is how the instance is created:</p>
-<div class="codehilite"><pre><span class="n">IFileSystem</span><span class="o">&amp;</span> <span class="n">IFileSystem</span><span class="o">::</span><span class="n">instance</span><span class="p">()</span>
+<div class="codehilite"><pre><span class="n">FileSystem</span><span class="o">&amp;</span> <span class="n">FileSystem</span><span class="o">::</span><span class="n">instance</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">instance_</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
   <span class="p">{</span>
@@ -625,10 +630,10 @@ base class. We can use that to our advantage:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">GameObject</span>
 <span class="p">{</span>
 <span class="nl">protected:</span>
-  <span class="n">ILog</span><span class="o">&amp;</span> <span class="n">getLog</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">log_</span><span class="p">;</span> <span class="p">}</span>
+  <span class="n">Log</span><span class="o">&amp;</span> <span class="n">getLog</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">log_</span><span class="p">;</span> <span class="p">}</span>
 
 <span class="nl">private:</span>
-  <span class="k">static</span> <span class="n">ILog</span><span class="o">&amp;</span> <span class="n">log_</span><span class="p">;</span>
+  <span class="k">static</span> <span class="n">Log</span><span class="o">&amp;</span> <span class="n">log_</span><span class="p">;</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">Enemy</span> <span class="o">:</span> <span class="k">public</span> <span class="n">GameObject</span>

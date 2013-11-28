@@ -402,7 +402,7 @@ method and put it into this class. The changes to <code>Bjorn</code> are also st
   <span class="kt">int</span> <span class="n">velocity</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
 
-  <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">input_</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
 
@@ -490,7 +490,7 @@ Not much:</p>
   <span class="kt">int</span> <span class="n">velocity</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
 
-  <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="nf">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">input_</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
     <span class="n">physics_</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">world</span><span class="p">);</span>
@@ -525,6 +525,7 @@ interface. We&#x2019;ll turn <code>InputComponent</code> into an abstract base c
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">InputComponent</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">InputComponent</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Bjorn</span><span class="o">&amp;</span> <span class="n">bjorn</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
@@ -567,7 +568,7 @@ of owning an instance directly:</p>
   <span class="o">:</span> <span class="n">input_</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
   <span class="p">{}</span>
 
-  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">input_</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
     <span class="n">physics_</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">world</span><span class="p">);</span>
@@ -626,7 +627,7 @@ graphics don&#x2019;t even know there&#x2019;s a difference. Maybe I&#x2019;m a 
 strange, but it&#x2019;s stuff like this that gets me up in the <span name="coffee">morning</span>.</p>
 <aside name="coffee">
 
-<p>That, and coffee.</p>
+<p>That, and coffee. Sweet, steaming hot coffee.</p>
 </aside>
 
 <h3><a href="#no-bj&oslash;rn-at-all" name="no-bj&oslash;rn-at-all">No Bj&oslash;rn at all?</a></h3>
@@ -641,12 +642,14 @@ like Dr. Frankenstein.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">PhysicsComponent</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">PhysicsComponent</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">GameObject</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">,</span> <span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">GraphicsComponent</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">GraphicsComponent</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">GameObject</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
@@ -668,7 +671,7 @@ uses those interfaces:</p>
     <span class="n">graphics_</span><span class="p">(</span><span class="n">graphics</span><span class="p">)</span>
   <span class="p">{}</span>
 
-  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">input_</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
     <span class="n">physics_</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">world</span><span class="p">);</span>
@@ -686,7 +689,7 @@ uses those interfaces:</p>
 <aside name="id">
 
 <p>Some component systems take this even farther. Instead of a <code>GameObject</code> that contains its components, the game entity is just an ID, a number. Then you maintain separate collections of components where each one knows the ID of the entity its attached to.</p>
-<p>These <a href="http://en.wikipedia.org/wiki/Entity_component_system">entity component systems</a> take decoupling components to the extreme and let you add new components to an entity without the entity even knowing.</p>
+<p>These <a href="http://en.wikipedia.org/wiki/Entity_component_system">entity component systems</a> take decoupling components to the extreme and let you add new components to an entity without the entity even knowing. The <a href="data-locality.html" class="pattern">Data Locality</a> chapter has more details.</p>
 </aside>
 
 <p>Our existing concrete classes will get renamed and implement those interfaces:</p>
@@ -917,6 +920,7 @@ it a reference to his corresponding <code>PhysicsComponent</code>.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Component</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Component</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">receive</span><span class="p">(</span><span class="kt">int</span> <span class="n">message</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>

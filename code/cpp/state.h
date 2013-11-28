@@ -360,6 +360,7 @@ namespace State
       //^omit
       static JumpingState jumping;
       //^omit
+      virtual ~HeroineState() {}
       virtual void handleInput(Heroine& heroine, Input input) {}
       virtual void update(Heroine& heroine) {}
     };
@@ -485,6 +486,7 @@ namespace State
     class HeroineState
     {
     public:
+      virtual ~HeroineState() {}
       virtual void enter(Heroine& heroine) {}
       virtual void handleInput(Heroine& heroine, Input input) {}
       virtual void update(Heroine& heroine) {}
@@ -563,7 +565,7 @@ namespace State
     {
       // Other code...
       //^omit
-      virtual void handleInput(Input input);
+      void handleInput(Input input);
       //^omit
 
     private:
@@ -588,12 +590,12 @@ namespace State
 
     class HeroineState {
     public:
-      void handleInput(Heroine& heroine, Input input);
+      virtual void handleInput(Heroine& heroine, Input input);
     };
 
     class Heroine
     {
-      virtual void handleInput(Input input) {}
+      void handleInput(Input input) {}
 
     private:
       HeroineState* state_;

@@ -199,6 +199,9 @@ not the complexity of its implementation.</p>
 <p>We&#x2019;ll start with our <code>Superpower</code> superclass:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Superpower</span><span class="p">()</span> <span class="p">{}</span>
+
 <span class="nl">protected:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">activate</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 

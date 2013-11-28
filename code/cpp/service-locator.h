@@ -21,9 +21,10 @@ void example()
 }
 
 //^9
-class IAudio
+class Audio
 {
 public:
+  virtual ~Audio() {}
   virtual void playSound(int soundID) = 0;
   virtual void stopSound(int soundID) = 0;
   virtual void stopAllSounds() = 0;
@@ -31,7 +32,7 @@ public:
 //^9
 
 //^10
-class ConsoleAudio : public IAudio
+class ConsoleAudio : public Audio
 {
 public:
   virtual void playSound(int soundID)
@@ -52,10 +53,10 @@ public:
 //^10
 
 //^12
-class LoggedAudio : public IAudio
+class LoggedAudio : public Audio
 {
 public:
-  LoggedAudio(IAudio &wrapped) : wrapped_(wrapped) {}
+  LoggedAudio(Audio &wrapped) : wrapped_(wrapped) {}
 
   virtual void playSound(int soundID)
   {
@@ -79,7 +80,7 @@ public:
 private:
   void log(const char* message) { /* Code to log message... */ }
 
-  IAudio &wrapped_;
+  Audio &wrapped_;
 };
 //^12
 
@@ -90,19 +91,19 @@ namespace Version1
   class Locator
   {
   public:
-    static IAudio* getAudio() { return service_; }
+    static Audio* getAudio() { return service_; }
 
-    static void provide(IAudio* service)
+    static void provide(Audio* service)
     {
       service_ = service;
     }
 
   private:
-    static IAudio* service_;
+    static Audio* service_;
   };
   //^1
 
-  IAudio *Locator::service_;
+  Audio *Locator::service_;
 
   //^11
   void initGame()
@@ -118,7 +119,7 @@ namespace Version1
     //^omit
     int VERY_LOUD_BANG = 0;
     //^omit
-    IAudio *audio = Locator::getAudio();
+    Audio *audio = Locator::getAudio();
     audio->playSound(VERY_LOUD_BANG);
   }
   //^5
@@ -127,7 +128,7 @@ namespace Version1
 // design decisions / compile time
 namespace Version2
 {
-  class DebugAudio: public IAudio
+  class DebugAudio: public Audio
   {
   public:
     virtual void playSound(int soundID) { /* Do nothing. */ }
@@ -140,7 +141,7 @@ namespace Version2
   class Locator
   {
   public:
-    static IAudio& getAudio() { return service_; }
+    static Audio& getAudio() { return service_; }
 
   private:
     #if DEBUG
@@ -162,10 +163,10 @@ namespace Version3
 
   protected:
     // Derived classes can use service
-    static IAudio& getAudio() { return *service_; }
+    static Audio& getAudio() { return *service_; }
 
   private:
-    static IAudio* service_;
+    static Audio* service_;
   };
   //^3
 }
@@ -176,9 +177,9 @@ namespace Version4
   class Locator
   {
   public:
-    static IAudio& getAudio()
+    static Audio& getAudio()
     {
-      IAudio* service = NULL;
+      Audio* service = NULL;
 
       // Code here to locate service...
 
@@ -192,7 +193,7 @@ namespace Version4
 namespace Version5
 {
   //^7
-  class NullAudio: public IAudio
+  class NullAudio: public Audio
   {
   public:
     virtual void playSound(int soundID) { /* Do nothing. */ }
@@ -207,9 +208,9 @@ namespace Version5
   public:
     static void initialize() { service_ = &nullService_; }
 
-    static IAudio& getAudio() { return *service_; }
+    static Audio& getAudio() { return *service_; }
 
-    static void provide(IAudio* service)
+    static void provide(Audio* service)
     {
       if (service == NULL)
       {
@@ -223,19 +224,19 @@ namespace Version5
     }
 
   private:
-    static IAudio* service_;
+    static Audio* service_;
     static NullAudio nullService_;
   };
   //^8
 
-  IAudio *Locator::service_ = NULL;
+  Audio *Locator::service_ = NULL;
   NullAudio Locator::nullService_;
 
   //^13
   void enableAudioLogging()
   {
     // Decorate the existing service.
-    IAudio *service = new LoggedAudio(Locator::getAudio());
+    Audio *service = new LoggedAudio(Locator::getAudio());
 
     // Swap it in.
     Locator::provide(service);

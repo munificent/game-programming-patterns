@@ -425,7 +425,7 @@ strange, but it's stuff like this that gets me up in the <span name="coffee">mor
 
 <aside name="coffee">
 
-That, and coffee.
+That, and coffee. Sweet, steaming hot coffee.
 
 </aside>
 
@@ -452,7 +452,7 @@ uses those interfaces:
 
 Some component systems take this even farther. Instead of a `GameObject` that contains its components, the game entity is just an ID, a number. Then you maintain separate collections of components where each one knows the ID of the entity its attached to.
 
-These [entity component systems](http://en.wikipedia.org/wiki/Entity_component_system) take decoupling components to the extreme and let you add new components to an entity without the entity even knowing.
+These [entity component systems](http://en.wikipedia.org/wiki/Entity_component_system) take decoupling components to the extreme and let you add new components to an entity without the entity even knowing. The <a href="data-locality.html" class="pattern">Data Locality</a> chapter has more details.
 
 </aside>
 
