@@ -7,9 +7,9 @@
 
 ## Motivation
 
-The player's mighty warrior is on a quest to steal the glorious jewels from where they rest on the bones of the long-dead sorceror-queen. He walks to the entrance of her magnificent crypt to discover... nothing. No cursed statues shooting lightning at him. No undead warriors guarding the entrance. He can just walk right in that grab the loot. That won't do.
+The player's mighty warrior is on a quest to steal the glorious jewels from where they rest on the bones of the long-dead sorcerer-queen. He walks to the entrance of her magnificent crypt to discover... nothing. No cursed statues shooting lightning at him. No undead warriors guarding the entrance. He can just walk right in that grab the loot. That won't do.
 
-This crypt needs some protection: some enemies our brave hero can grapple with. First up, we want a re-animated skeleton guard to patrol back and forth in front of the door. (If the sorceror-queen wanted more intelligent behavior, she should have re-animated something that still had brains.)
+This crypt needs some protection: some enemies our brave hero can grapple with. First up, we want a re-animated skeleton guard to patrol back and forth in front of the door. (If the sorcerer-queen wanted more intelligent behavior, she should have re-animated something that still had brains.)
 
 Our actual game deals with user input, rendering, and maintaining a stable framerate. That means all of the game code is nestled within a comfy little <a href="game-loop.html" class="pattern">game loop</a>. If we ignore that for the moment and imagine the simplest possible code to move our skeleton back and forth, we'd have something like:
 

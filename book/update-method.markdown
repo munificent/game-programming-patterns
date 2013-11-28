@@ -7,7 +7,7 @@
 
 ## Motivation
 
-The player's mighty valkyrie is on a quest to steal glorious jewels from where they rest on the bones of the long-dead sorceror-king. She tentatively approaches the entrance of his magnificent crypt and is attacked by... *nothing*. No cursed statues shooting lightning at her. No undead warriors patrolling the entrance. She just walks right in grabs the loot. <span name="win">Game over.</span> You win.
+The player's mighty valkyrie is on a quest to steal glorious jewels from where they rest on the bones of the long-dead sorcerer-king. She tentatively approaches the entrance of his magnificent crypt and is attacked by... *nothing*. No cursed statues shooting lightning at her. No undead warriors patrolling the entrance. She just walks right in grabs the loot. <span name="win">Game over.</span> You win.
 
 Well, that won't do.
 
@@ -21,7 +21,7 @@ This crypt needs some guards -- some enemies our brave hero can grapple with. Fi
 
 <aside name="brains">
 
-If the sorceror-king wanted more intelligent behavior, he should have re-animated something that still had brain tissue.
+If the sorcerer-king wanted more intelligent behavior, he should have re-animated something that still had brain tissue.
 
 </aside>
 

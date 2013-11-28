@@ -17,7 +17,7 @@ Watch [the demo](http://www.youtube.com/watch?v=USyoT_Ha_bA) and prepare to be b
 
 Pretend we're making a game in the style of Gauntlet. We've got creatures and fiends swarming around the hero, vying for their share of his flesh. These unsavory dinner companions enter the arena by way of generators, and there is a different generator for each kind of enemy.
 
-For the sake of this example, let's say we have different types for each kind of monster in the game. We'll have actual C++ classes for `Ghost`, `Demon`, `Sorceror`, etc.:
+For the sake of this example, let's say we have different types for each kind of monster in the game. We'll have actual C++ classes for `Ghost`, `Demon`, `Sorcerer`, etc., like:
 
 ^code monster-classes
 
