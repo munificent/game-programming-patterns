@@ -121,15 +121,13 @@ instance. All together, the textbook implementation looks like this:</p>
   <span class="k">static</span> <span class="n">FileSystem</span><span class="o">&amp;</span> <span class="n">instance</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="c1">// Lazy initialize.</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">instance_</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="n">instance_</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileSystem</span><span class="p">();</span>
+    <span class="k">static</span> <span class="n">FileSystem</span> <span class="o">*</span><span class="n">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileSystem</span><span class="p">();</span>
 
-    <span class="k">return</span> <span class="o">*</span><span class="n">instance_</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">*</span><span class="n">instance</span><span class="p">;</span>
   <span class="p">}</span>
 
 <span class="nl">private:</span>
   <span class="n">FileSystem</span><span class="p">()</span> <span class="p">{}</span>
-
-  <span class="k">static</span> <span class="n">FileSystem</span> <span class="o">*</span><span class="n">instance_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
@@ -227,8 +225,6 @@ another when initializing itself.</p>
 
 <span class="nl">protected:</span>
   <span class="n">FileSystem</span><span class="p">()</span> <span class="p">{}</span>
-
-  <span class="k">static</span> <span class="n">FileSystem</span> <span class="o">*</span><span class="n">instance_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
@@ -236,16 +232,13 @@ another when initializing itself.</p>
 <p>The clever part is how the instance is created:</p>
 <div class="codehilite"><pre><span class="n">FileSystem</span><span class="o">&amp;</span> <span class="n">FileSystem</span><span class="o">::</span><span class="n">instance</span><span class="p">()</span>
 <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">instance_</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="err">#</span><span class="k">if</span> <span class="n">PLATFORM</span> <span class="o">==</span> <span class="n">PLAYSTATION3</span>
-      <span class="n">instance_</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PS3FileSystem</span><span class="p">();</span>
-    <span class="err">#</span><span class="n">elif</span> <span class="n">PLATFORM</span> <span class="o">==</span> <span class="n">WII</span>
-      <span class="n">instance_</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WiiFileSystem</span><span class="p">();</span>
-    <span class="err">#</span><span class="n">endif</span>
-  <span class="p">}</span>
+  <span class="err">#</span><span class="k">if</span> <span class="n">PLATFORM</span> <span class="o">==</span> <span class="n">PLAYSTATION3</span>
+    <span class="k">static</span> <span class="n">FileSystem</span> <span class="o">*</span><span class="n">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PS3FileSystem</span><span class="p">();</span>
+  <span class="err">#</span><span class="n">elif</span> <span class="n">PLATFORM</span> <span class="o">==</span> <span class="n">WII</span>
+    <span class="k">static</span> <span class="n">FileSystem</span> <span class="o">*</span><span class="n">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WiiFileSystem</span><span class="p">();</span>
+  <span class="err">#</span><span class="n">endif</span>
 
-  <span class="k">return</span> <span class="o">*</span><span class="n">instance_</span><span class="p">;</span>
+  <span class="k">return</span> <span class="o">*</span><span class="n">instance</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
 
