@@ -332,6 +332,11 @@ namespace DataLocality
     //^hot-cold
   }
 
+  namespace InlineComponents
+  {
+    //^inline-components
+  }
+
   /*
 
   clock_t startTime;

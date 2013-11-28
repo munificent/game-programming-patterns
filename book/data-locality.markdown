@@ -136,7 +136,13 @@ But optimization for cache usage is a huge topic. I haven't even touched on *ins
 
 Until you get your hands on that, though, I do think there are a few basic techniques that I can fit in here that will get you started along the path of thinking about how your data structures impact your performance.
 
-What it all boils down to is something pretty simple: Whenever the chip reads some memory, it gets a whole cache line. The more you can use stuff in that cache line, the faster you go. So the goal then is to *organize your data structures so that the things you're processing are next to each other in memory*.
+What it all boils down to is something pretty simple: Whenever the chip reads some memory, it gets a whole cache line. The more you can use stuff in that <span name="line">cache line, the faster you go</span>. So the goal then is to *organize your data structures so that the things you're processing are next to each other in memory*.
+
+<aside name="line">
+
+There's a key assumption here, though: single-threadedness. If you are accessing nearby data on *multiple* threads, it's often faster to have data on *different* cache lines. If two threads are accessing data so close to each other that they occupy the same cache line, the caches of those two cores have to synchronize with each other, which is costly.
+
+</aside>
 
 If your code is crunching on A then B then C, you want them laid out in memory like this:
 
@@ -368,7 +374,7 @@ Doing this kind of optimization is somewhere between a black art and a rathole. 
 
 This pattern is really about a mindset: it's getting you to think about where your data is in memory as a critical piece of your game's performance story. The actual concrete design space is wide open. You can let <span name="dod">data locality</span> affect your whole design philosophy, or maybe it's just a localized pattern you apply to a few critical data structures.
 
-The biggest question you'll need to answer is when and where you apply this pattern. But here's a few more concrete ones that may come up, especially if you're using this on your main game entity type.
+The biggest question you'll need to answer is when and where you apply this pattern. But here's a couple specific ones that may come up.
 
 <aside name="dod">
 
@@ -397,7 +403,7 @@ We use polymorphism so that we can invoke behavior on an object whose type we do
 But that just raises the question of why mix the bag to begin with? Instead, why not just maintain separate homogenous collections for each type?
 
   * *It keeps objects tightly packed.* Since each array only contains objects of the same type, there's no padding or other weirdness.
-  * *You can statically dispatch* Once you've got objects partitioned by type, you don't actually need polymorphism at all any more. You can use regular non-virtual method calls.
+  * *You can statically dispatch.* Once you've got objects partitioned by type, you don't actually need polymorphism at all any more. You can use regular non-virtual method calls.
   * *You have to keep track of a bunch of collections.* If you have a lot of different object types, the overhead and complexity of maintaining separate arrays for each can be a chore.
 
   * *You have to be aware of every type*. Since you have to maintain seprate collections for each type, you can't be decoupled from them. Part of the magic of polymorphism is that it's *open-ended*: code that works with an interface can be completely decoupled from the potentially large set of types that implement that interface.
@@ -409,122 +415,82 @@ If you weren't worried about caching, this is the natural solution. Just have an
   * *It's flexible.* The code that consumes the collection can work with objects of any type as long as it supports the interface you care about. It's completely open-ended.
   * *It's less cache-friendly.* Of course, the whole reason we're discussing other options here is because this means cache-unfriendly pointer indirection. But, remember, if this code isn't performance critical, that probably doesn't matter.
 
-<!--
+### How are game entities defined?
 
-### What is granularity of a class?
+If you use this pattern in tandem with the <a href="components.html" class="pattern">Component</a> pattern, you'll have nice contiguous arrays for all of the components that make up your game entity. The game loop will be iterating over those directly, so the actual object representing the game entity itself will be less important, but it's still useful in other parts of the codebase where you want to work with a single conceptual "entity".
 
-A lot of OOP pedagogy teaches that objects that be as fine-grained and narrowly focused as possible. You hear people spouting craziness like a class shouldn't be longer than a page of code. Conceptually large objects end up being made of just a couple of smaller ones that are in turn made of smaller ones ending in some fractal cloud of tiny objects.
+The question then is how should it be represented? How does it keep track of its components?
 
-This is great for separation of concerns, but it's not so nice for keeping things straight in memory. We don't have to give up encapsulation, but sometimes it makes more sense to define your class as representation an *aggregation* of objects. Instead of a particle class, you have a particle *system* class.
+**Game entities are classes with pointers to their components:**
 
-**If a class represents an individual object:**
+This is what our first example looked like. It's sort of the vanilla OOP solution. You've got a class for `GameEntity`, and it has pointers to the componentes each entity owns. Since they're just pointers, it's agnostic about where and how those components are actually organized in memory.
 
-  * *It's how we've been trained to model things.* It lets us apply all of powerful abstraction and encapsulation tools OOP hands us. Smaller, more isolated objects are easier to reason about and modify.
+  * *You can store components in contiguous arrays.* Since the game entity doesn't <span name="care">care</span> where its components are, you can organize them in a nice packed array to optimize iterating over them.
 
-  * *It's adequate for most of the codebase.* I find optimization short-circuits some weird corner of my brain. Once I start doing it, I start seeing *everything* as an optimization problem to be solved. The next thing I know, I've sorted and packed my entire sock drawer.
+<aside name="care">
 
-  The truth is, 90% of the codebase is nowhere near performance critical. Time spent optimizing that stuff is time *not* spend making a better game.
+It's 2:00 AM. Do *you* know where your components are?
 
-**If classes represent:**
+</aside>
 
-  * *for lightweight "dumb" objects, don't lose much by having object that represents group of them.* things like particles where behavior of every particle is conceptually same are just as easy to reason about in class that updates a pile of them as they are in class that only deals with one.
+  * *Given an actor you can easily get to its components.* They're just a pointer indirection away.
 
-  * *lets manager completely control memory for objects.* weird that with most objects, they don't encapsulate their own memory management. [operator new] memory has to be given to them before they come to life. to keep stuff in right place in memory, you need some manager *anyway*, so it may as well manage the objects as well as their memory.
+  * *Moving components in memory is hard.* When components get enabled or disabled, you may want to move them around in the array to keep the components you actually need to process up front and contiguous. If you move a component while the entity has a raw pointer to it, though, that pointer gets broken if you aren't careful. You'll have to make sure to update the entity's pointer at the same time.
 
-  * *lets you control access to objects*. by hiding individual objects behind manager, you can prevent outside code from getting raw pointer to them. very important if you are sorting, packing or otherwise moving in memory: doing so would break any existing pointers.
+**Game entities are class with IDs for their components:**
 
-**both:**
+The challenge with raw pointers to components is that it makes it harder to move them around in memory. You can address that by having something more abstract: an ID or index that can be used to *look up* a component.
 
-final option is to do both: have class for manager and class for individual objects. if doing manager, will end up doing this in some way anyway. at very least, will have dumb struct for individual object. once have that, have option of putting some methods there too for things that only operate on single object.
+The actual semantics of the ID and lookup process are up to you. It could be as simple as storing a unique ID in each component and walking the list, or something more complex like a hash table that maps IDs to their current index in the component array.
 
-classes will likely end up being very closely tied to each other. friend in c++.
+  * *It's more complex.* Your ID system doesn't have to be rocket science, but it's still more work than a basic pointer. You'll have to implement and debug it, and there will likely be some memory overhead for bookkeeping.
 
-  * *gets you back some of encapsulation of individual objects.* at least some of behavior can be scope to single object.
+  * *It's slower*. It's hard to beat traversing a raw pointer. There may be some actual searching or hashing involved to get from an entity to one of its components. This may not matter much, though. Remember, the game loop is working with the components directly so it won't go through this. Code that does need to look up a component given an entity may not be on your hot code path.
 
-  * *most complex.* have two full classes. have to decide which has which parts of responsibility.
+  * *You'll need access to the component "manager".* The basic idea is that you have some abstract ID that identifies a component. You can use it to get a reference to the actual component object. But to do that, you need to hand that ID to something that can actually find the component. That will be the class that wraps your raw contiguous array of component objects.
 
--->
+  With raw pointers, if you have a game entity, you can find its components. With this, you <span name="singleton">need</span> the game entity *and the component registry too*.
 
-### how are actors defined?
+<aside name="singleton">
 
-if using nice contiguous arrays of components and iterating them directly,
-actual actor object is less important during core game loop. still useful in other places in codebase that want to work with single logical "actor".
+You may be thinking, "I'll just make it a singleton! Problem solved!" Well, sort of. You might want to check out <a href="singleton.html">the chapter</a> on those first.
 
-question is how should it be represented? how does it track its components?
+</aside>
 
-**inline:**
+**The game entity is *itself* just an ID:**
 
-if actor has components as actual fields and not pointers to components (or not using explicit component pattern at all), then data stored inline in actor object. in other words, not using optimizing components in memory for updating.
+This is a newer style that some game engines use. Once you've moved all of your entity's behavior and state out of the main class and into components, what's left? It turns out, not much. The only thing an entity does is bind a set of components together. It exists just to say *this* AI component and *this* physics component and *this* render component "go together".
 
-  *can move entire actor in memory.* since actor and its components are now all
-  one contiguous obj, can move whole thing around without worrying about fragmenting it.
+That's important because components interact. The render component needs to know where the entity is, which is likely a property of the physics component. The AI component wants to move the entity, so it needs to apply a force to the physics component. So each component needs a way to get the other sibling components of the entity they are a part of.
 
-  *faster to access all actor data.* splitting actors into components optimizes for use case where you access all components of bunch of actors at same time. but if your access pattern is for touching all data for one actor at same time, this better. localizes actor data together.
+Some smart people realized all you need for that is an ID. Instead of the entity knowing its components, the components know their entity. Each component knows the ID of the entity that owns it. When the AI component needs the physics component for its entity, it just asks for the physics component with the same entity ID that it has.
 
-  *simpler, smaller:* don't have to manage memory for pieces of actor separately. don't waste space storing pointers.
+Your entity classes disappear entirely. They just become more or less a typedef for a number.
 
-**pointers:**
+  *Entities are tiny.* When you want to pass around a reference to a game entity, it's literally just a tiny bit of data.
 
-kind of typical oop solution. actor has raw pointers to its components.
+  *Entities are empty.* Of course, the downside of moving everything out of entities is that you *have* to move everything out of entities. You no longer have a place to put non-component-specific state or behavior. This style is basically doubling down on components.
 
-  *can store components in contiguous arrays.* since actor no longer cares where component is,
-  can actuall physically be in obj pool, so iterating over components is nice to cache. at same time, actor can still easily get to its components.
+  *You don't have to manage their lifetime.* Since entities are just dumb value types, they don't need to be explicitly allocated and freed. A entity implicitly dies when all of its components are destroyed.
 
-  *makes moving components hard.* if sorting or packing components in memory to keep cache filled, pointers in actor will break if you're not careful to update them.
+  *Looking up a component for an entity may be slow.* This is the same problem as the previous answer, but in the opposite direction. To find a component for some entity, you'll have to map an ID to an object. That process may be a bit costly.
 
-**handles or smart pointer:*
+  This time, though, it *is* performance critical. Components often interact with their siblings during update, so you will need to find components frequently. One solution is to make the "ID" of an entity just the index of the component in its array.
 
-more refined solution is some kind of "handle" or custom pointer type. still references component stored elsewhere, but can include some additional tracking info. in particular, lets you keep track of all existing pointers into some component.
+  If every entity has the same set of components, then your component arrays are completely parallel. The component in slot three of the AI component array will be for the same entity that the physics component in slot three of its array is associated with.
 
-  *more complex*: smart pointers aren't rocket science, but aren't trivial either.
-  *can handle moving components*: if have way of finding all handles to some component, can move component in memory and have handles update to new location.
-
-      **Todo: code**
-
-**actors as id:**
-
-new style some engines use. imagine have contiguous arrays for each component type. now say components are stored in same order in each array. so ai component for some actor will be in third slot in ai component array, and render component for that actor will be in third slot in render component array, etc.
-
-at this point, number 3 is all you need to find all components for an actor. so can turn actor class into just a simple id. becomes tiny! to get component for some actor, pass it (i.e. actor itself) to manager for some component. it uses id to look up index in array.
-
-  *actors are tiny* just little ids, no pointers or anything.
-
-  *actors are tiny*. downside is can't store other data on actor. really have to double down
-  on pushing things into components.
-
-  *works best when all actors have same set of components.* good thing about component pattern is allows mix-and-match. invisible object can just not have render component. immovable object can not have ai component. but if id describes index in parallel component arrays, those arrays need to be parallel to keep things lined up.
-
-  if actor doesn't have render component, still have to claim a slot in array so that later actors render components are in right position. can have inactive components to handle this. but means update loop will have to skip over memory for unused components.
-
-  *can't sort components independently.* since single id identifies component for actor in all arrays, can't sort one component array to keep things packed without sorting others in parallel. if, for example, active states for different components vary, can't keep each one sorted according to its own needs. very tighltly parallel arrays.
-
-  *can't move components* of course, not only can't move them independently, can't move them at all. since actor id is direct index into array, moving component invalidates id. instead,
-  engines keep track of unused ids. when actors are added and removed, instead of moving others around, just allows holes for unused ids in list and fills them in later.
-
-  see object pool for more details.
+  Keep in mind, though, that this forces you to keep those arrays in parallel. That's hard if you want to start sorting or packing them by different criteria. For example, you may have some entities with disabled physics and others that are invisible. There's no way to sort the physics and render component arrays optimally for both cases.
 
 ## See Also
 
-* as you can see from example, pattern goes hand in hand with components.
-  since actors update one domain at a time, splitting into components also
-  conveniently lets you slice an actor into pieces that you can order to be
-  cache friendly.
+* Much of this chapter revolves around the <a href="component.html" class="pattern">Component</a>, and that is definitely one of the most common data structures that gets optimized for cache usage. In fact, using the component pattern makes this optimization much easier. Since entities are updated one "domain" (AI, physics, etc.) at a time, splitting them out into components lets you slice a bunch of entities into just the right pieces to be cache-friendly.
 
-  don't need components to use this! even code totally unrelated to main game
-  objects can still benefit from cache opt.
+    But that doesn't mean you can *only* use this pattern with components! Any time you have performance critical code that touches a lot of data, it's important to think about locality.
 
-* classic presentation that got lot of people more aware of this is: http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf
+* Tony Albrecht's "[Pitfalls of Object-Oriented Programming](http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf))" (PDF) is probably the most widely-read introduction to designing your game's data structures for cache-friendliness. It made a lot more people (including me!) aware of how big a deal this is for performance.
 
-* around the same time, very influential blog post http://gamesfromwithin.com/data-oriented-design
+* Around the same time, Noel Llopis wrote a [very influential blog post](http://gamesfromwithin.com/data-oriented-design) on the same topic.
 
-* pattern usually takes advantage of "flat array of objects of same kind". if
-  need to create and destroy them while doing that, see "object pool".
+* This pattern almost invariably takes advantage of a contiguous array of homogenous objects. Over time, you'll very likely be adding and removing objects from that array. The <a href="object-pool.html" class="pattern">Object Pool</a> pattern is about exactly that.
 
-* artemis (http://gamadu.com/artemis/) is well-known framework using pure-id entities
-
-## random notes
-
-used to bit pack because memory was limited. then had enough memory that speed
-mattered more and decoding was too expensive. now memory is effectively expensive again (have plenty, but slow to get to it), so worth it to bit pack again.
-
-talk about how sometimes you *don't* want stuff on one cache line. if accessing on multiple threads, may be better to split.
+* The [Artemis](http://gamadu.com/artemis/) game engine is one of the first and better-known frameworks that uses simple IDs for game entities.
