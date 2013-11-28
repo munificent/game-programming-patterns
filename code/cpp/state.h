@@ -187,6 +187,7 @@ namespace State
         }
         else
         {
+          isJumping_ = false;
           setGraphics(IMAGE_DIVE);
         }
       }
