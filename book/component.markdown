@@ -690,7 +690,7 @@ communication paths if you need them.
     got them laid out in memory in the most efficient way for your
     CPU to read them.
 
-    This is a rare hat trick in architecture: your code is both more
+    This is a rare win-win in architecture: your code is both more
     maintainable *and* faster.
 
 *   The open source <a href="http://www.delta3d.org/">Delta3D</a>

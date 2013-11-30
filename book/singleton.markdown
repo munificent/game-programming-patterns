@@ -72,11 +72,10 @@ instance. All together, the classic implementation looks like this:
 The static `instance_` member holds an instance of the class, and the
 private constructor ensures that it is the *only* one. The public
 static `instance()` method grants access to the instance from anywhere
-in the codebase. It is also responsible for creating the instance
-using lazy initialization: it instantiates the Singleton the first
-time someone asks for it.
+in the codebase. It is also responsible for instantiating the
+singleton instance lazily the first time someone asks for it.
 
-A more modern update on this is like so:
+A modern take looks like this:
 
 ^code local-static
 

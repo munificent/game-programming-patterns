@@ -136,10 +136,9 @@ instance. All together, the classic implementation looks like this:</p>
 <p>The static <code>instance_</code> member holds an instance of the class, and the
 private constructor ensures that it is the <em>only</em> one. The public
 static <code>instance()</code> method grants access to the instance from anywhere
-in the codebase. It is also responsible for creating the instance
-using lazy initialization: it instantiates the Singleton the first
-time someone asks for it.</p>
-<p>A more modern update on this is like so:</p>
+in the codebase. It is also responsible for instantiating the
+singleton instance lazily the first time someone asks for it.</p>
+<p>A modern take looks like this:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">FileSystem</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
