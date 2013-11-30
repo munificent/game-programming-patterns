@@ -292,7 +292,7 @@ There's a subtle assumption here that the `if` check is faster than a matrix mul
 
 However, modern CPUs are fantastically complex. They rely heavily on *pipelining* -- queueing up a series of sequential instructions. A branch like our `if` here can cause a *branch misprediction* and force the CPU lose cycles refilling the pipeline.
 
-As always, the golden rule of optimization: *profile first*.
+The <a href="data-locality.html" class="pattern">Data Locality</a> chapter has more about how modern CPUs try to go faster and how you can avoid tripping them up like this.
 
 </aside>
 

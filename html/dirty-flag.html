@@ -337,7 +337,7 @@ turn up uses of this pattern.</p>
 
 <p>There&#x2019;s a subtle assumption here that the <code>if</code> check is faster than a matrix multiply. Intuitively, you would think it is: surely testing a single bit is faster than a bunch of floating point arithematic.</p>
 <p>However, modern CPUs are fantastically complex. They rely heavily on <em>pipelining</em>&thinsp;&mdash;&thinsp;queueing up a series of sequential instructions. A branch like our <code>if</code> here can cause a <em>branch misprediction</em> and force the CPU lose cycles refilling the pipeline.</p>
-<p>As always, the golden rule of optimization: <em>profile first</em>.</p>
+<p>The <a href="data-locality.html" class="pattern">Data Locality</a> chapter has more about how modern CPUs try to go faster and how you can avoid tripping them up like this.</p>
 </aside>
 
 <p>This is similar to the original na&iuml;ve implementation. The key changes are that we check to see if the node is dirty before calculating the world transform, and we store the result in a field instead of a local variable. When the node is clean, we skip <code>combine()</code> completely and use the old but still correct <code>world_</code> value.</p>
