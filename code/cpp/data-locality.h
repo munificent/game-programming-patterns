@@ -219,11 +219,11 @@ namespace DataLocality
   }
 
   Particle particles[100];
-  int numActiveParticles_ = 0;
+  int numActive_ = 0;
   void updateParticles()
   {
     //^update-particles
-    for (int i = 0; i < numActiveParticles_; i++)
+    for (int i = 0; i < numActive_; i++)
     {
       particles[i].update();
     }
@@ -234,16 +234,16 @@ namespace DataLocality
   void ParticleSystem::activateParticle(int index)
   {
     // Shouldn't already be active!
-    assert(index >= numActiveParticles_);
+    assert(index >= numActive_);
 
     // Swap it with the first inactive particle
     // right after the active ones.
-    Particle temp = particles_[numActiveParticles_];
-    particles_[numActiveParticles_] = particles_[index];
+    Particle temp = particles_[numActive_];
+    particles_[numActive_] = particles_[index];
     particles_[index] = temp;
 
     // Now there's one more.
-    numActiveParticles_++;
+    numActive_++;
   }
   //^activate-particle
 
@@ -251,15 +251,15 @@ namespace DataLocality
   void ParticleSystem::deactivateParticle(int index)
   {
     // Shouldn't already be inactive!
-    assert(index < numActiveParticles_);
+    assert(index < numActive_);
 
     // There's one fewer.
-    numActiveParticles_--;
+    numActive_--;
 
     // Swap it with the last active particle
     // right before the inactive ones.
-    Particle temp = particles_[numActiveParticles_];
-    particles_[numActiveParticles_] = particles_[index];
+    Particle temp = particles_[numActive_];
+    particles_[numActive_] = particles_[index];
     particles_[index] = temp;
   }
   //^deactivate-particle

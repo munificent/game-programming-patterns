@@ -3,23 +3,21 @@
 
 ## Intent
 
-*Optimize processor cache utilization by arranging data in memory in the order that it is used.*
+*Speed up memory access by arranging data in memory to take advantage of CPU caching.*
 
 ## Motivation
 
-We've all been lied to. For years, we've been shown charts where CPU speed keeps going up and to the right. Moore's Law isn't just some historical observation, it's some kind of moral imperative. We software folks shouldn't have to lift a finger to see our programs magically speed up every year.
+We've been lied to. They keep showing us charts where CPU speed keeps goes up and up every year as if Moore's Law isn't just a historical observation but some kind of divine right. Without lifting a finger, we software folks watch our programs magically speed up just by virtue of new hardware.
 
-CPUs have been getting faster (though even that's plateauing now), but the hardware heads failed to mention a little something. Sure, we can process data faster than ever. But we can't *get* that data faster.
+Chips *have* been getting faster (though even that's plateauing now), but the hardware heads failed to mention something. Sure, we can *process* data faster than ever, but we can't *get* that data faster.
 
 **TODO: graph of processor and memory speeds**
 
-### A data warehouse
+For your super-fast CPU to blow through a ream of calculations, it actually has to get the data out of main memory and into registers. It turns out that RAM hasn't been keeping up with increasing CPU speeds. Not even close.
 
-Before your super fast CPU can blow through a ream of calculations, it actually needs to get the data its working on out of main memory and into registers. It turns out that RAM hasn't been keeping up with increasing CPU speeds. Not even close.
+With today's hardware, it can take *hundreds* of cycles to fetch a byte of data from <span name="ram">RAM</span>. If most instructions need data, and it takes hundreds of cycles to get it, how is that our CPUs aren't sitting idle 99% of the time waiting for data?
 
-With today's typical hardware, it can take *hundreds* of cycles to fetch a byte of data from <span name="ram">RAM</span>. If each instruction needs some data, and it takes hundreds of cycles just to get a byte of data for that instruction, how is that our CPUs aren't just sitting idle 99% of the time waiting for data?
-
-Actually, they *are* stuck waiting on memory an astonishingly large fraction of time these days, but it's not as bad as it could be. To explain how, we're going to take a trip to the Land of Overly Long Analogies...
+Actually, they *are* stuck waiting on memory an astonishingly large fraction of time these days, but it's not as bad as it could be. To explain why, let's take a trip to the Land of Overly Long Analogies...
 
 <aside name="ram">
 
@@ -29,7 +27,9 @@ Or, at least, you *didn't*. As we'll see, RAM isn't so random access anymore eit
 
 </aside>
 
-Imagine you're an accountant in a tiny little office. Your job is to request a box of papers and go through and do some <span name="accountant">accountant</span>-y stuff with them. Add up a bunch of numbers or something. You do this for specific labeled boxes according to some arcane logic that only makes sense to other accountants.
+### A data warehouse
+
+Imagine you're an accountant in a tiny little office. Your job is to request a box of papers then do some <span name="accountant">accountant</span>-y stuff with them -- add up a bunch of numbers or something. You must do this for specific labeled boxes according to some arcane logic that only makes sense to other accountants.
 
 <aside name="accountant">
 
@@ -37,15 +37,11 @@ I probably shouldn't have used a job I know absolutely nothing about in this ana
 
 </aside>
 
-You've been working this job for a while and you've gotten pretty awesome at it. You can now finish off an entire box of paper in, say, a minute. Impressive, right? On a good day without too many coffee breaks, you should be able to get through about 480 boxes.
+Thanks to a mixture of hard work, natural aptitude, and stimulants, you can finish an entire box in, say, a minute. There's a little problem, though. All of those boxes are stored in a warehouse in a separate building. To get a box, you have to ask the warehouse guy to bring it to you. He goes and gets a forklift and drives around the aisles until he finds the box you want.
 
-There's a little problem though. All of those boxes are stored in a warehouse in a separate building. To get a box, you have to ask the warehouse guy to bring it to you. He goes and gets a forklift and drives around the aisles until he finds the box you want.
+It takes him, seriously, an entire day to do this. Unlike you, he's not getting employee of the month any time soon. This means that no matter how fast you are, you only get one box a day. The rest of the time, you just sit there and question the life decisions that led to this soul-sucking job.
 
-It takes him, seriously, an entire day to do this. Not exactly a go-getter. He's the boss's son, so no one's gonna do anything about it. This means that no matter how fast you are, you only get one box a day. The rest of the time, you just sit there and question the life decisions that led to this soul-sucking job instead of following your passion for videogames.
-
-One day, a couple of industrial designers show up. Their job is to improve the efficiency of operations. They make assembly lines and stuff go faster. The boss has noticed how few boxes get processed and he wants some improvement, so he brought in the experts.
-
-After watching you work for a few days, they notice a few things:
+One day, a group of industrial designers show up. Their job is to improve the efficiency of operations -- things like making assembly lines go faster. After watching you work for a few days, they notice a few things:
 
 * Pretty often, when you're done with one box, the next box you request is right
   <span name="next">next</span> to it on the same shelf in the warehouse.
@@ -56,69 +52,55 @@ After watching you work for a few days, they notice a few things:
 
 <aside name="next">
 
-The technical term for often using stuff nearby the thing you just used is *locality of reference*.
+The technical term for often using something near the thing you just used is *locality of reference*.
 
 </aside>
 
-They come up with a clever fix. Whenever the warehouse guy gets a box, he'll
-actually grab an entire pallet of them. He gets the box you requested, and then
-a bunch of boxes that are next to it. He doesn't know if you want those (and, given his work ethic, clearly doesn't care). He just grabs them.
+They come up with a clever fix. Whenever you request a box from the warehouse guy, he'll
+grab an entire pallet of them. He gets the box you want and then
+some more boxes that are next to it. He doesn't know if you want those (and, given his work ethic, clearly doesn't care), he just takes them.
 
-He loads the whole pallet and brings it to you. Ignoring issues of workplace safety, he drives the forklift right in and drops the pallet in the corner of your office.
+He loads the whole pallet and brings it to you. Disregarding concerns for workplace safety, he drives the forklift right in and drops the pallet in the corner of your office.
 
-When you need a new box, now, the first thing you do is see if it's already on the pallet in your office. If it is, great! It just takes you a second to grab it and you're back to crunching numbers. If a pallet holds fifty boxes and you got lucky and all of the boxes you need happen to be on it, you can churn through fifty times more work than you could before.
+When you need a new box, now, the first thing you do is see if it's already on the pallet in your office. If it is, great! It just takes you a second to grab it and you're back to crunching numbers. If a pallet holds fifty boxes and you got lucky and *all* of the boxes you need happen to be on it, you can churn through fifty times more work than you could before.
 
-But, if you need a box that's *not* on the pallet, you're back to square one. You can only fit one pallet in your office, so your warehouse friend will have to come take that one back and then bring you entirely new one. Tomorrow.
+But, if you need a box that's *not* on the pallet, you're back to square one. Since you can only fit one pallet in your office, your warehouse friend will have to take that one back and then bring you entirely new one.
 
 ### A pallet for your CPU
 
-That's a pretty close <span name="analogy">analogy</span> for how CPUs in modern computers work. In case it isn't obvious, you play the role of the CPU. Your desk is the CPU's registers, and the box of papers is the data you can fit in them. The warehouse is your machine's RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.
+Strangely enough, this is similiar to how CPUs in modern computers work. In case it isn't obvious, you play the role of the CPU. Your desk is the CPU's registers, and the box of papers is the data you can fit in them. The warehouse is your machine's RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.
 
-<aside name="analogy">
+If I were writing this chapter thirty years ago, the analogy would stop there. But as chips got faster and RAM, well, *didn't*, hardware engineers started looking for solutions. What they came up with was *CPU caching*.
 
-Why would it be in this chapter if it wasn't a good analogy?
-
-</aside>
-
-If I were writing this chapter thirty years ago, the analogy would stop there. But as chips got faster and RAM... didn't... the hardware guys started looking for solutions. What they came up with was *CPU caching*. Modern chips have a <span name="caches">little chunk</span> of memory right inside the chip. It's small because it has to fit in the chip. The CPU can pull data from this much faster than it can main memory in part because it's physically closer to the registers. The electrons have a shorter distance to travel.
+Modern chips have a <span name="caches">little chunk</span> of memory right inside the chip. It's small because it has to fit in the chip. The CPU can pull data from this much faster than it can main memory in part because it's physically closer to the registers. The electrons have a shorter distance to travel.
 
 <aside name="caches">
 
-Modern hardware actually has multiple levels of caching, which is what they mean when you hear "L1", "L2", "L3", etc. Each level is larger but slower than the previous. For this chapter, we won't worry about the fact that memory is actually a hierarchy, but it's important to know.
+Modern hardware actually has multiple levels of caching, which is what they mean when you hear "L1", "L2", "L3", etc. Each level is larger but slower than the previous. For this chapter, we won't worry about the fact that memory is actually a [hierarchy](http://en.wikipedia.org/wiki/Memory_hierarchy), but it's important to know.
 
 </aside>
 
-This little chunk of memory is called a *cache* (in particular, the chunk on the chip is your *L1 cache*) and in my belabored analogy, its part was played by the pallet of boxes. Whenever your chip reads a byte of data from RAM, it automatically grabs the following chunk of contiguous memory -- usually around 64 to 128 bytes -- too and puts it all in the cache. This strip of contiguous memory is called a *cache line*.
+This little chunk of memory is called a *cache* (in particular, the chunk on the chip is your *L1 cache*) and in my belabored analogy, its part was played by the pallet of boxes. Whenever your chip needs a byte of data from RAM, it automatically grabs a whole chunk of contiguous memory -- usually around 64 to 128 bytes -- and puts it in the cache. This dollop of memory is called a <span name="pallet">*cache line*</span>.
 
-If the next byte of data you need happens to be in that chunk, the CPU reads it straight from the cache, which is *much* faster than hitting RAM. When it looks for a bit of data and finds it, that's called a *cache hit*. If it can't find it in the cache and has to go to main memory, that's a *cache miss*.
+<aside name="pallet">
 
-There's one important detail I glossed over in the analogy. In the accountant's office, there was only room for one pallet, or one cache line. In a real cache, it has room for a number of cache lines. It's a relatively smaller, fixed number, but it's more than *one*. The details about how those work is unfortunately out of scope here, but Google "cache associativity" if you want to feed your brain.
+There's one detail I glossed over in the analogy. In your office, there was only room for one pallet, or one cache line. A real cache contains a number of cache lines. The details about how those work is out of scope here, but search for "cache associativity" to feed your brain.
 
-So, whenever the CPU needs some data, it looks to see if a cache line containing it is already in the cache. When that fails, and a cache miss occurs, the CPU *stalls*: it can't process the next instruction because needs data. So it just sits there, spinning its cycles all bored and lonely, for a few hundred cycles until the fetch completes.
+</aside>
 
-Our mission for the rest of this chapter is to figure out how to minimize that happening. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
+If the next byte of data you need happens to be in that chunk, the CPU reads it straight from the cache, which is *much* faster than hitting RAM. Successfully finding a piece of data in the cache is called a *cache hit*. If it can't find it in there and has to go to main memory, that's a *cache miss*.
+
+When a cache miss occurs, the CPU *stalls*: it can't process the next instruction because needs data. It sits there, bored out of its mind for a few hundred cycles until the fetch completes. Our mission is to learn out how to avoid that. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
 
 ^code do-nothing
 
-What's the first change you're going to make to that code? Right. Take out that pointless function, expensive call. That functional call is equivalent to the performance hit of a cache miss. Every time you bounce to main memory, it's like you put a `sleep()` call in your code.
+What's the first change you're going to make to that code? Right. Take out that pointless, expensive function call. That functional call is equivalent to the performance cost of a cache miss. Every time you bounce to main memory, it's like you put a delay in your code.
 
 ### Wait, data is performance?
 
-Now, I've known about CPU caching and optimizing for it for a long time. It's one of those ideas that I sort of absorbed through osmosis just by being around other programmers. But I didn't have any first-hand experience with it.
+When I started working on this chapter, I spent some time putting together little game-like programs that would trigger best case and worst case cache usage. I wanted benchmarks that would thrash the cache so I could see first-hand how much bloodshed it causes.
 
-Most of my programming background is higher level: I've done gameplay, a bit of AI, and tons of UI, tools, and shared library kind of stuff. But I'm generally not one of those people who spends <span name="weeks">three weeks</span> squeezing another 3 FPS out of the rendering engine. I try to keep myself out of the hot path of the game loop most of the time.
-
-<aside name="weeks">
-
-I have a ton of respect for them, though!
-
-</aside>
-
-Don't get me wrong, I do care about performance too. So when I started to work on this chapter, I spend some time putting together little mini-game-like programs to try to trigger best case and worst case cache usage. I wanted to write benchmarks that would thrash the cache so I could see first-hand how much bloodshed it causes.
-
-The first thing I learned is that it's surprisingly hard to get a clear window into what your cache is doing. Many basic profilers won't show it and since it's just memory access, it doesn't stick out in the profile. It just looks like every line of code is kind of slow.
-
-When I finally got some stuff working, though, I was surprised. Even after hearing of how big a deal it is, there's nothing quite like seeing it with your own eyes. <span name="ymmv">I got a few programs</span> that did the *exact same* computation. The only difference was how many cache misses and memory thrashing they caused. The worst case was fifty *times* slower than the best case.
+When I got some stuff working, I was surprised. I knew it was a big deal, but there's nothing quite like seeing it with your own eyes. <span name="ymmv">I wrote two programs</span> that did the *exact same* computation. The only difference was how many cache misses they caused. The slow one was fifty *times* slower than the other.
 
 <aside name="ymmv">
 
@@ -128,29 +110,33 @@ Your mileage will vary.
 
 </aside>
 
-This was a real eye-opener to me. I'm used to thinking of performance being an aspect of *code* not *data*. A byte isn't slow or fast, it's just a static thing sitting there. But, because of caching, *the way you organize things directly impacts performance.*
+This was a real eye-opener to me. I'm used to thinking of performance being an aspect of *code* not *data*. A byte isn't slow or fast, it's just a static thing sitting there. But, because of caching, *the way you organize data directly impacts performance.*
 
-The challenge for me now is to wrap that concept up into something that fits into a chapter here. This book tries to be about simple, concrete patterns. It's a recipe book for code.
+The challenge now is to wrap that up into something that fits into a chapter here. Optimization for cache usage is a huge topic. I haven't even touched on *instruction caching*. Remember, code is in memory too and has to be loaded onto the CPU before it can be executed. Someone more versed on the subject could write an entire <span name="book">book</span> on it.
 
-But optimization for cache usage is a huge topic. I haven't even touched on *instruction caching*. Remember, code is in memory too and has to be loaded onto the CPU before it can be executed. Someone more versed on the subject could write an entire book on it.
+<aside name="book">
 
-Until you get your hands on that, though, I do think there are a few basic techniques that I can fit in here that will get you started along the path of thinking about how your data structures impact your performance.
-
-What it all boils down to is something pretty simple: Whenever the chip reads some memory, it gets a whole cache line. The more you can use stuff in that <span name="line">cache line, the faster you go</span>. So the goal then is to *organize your data structures so that the things you're processing are next to each other in memory*.
-
-<aside name="line">
-
-There's a key assumption here, though: single-threadedness. If you are accessing nearby data on *multiple* threads, it's often faster to have data on *different* cache lines. If two threads are accessing data so close to each other that they occupy the same cache line, the caches of those two cores have to synchronize with each other, which is costly.
+In fact, someone *is* writing a book on it: [*Data-Oriented Design*](http://www.dataorienteddesign.com/dodmain/) by Richard Fabian.
 
 </aside>
 
-If your code is crunching on A then B then C, you want them laid out in memory like this:
+Since you're already reading *this* book right now, though, I have a few basic techniques that will get you started along the path of thinking about how data structures impact your performance.
+
+It all boils down to something pretty simple: whenever the chip reads some memory, it gets a whole cache line. The more you can use stuff in that <span name="line">cache line, the faster you go</span>. So the goal then is to *organize your data structures so that the things you're processing are next to each other in memory*.
+
+<aside name="line">
+
+There's a key assumption here, though: one thread. If you are accessing nearby data on multiple threads, it's faster to have it on *different* cache lines. If two threads try to use data on the same cache line, both cores have to do some costly sychronization of their caches.
+
+</aside>
+
+In other words, if your code is crunching on A then B then C, you want them laid out in memory like this:
 
     +---+---+---+
     | a | b | c |
     +---+---+---+
 
-Note, these aren't *pointers* to A, B, and C. It's the data for them, right there, all lined up next to each other. As soon as the CPU reads in A, it will start to get B and C too (depending on how big they and how big a cache line is). Since you're working on those next, you're chip is happy and you're happy.
+Note, these aren't *pointers* to A, B, and C. This is the actual data for them, in place, all lined up next to each other. As soon as the CPU reads in A, it will start to get B and C too (depending on how big they and how big a cache line is). When you start working on them next, they'll already be cached. Your chip is happy and you're happy.
 
 ## The Pattern
 
@@ -158,25 +144,29 @@ Modern CPUs have **caches to speed up memory access.** These can access memory *
 
 ## When to Use It
 
-Like most optimizations, the first guideline for using it is *when you have a performance problem.* There's no point wasting time applying this in code that's way off to the side of your core game loop. In fact, doing so has *negative* value. It makes your code more complex and less flexible.
+Like most optimizations, the first guideline for using it is *when you have a performance problem.* Don't waste time applying this to some infrequently executed corner of your codebase. Optimizing code that doesn't need it just makes your life harder since the result is almost always more complex and less flexible.
 
-With this pattern specifically, you'll also want to ensure you reach for it because you have performance problems *caused by cache misses*. If your code is slow for other reasons, this won't help. There are three golden rules for optimization:
+With this pattern specifically, you'll also want to be sure your performance problems *are caused by cache misses*. If your code is slow for other reasons, this won't help.
 
-1. Profile.
-2. Profile.
-3. Profile.
+The cheap way to profile is to manually add a bit of code that checks how much time has elapsed between two points in the code, hopefully using a precise timer. To catch cache misses, you'll want something a little more sophisticated. You really want to see how many cache misses are occurring and where.
 
-You'll need something a little more sophisticated than manually instrumenting your code with some profile hooks that just see how much time has elapsed. You really need to see how many cache misses are occurring and where. Fortunately, CPUs expose this information and there are profilers out that there can access it. Also, tools like cachegrind can run your code in a way that simulates the cache and report cache misses.
+Fortunately, there are <span name="cachegrind">profilers</span> out that there can report it. It's worth spending the time to get one of these working and making sure you understand the (surprisingly complex) numbers it throws at you before you do major surgery on your data structures.
 
-It's worth spending the time to get one of these working and make sure you understand the (surprisingly complex) numbers it gives you in return. You really don't want to be fumbling around in the dark here. This pattern may cause you to do some major surgery on your data structures. You need a reliable heart monitor so you can ensure you've actually helped your patient.
+<aside name="cachegrind">
 
-That being said, designing your data structures to be cache friendly can have speeding affects on your program. Cache misses *will* affect the performance of your game, so it's good to be thinking about how cache-friendly your program is throughout the design process.
+Unfortunately, most of those tools aren't cheap. If you're on a console dev team, you probably already have licenses for them.
+
+If not, an excellent free option is [cachegrind](http://valgrind.org/docs/manual/cg-manual.html). It runs your program on top of a simulated CPU and cache hierarchy and then reports all of the cache interactions.
+
+</aside>
+
+That being said, cache misses *will* affect the performance of your game. While you shouldn't spend a ton of time pre-emptively optimizing for cache usage, do think about how cache-friendly your data structures are throughout the design process.
 
 ## Keep in Mind
 
-Many optimizations sacrifice flexibility for speed. We use things like interfaces to insulate parts of the codebase from each other. That makes it easier to change one of these parts without affecting the others. The cost is that code on either side of the interface can make fewer assumptions about what the other side is doing. That's the *point*: assumptions are coupling.
+One of the hallmarks of OOP is *abstraction*. A large chunk of this book is about patterns to decouple pieces of code from each other so that they can be changed more easily. This almost always means using interfaces.
 
-Performance is often about making things *concrete*. Many optimization start with "if we assume X then we can...". Optimizations thrive on specifics. This pattern in particular fights against our desire for abstraction. In C++, using interfaces implies accessing objects through <span name="virtual">pointers or references</span> to objects. But going through a pointer often means hopping across memory, which causes the exact cache misses this pattern tries to avoid. You'll be sacrificing some of your precious interfaces to please this pattern.
+In C++, using interfaces implies accessing objects through <span name="virtual">pointers or references</span>. But going through a pointer means hopping across memory, which leads to the cache misses this pattern works to avoid.
 
 <aside name="virtual">
 
@@ -184,47 +174,39 @@ The other half of interfaces is *virtual method calls*. Those require the CPU to
 
 </aside>
 
-Some people feel focusing on data locality also goes against the grain of object-orientation. In their minds, OOP is about each *object* taking care of itself. As we'll see, this pattern thrives on dealing with *collections* of homogenous objects.
-
-Personally, I think OOP is more about each *class* taking care of its instances, so I believe the nice things we get from OOP like data hiding still apply here. There may be times where you need to open up an object's internal structure more than you would like to please outside code wanting to get at its data directly in a certain order, but I'm not enough of an OOP purist to be really bothered like that. As always, there are challenging trade-offs. That's what makes it fun.
+In order to please this pattern, you will have to sacrifice some of your precious abstractions. The more you design your program around data locality, the more you will have to give up inheritance and interfaces, and the benefits those tools can provide. There's no silver bullet here, just challenging trade-offs. That's what makes it fun!
 
 ## Sample Code
 
-OK, it's time for a confession. My goal for this part of the chapter was to show you a little skeleton of a game loop that was processing a bunch of game objects. I was going to show a complete example that demonstrated worst case cache usage so you could run it and see for yourself. Then we'd optimize so you could see the difference.
-
-What I got instead was a lesson in how tricky controlling cache usage is. Every time I tried to rearrange my sample program into pieces that made sense in the context of the chapter, the cache usage changed dramatically. Cache usage is *highly* context dependent. Even the order that functions are written in your source file can affect things. This means that a piece of code can have different caching behavior just by putting it in a program with other code.
-
-Instead of trying to shoehorn a teaching sample and a tight benchmark into one single example program, I'm going to do something I think is ultimately more useful. Instead of a monolithic example, we'll walk through a few small examples each showing one common technique used to make code more cache friendly.
+If you really go down the rathole of optimizing for data locality, you'll discover countless ways to slice and dice your data structures into pieces your CPU can most easily digest. To get you started, I'll show an example for each of a few of the most common ways to organize your data. We'll cover them in the context of some specific part of a game engine, but (as with other patterns), keep in mind that the general technique can be applied anywhere it fits.
 
 ### Contiguous arrays
 
-Let's start with the quintessential example of re-organizing a game architecture to be more cache friendly. We'll start with a typical <a href="game-loop.html" class="pattern">Game Loop</a> that processes a bunch of game entities that are organizing using the <a href="component.html" class="pattern">Component</a> pattern.
-
-Each game entity has components for AI, physics, and rendering. So you have a game entity something like this:
+Let's start with a <a href="game-loop.html" class="pattern">Game Loop</a> that processes a bunch of game entities. Those entities are decomposed into different domains -- AI, physics, and rendering -- using the <a href="component.html" class="pattern">Component</a> pattern. The game entity class looks something like this:
 
 ^code game-entity
 
-Each component will have a relatively small amount of state, maybe little more than a few vectors or a matrix, and then a method to <span name="update">update</span> it. The details aren't important here, but imagine something roughly like:
+Each component has a relatively small amount of state, maybe little more than a few vectors or a matrix, and then a method to <span name="update">update</span> it. The details aren't important here, but imagine something roughly along the lines of:
 
 <aside name="update">
 
-Like the name implies, these are a few examples of the <a href="update-method.html" class="pattern">Update Method</a> pattern. Even `render()` is this pattern, just by another name.
+As the name implies, these are examples of the <a href="update-method.html" class="pattern">Update Method</a> pattern. Even `render()` is this pattern, just by another name.
 
 </aside>
 
 ^code components
 
-The game maintains a big list of pointers to the entities in the world. Each spin of the game loop, this needs to happen:
+The game maintains a big array of pointers to all of the entities in the world. Each spin of the game loop, this needs to happen, in this order:
 
 1. Update the AI components for all of the entities.
 2. Update the physics components for them.
 3. Render them using their render components.
 
-Lots of game engines implement that something like this:
+Lots of game engines implement that like so:
 
 ^code game-loop
 
-Before you ever heard of a CPU cache, this looked totally innocuous. But by now you've got an inkling that something isn't right here. This code hates the cache. It is spitting in the cache's coffee. Here's what it's doing:
+Before you ever heard of a CPU cache, this looked totally innocuous. But by now you've got an inkling that something isn't right here. This code isn't just thrashing the cache, it's taking it around back and beating it bloody. Here's what it's doing:
 
 1. We've got a list of *pointers* to game entities. For every game entity in the world, we have to traverse that pointer. That's a cache miss.
 
@@ -234,43 +216,51 @@ Before you ever heard of a CPU cache, this looked totally innocuous. But by now 
 
 4. Now we go back to step one for *every component of every entity in the game*.
 
-The scary part here is we have no idea how any of this stuff is laid out in memory. We're completely at the mercy of the memory manager and the order that things happened to be allocated, which, after the game has been running for a while, is anything but clear cut.
+The scary part is we have no idea how any of these objects are laid out in memory. We're completely at the mercy of the memory manager. As entities get allocated and freed over time, the heap is likely to become increasingly randomly organized in memory.
 
 **TODO: illustration**
 
-If our goal here was to take a whirlwhind tour around the game's address space, sort of a 256MB of RAM in 4 Nights!" cheap European vacation package, it would be a fantastic deal. But our goal is to run the game quickly, and <span name="chase">traipsing</span> all over main memory is *not* the most effective way to do it. Remember that `doAbsolutelyNothingFor500Cycles()` function? Well this code is calling that *all the time*.
+If our goal was to take a whirlwhind tour around the game's address space like some "256MB of RAM in Four Nights!" cheap vacation package, this would be a fantastic deal. But our goal is to run the game quickly, and <span name="chase">traipsing</span> all over main memory is *not* the way to do that. Remember that `doAbsolutelyNothingFor500Cycles()` function? Well this code is calling that *all the time*.
 
 <aside name="chase">
 
-The term for burning cycles traversing pointers is *pointer chasing*, which isn't quite as fun as it sounds.
+The term for wasting a bunch of time traversing pointers is "pointer chasing", which it turns out is nowhere near as fun as it sounds.
 
 </aside>
 
-Let's do something better. Our first observation is that the only reason we even follow a pointer to get to the game entity is so we can get to a component. `GameEntity` itself has no interesting state and no useful methods. The components are what the game loop cares about. Game entities are just a means to that end.
+Let's do something better. Our first observation is that the only reason we follow a pointer to get to the game entity is so we can immediately follow *another* pointer to get to a component. `GameEntity` itself has no interesting state and no useful methods. The *components* are what the game loop cares about.
 
-So lets cut out the middle man. Instead of a huge tree of game entities and components scattered like stars across the inky darkess of address space, we're going to get back down to Earth. We'll have a big array for each type of component. A flat array of AI components, another for physics, and another for rendering.
+Instead of a giant constellation of game entities and components scattered across the inky darkess of address space, we're going to get back down to Earth. We'll have a big array for each type of component: a flat array of AI components, another for physics, and another for rendering.
 
 Like this:
 
+<span name="long-name"></span>
+
 ^code component-arrays
 
-Let me just stress that these are arrays of *components* and not *pointers* to them. The data is all there, nicely lined up. The game loop will then walk these directly:
+<aside name="long-name">
+
+My least favorite part about using components is how long the word "component" is.
+
+</aside>
+
+Let me just stress that these are arrays of *components* and not *pointers to components*. The data is all there, one byte after the other. The game loop can then walk these directly:
 
 ^code game-loop-arrays
 
-We've ditched all of that <span name="arrow">pointer chasing</span>. Instead of skipping around in memory, we're doing a straight crawl straight through contiguous arrays. We're pumping a solid stream of bytes right into the hungry maw of the CPU. In my little synthetic benchmark programs, this made the update loop fifty *times* faster than the previous example.
+We've ditched all of that <span name="arrow">pointer chasing</span>. Instead of skipping around in memory, we're doing a straight crawl through three contiguous arrays. This pumps a solid stream of bytes right into the hungry maw of the CPU. In my test program, this change made the update loop fifty *times* faster than the previous version.
 
 **TODO: illustration**
 
 <aside name="arrow">
 
-One hint that we're doing better here is how few `->` operators there are in the new code.
+One hint that we're doing better here is how few `->` operators there are in the new code. If you're optimizing for data locality, indirection operators are a code smell.
 
 </aside>
 
-Interestingly, we haven't lost much encapsulation here. Sure, the game loop is going straight to the components instead of getting them from game entities. But it was doing that before. It needed to to ensure things were updated in the right order. But each component itself is still nicely encapsulated. It owns its own data and methods. We just changed the way it's used.
+Interestingly, we haven't lost much encapsulation here. Sure, the game loop is updating the components directly instead of going through the game entities, but it was doing that before to ensure they were processed in the right order. Even so, each component itself is still nicely encapsulated. It owns its own data and methods. We just changed the way it's used.
 
-This doesn't mean we need to get rid of `GameEntity` either. We can leave it just as it is with pointers to its components. They'll just point into those arrays. This can still be useful for other parts of the codebase where you want to pass around a conceptual "game entity" and everything that goes with it. The important part is that the performance critical game loop sidesteps that and goes straight to the data.
+This doesn't mean we need to get rid of `GameEntity` either. We can leave it just as it is with pointers to its components. They'll just point into those arrays. This is still useful for other parts of the game where you want to pass around a conceptual "game entity" and everything that goes with it. The important part is that the performance critical game loop sidesteps that and goes straight to the data.
 
 ### Packed data
 
@@ -278,7 +268,7 @@ Say we're doing a particle system. Following the advice of the previous section,
 
 <aside name="pool">
 
-This is a great example of an <a href="object-pool.html" class="pattern">Object Pool</a> custom built for a single type of object.
+The `ParticleSystem` class is an example of an <a href="object-pool.html" class="pattern">Object Pool</a> custom built for a single type of object.
 
 </aside>
 
@@ -288,45 +278,47 @@ A rudimentary update method for the system just looks like this:
 
 ^code update-particle-system
 
-But it turns out that we don't actually need to process *all* of them all the time. Sometimes particles are disabled, deactivated, culled, offscreen, or otherwise temporarily out of commission. The easy answer is something like this:
+But it turns out that we don't actually need to process *all* of the particles all the time. The particle system has a fixed-size pool of objects, but most of the time, they aren't all actively twinkling across the screen. The easy answer is something like this:
 
 ^code particles-is-active
 
-For every particle, we have to check that flag before we update it. (We could move the check inside `update()` but that doesn't actually make a difference.) That probably loads the whole particle into the cache. If the particle *isn't* active, then we just skip over it to the next particle. So loading that particle into the cache was a waste of time.
+For every particle, we <span name="branch">check</span> that flag before we update it. That means loading the memory for the flag into the cache along with the rest of the particle's data. If the particle *isn't* active, then we just skip over it to the next particle. So loading all of that into the cache was a waste of time.
 
-The more inactive particles there are, the more we're <span name="branch">skipping across memory</span>. The faster we do that, the more cache misses there are between actually doing useful work updating active particles. If that array is large and has *lots* of inactive particles in it, we're back to just thrashing the cache again.
+The fewer active particles there are, the more we're skipping across memory. The faster we do that, the more cache misses there are between actually doing useful work updating active particles. If that array is large and has *lots* of inactive particles in it, we're back to just thrashing the cache again.
 
-Having objects in a contiguous array doesn't solve everything if the objects we're actually processing aren't contiguous in it. If it's a foam of inactive objects we have to skip past, we're right back to the original problem.
+Having objects in a contiguous array doesn't solve much if the objects we're actually processing aren't contiguous in it. If littered with inactive objects we have to dance around, we're right back to the original problem.
 
 <aside name="branch">
 
-Savvy low-level coders are probably aware of another problem here. Doing an `if` check for every particle can cause a *branch misprediction* and a *pipeline stall*. In modern CPUs a single "instruction" actually takes several clock cycles. To keep the CPU busy, instructions are pipelined such that the next instructions start processing before the previous one finishes.
+Savvy low-level coders can see another problem here. Doing an `if` check for every particle can cause a *branch misprediction* and a *pipeline stall*. In modern CPUs a single "instruction" actually takes several clock cycles. To keep the CPU busy, instructions are pipelined such that the subsequent instructions start processing before the first one finishes.
 
-To do that, the CPU has to guess which instructions it will be executing next. In straight line code, that's easy, but with flow control, it gets harder. While it's executing the jump instruction for the `if`, does it guess that the particle is active and start executing the code for the `update()` call, or does it guess that it isn't?
+To do that, the CPU has to guess which instructions it will be executing next. In straight line code, that's easy, but with flow control, it's harder. While it's executing the jump instruction for the `if`, does it guess that the particle is active and start executing the code for the `update()` call, or does it guess that it isn't?
 
-To handle this, chips do *branch prediction*: they see which branches your code tends to take and guess that it will do that again. But when the loop is constantly toggling between particles that are and aren't active, that prediction will fail.
+To handle this, the chip does *branch prediction:* it sees which branches your code previously took and guesses that it will do that again. But when the loop is constantly toggling between particles that are and aren't active, that prediction fails.
 
-Every time it does, it has to ditch the instructions it had started speculatively processing and start over after the first jump instruction is done. The performance hit of this varies widely by machine, but this is why you'll see some coders avoid flow control in hot code.
+When it does, the CPU has to ditch the instructions it had started speculatively processing (a *pipeline flush*) and start over. The performance impact of this varies widely by machine, but this is why you see some coders avoid flow control in hot code.
 
 </aside>
 
-Given the subtitle you just read a minute ago, you can probably infer the solution. Instead of *checking* the active flag, we'll *sort* by it. We'll keep all of the active particles in the front of the list. We can also easily keep track of how many active particles there are. Then our update loop is beautiful:
+Given the subtitle of this section, you can probably guess the solution. Instead of *checking* the active flag, we'll *sort* by it. We'll keep all of the active particles in the front of the list. If we know all of those particles are active, we don't have to check the flag at all.
+
+We can also easily keep track of how many active particles there are. With this, our update loop turns into this thing of beauty:
 
 ^code update-particles
 
-Now we aren't skipping over any data. Every byte that gets sucked into the cache is a piece of an active particle that we actually need to process.
+Now we aren't skipping over *any* data. Every byte that gets sucked into the cache is a piece of an active particle that we actually need to process.
 
 Of course, I'm not saying you should actually quicksort the entire collection of particles every frame. That would more than eliminate the gains here. What we want to do is *keep* the array sorted.
 
-Obviously, the only time it can become less than perfectly sorted is when a particle has been activated or deactivated. We can handle those two cases pretty easily. When a particle gets activated, we move it up to the end of the active particles by swapping it with the first *in*active one:
+Assuming the array is already sorted -- and it is at first when all particles are inactive -- the only time it can become *un*sorted is when a particle has been activated or deactivated. We can handle those two cases pretty easily. When a particle gets activated, we move it up to the end of the active particles by swapping it with the first *in*active one:
 
 ^code activate-particle
 
-To deactivate a particle, of course, we just do the opposite:
+To deactivate a particle, we just do the opposite:
 
 ^code deactivate-particle
 
-Lots of programmers (myself included) have developed allergies to moving things around in memory. Schlepping a bunch of bytes around *feels* heavyweight in some sense. Pointers feel lightweight in comparison. But when you add in the cost of *traversing* that pointer, it turns out that your (well, at least my) intuition isn't right on modern hardware any more. In <span name="profile">many cases</span>, it's cheaper to actually move things around in memory so that you can keep the cache full.
+Lots of programmers (myself included) have developed allergies to moving things around in memory. Schlepping a bunch of bytes around *feels* heavyweight , compared to just assigning a pointer. But when you add in the cost of *traversing* that pointer, it turns out that our intuition is often wrong. In <span name="profile">many cases</span>, it's cheaper to actually move things around in memory so that you can keep the cache full.
 
 <aside name="profile">
 
@@ -334,31 +326,31 @@ This is your friendly reminder to *profile* when making these kinds of decisions
 
 </aside>
 
-There's a neat consequence of keeping the particles *sorted* by their active state. We no longer need to *store* the active flag at all. It can be determined entirely by its position in the array and the `numActiveParticles_` counter. That's good: it makes our particle objects smaller, which means we can pack more in our cache lines. And that makes them even faster.
+There's a neat consequence of keeping the particles *sorted* by their active state: We don't need to store an active flag in each particle at all. It can be determined entirely by its position in the array and the `numActive_` counter. This makes our particle objects smaller, which means we can pack more in our cache lines, and that makes them even faster.
 
-It's not all rosy, though. As you can see from the API, we've lost a bit of OOP flavor here. You can no longer just call some `activate()` method on the `Particle` itself since it doesn't know it's index. Instead, the particle *system* has this responsibility.
+It's not all rosy, though. As you can see from the API, we've lost a bit of OOP flavor here. The `Particle` class no longer controls its own active state. You can't just call some `activate()` method on it since it doesn't know it's index. Instead, any code that wants to activate partiles needs access to the particle *system*.
 
-In this case, I'm OK with `ParticleSystem` and `Particle` being tightly tied like this. I think of them as a single *concept* spread across two physical *classes*. It just means accepting the idea that particles are *only* meaningful in the context of some particle system.
+In this case, I'm OK with `ParticleSystem` and `Particle` being tightly tied like this. I think of them as a single *concept* spread across two physical *classes*. It just means accepting the idea that particles are *only* meaningful in the context of some particle system. Also, in this case it's likely the particle system that will be spawning and killing particles anyway.
 
 ### Hot/cold splitting
 
-OK, this will be the last example of a simple technique for making your cache happier. It's a bit like a finer-grained manifestion of the previous idea. Say we've got an AI component for some game entity. It has some state in it: the animation it's currently playing, a goal position its heading towards, energy level, etc.. Stuff it checks and tweaks every single frame. Something like:
+OK, this is the last example of a simple technique for making your cache happier. Say we've got an AI component for some game entity. It has some state in it: the animation it's currently playing, a goal position its heading towards, energy level, etc.. Stuff it checks and tweaks every single frame. Something like:
 
 ^code ai-component
 
-But it also has some state for rarer eventualities. It may need to store some data describing what loot it drops when it gets 86'd. That state will only ever be used once by the game entity's lifetime, right at the bitter end.
+But it also has some state for rarer eventualities. It may need to store some data describing what loot it drops when it has an unfortunate encounter with the noisy end of a shotgun. That drop data will only ever be used once in the game entity's lifetime, right at the bitter end.
 
 ^code loot-drop
 
-Assuming we've already followed the earlier patterns, when we update these AI components, we'll be walking through a nice packed array of data. But that data includes all of the loot drop information. That makes each component bigger, which reduces the number of them we can fit in a cache line. We get more cache misses because the total memory we walk over is larger. That drop data gets pulled into the cache for every component, every frame, even though we aren't even touching it.
+Assuming we followed the earlier patterns, when we update these AI components, we walk through a nice packed, contiguous array of data. But that data includes all of the loot drop information. That makes each component bigger, which reduces the number of them we can fit in a cache line. We get more cache misses because the total memory we walk over is larger. The loot data gets pulled into the cache for every component, every frame, even though we aren't even touching it.
 
-One solution for this is called "hot/cold splitting". The idea is to break our data structure into two separate pieces. The first holds the "hot" data: the state we need to touch every frame. The other piece is the "cold" data: everything else that gets used less frequently.
+The solution for this is called "hot/cold splitting". The idea is to break our data structure into two separate pieces. The first holds the "hot" data: the state we need to touch every frame. The other piece is the "cold" data: everything else that gets used less frequently.
 
-The hot piece is the *main* AI component. It's the one we need to use the most, so we don't want to hide it behind an indirection. The cold component can be off to the side, but we still need to get to it, so we give the hot component a pointer to it, like so:
+The hot piece is the *main* AI component. It's the one we need to use the most, so we don't want to chase a pointer to find it. The cold component can be off to the side, but we still need to get to it, so we give the hot component a pointer to it, like so:
 
 ^code hot-cold
 
-Now when we're walking the AI components every frame, the only data that gets loaded into the cache is what we really, with the <span name="parallel">exception</span> of that one little pointer to the cold data. But that's still a real improvement over having all of that cold data right there in the way.
+Now when we're walking the AI components every frame, the only data that gets loaded into the cache is stuff we are actually processing (with the <span name="parallel">exception</span> of that one little pointer to the cold data).
 
 <aside name="parallel">
 
@@ -366,9 +358,9 @@ We could conceivably ditch the pointer too by having parallel arrays for the hot
 
 </aside>
 
-You can see how this starts to get fuzzy though. In my example here, it's pretty obvious which data should be hot and cold, but it's rarely so clear cut. What if you have fields that are used when an entity is in a certain mode but not in others? What if entities use a certain chunk of data only when they're in certain parts of the level.
+You can see how this starts to get fuzzy though. In my example here, it's pretty obvious which data should be hot and cold, but it's rarely so clear cut. What if you have fields that are used when an entity is in a certain mode but not in others? What if entities use a certain chunk of data only when they're in certain parts of the level?
 
-Doing this kind of optimization is somewhere between a black art and a rathole. It's easy to get sucked in and spend endless time pushing data around to see what speed difference it makes. It will take some practice to get a handle on when and where it's worth it to focus on this stuff.
+Doing this kind of optimization is somewhere between a black art and a rathole. It's easy to get sucked in and spend endless time pushing data around to see what speed difference it makes. It will take some practice to get a handle on where to spend your effort.
 
 ## Design Decisions
 
