@@ -222,7 +222,8 @@ a:hover {
 }
 
 a.pattern:after,
-a.gof-pattern:after {
+a.gof-pattern:after,
+a.pdf:after {
   font: 9px $sans;
   color: mix($primary, #fff, 50%);
   vertical-align: super;
@@ -234,6 +235,10 @@ a.pattern:after {
 
 a.gof-pattern:after {
   content: "\00A0GoF";
+}
+
+a.pdf:after {
+  content: "\00A0PDF";
 }
 
 // Footer.

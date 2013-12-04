@@ -147,7 +147,8 @@ a:hover {
   border-bottom: solid 1px #acf; }
 
 a.pattern:after,
-a.gof-pattern:after {
+a.gof-pattern:after,
+a.pdf:after {
   font: 9px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
   color: #99b2e5;
   vertical-align: super; }
@@ -157,6 +158,9 @@ a.pattern:after {
 
 a.gof-pattern:after {
   content: "\00A0GoF"; }
+
+a.pdf:after {
+  content: "\00A0PDF"; }
 
 p.footer {
   text-align: center;

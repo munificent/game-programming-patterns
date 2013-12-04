@@ -1,3 +1,4 @@
+2013-12-03 - 1982 words, finish second draft of data locality
 2013-12-02 - 2267 words, second draft data locality
 2013-12-01 - 616 words (cut 185) second draft data locality
 2013-11-30 - 1821 words (cut 366) second draft data locality

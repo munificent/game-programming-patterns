@@ -539,39 +539,48 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 <p>You can see how this starts to get fuzzy though. In my example here, it&#x2019;s pretty obvious which data should be hot and cold, but it&#x2019;s rarely so clear cut. What if you have fields that are used when an entity is in a certain mode but not in others? What if entities use a certain chunk of data only when they&#x2019;re in certain parts of the level?</p>
 <p>Doing this kind of optimization is somewhere between a black art and a rathole. It&#x2019;s easy to get sucked in and spend endless time pushing data around to see what speed difference it makes. It will take some practice to get a handle on where to spend your effort.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
-<p>This pattern is really about a mindset: it&#x2019;s getting you to think about where your data is in memory as a critical piece of your game&#x2019;s performance story. The actual concrete design space is wide open. You can let <span name="dod">data locality</span> affect your whole design philosophy, or maybe it&#x2019;s just a localized pattern you apply to a few critical data structures.</p>
-<p>The biggest question you&#x2019;ll need to answer is when and where you apply this pattern. But here&#x2019;s a couple specific ones that may come up.</p>
+<p>This pattern is really about a mindset: it&#x2019;s getting you to think about your data&#x2019;s arrangement in memory as a key part of your game&#x2019;s performance story. The actual concrete design space is wide open. You can let <span name="dod">data locality</span> affect your whole design philosophy, or maybe it&#x2019;s just a localized pattern you apply to a few core data structures.</p>
+<p>The biggest question you&#x2019;ll need to answer is when and where you apply this pattern, but here are a couple of specific ones that may come up.</p>
 <aside name="dod">
 
 <p>Noel Llopis&#x2019; <a href="http://gamesfromwithin.com/data-oriented-design">famous article</a> that got a lot more people thinking about designing games around data locality and cache-friendliness calls this "data-oriented design".</p>
 </aside>
 
 <h3><a href="#how-do-you-handle-polymorphism" name="how-do-you-handle-polymorphism">How do you handle polymorphism?</a></h3>
-<p>One thing I&#x2019;ve dodged in this chapter so far is subclassing and virtual methods. We&#x2019;ve been assuming we&#x2019;ve got nice packed arrays of <em>homogenous</em> objects. That way, we know they&#x2019;re all the exact same size. But polymorphism and dynamic dispatch are useful tools, too. How do we merge them?</p>
+<p>Up to this point, we&#x2019;ve avoided subclassing and virtual methods. We assumed we have nice packed arrays of <em>homogenous</em> objects. That way, we know they&#x2019;re all the exact same size. But polymorphism and dynamic dispatch are useful tools, too. How do we merge them?</p>
 <p><strong>Don&#x2019;t:</strong></p>
 <p>The simplest answer is to just avoid subclassing, or at least avoid it in places where you&#x2019;re optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.</p>
 <ul>
 <li>
-<p><em>It&#x2019;s safe and easy.</em> You know exactly what class you&#x2019;re dealing with and all objects are obviously the same size. If you don&#x2019;t <em>need</em> polymorphism, don&#x2019;t use it.</p>
+<p><em>It&#x2019;s safe and easy.</em> You know exactly what class you&#x2019;re dealing with and all objects are obviously the same size. If you don&#x2019;t need polymorphism, don&#x2019;t use it.</p>
 </li>
 <li>
-<p><em>It&#x2019;s faster.</em> Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. That can be an <em>instruction</em> cache miss. While overhead for this varies widely across different hardware, there is a cost to dynamic dispatch.</p>
+<p><em>It&#x2019;s faster.</em> Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. That can be an instruction cache miss. While the cost of this varies widely across different hardware, there is <span name="cpp"><em>some</em></span> cost to dynamic dispatch.</p>
 </li>
-<li>
-<p><em>It&#x2019;s inflexible.</em> Of course, the reason we use dynamic dispatch is because it gives us a powerful way to make a bunch of different objects behave differently. If you want different entities in your game to have their own AI styles, their own special moves and attacks, virtual methods are a nice way to model that. Having to instead stuff all of that code into a single non-virtual method that does something like a switch on the AI type gets messy quickly.</p>
-</li>
+</ul>
+<aside name="cpp">
+
+<p>As usual, the only absolute is that there are no absolutes. In most cases, a C++ compiler will require an indirection for a virtual method call. But in <em>some</em> cases, the compiler may be able to do <em>devirtualization</em> and statically call the right method if it knows what concrete type it will be. Devirtualization is even more common in just-in-time compilers for languages like Java.</p>
+</aside>
+
+<ul>
+<li><em>It&#x2019;s inflexible.</em> Of course, the reason we use dynamic dispatch is because it gives us a powerful way to make a bunch of different objects behave differently. If you want different entities in your game to have their own rendering styles, or their own special moves and attacks, virtual methods are a nice way to model that. Having to instead stuff all of that code into a single non-virtual method that does something like a big <code>switch</code> gets messy quickly.</li>
 </ul>
 <p><strong>Use separate arrays for each type:</strong></p>
 <p>We use polymorphism so that we can invoke behavior on an object whose type we don&#x2019;t know. In other words, we have a mixed bag of stuff and we want each object in there to do its own thing when we tell it to go.</p>
 <p>But that just raises the question of why mix the bag to begin with? Instead, why not just maintain separate homogenous collections for each type?</p>
 <ul>
-<li><em>It keeps objects tightly packed.</em> Since each array only contains objects of the same type, there&#x2019;s no padding or other weirdness.</li>
-<li><em>You can statically dispatch.</em> Once you&#x2019;ve got objects partitioned by type, you don&#x2019;t actually need polymorphism at all any more. You can use regular non-virtual method calls.</li>
+<li>
+<p><em>It keeps objects tightly packed.</em> Since each array only contains objects of one type, there&#x2019;s no padding or other weirdness.</p>
+</li>
+<li>
+<p><em>You can statically dispatch.</em> Once you&#x2019;ve got objects partitioned by type, you don&#x2019;t actually need polymorphism at all any more. You can use regular non-virtual method calls.</p>
+</li>
 <li>
 <p><em>You have to keep track of a bunch of collections.</em> If you have a lot of different object types, the overhead and complexity of maintaining separate arrays for each can be a chore.</p>
 </li>
 <li>
-<p><em>You have to be aware of every type</em>. Since you have to maintain seprate collections for each type, you can&#x2019;t be decoupled from them. Part of the magic of polymorphism is that it&#x2019;s <em>open-ended</em>: code that works with an interface can be completely decoupled from the potentially large set of types that implement that interface.</p>
+<p><em>You have to be aware of every type</em>. Since you have to maintain seprate collections for each type, you can&#x2019;t be decoupled from the <em>set</em> of types. Part of the magic of polymorphism is that it&#x2019;s <em>open-ended</em>: code that works with an interface can be completely decoupled from the potentially large set of types that implement that interface.</p>
 </li>
 </ul>
 <p><strong>Use a collection of pointers:</strong></p>
@@ -581,41 +590,38 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 <li><em>It&#x2019;s less cache-friendly.</em> Of course, the whole reason we&#x2019;re discussing other options here is because this means cache-unfriendly pointer indirection. But, remember, if this code isn&#x2019;t performance critical, that probably doesn&#x2019;t matter.</li>
 </ul>
 <h3><a href="#how-are-game-entities-defined" name="how-are-game-entities-defined">How are game entities defined?</a></h3>
-<p>If you use this pattern in tandem with the <a href="components.html" class="pattern">Component</a> pattern, you&#x2019;ll have nice contiguous arrays for all of the components that make up your game entity. The game loop will be iterating over those directly, so the actual object representing the game entity itself will be less important, but it&#x2019;s still useful in other parts of the codebase where you want to work with a single conceptual "entity".</p>
+<p>If you use this pattern in tandem with the <a href="components.html" class="pattern">Component</a> pattern, you&#x2019;ll have nice contiguous arrays for all of the components that make up your game entities. The game loop will be iterating over those directly, so the object for the game entity itself is less important, but it&#x2019;s still useful in other parts of the codebase where you want to work with a single conceptual "entity".</p>
 <p>The question then is how should it be represented? How does it keep track of its components?</p>
 <p><strong>Game entities are classes with pointers to their components:</strong></p>
 <p>This is what our first example looked like. It&#x2019;s sort of the vanilla OOP solution. You&#x2019;ve got a class for <code>GameEntity</code>, and it has pointers to the componentes each entity owns. Since they&#x2019;re just pointers, it&#x2019;s agnostic about where and how those components are actually organized in memory.</p>
 <ul>
-<li><em>You can store components in contiguous arrays.</em> Since the game entity doesn&#x2019;t <span name="care">care</span> where its components are, you can organize them in a nice packed array to optimize iterating over them.</li>
-</ul>
-<aside name="care">
-
-<p>It&#x2019;s 2:00 AM. Do <em>you</em> know where your components are?</p>
-</aside>
-
-<ul>
+<li>
+<p><em>You can store components in contiguous arrays.</em> Since the game entity doesn&#x2019;t care where its components are, you can organize them in a nice packed array to optimize iterating over them.</p>
+</li>
 <li>
 <p><em>Given an actor you can easily get to its components.</em> They&#x2019;re just a pointer indirection away.</p>
 </li>
 <li>
-<p><em>Moving components in memory is hard.</em> When components get enabled or disabled, you may want to move them around in the array to keep the components you actually need to process up front and contiguous. If you move a component while the entity has a raw pointer to it, though, that pointer gets broken if you aren&#x2019;t careful. You&#x2019;ll have to make sure to update the entity&#x2019;s pointer at the same time.</p>
+<p><em>Moving components in memory is hard.</em> When components get enabled or disabled, you may want to move them around in the array to keep the active ones up front and contiguous. If you move a component while the entity has a raw pointer to it, though, that pointer gets broken if you aren&#x2019;t careful. You&#x2019;ll have to make sure to update the entity&#x2019;s pointer at the same time.</p>
 </li>
 </ul>
-<p><strong>Game entities are class with IDs for their components:</strong></p>
-<p>The challenge with raw pointers to components is that it makes it harder to move them around in memory. You can address that by having something more abstract: an ID or index that can be used to <em>look up</em> a component.</p>
-<p>The actual semantics of the ID and lookup process are up to you. It could be as simple as storing a unique ID in each component and walking the list, or something more complex like a hash table that maps IDs to their current index in the component array.</p>
+<p><strong>Game entities are classes with IDs for their components:</strong></p>
+<p>The challenge with raw pointers to components is that it makes it harder to move them around in memory. You can address that by using something more abstract: an ID or index that can be used to <em>look up</em> a component.</p>
+<p>The actual semantics of the ID and lookup process are up to you. It could be as simple as storing a unique ID in each component and walking the array, or more complex like a hash table that maps IDs to their current index in the component array.</p>
 <ul>
 <li>
-<p><em>It&#x2019;s more complex.</em> Your ID system doesn&#x2019;t have to be rocket science, but it&#x2019;s still more work than a basic pointer. You&#x2019;ll have to implement and debug it, and there will likely be some memory overhead for bookkeeping.</p>
+<p><em>It&#x2019;s more complex.</em> Your ID system doesn&#x2019;t have to be rocket science, but it&#x2019;s still more work than a basic pointer. You&#x2019;ll have to implement and debug it, and there will be memory overhead for bookkeeping.</p>
 </li>
 <li>
-<p><em>It&#x2019;s slower</em>. It&#x2019;s hard to beat traversing a raw pointer. There may be some actual searching or hashing involved to get from an entity to one of its components. This may not matter much, though. Remember, the game loop is working with the components directly so it won&#x2019;t go through this. Code that does need to look up a component given an entity may not be on your hot code path.</p>
+<p><em>It&#x2019;s slower</em>. It&#x2019;s hard to beat traversing a raw pointer. There may be some actual searching or hashing involved to get from an entity to one of its components. This may not matter much, though.</p>
+<p>Remember, the game loop is working with the component arrays directly so it isn&#x2019;t going through this bottleneck. Code that <em>does</em> need to look up a
+component given an entity may not be on your hot code paths.</p>
 </li>
 <li>
 <p><em>You&#x2019;ll need access to the component "manager".</em> The basic idea is that you have some abstract ID that identifies a component. You can use it to get a reference to the actual component object. But to do that, you need to hand that ID to something that can actually find the component. That will be the class that wraps your raw contiguous array of component objects.</p>
+<p>With raw pointers, if you have a game entity, you can find its components. With this, you <span name="singleton">need</span> the game entity <em>and the component registry too</em>.</p>
 </li>
 </ul>
-<p>With raw pointers, if you have a game entity, you can find its components. With this, you <span name="singleton">need</span> the game entity <em>and the component registry too</em>.</p>
 <aside name="singleton">
 
 <p>You may be thinking, "I&#x2019;ll just make it a singleton! Problem solved!" Well, sort of. You might want to check out <a href="singleton.html">the chapter</a> on those first.</p>
@@ -623,24 +629,35 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 
 <p><strong>The game entity is <em>itself</em> just an ID:</strong></p>
 <p>This is a newer style that some game engines use. Once you&#x2019;ve moved all of your entity&#x2019;s behavior and state out of the main class and into components, what&#x2019;s left? It turns out, not much. The only thing an entity does is bind a set of components together. It exists just to say <em>this</em> AI component and <em>this</em> physics component and <em>this</em> render component "go together".</p>
-<p>That&#x2019;s important because components interact. The render component needs to know where the entity is, which is likely a property of the physics component. The AI component wants to move the entity, so it needs to apply a force to the physics component. So each component needs a way to get the other sibling components of the entity they are a part of.</p>
-<p>Some smart people realized all you need for that is an ID. Instead of the entity knowing its components, the components know their entity. Each component knows the ID of the entity that owns it. When the AI component needs the physics component for its entity, it just asks for the physics component with the same entity ID that it has.</p>
-<p>Your entity classes disappear entirely. They just become more or less a typedef for a number.</p>
-<p><em>Entities are tiny.</em> When you want to pass around a reference to a game entity, it&#x2019;s literally just a tiny bit of data.</p>
-<p><em>Entities are empty.</em> Of course, the downside of moving everything out of entities is that you <em>have</em> to move everything out of entities. You no longer have a place to put non-component-specific state or behavior. This style is basically doubling down on components.</p>
-<p><em>You don&#x2019;t have to manage their lifetime.</em> Since entities are just dumb value types, they don&#x2019;t need to be explicitly allocated and freed. A entity implicitly dies when all of its components are destroyed.</p>
-<p><em>Looking up a component for an entity may be slow.</em> This is the same problem as the previous answer, but in the opposite direction. To find a component for some entity, you&#x2019;ll have to map an ID to an object. That process may be a bit costly.</p>
+<p>That&#x2019;s important because components interact. The render component needs to know where the entity is, which is likely a property of the physics component. The AI component wants to move the entity, so it needs to apply a force to the physics component. Each component needs a way to get the other sibling components of the entity it&#x2019;s a part of.</p>
+<p>Some smart people realized all you need for that is an ID. Instead of the entity knowing its components, the components know their entity. Each component knows the ID of the entity that owns it. When the AI component needs the physics component for its entity, it just asks for the physics component with the same entity ID as its own.</p>
+<p>Your entity <em>classes</em> disappear entirely, replaced by a glorified wrapper around a number.</p>
+<ul>
+<li>
+<p><em>Entities are tiny.</em> When you want to pass around a reference to a game entity, it&#x2019;s just a single value.</p>
+</li>
+<li>
+<p><em>Entities are empty.</em> Of course, the downside of moving everything out of entities is that you <em>have</em> to move everything out of entities. You no longer have a place to put non-component-specific state or behavior. This style
+  doubles down on the component pattern.</p>
+</li>
+<li>
+<p><em>You don&#x2019;t have to manage their lifetime.</em> Since entities are just dumb value types, they don&#x2019;t need to be explicitly allocated and freed. An entity implicitly "dies" when all of its components are destroyed.</p>
+</li>
+<li>
+<p><em>Looking up a component for an entity may be slow.</em> This is the same problem as the previous answer, but in the opposite direction. To find a component for some entity, you have to map an ID to an object. That process may be costly.</p>
 <p>This time, though, it <em>is</em> performance critical. Components often interact with their siblings during update, so you will need to find components frequently. One solution is to make the "ID" of an entity just the index of the component in its array.</p>
 <p>If every entity has the same set of components, then your component arrays are completely parallel. The component in slot three of the AI component array will be for the same entity that the physics component in slot three of its array is associated with.</p>
-<p>Keep in mind, though, that this forces you to keep those arrays in parallel. That&#x2019;s hard if you want to start sorting or packing them by different criteria. For example, you may have some entities with disabled physics and others that are invisible. There&#x2019;s no way to sort the physics and render component arrays optimally for both cases.</p>
+<p>Keep in mind, though, that this <em>forces</em> you to keep those arrays in parallel. That&#x2019;s hard if you want to start sorting or packing them by different criteria. For example, you may have some entities with disabled physics and others that are invisible. There&#x2019;s no way to sort the physics and render component arrays optimally for both cases if they have to stay in sync with each other.</p>
+</li>
+</ul>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
 <li>
-<p>Much of this chapter revolves around the <a href="component.html" class="pattern">Component</a>, and that is definitely one of the most common data structures that gets optimized for cache usage. In fact, using the component pattern makes this optimization much easier. Since entities are updated one "domain" (AI, physics, etc.) at a time, splitting them out into components lets you slice a bunch of entities into just the right pieces to be cache-friendly.</p>
+<p>Much of this chapter revolves around the <a href="component.html" class="pattern">Component</a> pattern, and those are definitely one of the most common data structures that get optimized for cache usage. In fact, using the component pattern makes this optimization easier. Since entities are updated one "domain" (AI, physics, etc.) at a time, splitting them out into components lets you slice a bunch of entities into just the right pieces to be cache-friendly.</p>
 <p>But that doesn&#x2019;t mean you can <em>only</em> use this pattern with components! Any time you have performance critical code that touches a lot of data, it&#x2019;s important to think about locality.</p>
 </li>
 <li>
-<p>Tony Albrecht&#x2019;s "<a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf">Pitfalls of Object-Oriented Programming</a>)" (PDF) is probably the most widely-read introduction to designing your game&#x2019;s data structures for cache-friendliness. It made a lot more people (including me!) aware of how big a deal this is for performance.</p>
+<p>Tony Albrecht&#x2019;s <a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf" class="pdf">"Pitfalls of Object-Oriented Programming"</a> is probably the most widely-read introduction to designing your game&#x2019;s data structures for cache-friendliness. It made a lot more people (including me!) aware of how big a deal this is for performance.</p>
 </li>
 <li>
 <p>Around the same time, Noel Llopis wrote a <a href="http://gamesfromwithin.com/data-oriented-design">very influential blog post</a> on the same topic.</p>
