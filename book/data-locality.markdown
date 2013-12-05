@@ -3,11 +3,11 @@
 
 ## Intent
 
-*Speed up memory access by arranging data in memory to take advantage of CPU caching.*
+*Speed memory access by arranging data to take advantage of CPU caching.*
 
 ## Motivation
 
-We've been lied to. They keep showing us charts where CPU speed keeps goes up and up every year as if Moore's Law isn't just a historical observation but some kind of divine right. Without lifting a finger, we software folks watch our programs magically speed up just by virtue of new hardware.
+We've been lied to. They keep showing us charts where CPU speed goes up and up every year as if Moore's Law isn't just a historical observation but some kind of divine right. Without lifting a finger, we software folks watch our programs magically accelerate just by virtue of new hardware.
 
 Chips *have* been getting faster (though even that's plateauing now), but the hardware heads failed to mention something. Sure, we can *process* data faster than ever, but we can't *get* that data faster.
 
@@ -17,13 +17,13 @@ For your super-fast CPU to blow through a ream of calculations, it actually has 
 
 With today's hardware, it can take *hundreds* of cycles to fetch a byte of data from <span name="ram">RAM</span>. If most instructions need data, and it takes hundreds of cycles to get it, how is that our CPUs aren't sitting idle 99% of the time waiting for data?
 
-Actually, they *are* stuck waiting on memory an astonishingly large fraction of time these days, but it's not as bad as it could be. To explain why, let's take a trip to the Land of Overly Long Analogies...
+Actually, they *are* stuck waiting on memory an astonishingly large fraction of time these days, but it's not as bad as it could be. To explain how, let's take a trip to the Land of Overly Long Analogies...
 
 <aside name="ram">
 
 It's called "Random access memory" because, unlike disc drives, you can theoretically access any piece of it as quick as any other. You don't have to worry about reading things consecutively like you do a disc.
 
-Or, at least, you *didn't*. As we'll see, RAM isn't so random access anymore either.
+Or, at least, you *didn't*. As we'll see, RAM isn't so random access anymore.
 
 </aside>
 
@@ -52,13 +52,13 @@ One day, a group of industrial designers show up. Their job is to improve the ef
 
 <aside name="next">
 
-The technical term for often using something near the thing you just used is *locality of reference*.
+The technical term for using something near the thing you just used is *locality of reference*.
 
 </aside>
 
 They come up with a clever fix. Whenever you request a box from the warehouse guy, he'll
 grab an entire pallet of them. He gets the box you want and then
-some more boxes that are next to it. He doesn't know if you want those (and, given his work ethic, clearly doesn't care), he just takes them.
+some more boxes that are next to it. He doesn't know if you want those (and, given his work ethic, clearly doesn't care); he just takes as many as he can fit on the pallet.
 
 He loads the whole pallet and brings it to you. Disregarding concerns for workplace safety, he drives the forklift right in and drops the pallet in the corner of your office.
 
@@ -72,7 +72,7 @@ Strangely enough, this is similiar to how CPUs in modern computers work. In case
 
 If I were writing this chapter thirty years ago, the analogy would stop there. But as chips got faster and RAM, well, *didn't*, hardware engineers started looking for solutions. What they came up with was *CPU caching*.
 
-Modern chips have a <span name="caches">little chunk</span> of memory right inside the chip. It's small because it has to fit in the chip. The CPU can pull data from this much faster than it can main memory in part because it's physically closer to the registers. The electrons have a shorter distance to travel.
+Modern computers have a <span name="caches">little chunk</span> of memory right inside the chip. It's small because it has to fit in the chip. The CPU can pull data from this much faster than it can main memory in large part because it's physically closer to the registers. The electrons have a shorter distance to travel.
 
 <aside name="caches">
 
@@ -90,11 +90,11 @@ There's one detail I glossed over in the analogy. In your office, there was only
 
 If the next byte of data you need happens to be in that chunk, the CPU reads it straight from the cache, which is *much* faster than hitting RAM. Successfully finding a piece of data in the cache is called a *cache hit*. If it can't find it in there and has to go to main memory, that's a *cache miss*.
 
-When a cache miss occurs, the CPU *stalls*: it can't process the next instruction because needs data. It sits there, bored out of its mind for a few hundred cycles until the fetch completes. Our mission is to learn out how to avoid that. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
+When a cache miss occurs, the CPU *stalls*: it can't process the next instruction because needs data. It sits there, bored out of its mind for a few hundred cycles until the fetch completes. Our mission is to avoid that. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
 
 ^code do-nothing
 
-What's the first change you're going to make to that code? Right. Take out that pointless, expensive function call. That functional call is equivalent to the performance cost of a cache miss. Every time you bounce to main memory, it's like you put a delay in your code.
+What's the first change you're going to make to that code? Right. Take out that pointless, expensive function call. That call is equivalent to the performance cost of a cache miss. Every time you bounce to main memory, it's like you put a delay in your code.
 
 ### Wait, data is performance?
 
@@ -110,13 +110,13 @@ Your mileage will vary.
 
 </aside>
 
-This was a real eye-opener to me. I'm used to thinking of performance being an aspect of *code* not *data*. A byte isn't slow or fast, it's just a static thing sitting there. But, because of caching, *the way you organize data directly impacts performance.*
+This was a real eye-opener to me. I'm used to thinking of performance being an aspect of *code* not *data*. A byte isn't slow or fast, it's just some static thing sitting there. But, because of caching, *the way you organize data directly impacts performance.*
 
 The challenge now is to wrap that up into something that fits into a chapter here. Optimization for cache usage is a huge topic. I haven't even touched on *instruction caching*. Remember, code is in memory too and has to be loaded onto the CPU before it can be executed. Someone more versed on the subject could write an entire <span name="book">book</span> on it.
 
 <aside name="book">
 
-In fact, someone *is* writing a book on it: [*Data-Oriented Design*](http://www.dataorienteddesign.com/dodmain/) by Richard Fabian.
+In fact, someone *did* write a book on it: [*Data-Oriented Design*](http://www.dataorienteddesign.com/dodmain/) by Richard Fabian.
 
 </aside>
 
@@ -136,7 +136,7 @@ In other words, if your code is crunching on A then B then C, you want them laid
     | a | b | c |
     +---+---+---+
 
-Note, these aren't *pointers* to A, B, and C. This is the actual data for them, in place, all lined up next to each other. As soon as the CPU reads in A, it will start to get B and C too (depending on how big they and how big a cache line is). When you start working on them next, they'll already be cached. Your chip is happy and you're happy.
+Note, these aren't *pointers* to A, B, and C. This is the actual data for them, in place, lined up next to each other. As soon as the CPU reads in A, it will start to get B and C too (depending on how big they are and how big a cache line is). When you start working on them next, they'll already be cached. Your chip is happy and you're happy.
 
 ## The Pattern
 

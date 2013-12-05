@@ -15,7 +15,7 @@
 
 namespace DataLocality
 {
-  void doAbsolutelyNothingFor500Cycles() {}
+  void sleepFor500Cycles() {}
 
   struct Thing
   {
@@ -31,7 +31,7 @@ namespace DataLocality
     //^do-nothing
     for (int i = 0; i < NUM_THINGS; i++)
     {
-      doAbsolutelyNothingFor500Cycles();
+      sleepFor500Cycles();
       things[i].doStuff();
     }
     //^do-nothing

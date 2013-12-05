@@ -12,4 +12,12 @@ i *thought* i had a solution for this that cleverly threaded the list of
 observers through the observers themselves. but that has the unpleasant
 side effect that a given observer can only observe one object.
 
-need to do more research and possibly just ditch this chapter.
+maybe that's ok? talk about specific 1-many observable/observer design.
+
+another option is to talk about using an object pool for the observer/obserable
+pair objects.
+
+also discuss using generic callbacks instead of having to implement interface.
+
+http://www.gotw.ca/gotw/083.htm
+http://molecularmusings.wordpress.com/2011/09/19/generic-type-safe-delegates-and-events-in-c/
