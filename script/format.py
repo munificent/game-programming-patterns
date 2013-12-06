@@ -128,7 +128,8 @@ def formatfile(path, nav, skip_up_to_date):
 
         contents = contents.replace('<aside', '<aside markdown="1"')
 
-        body = markdown.markdown(contents, ['extra', 'def_list', 'codehilite'])
+        body = markdown.markdown(contents,
+                        extensions=['extra', 'def_list', 'codehilite'])
         body = body.replace('<aside markdown="1"', '<aside')
 
         html = template
