@@ -308,6 +308,8 @@ namespace DataLocality
 
   namespace HotCold
   {
+    class LootDrop;
+
     //^hot-cold
     class AIComponent
     {
@@ -318,10 +320,10 @@ namespace DataLocality
       float        energy_;
       Vector       goalPos_;
 
-      AIComponent* cold_;
+      LootDrop*    loot_;
     };
 
-    class AIComponentCold
+    class LootDrop
     {
       friend class AIComponent;
       LootType drop_;

@@ -136,7 +136,7 @@ In other words, if your code is crunching on A then B then C, you want them laid
     | a | b | c |
     +---+---+---+
 
-Note, these aren't *pointers* to A, B, and C. This is the actual data for them, in place, lined up next to each other. As soon as the CPU reads in A, it will start to get B and C too (depending on how big they are and how big a cache line is). When you start working on them next, they'll already be cached. Your chip is happy and you're happy.
+Note, these aren't *pointers* to A, B, and C. This is the actual data for them, in place, lined up one after the other. As soon as the CPU reads in A, it will start to get B and C too (depending on how big they are and how big a cache line is). When you start working on them next, they'll already be cached. Your chip is happy and you're happy.
 
 ## The Pattern
 
@@ -148,9 +148,9 @@ Like most optimizations, the first guideline for using it is *when you have a pe
 
 With this pattern specifically, you'll also want to be sure your performance problems *are caused by cache misses*. If your code is slow for other reasons, this won't help.
 
-The cheap way to profile is to manually add a bit of code that checks how much time has elapsed between two points in the code, hopefully using a precise timer. To catch cache misses, you'll want something a little more sophisticated. You really want to see how many cache misses are occurring and where.
+The cheap way to profile is to manually add a bit of instrumentation that checks how much time has elapsed between two points in the code, hopefully using a precise timer. To catch cache misses, you'll want something a little more sophisticated. You really want to see how many cache misses are occurring and where.
 
-Fortunately, there are <span name="cachegrind">profilers</span> out that there can report it. It's worth spending the time to get one of these working and making sure you understand the (surprisingly complex) numbers it throws at you before you do major surgery on your data structures.
+Fortunately, there are <span name="cachegrind">profilers</span> out that there report it. It's worth spending the time to get one of these working and make sure you understand the (surprisingly complex) numbers it throws at you before you do major surgery on your data structures.
 
 <aside name="cachegrind">
 
@@ -164,13 +164,13 @@ That being said, cache misses *will* affect the performance of your game. While 
 
 ## Keep in Mind
 
-One of the hallmarks of OOP is *abstraction*. A large chunk of this book is about patterns to decouple pieces of code from each other so that they can be changed more easily. This almost always means using interfaces.
+One of the hallmarks of software architecture is *abstraction*. A large chunk of this book is about patterns to decouple pieces of code from each other so that they can be changed more easily. In object-oriented languages, this almost always means interfaces.
 
 In C++, using interfaces implies accessing objects through <span name="virtual">pointers or references</span>. But going through a pointer means hopping across memory, which leads to the cache misses this pattern works to avoid.
 
 <aside name="virtual">
 
-The other half of interfaces is *virtual method calls*. Those require the CPU to look up an object's vtable, and then find the pointer to the actual method to call there. So, again, you're chasing a pointer and often causing a cache miss, though this time it's an *instruction* cache miss, since you're loading code onto the CPU.
+The other half of interfaces is *virtual method calls*. Those require the CPU to look up an object's vtable, and then find the pointer to the actual method to call there. So, again, you're chasing a pointer and often causing a cache miss, though this time it's an *instruction* cache miss, since you're reading *code* from RAM.
 
 </aside>
 
@@ -182,7 +182,7 @@ If you really go down the rathole of optimizing for data locality, you'll discov
 
 ### Contiguous arrays
 
-Let's start with a <a href="game-loop.html" class="pattern">Game Loop</a> that processes a bunch of game entities. Those entities are decomposed into different domains -- AI, physics, and rendering -- using the <a href="component.html" class="pattern">Component</a> pattern. The game entity class looks something like this:
+Let's start with a <a href="game-loop.html" class="pattern">Game Loop</a> that processes a bunch of game entities. Those entities are decomposed into different domains -- AI, physics, and rendering -- using the <a href="component.html" class="pattern">Component</a> pattern. Here's the game entity class:
 
 ^code game-entity
 
@@ -196,7 +196,7 @@ As the name implies, these are examples of the <a href="update-method.html" clas
 
 ^code components
 
-The game maintains a big array of pointers to all of the entities in the world. Each spin of the game loop, this needs to happen, in this order:
+The game maintains a big array of pointers to all of the entities in the world. Each spin of the game loop, we need to run the following, in this order:
 
 1. Update the AI components for all of the entities.
 2. Update the physics components for them.
@@ -206,9 +206,9 @@ Lots of game engines implement that like so:
 
 ^code game-loop
 
-Before you ever heard of a CPU cache, this looked totally innocuous. But by now you've got an inkling that something isn't right here. This code isn't just thrashing the cache, it's taking it around back and beating it bloody. Here's what it's doing:
+Before you ever heard of a CPU cache, this looked totally innocuous. But by now you've got an inkling that something isn't right here. This code isn't just thrashing the cache, it's taking it around back and beating it to a pulp. Watch what it's doing:
 
-1. We've got a list of *pointers* to game entities. For every game entity in the world, we have to traverse that pointer. That's a cache miss.
+1. The array of game entities is *pointers* to them, so for each element in the array, we have to traverse that pointer. That's a cache miss.
 
 2. Then the game entity has a pointer to the component. Another cache miss.
 
@@ -216,11 +216,11 @@ Before you ever heard of a CPU cache, this looked totally innocuous. But by now 
 
 4. Now we go back to step one for *every component of every entity in the game*.
 
-The scary part is we have no idea how any of these objects are laid out in memory. We're completely at the mercy of the memory manager. As entities get allocated and freed over time, the heap is likely to become increasingly randomly organized in memory.
+The scary part is we have no idea how any of these objects are laid out in memory. We're completely at the mercy of the memory manager. As entities get allocated and freed over time, the heap is likely to become increasingly randomly organized.
 
 **TODO: illustration**
 
-If our goal was to take a whirlwhind tour around the game's address space like some "256MB of RAM in Four Nights!" cheap vacation package, this would be a fantastic deal. But our goal is to run the game quickly, and <span name="chase">traipsing</span> all over main memory is *not* the way to do that. Remember that `doAbsolutelyNothingFor500Cycles()` function? Well this code is calling that *all the time*.
+If our goal was to take a whirlwhind tour around the game's address space like some "256MB of RAM in Four Nights!" cheap vacation package, this would be a fantastic deal. But our goal is to run the game quickly, and <span name="chase">traipsing</span> all over main memory is *not* the way to do that. Remember that `sleepFor500Cycles()` function? Well this code is effectively calling that *all the time*.
 
 <aside name="chase">
 
@@ -248,7 +248,7 @@ Let me just stress that these are arrays of *components* and not *pointers to co
 
 ^code game-loop-arrays
 
-We've ditched all of that <span name="arrow">pointer chasing</span>. Instead of skipping around in memory, we're doing a straight crawl through three contiguous arrays. This pumps a solid stream of bytes right into the hungry maw of the CPU. In my test program, this change made the update loop fifty *times* faster than the previous version.
+We've ditched all of that <span name="arrow">pointer chasing</span>. Instead of skipping around in memory, we're doing a straight crawl through three contiguous arrays. This pumps a solid stream of bytes right into the hungry maw of the CPU. In my testing, this change made the update loop fifty *times* faster than the previous version.
 
 **TODO: illustration**
 
@@ -278,29 +278,29 @@ A rudimentary update method for the system just looks like this:
 
 ^code update-particle-system
 
-But it turns out that we don't actually need to process *all* of the particles all the time. The particle system has a fixed-size pool of objects, but most of the time, they aren't all actively twinkling across the screen. The easy answer is something like this:
+But it turns out that we don't actually need to process *all* of the particles all the time. The particle system has a fixed-size pool of objects, but they aren't usually all actively twinkling across the screen. The easy answer is something like this:
 
 ^code particles-is-active
 
-For every particle, we <span name="branch">check</span> that flag before we update it. That means loading the memory for the flag into the cache along with the rest of the particle's data. If the particle *isn't* active, then we just skip over it to the next particle. So loading all of that into the cache was a waste of time.
+We give `Particle` a flag to track whether its in use or not. In the update loop, we <span name="branch">check</span> that for each particle. That loads the flag into the cache, along with all of that particle's other data. If the particle *isn't* active, then we just skip over that to the next one. The rest of the particle's data that we loaded into the cache is a waste.
 
-The fewer active particles there are, the more we're skipping across memory. The faster we do that, the more cache misses there are between actually doing useful work updating active particles. If that array is large and has *lots* of inactive particles in it, we're back to just thrashing the cache again.
+The fewer active particles there are, the more we're skipping across memory. The more we do that, the more cache misses there are between actually doing useful work updating active particles. If the array is large and has *lots* of inactive particles in it, we're back to just thrashing the cache again.
 
-Having objects in a contiguous array doesn't solve much if the objects we're actually processing aren't contiguous in it. If littered with inactive objects we have to dance around, we're right back to the original problem.
+Having objects in a contiguous array doesn't solve much if the objects we're actually processing aren't contiguous in it. If it's littered with inactive objects we have to dance around, we're right back to the original problem.
 
 <aside name="branch">
 
-Savvy low-level coders can see another problem here. Doing an `if` check for every particle can cause a *branch misprediction* and a *pipeline stall*. In modern CPUs a single "instruction" actually takes several clock cycles. To keep the CPU busy, instructions are pipelined such that the subsequent instructions start processing before the first one finishes.
+Savvy low-level coders can see another problem here. Doing an `if` check for every particle can cause a *branch misprediction* and a *pipeline stall*. In modern CPUs a single "instruction" actually takes several clock cycles. To keep the CPU busy, instructions are *pipelined* so that the subsequent instructions start processing before the first one finishes.
 
-To do that, the CPU has to guess which instructions it will be executing next. In straight line code, that's easy, but with flow control, it's harder. While it's executing the jump instruction for the `if`, does it guess that the particle is active and start executing the code for the `update()` call, or does it guess that it isn't?
+To do that, the CPU has to guess which instructions it will be executing next. In straight line code, that's easy, but with flow control, it's harder. While it's executing the instructions for that `if`, does it guess that the particle is active and start executing the code for the `update()` call, or does it guess that it isn't?
 
-To handle this, the chip does *branch prediction:* it sees which branches your code previously took and guesses that it will do that again. But when the loop is constantly toggling between particles that are and aren't active, that prediction fails.
+To answer that, the chip does *branch prediction:* it sees which branches your code previously took and guesses that it will do that again. But when the loop is constantly toggling between particles that are and aren't active, that prediction fails.
 
-When it does, the CPU has to ditch the instructions it had started speculatively processing (a *pipeline flush*) and start over. The performance impact of this varies widely by machine, but this is why you see some coders avoid flow control in hot code.
+When it does, the CPU has to ditch the instructions it had started speculatively processing (a *pipeline flush*) and start over. The performance impact of this varies widely by machine, but this is why you sometimes see developers avoid flow control in hot code.
 
 </aside>
 
-Given the subtitle of this section, you can probably guess the solution. Instead of *checking* the active flag, we'll *sort* by it. We'll keep all of the active particles in the front of the list. If we know all of those particles are active, we don't have to check the flag at all.
+Given the title of this section, you can probably guess the answer. Instead of *checking* the active flag, we'll *sort* by it. We'll keep all of the active particles in the front of the list. If we know all of those particles are active, we don't have to check the flag at all.
 
 We can also easily keep track of how many active particles there are. With this, our update loop turns into this thing of beauty:
 
@@ -318,7 +318,7 @@ To deactivate a particle, we just do the opposite:
 
 ^code deactivate-particle
 
-Lots of programmers (myself included) have developed allergies to moving things around in memory. Schlepping a bunch of bytes around *feels* heavyweight , compared to just assigning a pointer. But when you add in the cost of *traversing* that pointer, it turns out that our intuition is often wrong. In <span name="profile">many cases</span>, it's cheaper to actually move things around in memory so that you can keep the cache full.
+Lots of programmers (myself included) have developed allergies to moving things around in memory. Schlepping a bunch of bytes around *feels* heavyweight , compared to just assigning a pointer. But when you add in the cost of *traversing* that pointer, it turns out that our intuition is sometimes wrong. In <span name="profile">some cases</span>, it's cheaper to push things around in memory if it helps you keep the cache full.
 
 <aside name="profile">
 
@@ -326,19 +326,19 @@ This is your friendly reminder to *profile* when making these kinds of decisions
 
 </aside>
 
-There's a neat consequence of keeping the particles *sorted* by their active state: We don't need to store an active flag in each particle at all. It can be determined entirely by its position in the array and the `numActive_` counter. This makes our particle objects smaller, which means we can pack more in our cache lines, and that makes them even faster.
+There's a neat consequence of keeping the particles *sorted* by their active state: We don't need to store an active flag in each particle at all. It can be inferred by its position in the array and the `numActive_` counter. This makes our particle objects smaller, which means we can pack more in our cache lines, and that makes them even faster.
 
-It's not all rosy, though. As you can see from the API, we've lost a bit of OOP flavor here. The `Particle` class no longer controls its own active state. You can't just call some `activate()` method on it since it doesn't know it's index. Instead, any code that wants to activate partiles needs access to the particle *system*.
+It's not all rosy, though. As you can see from the API, we've lost a bit of object-orientation here. The `Particle` class no longer controls its own active state. You can't just call some `activate()` method on it since it doesn't know it's index. Instead, any code that wants to activate particles needs access to the particle *system*.
 
-In this case, I'm OK with `ParticleSystem` and `Particle` being tightly tied like this. I think of them as a single *concept* spread across two physical *classes*. It just means accepting the idea that particles are *only* meaningful in the context of some particle system. Also, in this case it's likely the particle system that will be spawning and killing particles anyway.
+In this case, I'm OK with `ParticleSystem` and `Particle` being tightly tied like this. I think of them as a single *concept* spread across two physical *classes*. It just means accepting the idea that particles are *only* meaningful in the context of some particle system. Also, in this case it's likely to be the particle system that will be spawning and killing particles anyway.
 
 ### Hot/cold splitting
 
-OK, this is the last example of a simple technique for making your cache happier. Say we've got an AI component for some game entity. It has some state in it: the animation it's currently playing, a goal position its heading towards, energy level, etc.. Stuff it checks and tweaks every single frame. Something like:
+OK, this is the last example of a simple technique for making your cache happier. Say we've got an AI component for some game entity. It has some state in it: the animation it's currently playing, a goal position its heading towards, energy level, etc. -- stuff it checks and tweaks every single frame. Something like:
 
 ^code ai-component
 
-But it also has some state for rarer eventualities. It may need to store some data describing what loot it drops when it has an unfortunate encounter with the noisy end of a shotgun. That drop data will only ever be used once in the game entity's lifetime, right at the bitter end.
+But it also has some state for rarer eventualities. It stores some data describing what loot it drops when it has an unfortunate encounter with the noisy end of a shotgun. That drop data is only used once in the entity's lifetime, right at its bitter end.
 
 ^code loot-drop
 
@@ -354,13 +354,13 @@ Now when we're walking the AI components every frame, the only data that gets lo
 
 <aside name="parallel">
 
-We could conceivably ditch the pointer too by having parallel arrays for the hot and cold components. Then we can find the cold AI data for an actor as long as we know its index since both pieces will be at the same index in their respective arrays.
+We could conceivably ditch the pointer too by having parallel arrays for the hot and cold components. Then we can find the cold AI data for a component since both pieces will be at the same index in their respective arrays.
 
 </aside>
 
 You can see how this starts to get fuzzy though. In my example here, it's pretty obvious which data should be hot and cold, but it's rarely so clear cut. What if you have fields that are used when an entity is in a certain mode but not in others? What if entities use a certain chunk of data only when they're in certain parts of the level?
 
-Doing this kind of optimization is somewhere between a black art and a rathole. It's easy to get sucked in and spend endless time pushing data around to see what speed difference it makes. It will take some practice to get a handle on where to spend your effort.
+Doing this kind of optimization is somewhere between a black art and a rathole. It's easy to get sucked in and spend endless time pushing data around to see what speed difference it makes. It will take practice to get a handle on where to spend your effort.
 
 ## Design Decisions
 
