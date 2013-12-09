@@ -1,3 +1,4 @@
+2013-12-09 - post chapter online, tweet, reddit, mailing list
 2013-12-08 - 1928 words, finish data locality! optimization patterns intro
 2013-12-07 - photoshop illustrations
 2013-12-06 - 2709 words, third draft of data locality

@@ -255,9 +255,15 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 
 <p>The game maintains a big array of pointers to all of the entities in the world. Each spin of the game loop, we need to run the following, in this order:</p>
 <ol>
-<li>Update the AI components for all of the entities.</li>
-<li>Update the physics components for them.</li>
-<li>Render them using their render components.</li>
+<li>
+<p>Update the AI components for all of the entities.</p>
+</li>
+<li>
+<p>Update the physics components for them.</p>
+</li>
+<li>
+<p>Render them using their render components.</p>
+</li>
 </ol>
 <p>Lots of game engines implement that like so:</p>
 <div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">gameOver</span><span class="p">)</span>

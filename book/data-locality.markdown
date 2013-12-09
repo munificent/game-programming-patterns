@@ -210,7 +210,9 @@ As the name implies, these are examples of the <a href="update-method.html" clas
 The game maintains a big array of pointers to all of the entities in the world. Each spin of the game loop, we need to run the following, in this order:
 
 1. Update the AI components for all of the entities.
+
 2. Update the physics components for them.
+
 3. Render them using their render components.
 
 Lots of game engines implement that like so:
