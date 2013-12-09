@@ -116,11 +116,11 @@ grab an entire pallet of them. He gets the box you want and then
 some more boxes that are next to it. He doesn&#x2019;t know if you want those (and, given his work ethic, clearly doesn&#x2019;t care); he just takes as many as he can fit on the pallet.</p>
 <p>He loads the whole pallet and brings it to you. Disregarding concerns for workplace safety, he drives the forklift right in and drops the pallet in the corner of your office.</p>
 <p>When you need a new box, now, the first thing you do is see if it&#x2019;s already on the pallet in your office. If it is, great! It just takes you a second to grab it and you&#x2019;re back to crunching numbers. If a pallet holds fifty boxes and you got lucky and <em>all</em> of the boxes you need happen to be on it, you can churn through fifty times more work than you could before.</p>
-<p>But, if you need a box that&#x2019;s <em>not</em> on the pallet, you&#x2019;re back to square one. Since you can only fit one pallet in your office, your warehouse friend will have to take that one back and then bring you entirely new one.</p>
+<p>But, if you need a box that&#x2019;s <em>not</em> on the pallet, you&#x2019;re back to square one. Since you can only fit one pallet in your office, your warehouse friend will have to take that one back and then bring you an entirely new one.</p>
 <h3><a href="#a-pallet-for-your-cpu" name="a-pallet-for-your-cpu">A pallet for your CPU</a></h3>
-<p>Strangely enough, this is similiar to how CPUs in modern computers work. In case it isn&#x2019;t obvious, you play the role of the CPU. Your desk is the CPU&#x2019;s registers, and the box of papers is the data you can fit in them. The warehouse is your machine&#x2019;s RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.</p>
+<p>Strangely enough, this is similar to how CPUs in modern computers work. In case it isn&#x2019;t obvious, you play the role of the CPU. Your desk is the CPU&#x2019;s registers, and the box of papers is the data you can fit in them. The warehouse is your machine&#x2019;s RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.</p>
 <p>If I were writing this chapter thirty years ago, the analogy would stop there. But as chips got faster and RAM, well, <em>didn&#x2019;t</em>, hardware engineers started looking for solutions. What they came up with was <em>CPU caching</em>.</p>
-<p>Modern computers have a <span name="caches">little chunk</span> of memory right inside the chip. It&#x2019;s small because it has to fit in the chip. The CPU can pull data from this much faster than it can main memory in large part because it&#x2019;s physically closer to the registers. The electrons have a shorter distance to travel.</p>
+<p>Modern computers have a <span name="caches">little chunk</span> of memory right inside the chip. It&#x2019;s small because it has to fit in the chip. The CPU can pull data from this much faster than it can from main memory, in large part because it&#x2019;s physically closer to the registers. The electrons have a shorter distance to travel.</p>
 <aside name="caches">
 
 <p>Modern hardware actually has multiple levels of caching, which is what they mean when you hear "L1", "L2", "L3", etc. Each level is larger but slower than the previous. For this chapter, we won&#x2019;t worry about the fact that memory is actually a <a href="http://en.wikipedia.org/wiki/Memory_hierarchy">hierarchy</a>, but it&#x2019;s important to know.</p>
@@ -134,7 +134,7 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 <p>I glossed over (at least) one detail in the analogy. In your office, there was only room for one pallet, or one cache line. A real cache contains a number of cache lines. The details about how those work is out of scope here, but search for "cache associativity" to feed your brain.</p>
 </aside>
 
-<p>When a cache miss occurs, the CPU <em>stalls</em>: it can&#x2019;t process the next instruction because needs data. It sits there, bored out of its mind for a few hundred cycles until the fetch completes. Our mission is to avoid that. Imagine you&#x2019;re trying to optimize some performance critical piece of game code and it looks like this:</p>
+<p>When a cache miss occurs, the CPU <em>stalls</em>: it can&#x2019;t process the next instruction because it needs data. It sits there, bored out of its mind for a few hundred cycles until the fetch completes. Our mission is to avoid that. Imagine you&#x2019;re trying to optimize some performance critical piece of game code and it looks like this:</p>
 <div class="codehilite"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_THINGS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">sleepFor500Cycles</span><span class="p">();</span>
@@ -164,7 +164,7 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 <p>It all boils down to something pretty simple: whenever the chip reads some memory, it gets a whole cache line. The more you can use stuff in that <span name="line">cache line, the faster you go</span>. So the goal then is to <em>organize your data structures so that the things you&#x2019;re processing are next to each other in memory</em>.</p>
 <aside name="line">
 
-<p>There&#x2019;s a key assumption here, though: one thread. If you are accessing nearby data on multiple threads, it&#x2019;s faster to have it on <em>different</em> cache lines. If two threads try to use data on the same cache line, both cores have to do some costly sychronization of their caches.</p>
+<p>There&#x2019;s a key assumption here, though: one thread. If you are accessing nearby data on multiple threads, it&#x2019;s faster to have it on <em>different</em> cache lines. If two threads try to use data on the same cache line, both cores have to do some costly synchronization of their caches.</p>
 </aside>
 
 <p>In other words, if your code is crunching on <code>Thing</code> then <code>Another</code> then <code>Also</code>, you want them laid out in memory like this:</p>
@@ -176,7 +176,7 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 <p>Like most optimizations, the first guideline for using it is <em>when you have a performance problem.</em> Don&#x2019;t waste time applying this to some infrequently executed corner of your codebase. Optimizing code that doesn&#x2019;t need it just makes your life harder since the result is almost always more complex and less flexible.</p>
 <p>With this pattern specifically, you&#x2019;ll also want to be sure your performance problems <em>are caused by cache misses</em>. If your code is slow for other reasons, this won&#x2019;t help.</p>
 <p>The cheap way to profile is to manually add a bit of instrumentation that checks how much time has elapsed between two points in the code, hopefully using a precise timer. To catch cache misses, you&#x2019;ll want something a little more sophisticated. You really want to see how many cache misses are occurring and where.</p>
-<p>Fortunately, there are <span name="cachegrind">profilers</span> out that there report it. It&#x2019;s worth spending the time to get one of these working and make sure you understand the (surprisingly complex) numbers it throws at you before you do major surgery on your data structures.</p>
+<p>Fortunately, there are <span name="cachegrind">profilers</span> out there that report it. It&#x2019;s worth spending the time to get one of these working and make sure you understand the (surprisingly complex) numbers it throws at you before you do major surgery on your data structures.</p>
 <aside name="cachegrind">
 
 <p>Unfortunately, most of those tools aren&#x2019;t cheap. If you&#x2019;re on a console dev team, you probably already have licenses for them.</p>
@@ -315,7 +315,7 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 </aside>
 
 <p>Let&#x2019;s do something better. Our first observation is that the only reason we follow a pointer to get to the game entity is so we can immediately follow <em>another</em> pointer to get to a component. <code>GameEntity</code> itself has no interesting state and no useful methods. The <em>components</em> are what the game loop cares about.</p>
-<p>Instead of a giant constellation of game entities and components scattered across the inky darkess of address space, we&#x2019;re going to get back down to Earth. We&#x2019;ll have a big array for each type of component: a flat array of AI components, another for physics, and another for rendering.</p>
+<p>Instead of a giant constellation of game entities and components scattered across the inky darkness of address space, we&#x2019;re going to get back down to Earth. We&#x2019;ll have a big array for each type of component: a flat array of AI components, another for physics, and another for rendering.</p>
 <p>Like this:</p>
 <p><span name="long-name"></span></p>
 <div class="codehilite"><pre><span class="n">AIComponent</span><span class="o">*</span> <span class="n">aiComponents</span> <span class="o">=</span>
