@@ -1,5 +1,5 @@
 ^title Spatial Partition
-^section Optimizing Patterns
+^section Optimization Patterns
 
 ## Intent
 

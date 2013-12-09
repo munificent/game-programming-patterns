@@ -123,6 +123,8 @@ def formatfile(path, nav, skip_up_to_date):
             title_text = section + " / " + title
             if section == "Sequencing Patterns":
                 section_header = ' / <a href="sequencing-patterns.html">' + section + '</a>'
+            elif section == "Optimization Patterns":
+                section_header = ' / <a href="optimization-patterns.html">' + section + '</a>'
             else:
                 section_header = " / " + section
 

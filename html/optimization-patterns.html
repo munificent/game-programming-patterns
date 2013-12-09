@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+
+<title>Game Programming Patterns / Optimization Patterns</title>
+
+<!-- Tell mobile browsers we're optimized for them and they don't need to crop
+     the viewport. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<link rel="stylesheet" type="text/css" href="style.css" />
+<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro|Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
+  ga('send', 'pageview');
+</script>
+</head>
+<body id="top">
+<div class="content">
+<h1 class="book"><a href="index.html">Game Programming Patterns</a></h1>
+<h1>Optimization Patterns</h1>
+<div class="in-progress">
+  <span class="dismiss">&times;</span>
+  <p><strong>This book is a work in progress!</strong></p>
+
+  <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/game-programming-patterns/issues/new" target="_blank">file a ticket</a>. To know when new chapters are up, join the mailing list:</p>
+
+  <!-- Begin MailChimp Signup Form -->
+  <div id="mc_embed_signup">
+  <form action="http://gameprogrammingpatterns.us7.list-manage.com/subscribe/post?u=0952ca43ed2536d6717766b88&amp;id=0c27329244" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <table>
+      <tr>
+        <td width="100%">
+          <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+        </td>
+        <td>
+          <div class="spacer"></div>
+        </td>
+        <td>
+          <input type="submit" value="Join" name="subscribe" id="mc-embedded-subscribe" class="button">
+        </td>
+      </tr>
+    </table>
+  </form>
+  </div>
+  <!--End mc_embed_signup-->
+
+  <table width="100%">
+    <tr>
+      <td width="50%">
+        <p>Thank you!</p>
+      </td>
+      <td width="50%">
+        <p class="signature">&mdash; Bob (<a href="https://twitter.com/intent/user?screen_name=munificentbob" target="_blank">@munificentbob</a>)</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>While the rising tide of faster and faster hardware has lifted most software above needing to worry about performance, games are one of the few remaining exceptions. Players always want richer, more realistic and exciting experiences. Screens are crowded with games vying for a player&#x2019;s attention&thinsp;&mdash;&thinsp;and cash!&thinsp;&mdash;&thinsp;and the game that squeezes the most out of the hardware often wins.</p>
+<p>Optimizing for performance is a deep art that touches all aspects of software. Low-level coders master the myriad idiosyncracies of hardware architectures. Meanwhile, algorithms researchers compete to prove mathematically whose procedure is the most efficient.</p>
+<p>Here, I touch on a few mid-level patterns that are often used to speed up a game. <a href="data-locality.html">Data Locality</a> introduces you to the modern computer&#x2019;s memory hierarchy and how you can use it to your advantage. The <a href="dirty-flag.html">Dirty Flag</a> pattern helps you avoid unnecessary computation while <a href="object-pool.html">Object Pools</a> help you avoid unnecessary allocation. <a href="spatial-partition.html">Spatial Partitioning</a> speeds up the virtual world and its inhabitants&#x2019; arrangement in space.</p>
+<!--
+Videogames are exciting in large part because they take us somewhere else. For a few minutes (or, let&#x2019;s be honest with ourselves, much longer), we become inhabitants of a virtual world. Creating these worlds is one of the supreme delights of being a game programmer.
+
+One aspect that most of these game worlds feature is *time*: the artificial world lives and breathes on its own cadence. As world builders, we must invent time and craft the gears that drive our game&#x2019;s great clock.
+
+The patterns in this section are tools for doing just that. A [Game Loop](game-loop.html) is the central axle that the clock spins on. Objects hear its ticking through [Update Methods](update-method.html). We can hide the computer&#x2019;s sequential nature behind a facade of snapshots of moments in time using [Double Buffering](double-buffer.html), so that the world appears to update simultaneously.
+-->
+
+<h2><a href="#the-patterns" name="the-patterns">The Patterns</a></h2>
+<ul>
+<li><a href="data-locality.html">Data Locality</a></li>
+<li><a href="dirty-flag.html">Dirty Flag</a></li>
+<li><a href="object-pool.html">Object Pool</a></li>
+<li><a href="spatial-partition.html">Spatial Partition</a></li>
+</ul>
+<p class="footer">&copy; 2009-2013 Bob Nystrom</p>
+</div>
+</body>
+<script src="jquery-1.10.1.min.js"></script>
+<script src="script.js"></script>
+</html>

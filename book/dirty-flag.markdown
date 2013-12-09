@@ -1,5 +1,5 @@
 ^title Dirty Flag
-^section Optimizing Patterns
+^section Optimization Patterns
 
 ## Intent
 
