@@ -11,9 +11,20 @@ We've been lied to. They keep showing us charts where CPU speed goes up and up e
 
 Chips *have* been getting faster (though even that's plateauing now), but the hardware heads failed to mention something. Sure, we can *process* data faster than ever, but we can't *get* that data faster.
 
-**TODO: graph of processor and memory speeds**
+<span name="legend"></span>
 
-For your super-fast CPU to blow through a ream of calculations, it actually has to get the data out of main memory and into registers. It turns out that RAM hasn't been keeping up with increasing CPU speeds. Not even close.
+<img src="images/data-locality-chart.png" />
+
+<aside name="legend">
+
+Processor and RAM speed relative to their respective speeds in 1980. As you can see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.
+
+Data for this is from "Computer architecture: a quantitative approach"
+by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht's "[Pitfalls of Object-Oriented Programming](http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf)".
+
+</aside>
+
+For your super-fast CPU to blow through a ream of calculations, it actually has to get the data out of main memory and into registers. As you can see, RAM hasn't been keeping up with increasing CPU speeds. Not even close.
 
 With today's hardware, it can take *hundreds* of cycles to fetch a byte of data from <span name="ram">RAM</span>. If most instructions need data, and it takes hundreds of cycles to get it, how is that our CPUs aren't sitting idle 99% of the time waiting for data?
 
@@ -80,15 +91,17 @@ Modern hardware actually has multiple levels of caching, which is what they mean
 
 </aside>
 
-This little chunk of memory is called a *cache* (in particular, the chunk on the chip is your *L1 cache*) and in my belabored analogy, its part was played by the pallet of boxes. Whenever your chip needs a byte of data from RAM, it automatically grabs a whole chunk of contiguous memory -- usually around 64 to 128 bytes -- and puts it in the cache. This dollop of memory is called a <span name="pallet">*cache line*</span>.
+This little chunk of memory is called a *cache* (in particular, the chunk on the chip is your *L1 cache*) and in my belabored analogy, its part was played by the pallet of boxes. Whenever your chip needs a byte of data from RAM, it automatically grabs a whole chunk of contiguous memory -- usually around 64 to 128 bytes -- and puts it in the cache. This dollop of memory is called a *cache line*.
+
+<img src="images/data-locality-cache-line.png" />
+
+If the <span name="pallet">next byte</span> of data you need happens to be in that chunk, the CPU reads it straight from the cache, which is *much* faster than hitting RAM. Successfully finding a piece of data in the cache is called a *cache hit*. If it can't find it in there and has to go to main memory, that's a *cache miss*.
 
 <aside name="pallet">
 
-There's one detail I glossed over in the analogy. In your office, there was only room for one pallet, or one cache line. A real cache contains a number of cache lines. The details about how those work is out of scope here, but search for "cache associativity" to feed your brain.
+I glossed over (at least) one detail in the analogy. In your office, there was only room for one pallet, or one cache line. A real cache contains a number of cache lines. The details about how those work is out of scope here, but search for "cache associativity" to feed your brain.
 
 </aside>
-
-If the next byte of data you need happens to be in that chunk, the CPU reads it straight from the cache, which is *much* faster than hitting RAM. Successfully finding a piece of data in the cache is called a *cache hit*. If it can't find it in there and has to go to main memory, that's a *cache miss*.
 
 When a cache miss occurs, the CPU *stalls*: it can't process the next instruction because needs data. It sits there, bored out of its mind for a few hundred cycles until the fetch completes. Our mission is to avoid that. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
 
@@ -130,13 +143,11 @@ There's a key assumption here, though: one thread. If you are accessing nearby d
 
 </aside>
 
-In other words, if your code is crunching on A then B then C, you want them laid out in memory like this:
+In other words, if your code is crunching on `Thing` then `Another` then `Also`, you want them laid out in memory like this:
 
-    +---+---+---+
-    | a | b | c |
-    +---+---+---+
+<img src="images/data-locality-things.png" />
 
-Note, these aren't *pointers* to A, B, and C. This is the actual data for them, in place, lined up one after the other. As soon as the CPU reads in A, it will start to get B and C too (depending on how big they are and how big a cache line is). When you start working on them next, they'll already be cached. Your chip is happy and you're happy.
+Note, these aren't *pointers* to `Thing`, `Another`, and `Also`. This is the actual data for them, in place, lined up one after the other. As soon as the CPU reads in `Thing`, it will start to get `Another` and `Also` too (depending on how big they are and how big a cache line is). When you start working on them next, they'll already be cached. Your chip is happy and you're happy.
 
 ## The Pattern
 
@@ -218,7 +229,15 @@ Before you ever heard of a CPU cache, this looked totally innocuous. But by now 
 
 The scary part is we have no idea how any of these objects are laid out in memory. We're completely at the mercy of the memory manager. As entities get allocated and freed over time, the heap is likely to become increasingly randomly organized.
 
-**TODO: illustration**
+<span name="lines"></span>
+
+<img src="images/data-locality-pointer-chasing.png" />
+
+<aside name="lines">
+
+Every frame, the game loop has to follow all of those arrows to get to the data it cares about.
+
+</aside>
 
 If our goal was to take a whirlwhind tour around the game's address space like some "256MB of RAM in Four Nights!" cheap vacation package, this would be a fantastic deal. But our goal is to run the game quickly, and <span name="chase">traipsing</span> all over main memory is *not* the way to do that. Remember that `sleepFor500Cycles()` function? Well this code is effectively calling that *all the time*.
 
@@ -246,17 +265,21 @@ My least favorite part about using components is how long the word "component" i
 
 Let me just stress that these are arrays of *components* and not *pointers to components*. The data is all there, one byte after the other. The game loop can then walk these directly:
 
+<span name="arrow"></span>
+
 ^code game-loop-arrays
-
-We've ditched all of that <span name="arrow">pointer chasing</span>. Instead of skipping around in memory, we're doing a straight crawl through three contiguous arrays. This pumps a solid stream of bytes right into the hungry maw of the CPU. In my testing, this change made the update loop fifty *times* faster than the previous version.
-
-**TODO: illustration**
 
 <aside name="arrow">
 
-One hint that we're doing better here is how few `->` operators there are in the new code. If you're optimizing for data locality, indirection operators are a code smell.
+One hint that we're doing better here is how few `->` operators there are in the new code. If you want to improve data locality, look for indirection operators you can get rid of.
 
 </aside>
+
+We've ditched all of that pointer chasing. Instead of skipping around in memory, we're doing a straight crawl through three contiguous arrays.
+
+<img src="images/data-locality-component-arrays.png" />
+
+This pumps a solid stream of bytes right into the hungry maw of the CPU. In my testing, this change made the update loop fifty *times* faster than the previous version.
 
 Interestingly, we haven't lost much encapsulation here. Sure, the game loop is updating the components directly instead of going through the game entities, but it was doing that before to ensure they were processed in the right order. Even so, each component itself is still nicely encapsulated. It owns its own data and methods. We just changed the way it's used.
 
@@ -358,41 +381,41 @@ We could conceivably ditch the pointer too by having parallel arrays for the hot
 
 </aside>
 
-You can see how this starts to get fuzzy though. In my example here, it's pretty obvious which data should be hot and cold, but it's rarely so clear cut. What if you have fields that are used when an entity is in a certain mode but not in others? What if entities use a certain chunk of data only when they're in certain parts of the level?
+You can see how this starts to get fuzzy, though. In my example here, it's pretty obvious which data should be hot and cold, but it's rarely so clear cut. What if you have fields that are used when an entity is in a certain mode but not in others? What if entities use a certain chunk of data only when they're in certain parts of the level?
 
 Doing this kind of optimization is somewhere between a black art and a rathole. It's easy to get sucked in and spend endless time pushing data around to see what speed difference it makes. It will take practice to get a handle on where to spend your effort.
 
 ## Design Decisions
 
-This pattern is really about a mindset: it's getting you to think about your data's arrangement in memory as a key part of your game's performance story. The actual concrete design space is wide open. You can let <span name="dod">data locality</span> affect your whole design philosophy, or maybe it's just a localized pattern you apply to a few core data structures.
+This pattern is really about a mindset: it's getting you to think about your data's arrangement in memory as a key part of your game's performance story. The actual concrete design space is wide open. You can let <span name="dod">data locality</span> affect your whole architecture, or maybe it's just a localized pattern you apply to a few core data structures.
 
-The biggest question you'll need to answer is when and where you apply this pattern, but here are a couple of specific ones that may come up.
+The biggest question you'll need to answer is when and where you apply this pattern, but here are a couple of others that may come up.
 
 <aside name="dod">
 
-Noel Llopis' [famous article](http://gamesfromwithin.com/data-oriented-design) that got a lot more people thinking about designing games around data locality and cache-friendliness calls this "data-oriented design".
+Noel Llopis' [famous article](http://gamesfromwithin.com/data-oriented-design) that got a lot more people thinking about designing games around cache usage calls this "data-oriented design".
 
 </aside>
 
 ### How do you handle polymorphism?
 
-Up to this point, we've avoided subclassing and virtual methods. We assumed we have nice packed arrays of *homogenous* objects. That way, we know they're all the exact same size. But polymorphism and dynamic dispatch are useful tools, too. How do we merge them?
+Up to this point, we've avoided subclassing and virtual methods. We assumed we have nice packed arrays of *homogenous* objects. That way, we know they're all the exact same size. But polymorphism and dynamic dispatch are useful tools, too. How do we reconcile this?
 
 **Don't:**
 
 The simplest answer is to just avoid subclassing, or at least avoid it in places where you're optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.
 
-  * *It's safe and easy.* You know exactly what class you're dealing with and all objects are obviously the same size. If you don't need polymorphism, don't use it.
+  * *It's safe and easy.* You know exactly what class you're dealing with and all objects are obviously the same size.
 
   * *It's faster.* Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. That can be an instruction cache miss. While the cost of this varies widely across different hardware, there is <span name="cpp">*some*</span> cost to dynamic dispatch.
 
 <aside name="cpp">
 
-As usual, the only absolute is that there are no absolutes. In most cases, a C++ compiler will require an indirection for a virtual method call. But in *some* cases, the compiler may be able to do *devirtualization* and statically call the right method if it knows what concrete type it will be. Devirtualization is even more common in just-in-time compilers for languages like Java.
+As usual, the only absolute is that there are no absolutes. In most cases, a C++ compiler will require an indirection for a virtual method call. But in *some* cases, the compiler may be able to do *devirtualization* and statically call the right method if it knows what concrete type the receiver is. Devirtualization is more common in just-in-time compilers for languages like Java and JavaScript.
 
 </aside>
 
-  * *It's inflexible.* Of course, the reason we use dynamic dispatch is because it gives us a powerful way to make a bunch of different objects behave differently. If you want different entities in your game to have their own rendering styles, or their own special moves and attacks, virtual methods are a nice way to model that. Having to instead stuff all of that code into a single non-virtual method that does something like a big `switch` gets messy quickly.
+  * *It's inflexible.* Of course, the reason we use dynamic dispatch is because it gives us a powerful way to vary behavior between objects. If you want different entities in your game to have their own rendering styles, or their own special moves and attacks, virtual methods are a proven way to model that. Having to instead stuff all of that code into a single non-virtual method that does something like a big `switch` gets messy quickly.
 
 **Use separate arrays for each type:**
 
@@ -400,20 +423,21 @@ We use polymorphism so that we can invoke behavior on an object whose type we do
 
 But that just raises the question of why mix the bag to begin with? Instead, why not just maintain separate homogenous collections for each type?
 
-  * *It keeps objects tightly packed.* Since each array only contains objects of one type, there's no padding or other weirdness.
+  * *It keeps objects tightly packed.* Since each array only contains objects of one class, there's no padding or other weirdness.
 
   * *You can statically dispatch.* Once you've got objects partitioned by type, you don't actually need polymorphism at all any more. You can use regular non-virtual method calls.
 
   * *You have to keep track of a bunch of collections.* If you have a lot of different object types, the overhead and complexity of maintaining separate arrays for each can be a chore.
 
-  * *You have to be aware of every type*. Since you have to maintain seprate collections for each type, you can't be decoupled from the *set* of types. Part of the magic of polymorphism is that it's *open-ended*: code that works with an interface can be completely decoupled from the potentially large set of types that implement that interface.
+  * *You have to be aware of every type*. Since you have to maintain separate collections for each type, you can't be decoupled from the *set* of classes. Part of the magic of polymorphism is that it's *open-ended*: code that works with an interface can be completely decoupled from the potentially large set of types that implement that interface.
 
 **Use a collection of pointers:**
 
 If you weren't worried about caching, this is the natural solution. Just have an array of pointers to some base class or interface type. All the polymorphism you could want, and objects can be whatever size they want.
 
   * *It's flexible.* The code that consumes the collection can work with objects of any type as long as it supports the interface you care about. It's completely open-ended.
-  * *It's less cache-friendly.* Of course, the whole reason we're discussing other options here is because this means cache-unfriendly pointer indirection. But, remember, if this code isn't performance critical, that probably doesn't matter.
+
+  * *It's less cache-friendly.* Of course, the whole reason we're discussing other options here is because this means cache-unfriendly pointer indirection. But, remember, if this code isn't performance critical, that's probably OK.
 
 ### How are game entities defined?
 
@@ -421,17 +445,17 @@ If you use this pattern in tandem with the <a href="components.html" class="patt
 
 The question then is how should it be represented? How does it keep track of its components?
 
-**Game entities are classes with pointers to their components:**
+**If game entities are classes with pointers to their components:**
 
-This is what our first example looked like. It's sort of the vanilla OOP solution. You've got a class for `GameEntity`, and it has pointers to the componentes each entity owns. Since they're just pointers, it's agnostic about where and how those components are actually organized in memory.
+This is what our first example looked like. It's sort of the vanilla OOP solution. You've got a class for `GameEntity`, and it has pointers to the components it owns. Since they're just pointers, it's agnostic about where and how those components are actually organized in memory.
 
   * *You can store components in contiguous arrays.* Since the game entity doesn't care where its components are, you can organize them in a nice packed array to optimize iterating over them.
 
-  * *Given an actor you can easily get to its components.* They're just a pointer indirection away.
+  * *Given an entity, you can easily get to its components.* They're just a pointer indirection away.
 
   * *Moving components in memory is hard.* When components get enabled or disabled, you may want to move them around in the array to keep the active ones up front and contiguous. If you move a component while the entity has a raw pointer to it, though, that pointer gets broken if you aren't careful. You'll have to make sure to update the entity's pointer at the same time.
 
-**Game entities are classes with IDs for their components:**
+**If game entities are classes with IDs for their components:**
 
 The challenge with raw pointers to components is that it makes it harder to move them around in memory. You can address that by using something more abstract: an ID or index that can be used to *look up* a component.
 
@@ -439,10 +463,7 @@ The actual semantics of the ID and lookup process are up to you. It could be as 
 
   * *It's more complex.* Your ID system doesn't have to be rocket science, but it's still more work than a basic pointer. You'll have to implement and debug it, and there will be memory overhead for bookkeeping.
 
-  * *It's slower*. It's hard to beat traversing a raw pointer. There may be some actual searching or hashing involved to get from an entity to one of its components. This may not matter much, though.
-
-    Remember, the game loop is working with the component arrays directly so it isn't going through this bottleneck. Code that *does* need to look up a
-    component given an entity may not be on your hot code paths.
+  * *It's slower*. It's hard to beat traversing a raw pointer. There may be some actual searching or hashing involved to get from an entity to one of its components.
 
   * *You'll need access to the component "manager".* The basic idea is that you have some abstract ID that identifies a component. You can use it to get a reference to the actual component object. But to do that, you need to hand that ID to something that can actually find the component. That will be the class that wraps your raw contiguous array of component objects.
 
@@ -454,13 +475,13 @@ You may be thinking, "I'll just make it a singleton! Problem solved!" Well, sort
 
 </aside>
 
-**The game entity is *itself* just an ID:**
+**If the game entity is *itself* just an ID:**
 
-This is a newer style that some game engines use. Once you've moved all of your entity's behavior and state out of the main class and into components, what's left? It turns out, not much. The only thing an entity does is bind a set of components together. It exists just to say *this* AI component and *this* physics component and *this* render component "go together".
+This is a newer style that some game engines use. Once you've moved all of your entity's behavior and state out of the main class and into components, what's left? It turns out, not much. The only thing an entity does is bind a set of components together. It exists just to say *this* AI component and *this* physics component and *this* render component define one living entity in the world.
 
-That's important because components interact. The render component needs to know where the entity is, which is likely a property of the physics component. The AI component wants to move the entity, so it needs to apply a force to the physics component. Each component needs a way to get the other sibling components of the entity it's a part of.
+That's important because components interact. The render component needs to know where the entity is, which may be a property of the physics component. The AI component wants to move the entity, so it needs to apply a force to the physics component. Each component needs a way to get the other sibling components of the entity it's a part of.
 
-Some smart people realized all you need for that is an ID. Instead of the entity knowing its components, the components know their entity. Each component knows the ID of the entity that owns it. When the AI component needs the physics component for its entity, it just asks for the physics component with the same entity ID as its own.
+Some smart people realized all you need for that is an ID. Instead of the entity knowing its components, the components know their entity. Each component knows the ID of the entity that owns it. When the AI component needs the physics component for its entity, it just asks for the physics component with the same entity ID that it holds.
 
 Your entity *classes* disappear entirely, replaced by a glorified wrapper around a number.
 
@@ -475,9 +496,9 @@ Your entity *classes* disappear entirely, replaced by a glorified wrapper around
 
     This time, though, it *is* performance critical. Components often interact with their siblings during update, so you will need to find components frequently. One solution is to make the "ID" of an entity just the index of the component in its array.
 
-    If every entity has the same set of components, then your component arrays are completely parallel. The component in slot three of the AI component array will be for the same entity that the physics component in slot three of its array is associated with.
+    If every entity has the same set of components, then your component arrays are completely parallel. The component in slot three of the AI component array will be for the same entity that the physics component in slot three of *its* array is associated with.
 
-    Keep in mind, though, that this *forces* you to keep those arrays in parallel. That's hard if you want to start sorting or packing them by different criteria. For example, you may have some entities with disabled physics and others that are invisible. There's no way to sort the physics and render component arrays optimally for both cases if they have to stay in sync with each other.
+    Keep in mind, though, that this *forces* you to keep those arrays in parallel. That's hard if you want to start sorting or packing them by different criteria. You may have some entities with disabled physics and others that are invisible. There's no way to sort the physics and render component arrays optimally for both cases if they have to stay in sync with each other.
 
 ## See Also
 
