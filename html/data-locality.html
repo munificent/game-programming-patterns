@@ -567,7 +567,12 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 <h3><a href="#how-do-you-handle-polymorphism" name="how-do-you-handle-polymorphism">How do you handle polymorphism?</a></h3>
 <p>Up to this point, we&#x2019;ve avoided subclassing and virtual methods. We assumed we have nice packed arrays of <em>homogenous</em> objects. That way, we know they&#x2019;re all the exact same size. But polymorphism and dynamic dispatch are useful tools, too. How do we reconcile this?</p>
 <p><strong>Don&#x2019;t:</strong></p>
-<p>The simplest answer is to just avoid subclassing, or at least avoid it in places where you&#x2019;re optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.</p>
+<p>The <span name="type">simplest</span> answer is to just avoid subclassing, or at least avoid it in places where you&#x2019;re optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.</p>
+<aside name="type">
+
+<p>One way to keep much of the flexibility of polymorphism without using subclassing is through the <a href="type-object.html" class="pattern">Type Object</a> pattern.</p>
+</aside>
+
 <ul>
 <li>
 <p><em>It&#x2019;s safe and easy.</em> You know exactly what class you&#x2019;re dealing with and all objects are obviously the same size.</p>

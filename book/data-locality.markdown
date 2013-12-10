@@ -405,7 +405,13 @@ Up to this point, we've avoided subclassing and virtual methods. We assumed we h
 
 **Don't:**
 
-The simplest answer is to just avoid subclassing, or at least avoid it in places where you're optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.
+The <span name="type">simplest</span> answer is to just avoid subclassing, or at least avoid it in places where you're optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.
+
+<aside name="type">
+
+One way to keep much of the flexibility of polymorphism without using subclassing is through the <a href="type-object.html" class="pattern">Type Object</a> pattern.
+
+</aside>
 
   * *It's safe and easy.* You know exactly what class you're dealing with and all objects are obviously the same size.
 
