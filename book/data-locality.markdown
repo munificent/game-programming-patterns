@@ -75,15 +75,15 @@ He loads the whole pallet and brings it to you. Disregarding concerns for workpl
 
 When you need a new box, now, the first thing you do is see if it's already on the pallet in your office. If it is, great! It just takes you a second to grab it and you're back to crunching numbers. If a pallet holds fifty boxes and you got lucky and *all* of the boxes you need happen to be on it, you can churn through fifty times more work than you could before.
 
-But, if you need a box that's *not* on the pallet, you're back to square one. Since you can only fit one pallet in your office, your warehouse friend will have to take that one back and then bring you entirely new one.
+But, if you need a box that's *not* on the pallet, you're back to square one. Since you can only fit one pallet in your office, your warehouse friend will have to take that one back and then bring you an entirely new one.
 
 ### A pallet for your CPU
 
-Strangely enough, this is similiar to how CPUs in modern computers work. In case it isn't obvious, you play the role of the CPU. Your desk is the CPU's registers, and the box of papers is the data you can fit in them. The warehouse is your machine's RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.
+Strangely enough, this is similar to how CPUs in modern computers work. In case it isn't obvious, you play the role of the CPU. Your desk is the CPU's registers, and the box of papers is the data you can fit in them. The warehouse is your machine's RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.
 
 If I were writing this chapter thirty years ago, the analogy would stop there. But as chips got faster and RAM, well, *didn't*, hardware engineers started looking for solutions. What they came up with was *CPU caching*.
 
-Modern computers have a <span name="caches">little chunk</span> of memory right inside the chip. It's small because it has to fit in the chip. The CPU can pull data from this much faster than it can main memory in large part because it's physically closer to the registers. The electrons have a shorter distance to travel.
+Modern computers have a <span name="caches">little chunk</span> of memory right inside the chip. It's small because it has to fit in the chip. The CPU can pull data from this much faster than it can from main memory, in large part because it's physically closer to the registers. The electrons have a shorter distance to travel.
 
 <aside name="caches">
 
@@ -103,7 +103,7 @@ I glossed over (at least) one detail in the analogy. In your office, there was o
 
 </aside>
 
-When a cache miss occurs, the CPU *stalls*: it can't process the next instruction because needs data. It sits there, bored out of its mind for a few hundred cycles until the fetch completes. Our mission is to avoid that. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
+When a cache miss occurs, the CPU *stalls*: it can't process the next instruction because it needs data. It sits there, bored out of its mind for a few hundred cycles until the fetch completes. Our mission is to avoid that. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
 
 ^code do-nothing
 
@@ -139,7 +139,7 @@ It all boils down to something pretty simple: whenever the chip reads some memor
 
 <aside name="line">
 
-There's a key assumption here, though: one thread. If you are accessing nearby data on multiple threads, it's faster to have it on *different* cache lines. If two threads try to use data on the same cache line, both cores have to do some costly sychronization of their caches.
+There's a key assumption here, though: one thread. If you are accessing nearby data on multiple threads, it's faster to have it on *different* cache lines. If two threads try to use data on the same cache line, both cores have to do some costly synchronization of their caches.
 
 </aside>
 
@@ -161,7 +161,7 @@ With this pattern specifically, you'll also want to be sure your performance pro
 
 The cheap way to profile is to manually add a bit of instrumentation that checks how much time has elapsed between two points in the code, hopefully using a precise timer. To catch cache misses, you'll want something a little more sophisticated. You really want to see how many cache misses are occurring and where.
 
-Fortunately, there are <span name="cachegrind">profilers</span> out that there report it. It's worth spending the time to get one of these working and make sure you understand the (surprisingly complex) numbers it throws at you before you do major surgery on your data structures.
+Fortunately, there are <span name="cachegrind">profilers</span> out there that report it. It's worth spending the time to get one of these working and make sure you understand the (surprisingly complex) numbers it throws at you before you do major surgery on your data structures.
 
 <aside name="cachegrind">
 
@@ -251,7 +251,7 @@ The term for wasting a bunch of time traversing pointers is "pointer chasing", w
 
 Let's do something better. Our first observation is that the only reason we follow a pointer to get to the game entity is so we can immediately follow *another* pointer to get to a component. `GameEntity` itself has no interesting state and no useful methods. The *components* are what the game loop cares about.
 
-Instead of a giant constellation of game entities and components scattered across the inky darkess of address space, we're going to get back down to Earth. We'll have a big array for each type of component: a flat array of AI components, another for physics, and another for rendering.
+Instead of a giant constellation of game entities and components scattered across the inky darkness of address space, we're going to get back down to Earth. We'll have a big array for each type of component: a flat array of AI components, another for physics, and another for rendering.
 
 Like this:
 
