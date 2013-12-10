@@ -612,7 +612,7 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 </li>
 </ul>
 <h3><a href="#how-are-game-entities-defined" name="how-are-game-entities-defined">How are game entities defined?</a></h3>
-<p>If you use this pattern in tandem with the <a href="components.html" class="pattern">Component</a> pattern, you&#x2019;ll have nice contiguous arrays for all of the components that make up your game entities. The game loop will be iterating over those directly, so the object for the game entity itself is less important, but it&#x2019;s still useful in other parts of the codebase where you want to work with a single conceptual "entity".</p>
+<p>If you use this pattern in tandem with the <a href="component.html" class="pattern">Component</a> pattern, you&#x2019;ll have nice contiguous arrays for all of the components that make up your game entities. The game loop will be iterating over those directly, so the object for the game entity itself is less important, but it&#x2019;s still useful in other parts of the codebase where you want to work with a single conceptual "entity".</p>
 <p>The question then is how should it be represented? How does it keep track of its components?</p>
 <p><strong>If game entities are classes with pointers to their components:</strong></p>
 <p>This is what our first example looked like. It&#x2019;s sort of the vanilla OOP solution. You&#x2019;ve got a class for <code>GameEntity</code>, and it has pointers to the components it owns. Since they&#x2019;re just pointers, it&#x2019;s agnostic about where and how those components are actually organized in memory.</p>

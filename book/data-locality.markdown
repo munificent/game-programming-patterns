@@ -443,7 +443,7 @@ If you weren't worried about caching, this is the natural solution. Just have an
 
 ### How are game entities defined?
 
-If you use this pattern in tandem with the <a href="components.html" class="pattern">Component</a> pattern, you'll have nice contiguous arrays for all of the components that make up your game entities. The game loop will be iterating over those directly, so the object for the game entity itself is less important, but it's still useful in other parts of the codebase where you want to work with a single conceptual "entity".
+If you use this pattern in tandem with the <a href="component.html" class="pattern">Component</a> pattern, you'll have nice contiguous arrays for all of the components that make up your game entities. The game loop will be iterating over those directly, so the object for the game entity itself is less important, but it's still useful in other parts of the codebase where you want to work with a single conceptual "entity".
 
 The question then is how should it be represented? How does it keep track of its components?
 
