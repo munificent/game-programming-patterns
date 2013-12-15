@@ -21,8 +21,10 @@
 
 int main (int argc, char * const argv[])
 {
+  /*
   UnbufferedSlapstick::testComedy();
   SpatialPartition::test();
+  */
   ObserverPattern::test();
   return 0;
 }

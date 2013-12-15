@@ -44,7 +44,7 @@
 		29AB1F331817291A004B501E /* prototype.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = prototype.h; sourceTree = SOURCE_ROOT; };
 		29B14848183F37820006AABE /* data-locality.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "data-locality.h"; sourceTree = SOURCE_ROOT; };
 		29BC60121779DA6C00C5D616 /* expect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = expect.h; sourceTree = SOURCE_ROOT; };
-		29F2A2A616E63EBB005803DA /* gpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = gpp; path = cpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		29F2A2A616E63EBB005803DA /* cpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		29FA84A017EDEC6D00D5519E /* flyweight.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flyweight.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -70,7 +70,7 @@
 		29F2A2A716E63EBB005803DA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				29F2A2A616E63EBB005803DA /* gpp */,
+				29F2A2A616E63EBB005803DA /* cpp */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -97,9 +97,9 @@
 				299FBF6F17D988660018EFD3 /* dirty-flag.h */,
 				29FA84A017EDEC6D00D5519E /* flyweight.h */,
 				292FD0FD180392A6003CE36E /* command.h */,
-				298A366118134C080009A9D6 /* observer.h */,
 				29AB1F331817291A004B501E /* prototype.h */,
 				29B14848183F37820006AABE /* data-locality.h */,
+				298A366118134C080009A9D6 /* observer.h */,
 			);
 			name = cpp;
 			path = gpp;
@@ -122,7 +122,7 @@
 			);
 			name = cpp;
 			productName = gpp;
-			productReference = 29F2A2A616E63EBB005803DA /* gpp */;
+			productReference = 29F2A2A616E63EBB005803DA /* cpp */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -167,7 +167,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -184,8 +184,10 @@
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -198,7 +200,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -209,8 +211,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;

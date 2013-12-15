@@ -8,6 +8,14 @@ void use(const T& obj) {
   // Do nothing.
 }
 
+#define ASSERT(condition) \
+    if (!(condition)) \
+    { \
+      std::cout << "FAIL: " #condition << "\n" << __FILE__ \
+                << ":" << __LINE__ << std::endl; \
+      abort(); \
+    }
+
 void assert(bool condition) {
   if (!condition) {
     printf("WTF\n");

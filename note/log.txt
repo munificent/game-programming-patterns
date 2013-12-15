@@ -1,3 +1,8 @@
+2013-12-14 - 876 words outline observer
+2013-12-13 - ~400 words outline observer + research
+2013-12-12 - unit tests and "pooled binding" sample code for observer
+2013-12-11 - work on sample code for observer
+2013-12-10 - take pull request for #53, fix #51, #54, #55
 2013-12-09 - post chapter online, tweet, reddit, mailing list
 2013-12-08 - 1928 words, finish data locality! optimization patterns intro
 2013-12-07 - photoshop illustrations
