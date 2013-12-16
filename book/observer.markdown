@@ -91,7 +91,7 @@
 - of course, not trying to say panacea. will talk a bit about why might not
   want to use it
 
-## too heavyweight
+### too heavyweight
 
 - talked to some people who heard of pattern but don't know details.
 - impresision was it was too "heavyweight" or "slow".
@@ -103,7 +103,7 @@
 - tiny bit of overhead compared to static method call, but pretty tiny.
 - just virtual method calls, no magic. no rpcs, serializations, etc.
 
-## too slow
+### too slow
 
 - similar to previous section. concern above was "slow" in sense of performance
 - doing too much work.
@@ -139,7 +139,7 @@
 - if really worried about blocking in handlers, then queueing *is* what you
   want. see message queue
 
-## too much dynamic alloc
+### too much dynamic alloc
 
 - most other progs don't sweat this
 - but game devs care deeply about perf and memory
@@ -152,7 +152,9 @@
 - but we're smart, we can handle. here's two refinements to pattern that avoid
   dynamic alloc. add some complexity though. simpler first.
 
-## linked observers
+## implementation tricks
+
+### linked observers
 
 - basic idea of pattern is have one subject that needs to maintain list of
   observers so it can notify them
@@ -173,56 +175,150 @@
 - in practice, often good enough. while subject often has more than one observer,
   observer usually only observes one thing
 
-## binding pool
+### binding pool
 
+- what if don't want that limitation, but still want to avoid dynamic alloc?
+- can we have an observer sys that allows subject to have multiple observers
+  and observer to observe multiple subjects?
+- yes, we can!
+- bit complex, but walk through it
+- two key ideas:
+- 1. since doing many-to-many mapping, arbitrary possible pairs of bindings
+  between subject and obs. so will define object represents that
+- binding defines one pair of observer and subject
+- subject maintains list of bindings for every obj observing it
+- earlier, observer themselves were list, but now level of indirection
+- good because now we can have multiple bindings lists that contain same
+  observer
+- this gives us way to have many to many mapping
+- but seems like we still need dynamic alloc for bindings
+- key idea two: use an object pool
+- all bindings are stored in reusable pool
+- allocates its memory up front and reuses binding objects
+- clever bit is since bindings are linked list, can reuse that machinery for
+  free list
 
+## remaining problems
 
+- think those are pretty cool techniques to make observers more usable in
+  confines of games
+- still not panacea
+- two problems worth thinking about, one technical and one more abstract
 
+### destruction
+
+- sample code up there side-stepped important issue: what happens when subject
+  or observer gets deleted?
+- if naively delete observer, subject still has dangling pointer to it. if it
+  notifies, bad
+- destroying subject is easier since observer doesn't refer to it in most impl
+- even that can be problematic: observer may still expect to be notified. may
+  want to know when it gets destroyed
+- can solve this couple ways:
+- simplest is to do nothing: its observer's responsibility to unregister itself
+  from its subjects before being deleted.
+- since most observers already have some kind of reference to subject anyway,
+  usually simple to add a "removeListener" call in dtor.
+- likewise, subject can send one final dying breath notification when being
+  deleted in case observers want to know
+
+- if want something safer, can make observer automatically unregister itself
+  from subjects when destroyed. does require observer to maintain poitners to
+  all subjects its watching, which adds complexity.
+
+- may think not an issue in gc languages. nothing gets destroyed manually, so
+  no chance of notifying dead observer
+- kind of true: won't notify freed memory, but can cause other problem
+- called "lapsed listener"
+- even though observer object itself will not be explicitly deleted and will
+  stay in memory since subject is referring to it, doesn't mean it's still
+  *useful*.
+- consider case where observer is some UI screen.
+- subject is main character in game
+- showing some data about character: health and stuff
+- player exits screen
+- screen doesn't remember to unregister listener
+- at this point screen is gone, but subject still has ref to it
+- every time character health changes, sends notification
+- "zombie" screen receives notification, updates widgets and does other stuff
+  all the while totally pointless
+- lesson here is have to be disciplined about registration
+
+### what's going on
+
+- other problem with observer pattern comes directly from problem it solves:
+  gets rid of coupling
+- goal is to keep pieces of codebase decoupled
+- does that too well
+- if you actually need to trace behavior as it flows through codebase, can be
+  very hard
+- instead of seeing "ah, yes, A calls B here which then calls C"
+- have "A notifies". "uh, let me see if i can find what registers itself to
+  observe that. hmm, maybe B? i'll have to check in the debugger and see if it
+  actually is registered"
+- instead of being able to statically tell how code is wired together,
+  communication structure is emergent property of how things happened to be
+  imperatively registered at runtime
+- have worked with codebases that use observer very heavily for critical
+  behavior and can be nightmare trying to find out what's going on (or failing
+  to)
+
+- one rule of thumb is that if it's critical that a subject and observer to be
+  wired up for program to function correctly, observer is probably wrong fit
+- observer works best when subject really doesn't care if it is observed
+- lets you layer "secondary" behavior on top of core shell
+- if that secondary behavior is critical, more explicit coupling may be right
+  answer
+
+## functions?
+
+- in 90s when gof came out and oop was hotness, observer pattern made lot of
+  sense
+- today, oop is still huge, but fp also increasingly popular
+- programmers increasingly comfortable with functions, higher-order functions,
+  etc
+- leads to new ways to approach this
+- one facet of pattern rubs people wrong today is that observer is *class*
+- have to implement entire interface just to receive notification
+- feels really heavyweight. is!
+- makes it impossible to have one class that can observe different subjects with
+  different methods to handle it
+- more modern approach is to have observer just be *fn* or reference to method
+- in languages with first class fns, and especially closures, much more common
+  way to do observers
+- events in c# register fns, not objects
+- event listeners in js can be obects implementing informat eventlistener
+  interface, but can also just be fns. almost always use latter
+- can even do in c++ with pointers to member fns
+
+## reactive?
+
+- if write big program using lots of observers, one thing realize is that
+  observer code is often really dumb boilerplate:
+
+  - receives event that some state changes
+  - imperatively modify some piece of ui or other derived state to reflect new
+    state
+
+- after a while, really want to automate that
+- people been trying to make that happen for *long* time: "dataflow programming"
+- frp
+- lately, more humble approach "data binding" starting to actually work
+- more declarative approach
+- you say, "this piece of data or ui is derived from this other data using
+  this transformation"
+- it then automatically updates the derived stuff whenever original stuff changes
+- don't have to write imperative code or wire things up
+- starting to get some traction
+- when it works well, great
+- when it doesn't work well, really really awkward
+- general problem with declarative systems compared to imperative:
+- make 90% of cases easier, make 10% of remaining cases a eye-stabbing nightmare
+- part of appeal of observer pattern for me is simplicity and easy out here
+- sure, not as advanced as data binding, but when need to dip into imperative
+  code or manually wiring stuff up, doesn't get in way
 
 ---
-
-random notes:
-
-originally intended to write chapter to address two complaint with observer:
-
-1. it's unpredictable because you don't know when a notification happens. can
-   be slow.
-
-here, just wanted to show normal implementation is synchronous and
-deterministic. doesn't have to pump message loop, use threads, etc.
-
-2. it requires dynamic allocation when adding.
-
-i *thought* i had a solution for this that cleverly threaded the list of
-observers through the observers themselves. but that has the unpleasant
-side effect that a given observer can only observe one object.
-
-maybe that's ok? talk about specific 1-many observable/observer design.
-
-another option is to talk about using an object pool for the observer/obserable
-pair objects.
-
-also discuss using generic callbacks instead of having to implement interface.
-
-talk about reactive programming.
-
-useful for things where observable doesn't care if being observed. rule of thumb
-is if subject needs to be observed, then shouldn't use pattern.
-
-one problem is you can get too many updates: make five small changes to subject
-and each one triggers wave of notifications. since it's synchronous, can't
-batch them. see message queue.
-
-what happens when observer is deleted?
-- subject still has reference to it.
-- option: do nothing. get dangling pointer. observer is responsible for
-  unregistering itself from everything it's observing before going away.
-- option: use some kind of smart pointer.
-- option: observer has reference to subject and automatically unregisters self.
-  harder if observer can observe multiple subjects.
-- for book, should probably just note problem and go with first solution.
-
-
 
 http://www.gotw.ca/gotw/083.htm
 http://molecularmusings.wordpress.com/2011/09/19/generic-type-safe-delegates-and-events-in-c/
