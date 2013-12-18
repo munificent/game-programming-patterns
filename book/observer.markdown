@@ -1,46 +1,125 @@
 ^title Observer
 ^section Design Patterns Revisited
 
-*Sorry, this chapter hasn't been written yet!*
+The Observer
+pattern is one of the most wildly successful programming patterns in existence.
+It was <span name="devised">devised</span> in tandem with the larger Model-View-Controller architecture
+which is structure underlying countless applications.
 
-- intro
-    - outside of games, observer one of most successful design patterns in existence.
-    - key piece of mvc which is dominant paradigm for client applications.
-    - now that web is becoming more app-like, becoming critical there.
-    - so important, java put in core lib, c# added first-class language support for it.
-    - often called "events" or "notifications".
-    - specific use of it popular now called "data binding".
+<aside name="devised">
 
-## achievements
+Like so many things in software, it was invented by Smalltalkers in the seventies.
+Lispers probably came up with in the sixties and didn't bother writing it down.
 
-- one of patterns part of collective unconscious of devs, so feels weird to
-  explain
-- walk through example
-- say you're adding an achievement sys to game
-- lots of different achievements: number of enemies killed, first time you
-  kill certain enemy, use item, etc.
-- tricky to implement cleanly since so many parts of game behavior may trigger
-  achievement
-- really don't want tendrils of achievement sys wound through entire codebase
-- ultimately, achievement triggered by something "happening" in game engine.
-- may require other data analysis to tell if achievement was unlocked, but
-  always some final bit to trigger
-- for example, "killed 100 monkey demon" achievement needs to track how many
-  monkey demons you've killed. but achievement will always be triggered when
-  100th one dies
-- would be cool if game engine could just holler, "hey, killed something!"
-- doesn't care if anything listens, doesn't even know. just sends general
-  notification.
-- achievement system could then watch this notification.
-- when enemy is killed, it gets notified and it can look through bookkeeping
-  data. "oh, that was demon monkey. how many have we killed so far? oh 99, this
-  is it!"
-- this way, game engine totally unaware of achievement system. could remove it
-  completely without changing game code.
-- can add new achievements without touching rest of engine (assuming doesn't
-  need to be triggered by new *kind* of change.)
+</aside>
 
-## observer pattern
+As web pages have started to become web applications, it's becoming widely used there too. It's so important that Java put it in its core library ([`java.util.Observer`](http://docs.oracle.com/javase/7/docs/api/java/util/Observer.html)) and C# baked them right into the *language* (the [`event`](http://msdn.microsoft.com/en-us/library/8627sbea.aspx) keyword).
+
+But the world of game development can be strangely cloistered at times. Just in case you haven't left the abbey in a while, let me walk you through a motivating example.
+
+## Achievement Unlocked
+
+Say you're adding an achievements system to your game. These will be dozens of different badges players can earn for completing certain specific milestones, like "Kill 100 Monkey Demons", "Fire a Shotgun in the Dark", "Fall of a Bridge", or "Chug Ten Cans of Nutri-Beer".
+
+This is tricky to implement cleanly since you have such a wide range of achievements that can be unlocked by varying but very specific behaviors. You really don't want tendrils of your achievement system twining their way through every dark corner of your codebase. Sure, "Fall of a Bridge" is somehow tied to the <span name="physics">physics engine</span>, but do you really want to see a call to `unlockFallOffBridge()` right in the middle of the linear algebra in your collision resolution algorithm?
+
+<aside name="physics">
+
+This is a rhetorical question. No self-respecting physics programmer would ever let you sully their beautiful mathematics with something as pedestrian as *gameplay*.
+
+</aside>
+
+What we'd like, as always, is to have all the code concerned with one aspect of the game nicely lumped in one place. The challenge is that achievements are triggered by a bunch of different parts of the game. How can that work without coupling the achievement code to all of these?
+
+That's what the observer pattern is for. It's a pattern for letting one piece of code trigger a notification that something happened *without actually caring who gets the notification*. For example, you've got some gameplay code that handles the combat mechanics, dishes out damage, and decides who has seen their last sunrise.
+To handle the "Kill 100 Monkey Demons" achievement, you could just jam the code right in there, but that's a mess. Instead, the code that handles death just does:
+
+    if (entity->health() <= 0)
+    {
+      notify(EVENT_ENTITY_DIED, entity);
+    }
+
+All it does is say, "Uh, I don't know if anyone cares, but this thing died. Do with that as you will."
+
+The little achievement engine then registers itself to receive that notification. Whenever the gameplay code sends that notification, the achievement code receives it. It then has the bookkeeping data to track how many demon monkeys you've previously vanquished. When it hits 100, it unlocks the proper achievement and sets of the fireworks and fanfare, all with no involvement from the gameplay code.
+
+In fact, you change the set of achievements or tear out the entire achievement system without touching a line of gameplay code. It will still send out its notifications, oblivious to the fact that nothing may be receiving them anymore.
+
+## What's the Catch?
+
+This sounds pretty swell, and the pattern is certainly successful. But within
+games, it seems to have gotten a mixed reception. Part of this is the observer
+pattern usually rides along with MVC, and that isn't very popular in games.
+
+Any large software project has to be broken into relatively independent pieces
+if it's going to be developed by a large team. People can't get work done if
+they're constantly stepping on each other's toes. Melvin Conway tells us:
+
+<span name="conway"></span>
+
+> Any organization that designs a system ... will inevitably produce a design whose structure is a copy of the organization's communication structure.
+
+<aside name="conway">
+
+While he didn't have the hubris to call it "Conway's Law", he coined this in his well-known paper "[How Do Committees Invent?](http://www.melconway.com/research/committees.html)". It's well worth reading.
+</aside>
+
+This has been enshrined as "Conway's Law" and most people consider it a tongue-in-cheek observation of the foibles of office politics. But Conway was serious here, and it is quite true: if two parts of a program need to interact, the people writing those two parts will probably have to talk to each other.
+
+So, if you're trying to figure out how to break your huge programming project down into small pieces of work you can assign to people, one easy way to do it is to ask, "What are my different people good at?"
+
+In enterprise software, user interface programming skill is relatively uncommon. There are many talented "band-end" engineers who are actively hostile to doing UI work. Meanwhile, the engineers who *do* have the rare gift of making software that's joyful to use are usually discinclined to work on code that's deep in the bowels of the program and far removed from end users.
+
+It should come as no suprise that the model-view-controller paradigm is popular there. The architecture directly reflects the separation between front-end and back-end programmers. The observer pattern is a particularly good fit because the communication is mostly one way: I don't know about you, but most of the back-end programmers I've met don't even want to know what the UI folks are doing.
+
+The skill breakdown in games is a little more varied. Because games, especially top-tier ones, are quite technically challenging in a bunch of a different ways, large game teams have a slew of <span name="specialists">specialists</span>. You've got people who only do graphics and shaders, others who live and breathe physics, maybe a dedicated audio coder, AI engineers, and then the catch-all "gameplay" programmer.
+
+<aside name="specialists">
+
+Looking at things this way, it's no surprise the <a href="component.html" class="pattern">Component</a> is so popular: it slices up your codebase directly along the lines of your org chart, just like Conway predicted.
+
+</aside>
+
+Without a clear front-end/back-end separation, cramming MVC into a game is hard, so the observer pattern hasn't gotten a free ride there. When I ask other game programmers if they use it, some simply haven't heard of it. Some do use it, but I also hear the same couple of explanations for why they avoid it:
+
+ *  "It's too heavyweight." When some piece of code needs to interact with
+    another, they feel the observer pattern adds a lot of overhead, both
+    conceptually and computationally.
+
+ *  "It's too laggy." Since "observer" often gets mixed up with "events" and
+    "messages" and other asynchronous communication systems, some people worry
+    that using the observer pattern will add unacceptable delays between when
+    a notification is sent and when it's received.
+
+ *  "It does too much dynamic allocation." Games are one of the few domains
+    where programmers still focus heavily on memory allocation. Since an object
+    sending notifications may need to send it to several listeners, they worry
+    about the memory churn of dynamically allocating that list.
+
+ *  "It's *too* decoupled." While avoiding coupling is the *goal* here, some
+    feel that it makes a program too hard to reason about. When you're trying
+    to trace some behavior as it flows through the system, direct call chains
+    are easy to follow. If everything is wired up at runtime using observers,
+    the communication structure of the game is an emergent property of how
+    which listeners were registered to which objects. That can make it much
+    harder to figure out why something isn't working just be looking at the
+    code.
+
+My goal with this chapter is to try to have answers for at least the first
+three concerns here. That's not to say they aren't valid, but I think they can
+often be addressed. The fourth one is a real challenge, and we'll talk about
+that some too.
+
+## are too heavyweight?
+
+- talked to some people who heard of pattern but don't know details.
+- impresision was it was too "heavyweight" or "slow".
+- direct calls, even if adding coupling would be better.
+- somehow notifying observers without coupling them seemed like magic, and magic
+  is synomym for "weird code that will be slow and hard to debug"
+- here's actual pattern:
+
+### actual observer pattern
 
 - observer pattern is class pattern for doing this
 - have a "subject" -- thing doing something noteworthy. in example, this is
@@ -55,55 +134,11 @@
 - all subject knows is that it *can* be observed, and minimal machinery to
   notify.
 
-## sounds great
-
-- sounds awesome, and pattern certainly successful outside of games.
-- seems to be mix reception in games.
-- part of this is mvc not as popular in games.
-- large projects must be broken into relatively independent pieces if going to
-  be developed by large team. (conway's law)
-- mvc worked well in business. people with ux expertise often not same as people
-  with data skills, or server skills.
-- skill breakdown among game devs is different. more domain: render, physics,
-  ai, audio. part of why component pattern so popular: follows inclinations of team.
-
-- of course, different parts of game codebase need to communicate too
-- why not observer? some games do use it, but not that many.
-- unfamiliarity one reason: tend to do things other people do.
-- asked around once, and heard a few concrete reasons:
-
-- too heavyweight
-  - when a needs to talk to b, observer pattern adds lot of overhead
-- too slow part two
-  - worry that don't know when observer will receive notification after subject
-    sends it
-  - does it just go in some queue or something?
-- too much dynamic allocation
-  - subject needs list of observers, which can grow and shrink over time.
-  - game devs hate allocation
-- too decoupled
-  - "action at a distance"
-  - hard to tell who will actually get notified
-  - hard to trace flow of stuff through codebase
-
-- will try to have answer for first three. fourth is real concern we'll talk
-  about
-- of course, not trying to say panacea. will talk a bit about why might not
-  want to use it
-
-### too heavyweight
-
-- talked to some people who heard of pattern but don't know details.
-- impresision was it was too "heavyweight" or "slow".
-- direct calls, even if adding coupling would be better.
-- somehow notifying observers without coupling them seemed like magic, and magic
-  is synomym for "weird code that will be slow and hard to debug"
-- but since seen actual details above, obviously not that heavyweight.
 - just walking a list and calling virtual functions
 - tiny bit of overhead compared to static method call, but pretty tiny.
 - just virtual method calls, no magic. no rpcs, serializations, etc.
 
-### too slow
+## are too slow?
 
 - similar to previous section. concern above was "slow" in sense of performance
 - doing too much work.
@@ -139,7 +174,7 @@
 - if really worried about blocking in handlers, then queueing *is* what you
   want. see message queue
 
-### too much dynamic alloc
+## too much dynamic alloc?
 
 - most other progs don't sweat this
 - but game devs care deeply about perf and memory
@@ -151,8 +186,6 @@
   valid concern
 - but we're smart, we can handle. here's two refinements to pattern that avoid
   dynamic alloc. add some complexity though. simpler first.
-
-## implementation tricks
 
 ### linked observers
 
@@ -198,7 +231,7 @@
 - clever bit is since bindings are linked list, can reuse that machinery for
   free list
 
-## remaining problems
+## any remaining problems?
 
 - think those are pretty cool techniques to make observers more usable in
   confines of games
@@ -296,9 +329,9 @@
 - if write big program using lots of observers, one thing realize is that
   observer code is often really dumb boilerplate:
 
-  - receives event that some state changes
-  - imperatively modify some piece of ui or other derived state to reflect new
-    state
+    - receives event that some state changes
+    - imperatively modify some piece of ui or other derived state to reflect new
+      state
 
 - after a while, really want to automate that
 - people been trying to make that happen for *long* time: "dataflow programming"
