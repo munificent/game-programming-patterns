@@ -5,6 +5,124 @@ namespace ObserverPattern
 {
   using namespace std;
 
+  namespace Pattern
+  {
+    static const int SURFACE_BRIDGE = 0;
+
+    class Entity {
+    public:
+      bool isHero() const { return false; }
+      bool isStandingOn(int surface) const { return false; }
+    };
+
+    enum Event
+    {
+      EVENT_ENTITY_FELL
+    };
+
+    enum Achievement
+    {
+      ACHIEVEMENT_FELL_OFF_BRIDGE
+    };
+
+    //^observer
+    class Observer
+    {
+    public:
+      virtual ~Observer() {}
+
+      virtual void onNotify(const Entity& entity, Event event) = 0;
+    };
+    //^observer
+
+    //^achievements-observer
+    class Achievements : public Observer
+    {
+    protected:
+      void onNotify(const Entity& entity, Event event)
+      {
+        switch (event)
+        {
+        case EVENT_ENTITY_FELL:
+          if (entity.isHero() && heroIsOnBridge_)
+          {
+            unlock(ACHIEVEMENT_FELL_OFF_BRIDGE);
+          }
+          break;
+
+          // Handle other events, and update heroIsOnBridge_...
+        }
+      }
+
+    private:
+      void unlock(Achievement achievement)
+      {
+        // Unlock if not already unlocked...
+      }
+
+      bool heroIsOnBridge_;
+    };
+    //^achievements-observer
+
+    static const int MAX_OBSERVERS = 10;
+
+    //^physics-list
+    //^physics-register
+    class Physics
+    {
+      //^omit physics-list
+    public:
+      //^omit physics-register
+      void notify(const Entity& entity, Event event);
+      //^omit physics-register
+      void addObserver(Observer* observer)
+      {
+        observers_[numObservers_++] = observer;
+      }
+
+      void removeObserver(Observer* observer)
+      {
+        int index;
+        for (index = 0; index < MAX_OBSERVERS; index++)
+        {
+          if (observers_[index] == observer) break;
+        }
+
+        if (index < numObservers_)
+        {
+          // Shift the following ones up.
+          for (; index < numObservers_ - 1; index++)
+          {
+            observers_[index] = observers_[index + 1];
+          }
+
+          numObservers_--;
+        }
+      }
+
+      // Other stuff...
+      //^omit physics-list
+      //^omit physics-register
+    private:
+      Observer* observers_[MAX_OBSERVERS];
+      int numObservers_;
+      //^omit physics-register
+    };
+    //^physics-list
+    //^physics-register
+
+    //^physics-notify
+    void Physics::notify(const Entity& entity, Event event)
+    {
+      for (int i = 0; i < numObservers_; i++)
+      {
+        observers_[i]->onNotify(entity, event);
+      }
+    }
+    //^physics-notify
+
+  }
+
   namespace One
   {
     class Observable;
@@ -406,7 +524,7 @@ namespace ObserverPattern
 
     int Listener::numEvents() const
     {
-
+      return 0; // ?
     }
 
     // TODO(bob): Destructors for all of these types.

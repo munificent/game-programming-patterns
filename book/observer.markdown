@@ -31,19 +31,76 @@ This is a rhetorical question. No self-respecting physics programmer would ever 
 
 What we'd like, as always, is to have all the code concerned with one aspect of the game nicely lumped in one place. The challenge is that achievements are triggered by a bunch of different parts of the game. How can that work without coupling the achievement code to all of these?
 
-That's what the observer pattern is for. It's a pattern for letting one piece of code trigger a notification that something happened *without actually caring who gets the notification*. For example, you've got some gameplay code that handles the combat mechanics, dishes out damage, and decides who has seen their last sunrise.
-To handle the "Kill 100 Monkey Demons" achievement, you could just jam the code right in there, but that's a mess. Instead, the code that handles death just does:
+That's what the observer pattern is for. It's a pattern for letting one piece of code trigger a notification that something happened *without actually caring who gets the notification*. For example, you've got some physics code that handles gravity and tracking which bodies are relaxing calmy on nice flat surfaces and which are plummeting towards sure demise. To handle the "Fall of a Bridge" achievement, you could just jam the code right in there, but that's a mess. Instead, the code that handles entity falling just does:
 
-    if (entity->health() <= 0)
+**TODO: make real code**
+
+    bool wasOnSurface = body->isOnSurface();
+    body->accelerate(GRAVITY);
+    body->update();
+    if (wasOnSurface && !body->isOnSurface())
     {
-      notify(EVENT_ENTITY_DIED, entity);
+      notify(EVENT_START_FALL, body);
     }
 
-All it does is say, "Uh, I don't know if anyone cares, but this thing died. Do with that as you will."
+All it does is say, "Uh, I don't know if anyone cares, but this thing just fell. Do with that as you will."
 
-The little achievement engine then registers itself to receive that notification. Whenever the gameplay code sends that notification, the achievement code receives it. It then has the bookkeeping data to track how many demon monkeys you've previously vanquished. When it hits 100, it unlocks the proper achievement and sets of the fireworks and fanfare, all with no involvement from the gameplay code.
+The little achievement engine then registers itself to receive that notification. Whenever the physics code sends that notification, the achievement code receives it. It then checks to see if the body is for the player. If so, it checks its own bookkeeping data to see what the less-than-graceful hero happened to be standing on prior to his encounter with classical mechanics. If it's a bridge, it unlocks the proper achievement and sets of the fireworks and fanfare, all with no involvement from the physics code.
 
-In fact, you change the set of achievements or tear out the entire achievement system without touching a line of gameplay code. It will still send out its notifications, oblivious to the fact that nothing may be receiving them anymore.
+In fact, you can change the set of achievements or tear out the entire achievement system without touching a line of gameplay code. It will still send out its notifications, oblivious to the fact that nothing may be receiving them anymore.
+
+## How it Works
+
+If you don't know the mechanics of the actual pattern, you can probably guess
+them just from the description, but do keep things easy on you, I'll just walk
+through it quickly.
+
+We'll start with the nosy class that wants to know when some other object does something interesting. It does this by implementing this:
+
+<span name="signature"></span>
+
+^code observer
+
+<aside name="signature">
+
+The actual signature of this method is totally up to you. That's why this is the Observer *pattern* and not the "Observer ready-made chunk of code you can just copy and paste into your game". Usually, the notify method takes the object that's sending the notification and some other generic "data" parameter that you can use to stuff whatever you want into.
+
+If you're using a language with generics or templates, you'll probably use them here, but it's also perfectly fine to have some more specifically tailored to your use case. Here, I'm just hardcoding it to take a game entity, and some arbitrary enum that describes what happened to the entity.
+
+</aside>
+
+A concrete class becomes an observer by implementing this interface. In our example, it's the achievement system, so you'd have something like this:
+
+^code achievement-observer
+
+It receives a notification by having its `onNotify()` method called by the object that's doing something interesting. In Gang of Four parlance, that's called the
+"Subject". In our example, it's the physics engine.
+
+The subject has two jobs. First, it holds the list of observers that are waiting oh-so-patiently for a missive from it:
+
+<span name="stl"></span>
+
+^code physics-list
+
+<aside name="stl">
+
+In real code, you would invariably use a dynamically-sized list or vector type here instead of a dumb array. I'm sticking with the basics here to keep things simple for people coming from other languages that don't know C++'s standard library.
+
+</aside>
+
+The important bit is that the subject exposes a *public* API for modifying that list:
+
+^code physics-register
+
+This way, outside code is responsible for adding *itself* to the list of observers that the subject will notify. This way, the subject can communicate to the observers without its code being coupled to them. That's the clever part about this pattern.
+
+Then, the last piece is actually sending the notification. The basic method for that is simple:
+
+^code physics-notify
+
+When the physics engine does something noteworthy, it calls that. It will then walk the observer list and give them all the heads up. Pretty simple, right? Just one class that maintains a list of pointers to instances of some interface.
+
+It's hard to believe that something so straightforward is the cornerstone of the architecture of thousands of programs and app frameworks.
 
 ## What's the Catch?
 
