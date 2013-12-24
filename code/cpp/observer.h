@@ -5,26 +5,60 @@ namespace ObserverPattern
 {
   using namespace std;
 
+  static const int SURFACE_BRIDGE = 0;
+
+  class Entity {
+  public:
+    bool isHero() const { return false; }
+    bool isStandingOn(int surface) const { return false; }
+  };
+
+  enum Event
+  {
+    EVENT_ENTITY_FELL
+  };
+
+  enum Achievement
+  {
+    ACHIEVEMENT_FELL_OFF_BRIDGE
+  };
+
+  class PhysicsBody
+  {
+  public:
+    bool isOnSurface() { return true; }
+    void accelerate(int force) {}
+    void update() {}
+  };
+
+  static const int GRAVITY = 1;
+  static const int EVENT_START_FALL = 1;
+
+  namespace Motivation
+  {
+    class Physics
+    {
+    public:
+      void updateBody(PhysicsBody& body);
+      void notify(int event, PhysicsBody& body) {}
+    };
+
+    //^physics-update
+    void Physics::updateBody(PhysicsBody& body)
+    {
+      bool wasOnSurface = body.isOnSurface();
+      body.accelerate(GRAVITY);
+      body.update();
+      if (wasOnSurface && !body.isOnSurface())
+      {
+        notify(EVENT_START_FALL, body);
+      }
+    }
+    //^physics-update
+  }
+
   namespace Pattern
   {
-    static const int SURFACE_BRIDGE = 0;
-
-    class Entity {
-    public:
-      bool isHero() const { return false; }
-      bool isStandingOn(int surface) const { return false; }
-    };
-
-    enum Event
-    {
-      EVENT_ENTITY_FELL
-    };
-
-    enum Achievement
-    {
-      ACHIEVEMENT_FELL_OFF_BRIDGE
-    };
-
     //^observer
     class Observer
     {
@@ -35,7 +69,7 @@ namespace ObserverPattern
     };
     //^observer
 
-    //^achievements-observer
+    //^achievement-observer
     class Achievements : public Observer
     {
     protected:
@@ -62,19 +96,16 @@ namespace ObserverPattern
 
       bool heroIsOnBridge_;
     };
-    //^achievements-observer
+    //^achievement-observer
 
     static const int MAX_OBSERVERS = 10;
 
-    //^physics-list
-    //^physics-register
-    class Physics
+    //^subject-list
+    //^subject-register
+    class Subject
     {
-      //^omit physics-list
+      //^omit subject-list
     public:
-      //^omit physics-register
-      void notify(const Entity& entity, Event event);
-      //^omit physics-register
       void addObserver(Observer* observer)
       {
         observers_[numObservers_++] = observer;
@@ -101,26 +132,135 @@ namespace ObserverPattern
       }
 
       // Other stuff...
-      //^omit physics-list
-      //^omit physics-register
+      //^omit subject-list
+      //^omit subject-register
+    protected:
+      void notify(const Entity& entity, Event event);
+
     private:
       Observer* observers_[MAX_OBSERVERS];
       int numObservers_;
-      //^omit physics-register
+      //^omit subject-register
     };
-    //^physics-list
-    //^physics-register
+    //^subject-list
+    //^subject-register
 
-    //^physics-notify
-    void Physics::notify(const Entity& entity, Event event)
+    //^subject-notify
+    void Subject::notify(const Entity& entity, Event event)
     {
       for (int i = 0; i < numObservers_; i++)
       {
         observers_[i]->onNotify(entity, event);
       }
     }
-    //^physics-notify
+    //^subject-notify
 
+    //^physics-inherit
+    class Physics : public Subject
+    {
+    public:
+      void updateBody(PhysicsBody& body);
+    };
+    //^physics-inherit
+
+    class PhysicsEvent : public Observer
+    {
+      Subject entityFell_;
+      Subject& entityFell() { return entityFell_; }
+
+      void onNotify(const Entity& entity, Event event) {}
+
+      void physicsEvent()
+      {
+        PhysicsEvent physics;
+
+        //^physics-event
+        physics.entityFell()
+          .addObserver(this);
+        //^physics-event
+      }
+    };
+  }
+
+  namespace LinkedObservers
+  {
+    //^linked-observer
+    class Observer
+    {
+      friend class Subject;
+
+    public:
+      Observer()
+      : next_(NULL)
+      {}
+
+      // Other stuff...
+      //^omit
+      void onNotify(const Entity& entity, Event event) {}
+      //^omit
+    private:
+      Observer* next_;
+    };
+    //^linked-observer
+
+    //^linked-subject
+    class Subject
+    {
+      // Methods...
+      //^omit
+      void addObserver(Observer* observer);
+      void removeObserver(Observer* observer);
+      void notify(const Entity& entity, Event event);
+      //^omit
+    private:
+      Observer* head_;
+    };
+    //^linked-subject
+
+    //^linked-add
+    void Subject::addObserver(Observer* observer)
+    {
+      observer->next_ = head_;
+      head_ = observer;
+    }
+    //^linked-add
+
+    //^linked-remove
+    void Subject::removeObserver(Observer* observer)
+    {
+      if (head_ == observer)
+      {
+        head_ = observer->next_;
+        observer->next_ = NULL;
+        return;
+      }
+
+      Observer* current = head_;
+      while (current != NULL)
+      {
+        if (current->next_ == observer)
+        {
+          current->next_ = observer->next_;
+          observer->next_ = NULL;
+          return;
+        }
+
+        current = current->next_;
+      }
+    }
+    //^linked-remove
+
+    //^linked-notify
+    void Subject::notify(const Entity& entity, Event event)
+    {
+      Observer* observer = head_;
+      while (observer != NULL)
+      {
+        observer->onNotify(entity, event);
+        observer = observer->next_;
+      }
+    }
+    //^linked-notify
   }
 
   namespace One
