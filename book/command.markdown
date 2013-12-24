@@ -246,6 +246,8 @@ If you're comfortable with a functional style, this way of doing things is natur
     The command could store a reference to that too, but that can be a waste
     of space when every command will end up using the same context. A lighter-weight option is to pass it in when you execute the command. This is what the <a class="pattern" href="context-parameter.html">Context Parameter</a> pattern is about.
 
+- You may end up with a lot of different command classes. In order to make it easier to implement those, it's often helpful to define a concrete base class with a bunch of convenient high-level methods that the derived commands can compose to define their behavior. That turns the command's main `execute` method into a <a href="subclass-sandbox.html" class="pattern">Subclass Sandbox</a>.
+
 - In our examples, we explicitly chose which actor would handle a command. In some cases, especially where your object model is hierarchical, it may not be so cut-and-dried. An object may respond to a command, or it may decide to pawn it off on some subordinate object. If you do that, you've got yourself a <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">Chain of Responsibility</a>.
 
 - Some commands are stateless chunks of pure behavior like the `JumpCommand` in the first example. In cases like that, having <span name="singleton">more</span> than one instance of that class wastes memory, since all instances are equivalent. The <a class="gof-pattern" href="flyweight.html">Flyweight</a> pattern addresses that.
