@@ -62,30 +62,45 @@ concrete type and the process used to locate it.
 
 ## When to Use It
 
-If a large number of places in the codebase need access to the same
-object and there isn't an obvious way for them to get it, this pattern
-is often a good solution. It's usually more flexible than a static
-class, and more maintainable than a <a class="gof-pattern"
-href="singleton.html">Singleton</a>.
+Anytime you make something globally accessible to every part of your program,
+you're asking for trouble. That's the main problem with the
+<a class="gof-pattern" href="singleton.html">Singleton</a> pattern, and this
+pattern is no different. My simplest advice for when to use a service locator
+is: *sparingly*.
 
-One limitation is that the implementation of the service doesn't know
-*who* is using it or what for. This means it must be able to work
-correctly in any circumstance. For example, a class that expects to
-only be used during the simulation portion of the game loop and not
-during rendering may not work as a service -- it wouldn't be able
-to ensure that it's being used at the right time. So, if our class
-only expects to be used within a certain context, it may be safest to
-avoid exposing it to the world with this pattern.
+Instead of using a global mechanism to give some code access to an
+object it needs, first consider *just passing the object to it*. That's dead
+simple, and it makes the coupling completely obvious. That will cover most of
+your needs.
+
+*But...* there are some times when manually passing around an object is
+gratuitous or actively makes code harder to read. Some systems, like logging
+or memory management, shouldn't be part of a module's public API. The
+parameters to your rendering code should have to do with *rendering*, not
+stuff like logging.
+
+Likewise, other systems represent facilities that are fundamentally singular
+in nature. Your game probably only has one audio device or display system
+that it can talk to. It is an ambient property of the environment, so plumbing
+it through ten layers of methods just so one deeply nested call can get to it
+is adding needless complexity to your code.
+
+In those kinds of cases, this pattern can help. As we'll see, it functions
+as a more flexible, more configurable cousin of the singleton. When used
+well, it can make your codebase more flexible with little runtime cost.
 
 ## Keep in Mind
 
-### The service is globally accessible
+### The service doesn't know who is locating it
 
-This pattern shares a problem with the classic <a class="gof-pattern"
-href="singleton.html">Singleton</a> pattern: it's *global.* This is
-convenient for code that needs the service, but opens the door to
-coupling and maintenance headaches if the wrong code starts using the
-service.
+Since the locator is globally accessible, any code in the game could be
+requesting a service and then poking at it. This means that service must
+be able to work correctly in any circumstance. For example, a class that
+expects to only be used during the simulation portion of the game loop
+and not during rendering may not work as a service -- it wouldn't be able
+to ensure that it's being used at the right time. So, if a class
+expects to only be used in a certain context, it's safest to
+avoid exposing it to the entire world with this pattern.
 
 ### The service actually has to be located
 
@@ -126,8 +141,8 @@ the service locator -- the class that ties the two together.
 
 ### A simple locator
 
-The implementation we'll see here is about the simplest kind of
-service locator you'll see:
+The implementation here is about the simplest kind of service locator
+you can define:
 
 <span name="di"></span>
 
@@ -140,8 +155,8 @@ bit of jargon for a very simple idea. Say you have one class
 that depends on another. In our case, our `Locator` class needs an
 instance of the `Audio` service. Normally, the locator would be
 responsible for constructing that itself. Dependency injection
-instead says that outside code is responsible for *giving* that
-dependent object to our locator (i.e. injecting it into it).
+instead says that outside code is responsible for *injecting* that
+dependency into the object that needs it.
 
 </aside>
 
@@ -152,9 +167,8 @@ of our `Audio` service to use:
 ^code 5
 
 The way it "locates" is very simple: it relies on some outside code
-somewhere to register a service provider with it before any other code
-tries to use the service. When the game is starting up, it will call
-some code like this:
+to register a service provider before any tries to use the service.
+When the game is starting up, it calls some code like this:
 
 ^code 11
 
@@ -239,8 +253,8 @@ will default to a null provider.
 Turning off audio is handy during development. It frees up some memory
 and CPU cycles. More importantly, when you break into a debugger just
 as a loud sound starts playing, it saves you from having your eardrums
-shredded. There's nothing like a scream sound effect looping every
-twenty milliseconds to get your blood flowing in the morning.
+shredded. There's nothing like twenty seconds of a scream sound effect
+looping at full volume to get your blood flowing in the morning.
 
 </aside>
 

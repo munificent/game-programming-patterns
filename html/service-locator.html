@@ -115,26 +115,38 @@ A separate <strong>service locator</strong> provides access to the service by
 finding an appropriate provider while hiding both the provider&#x2019;s
 concrete type and the process used to locate it.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
-<p>If a large number of places in the codebase need access to the same
-object and there isn&#x2019;t an obvious way for them to get it, this pattern
-is often a good solution. It&#x2019;s usually more flexible than a static
-class, and more maintainable than a <a class="gof-pattern"
-href="singleton.html">Singleton</a>.</p>
-<p>One limitation is that the implementation of the service doesn&#x2019;t know
-<em>who</em> is using it or what for. This means it must be able to work
-correctly in any circumstance. For example, a class that expects to
-only be used during the simulation portion of the game loop and not
-during rendering may not work as a service&thinsp;&mdash;&thinsp;it wouldn&#x2019;t be able
-to ensure that it&#x2019;s being used at the right time. So, if our class
-only expects to be used within a certain context, it may be safest to
-avoid exposing it to the world with this pattern.</p>
+<p>Anytime you make something globally accessible to every part of your program,
+you&#x2019;re asking for trouble. That&#x2019;s the main problem with the
+<a class="gof-pattern" href="singleton.html">Singleton</a> pattern, and this
+pattern is no different. My simplest advice for when to use a service locator
+is: <em>sparingly</em>.</p>
+<p>Instead of using a global mechanism to give some code access to an
+object it needs, first consider <em>just passing the object to it</em>. That&#x2019;s dead
+simple, and it makes the coupling completely obvious. That will cover most of
+your needs.</p>
+<p><em>But&hellip;</em> there are some times when manually passing around an object is
+gratuitous or actively makes code harder to read. Some systems, like logging
+or memory management, shouldn&#x2019;t be part of a module&#x2019;s public API. The
+parameters to your rendering code should have to do with <em>rendering</em>, not
+stuff like logging.</p>
+<p>Likewise, other systems represent facilities that are fundamentally singular
+in nature. Your game probably only has one audio device or display system
+that it can talk to. It is an ambient property of the environment, so plumbing
+it through ten layers of methods just so one deeply nested call can get to it
+is adding needless complexity to your code.</p>
+<p>In those kinds of cases, this pattern can help. As we&#x2019;ll see, it functions
+as a more flexible, more configurable cousin of the singleton. When used
+well, it can make your codebase more flexible with little runtime cost.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
-<h3><a href="#the-service-is-globally-accessible" name="the-service-is-globally-accessible">The service is globally accessible</a></h3>
-<p>This pattern shares a problem with the classic <a class="gof-pattern"
-href="singleton.html">Singleton</a> pattern: it&#x2019;s <em>global.</em> This is
-convenient for code that needs the service, but opens the door to
-coupling and maintenance headaches if the wrong code starts using the
-service.</p>
+<h3><a href="#the-service-doesn&#x2019;t-know-who-is-locating-it" name="the-service-doesn&#x2019;t-know-who-is-locating-it">The service doesn&#x2019;t know who is locating it</a></h3>
+<p>Since the locator is globally accessible, any code in the game could be
+requesting a service and then poking at it. This means that service must
+be able to work correctly in any circumstance. For example, a class that
+expects to only be used during the simulation portion of the game loop
+and not during rendering may not work as a service&thinsp;&mdash;&thinsp;it wouldn&#x2019;t be able
+to ensure that it&#x2019;s being used at the right time. So, if a class
+expects to only be used in a certain context, it&#x2019;s safest to
+avoid exposing it to the entire world with this pattern.</p>
 <h3><a href="#the-service-actually-has-to-be-located" name="the-service-actually-has-to-be-located">The service actually has to be located</a></h3>
 <p>With a Singleton or a static class, there&#x2019;s no chance for the instance
 we need to <em>not</em> be available. Calling code can take for granted that
@@ -191,8 +203,8 @@ the bodies of these functions, but you get the idea:</p>
 <p>Now we have an interface and an implementation. The remaining piece is
 the service locator&thinsp;&mdash;&thinsp;the class that ties the two together.</p>
 <h3><a href="#a-simple-locator" name="a-simple-locator">A simple locator</a></h3>
-<p>The implementation we&#x2019;ll see here is about the simplest kind of
-service locator you&#x2019;ll see:</p>
+<p>The implementation here is about the simplest kind of service locator
+you can define:</p>
 <p><span name="di"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Locator</span>
 <span class="p">{</span>
@@ -217,8 +229,8 @@ bit of jargon for a very simple idea. Say you have one class
 that depends on another. In our case, our <code>Locator</code> class needs an
 instance of the <code>Audio</code> service. Normally, the locator would be
 responsible for constructing that itself. Dependency injection
-instead says that outside code is responsible for <em>giving</em> that
-dependent object to our locator (i.e. injecting it into it).</p>
+instead says that outside code is responsible for <em>injecting</em> that
+dependency into the object that needs it.</p>
 </aside>
 
 <p>The static <code>getAudio()</code> function does the locating&thinsp;&mdash;&thinsp;we can call
@@ -233,9 +245,8 @@ of our <code>Audio</code> service to use:</p>
 
 
 <p>The way it "locates" is very simple: it relies on some outside code
-somewhere to register a service provider with it before any other code
-tries to use the service. When the game is starting up, it will call
-some code like this:</p>
+to register a service provider before any tries to use the service.
+When the game is starting up, it calls some code like this:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="nf">initGame</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="n">ConsoleAudio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConsoleAudio</span><span class="p">();</span>
@@ -345,8 +356,8 @@ will default to a null provider.</p>
 <p>Turning off audio is handy during development. It frees up some memory
 and CPU cycles. More importantly, when you break into a debugger just
 as a loud sound starts playing, it saves you from having your eardrums
-shredded. There&#x2019;s nothing like a scream sound effect looping every
-twenty milliseconds to get your blood flowing in the morning.</p>
+shredded. There&#x2019;s nothing like twenty seconds of a scream sound effect
+looping at full volume to get your blood flowing in the morning.</p>
 </aside>
 
 <h3><a href="#logging-decorator" name="logging-decorator">Logging decorator</a></h3>
@@ -395,7 +406,10 @@ define another audio service provider implementation like this:</p>
 
 
 <span class="nl">private:</span>
-  <span class="kt">void</span> <span class="n">log</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* Code to log message... */</span> <span class="p">}</span>
+  <span class="kt">void</span> <span class="n">log</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">message</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="c1">// Code to log message...</span>
+  <span class="p">}</span>
 
   <span class="n">Audio</span> <span class="o">&amp;</span><span class="n">wrapped_</span><span class="p">;</span>
 <span class="p">};</span>

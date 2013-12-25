@@ -78,7 +78,10 @@ public:
 
 
 private:
-  void log(const char* message) { /* Code to log message... */ }
+  void log(const char* message)
+  {
+    // Code to log message...
+  }
 
   Audio &wrapped_;
 };
