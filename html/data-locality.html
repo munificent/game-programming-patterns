@@ -164,7 +164,7 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 <p>It all boils down to something pretty simple: whenever the chip reads some memory, it gets a whole cache line. The more you can use stuff in that <span name="line">cache line, the faster you go</span>. So the goal then is to <em>organize your data structures so that the things you&#x2019;re processing are next to each other in memory</em>.</p>
 <aside name="line">
 
-<p>There&#x2019;s a key assumption here, though: one thread. If you are accessing nearby data on multiple threads, it&#x2019;s faster to have it on <em>different</em> cache lines. If two threads try to use data on the same cache line, both cores have to do some costly synchronization of their caches.</p>
+<p>There&#x2019;s a key assumption here, though: one thread. If you are modifying nearby data on multiple threads, it&#x2019;s faster to have it on <em>different</em> cache lines. If two threads try to tweak data on the same cache line, both cores have to do some costly synchronization of their caches.</p>
 </aside>
 
 <p>In other words, if your code is crunching on <code>Thing</code> then <code>Another</code> then <code>Also</code>, you want them laid out in memory like this:</p>

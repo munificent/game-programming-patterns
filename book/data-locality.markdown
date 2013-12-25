@@ -139,7 +139,7 @@ It all boils down to something pretty simple: whenever the chip reads some memor
 
 <aside name="line">
 
-There's a key assumption here, though: one thread. If you are accessing nearby data on multiple threads, it's faster to have it on *different* cache lines. If two threads try to use data on the same cache line, both cores have to do some costly synchronization of their caches.
+There's a key assumption here, though: one thread. If you are modifying nearby data on multiple threads, it's faster to have it on *different* cache lines. If two threads try to tweak data on the same cache line, both cores have to do some costly synchronization of their caches.
 
 </aside>
 
