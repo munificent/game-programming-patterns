@@ -200,6 +200,7 @@ def includecode(pattern, index, indentation):
     with open(cpppath(pattern), 'r') as source:
         inblock = False
         omitting = False
+        omitting_name = False
         blockindent = 0
 
         for line in source:
@@ -216,7 +217,7 @@ def includecode(pattern, index, indentation):
                 elif stripped == '//^omit ' + index:
                     # omitting a section just for this block. other blocks that
                     # contain this code may not omit it.
-                    omitting = not omitting
+                    omitting_name = not omitting_name
 
                 elif stripped.startswith('//^'):
                     # a code block comment for another block,
@@ -224,7 +225,7 @@ def includecode(pattern, index, indentation):
                     # nested code blocks
                     pass
 
-                elif not omitting:
+                elif not omitting and not omitting_name:
                     # Hackish. Can't strip the leading indent off of blank
                     # lines.
                     if stripped == '':

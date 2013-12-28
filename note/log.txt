@@ -1,3 +1,7 @@
+2013-12-27 - 1512 words, second draft observer
+2013-12-26 - 703 words, second draft observer
+2013-12-25 - 451 words, second draft observer
+2013-12-24 - fix #56 and #57
 2013-12-23 - 1198 finish first draft observer
 2013-12-22 - 740 words, first draft observer
 2013-12-21 - 811 words, sample code and first draft observer

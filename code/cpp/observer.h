@@ -40,7 +40,7 @@ namespace ObserverPattern
     {
     public:
       void updateBody(PhysicsBody& body);
-      void notify(int event, PhysicsBody& body) {}
+      void notify(PhysicsBody& body, int event) {}
     };
 
     //^physics-update
@@ -51,7 +51,7 @@ namespace ObserverPattern
       body.update();
       if (wasOnSurface && !body.isOnSurface())
       {
-        notify(EVENT_START_FALL, body);
+        notify(body, EVENT_START_FALL);
       }
     }
     //^physics-update
@@ -64,7 +64,6 @@ namespace ObserverPattern
     {
     public:
       virtual ~Observer() {}
-
       virtual void onNotify(const Entity& entity, Event event) = 0;
     };
     //^observer
@@ -108,11 +107,16 @@ namespace ObserverPattern
     public:
       void addObserver(Observer* observer)
       {
+        // Add to array...
+        //^omit
         observers_[numObservers_++] = observer;
+        //^omit
       }
 
       void removeObserver(Observer* observer)
       {
+        // Remove from array...
+        //^omit
         int index;
         for (index = 0; index < MAX_OBSERVERS; index++)
         {
@@ -129,14 +133,15 @@ namespace ObserverPattern
 
           numObservers_--;
         }
+        //^omit
       }
 
       // Other stuff...
-      //^omit subject-list
       //^omit subject-register
     protected:
       void notify(const Entity& entity, Event event);
 
+      //^omit subject-list
     private:
       Observer* observers_[MAX_OBSERVERS];
       int numObservers_;

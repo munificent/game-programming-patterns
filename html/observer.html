@@ -61,28 +61,25 @@
     </tr>
   </table>
 </div>
-<p>The Observer
-pattern is one of the most wildly successful programming patterns in existence.
-It was <span name="devised">devised</span> in tandem with the larger Model-View-Controller architecture
-which is structure underlying countless applications.</p>
+<p>You can&#x2019;t throw a rock at a hard drive without hitting an application built using the <span name="devised">Model-View-Controller</span> architecture, and underlying that is the Observer pattern. It&#x2019;s not an understatement to say that this is one of the most successful software patterns in the world.</p>
 <aside name="devised">
 
-<p>Like so many things in software, it was invented by Smalltalkers in the seventies.
-Lispers probably came up with in the sixties and didn&#x2019;t bother writing it down.</p>
+<p>Like so many things in software, MVC was invented by Smalltalkers in the seventies. Lispers probably claim they came up with it in the sixties but didn&#x2019;t bother writing it down.</p>
 </aside>
 
-<p>As web pages have started to become web applications, it&#x2019;s becoming widely used there too. It&#x2019;s so important that Java put it in its core library (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Observer.html"><code>java.util.Observer</code></a>) and C# baked them right into the <em>language</em> (the <a href="http://msdn.microsoft.com/en-us/library/8627sbea.aspx"><code>event</code></a> keyword).</p>
-<p>But the world of game development can be strangely cloistered at times. Just in case you haven&#x2019;t left the abbey in a while, let me walk you through a motivating example.</p>
+<p>As web <em>pages</em> have turned into web <em>applications</em>, it&#x2019;s taking over there too. Observer is so important that Java put it in its core library (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Observer.html"><code>java.util.Observer</code></a>) and C# baked it right into the <em>language</em> (the <a href="http://msdn.microsoft.com/en-us/library/8627sbea.aspx"><code>event</code></a> keyword).</p>
+<p>But the world of game development can be strangely cloistered at times, so maybe this is all news to you. In case you haven&#x2019;t left the abbey in a while, let me walk you through a motivating example.</p>
 <h2><a href="#achievement-unlocked" name="achievement-unlocked">Achievement Unlocked</a></h2>
-<p>Say you&#x2019;re adding an achievements system to your game. These will be dozens of different badges players can earn for completing certain specific milestones, like "Kill 100 Monkey Demons", "Fire a Shotgun in the Dark", "Fall of a Bridge", or "Chug Ten Cans of Nutri-Beer".</p>
-<p>This is tricky to implement cleanly since you have such a wide range of achievements that can be unlocked by varying but very specific behaviors. You really don&#x2019;t want tendrils of your achievement system twining their way through every dark corner of your codebase. Sure, "Fall of a Bridge" is somehow tied to the <span name="physics">physics engine</span>, but do you really want to see a call to <code>unlockFallOffBridge()</code> right in the middle of the linear algebra in your collision resolution algorithm?</p>
+<p>Say you&#x2019;re adding an achievements system to your game. It will feature dozens of different badges players can earn for completing specific milestones, like "Kill 100 Monkey Demons", "Fire a Shotgun in the Dark", "Fall of a Bridge", or "Complete a Level Wielding Only a Dead Weasel".</p>
+<p>This is tricky to implement cleanly since you have such a wide range of achievements that are unlocked by all sorts of different behaviors. You really don&#x2019;t want tendrils of your achievement system twining their way through every dark corner of your codebase. Sure, "Fall of a Bridge" is somehow tied to the <span name="physics">physics engine</span>, but do you really want to see a call to <code>unlockFallOffBridge()</code> right in the middle of the linear algebra in your collision resolution algorithm?</p>
 <aside name="physics">
 
 <p>This is a rhetorical question. No self-respecting physics programmer would ever let you sully their beautiful mathematics with something as pedestrian as <em>gameplay</em>.</p>
 </aside>
 
-<p>What we&#x2019;d like, as always, is to have all the code concerned with one aspect of the game nicely lumped in one place. The challenge is that achievements are triggered by a bunch of different parts of the game. How can that work without coupling the achievement code to all of these?</p>
-<p>That&#x2019;s what the observer pattern is for. It&#x2019;s a pattern for letting one piece of code trigger a notification that something happened <em>without actually caring who gets the notification</em>. For example, you&#x2019;ve got some physics code that handles gravity and tracking which bodies are relaxing calmy on nice flat surfaces and which are plummeting towards sure demise. To handle the "Fall of a Bridge" achievement, you could just jam the code right in there, but that&#x2019;s a mess. Instead, the code that handles entity falling just does:</p>
+<p>What we&#x2019;d like, as always, is to have all the code concerned with one aspect of the game nicely lumped in one place. The challenge is that achievements are triggered by a bunch of different parts of the game. How can that work without coupling the achievement code to all of those?</p>
+<p>That&#x2019;s what the observer pattern is for. It lets one piece of code announce that something interesting happened <em>without actually caring who receives the notification</em>.</p>
+<p>For example, you&#x2019;ve got some physics code that handles gravity and tracking which bodies are chilling on nice flat surfaces and which are plummeting towards sure demise. To handle the "Fall of a Bridge" achievement, you could just jam the code right in there, but that&#x2019;s a mess. Instead, the code can just do:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Physics</span><span class="o">::</span><span class="n">updateBody</span><span class="p">(</span><span class="n">PhysicsBody</span><span class="o">&amp;</span> <span class="n">body</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">bool</span> <span class="n">wasOnSurface</span> <span class="o">=</span> <span class="n">body</span><span class="p">.</span><span class="n">isOnSurface</span><span class="p">();</span>
@@ -90,26 +87,30 @@ Lispers probably came up with in the sixties and didn&#x2019;t bother writing it
   <span class="n">body</span><span class="p">.</span><span class="n">update</span><span class="p">();</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">wasOnSurface</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">body</span><span class="p">.</span><span class="n">isOnSurface</span><span class="p">())</span>
   <span class="p">{</span>
-    <span class="n">notify</span><span class="p">(</span><span class="n">EVENT_START_FALL</span><span class="p">,</span> <span class="n">body</span><span class="p">);</span>
+    <span class="n">notify</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">EVENT_START_FALL</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 
 
 <p>All it does is say, "Uh, I don&#x2019;t know if anyone cares, but this thing just fell. Do with that as you will."</p>
-<p>The little achievement engine then registers itself to receive that notification. Whenever the physics code sends that notification, the achievement code receives it. It then checks to see if the body is for the player. If so, it checks its own bookkeeping data to see what the less-than-graceful hero happened to be standing on prior to his encounter with classical mechanics. If it&#x2019;s a bridge, it unlocks the proper achievement and sets of the fireworks and fanfare, all with no involvement from the physics code.</p>
-<p>In fact, you can change the set of achievements or tear out the entire achievement system without touching a line of gameplay code. It will still send out its notifications, oblivious to the fact that nothing may be receiving them anymore.</p>
+<p>The achievement system registers itself to receive that notification. Whenever the physics code sends it, the achievement receives it and checks to see if the body is for the player. If so, it checks its own bookkeeping data to see what the less-than-graceful hero happened to be standing on prior to his encounter with classical mechanics. If it&#x2019;s a bridge, it unlocks the proper achievement and sets of the fireworks and fanfare, all with no involvement from the physics code.</p>
+<p><span name="tear">In fact</span>, you can change the set of achievements or tear out the entire achievement system without touching a line of the physics engine. It will still send out its notifications, oblivious to the fact that nothing is receiving them anymore.</p>
+<aside name="tear">
+
+<p>Of course, if you <em>permanently</em> remove achievements and nothing else ever listens to the physics engine&#x2019;s notifications, you may as well remove the notification code too. But during the game&#x2019;s evolution, it&#x2019;s nice to have this flexibility.</p>
+</aside>
+
 <h2><a href="#how-it-works" name="how-it-works">How it Works</a></h2>
-<p>If you don&#x2019;t know the mechanics of the actual pattern, you can probably guess
-them just from the description, but do keep things easy on you, I&#x2019;ll just walk
+<p>If you don&#x2019;t already know the mechanics of the actual pattern, you could probably guess
+them just from the above description, but to keep things easy on you, I&#x2019;ll just walk
 through it quickly.</p>
-<p>We&#x2019;ll start with the nosy class that wants to know when some other object does something interesting. It does this by implementing this:</p>
+<p>We&#x2019;ll start with the nosy class that wants to know when another other object does something interesting. It accomplishes that by implementing this:</p>
 <p><span name="signature"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Observer</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Observer</span><span class="p">()</span> <span class="p">{}</span>
-
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">onNotify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
@@ -117,11 +118,11 @@ through it quickly.</p>
 
 <aside name="signature">
 
-<p>The actual signature of this method is totally up to you. That&#x2019;s why this is the Observer <em>pattern</em> and not the "Observer ready-made chunk of code you can just copy and paste into your game". Usually, the notify method takes the object that&#x2019;s sending the notification and some other generic "data" parameter that you can use to stuff whatever you want into.</p>
-<p>If you&#x2019;re using a language with generics or templates, you&#x2019;ll probably use them here, but it&#x2019;s also perfectly fine to have some more specifically tailored to your use case. Here, I&#x2019;m just hardcoding it to take a game entity, and some arbitrary enum that describes what happened to the entity.</p>
+<p>The precise signature of <code>onNotify()</code> is up to you. That&#x2019;s why this is the Observer <em>pattern</em> and not the "Observer ready-made code you can paste into your game". Usually, the notify method is passed the object that sent the notification and a generic "data" parameter you stuff other details into.</p>
+<p>If you&#x2019;re using a language with generics or templates, you&#x2019;ll probably use them here, but it&#x2019;s also fine to hand-tailor to your use case. Here, I&#x2019;m just hardcoding it to take a game entity, and an enum that describes what happened.</p>
 </aside>
 
-<p>A concrete class becomes an observer by implementing this interface. In our example, it&#x2019;s the achievement system, so you&#x2019;d have something like this:</p>
+<p>Any concrete class that implements this becomes an observer. In our example, that&#x2019;s the achievement system, so we&#x2019;d have something like so:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Achievements</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Observer</span>
 <span class="p">{</span>
 <span class="nl">protected:</span>
@@ -151,14 +152,11 @@ through it quickly.</p>
 </pre></div>
 
 
-<p>It receives a notification by having its <code>onNotify()</code> method called by the object that&#x2019;s doing something interesting. In Gang of Four parlance, that&#x2019;s called the
-"Subject". The subject has two jobs. First, it holds the list of observers that are waiting oh-so-patiently for a missive from it:</p>
+<p>The notification method is called by the object that did something worth observing. In Gang of Four parlance, that object is called the
+"subject". It has two jobs. First, it holds the list of observers that are waiting oh-so-patiently for a missive from it:</p>
 <p><span name="stl"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Subject</span>
 <span class="p">{</span>
-<span class="nl">protected:</span>
-  <span class="kt">void</span> <span class="n">notify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">);</span>
-
 <span class="nl">private:</span>
   <span class="n">Observer</span><span class="o">*</span> <span class="n">observers_</span><span class="p">[</span><span class="n">MAX_OBSERVERS</span><span class="p">];</span>
   <span class="kt">int</span> <span class="n">numObservers_</span><span class="p">;</span>
@@ -168,7 +166,7 @@ through it quickly.</p>
 
 <aside name="stl">
 
-<p>In real code, you would invariably use a dynamically-sized list or vector type here instead of a dumb array. I&#x2019;m sticking with the basics here to keep things simple for people coming from other languages that don&#x2019;t know C++&#x2019;s standard library.</p>
+<p>In real code, you would use a dynamically-sized collection instead of a dumb array. I&#x2019;m sticking with the basics here for people coming from other languages that don&#x2019;t know C++&#x2019;s standard library.</p>
 </aside>
 
 <p>The important bit is that the subject exposes a <em>public</em> API for modifying that list:</p>
@@ -177,27 +175,12 @@ through it quickly.</p>
 <span class="nl">public:</span>
   <span class="kt">void</span> <span class="n">addObserver</span><span class="p">(</span><span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="n">observers_</span><span class="p">[</span><span class="n">numObservers_</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">observer</span><span class="p">;</span>
+    <span class="c1">// Add to array...</span>
   <span class="p">}</span>
 
   <span class="kt">void</span> <span class="n">removeObserver</span><span class="p">(</span><span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="kt">int</span> <span class="n">index</span><span class="p">;</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">MAX_OBSERVERS</span><span class="p">;</span> <span class="n">index</span><span class="o">++</span><span class="p">)</span>
-    <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">observers_</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="n">observer</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">numObservers_</span><span class="p">)</span>
-    <span class="p">{</span>
-      <span class="c1">// Shift the following ones up.</span>
-      <span class="k">for</span> <span class="p">(;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">numObservers_</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">index</span><span class="o">++</span><span class="p">)</span>
-      <span class="p">{</span>
-        <span class="n">observers_</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">observers_</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
-      <span class="p">}</span>
-
-      <span class="n">numObservers_</span><span class="o">--</span><span class="p">;</span>
-    <span class="p">}</span>
+    <span class="c1">// Remove from array...</span>
   <span class="p">}</span>
 
   <span class="c1">// Other stuff...</span>
@@ -205,10 +188,10 @@ through it quickly.</p>
 </pre></div>
 
 
-<p>This way, outside code is responsible for adding <em>itself</em> to the list of observers that the subject will notify. This way, the subject can communicate to the observers without its code being coupled to them. That&#x2019;s the clever part about this pattern.</p>
-<p>The fact that it has a <em>list</em> of observers instead of a single one is important too. Sure, it&#x2019;s handy to have multiple observers of a single subject, but it also makes sure that the observers aren&#x2019;t implicitly coupled to <em>each other</em>. For example, lets say the audio engine also observes the fall event so that it can play an appropriate sound.</p>
-<p>If the subject only allowed one observer, when the audio engine registered itself, that would <em>un</em>register the achievements system. That means those two systems would be interfering with each other, and in a particularly nasty way, since one basically breaks the other. Supporting a list of observers ensures that each observer is treated independently from the others. As far as they know, they are the only thing in the world with eyes on the subject.</p>
-<p>The other job of the subject is actually sending the notification. The basic method for that is simple:</p>
+<p>That allows outside code to control who receives notifications. The subject communicates with the observers, but isn&#x2019;t <em>coupled</em> to them. In our example, no line of physics code will mention achievements. Yet, it can still notify the achievements system. That&#x2019;s the clever part about this pattern.</p>
+<p>It&#x2019;s also important that the subject has a <em>list</em> of observers instead of a single one. It makes sure that observers aren&#x2019;t implicitly coupled to <em>each other</em>. For example, say the audio engine also observes the fall event so that it can play an appropriate sound. If the subject only supported one observer, when the audio engine registered itself, that would <em>un</em>register the achievements system.</p>
+<p>That means those two systems would be interfering with each other, and in a particularly nasty way, since one effectively disables the other. Supporting a list of observers ensures that each observer is treated independently from the others. As far as they know, each is the only thing in the world with eyes on the subject.</p>
+<p>The other job of the subject is sending notifications:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">notify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numObservers_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
@@ -219,7 +202,7 @@ through it quickly.</p>
 </pre></div>
 
 
-<p>Once have this, we just need to hook it into the physics engine so that observers can observe it and it can send notifications. To stay close to the original <em>Design Patterns</em> recipe we&#x2019;ll <span name="event">inherit</span> <code>Subject</code>:</p>
+<p>Now we just need to hook all of this into the physics engine so that it can send notifications and the achievement system can wire itself up to receive them. We&#x2019;ll stay close to the original <em>Design Patterns</em> recipe and <span name="event">inherit</span> <code>Subject</code>:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Physics</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Subject</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -228,10 +211,10 @@ through it quickly.</p>
 </pre></div>
 
 
-<p>This lets us define <code>notify()</code> in <code>Subject</code> as protected. That way <code>Physics</code> itself can send notifications, but code outside the physics engine cannot. Meanwhile, <code>addObserver()</code> and <code>removeObserver()</code> are public, so anything that can get to the physics system can observe it.</p>
+<p>This lets us make <code>notify()</code> in <code>Subject</code> protected. That way the physics engine can send notifications, but code outside of it cannot. Meanwhile, <code>addObserver()</code> and <code>removeObserver()</code> are public, so anything that can get to the physics system can observe it.</p>
 <aside name="event">
 
-<p>If this were real code, I would absolutely avoid using inheritance here. Instead, I&#x2019;d make <code>Physics</code> <em>have</em> an instance of <code>Subject</code>. Instead of observing the physics engine itself, it would expose event objects for things like falling. Observers could register themselves using something like:</p>
+<p>If this were real code, I would absolutely avoid using inheritance here. Instead, I&#x2019;d make <code>Physics</code> <em>have</em> an instance of <code>Subject</code>. Instead of observing the physics engine itself, the subject would be a "falling event" object. Observers could register themselves using something like:</p>
 <div class="codehilite"><pre><span class="n">physics</span><span class="p">.</span><span class="n">entityFell</span><span class="p">()</span>
   <span class="p">.</span><span class="n">addObserver</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
 </pre></div>
@@ -240,54 +223,61 @@ through it quickly.</p>
 <p>To me, this is the difference between "observer" systems and "event" systems. With the former, you observe <em>the thing that did something interesting</em>. With the latter, you observe an object that represents <em>the thing that happened</em>.</p>
 </aside>
 
-<p>Now, when the physics engine does something noteworthy, it calls <code>notify()</code> just like in the motivation example above. That walks the observer list and gives them all the heads up. Pretty simple, right? Just one class that maintains a list of pointers to instances of some interface.</p>
-<p>It&#x2019;s hard to believe that something so straightforward is the cornerstone of the architecture of thousands of programs and app frameworks.</p>
+<p>Now, when the physics engine does something noteworthy, it calls <code>notify()</code> just like in the original motivation example above. That walks the observer list and gives them all the heads up. Pretty simple, right? Just one class that maintains a list of pointers to instances of some interface.</p>
+<p>It&#x2019;s hard to believe that something so straightforward is communication backbone of thousands of programs and app frameworks.</p>
 <h2><a href="#what-about-games" name="what-about-games">What About Games?</a></h2>
 <p>If it&#x2019;s such a big deal outside of the game industry, how does it fare inside?
-Here, it seems to have gotten a mixed reception. Part of this is the observer
+Here, it seems to have gotten a mixed reception. Part of this is that the Observer
 pattern usually rides along with MVC, and that isn&#x2019;t very popular in games.</p>
-<p>In most applications I&#x2019;ve seen, "MVC" really means a two-layer approach: front end and back end. The big-C "controller" part of MVC is this weird little orphan that no one knows what to do with and every framework redefines to something arbitrary.</p>
-<p>That separation makes a lot of sense in most applications. The app has some complex state that needs to be modified and persisted. It&#x2019;s usually stored in a database or on files. There is complex business logic defining what kind of modifications are valid.</p>
-<p>Meanwhile, the user interface is fairly separate from that, changes frequently, and may have different views into the same underlying data. A chart and grid of cells really are "views" into a distinct "model", which is the tabular data of a spreadsheet. It&#x2019;s still conceptually a "spreadsheet" even if you ditch the chart and radically change the UI.</p>
-<p>Games don&#x2019;t have that same <span name="separation">separation</span>. Is a visual effect particle&#x2019;s position "front-end"? After all, it&#x2019;s used to determine where the player sees it on-screen, a purely visual user experience distinction. But a particle is positioned in space in the game world, and that position interacts physically with the world. Isn&#x2019;t the game world the "model"?</p>
+<p>In most applications I&#x2019;ve seen, "MVC" really means a <span name="controller">two-layer</span> approach: front end and back end. That separation makes sense in most applications, which have some complex state that needs to be modified and persisted. There&#x2019;s some database or file storage layer, and a pile of complex business logic defining which kind of modifications are allowed.</p>
+<aside name="controller">
+
+<p>The "controller" part of MVC is the third wheel that no one knows what to do with and every framework designer redefines to mean whatever they want.</p>
+</aside>
+
+<p>Meanwhile, the user interface is fairly separate from that. It changes more frequently, and may have multiple different views into the same underlying data. A chart and grid of cells really are "views" into a distinct "model", which is the tabular data of a spreadsheet. It&#x2019;s still conceptually a "spreadsheet" even if you ditch the chart and radically change the UI.</p>
+<p>Games don&#x2019;t have the same <span name="separation">separation</span>. Is a visual effect particle&#x2019;s position "front-end"? It&#x2019;s part of the user experience and doesn&#x2019;t get persisted or affect gameplay. But a particle is positioned in space in the game world, and that position interacts physically with the world. Is the game world the "model"? Are physics the "business rules"?</p>
 <aside name="separation">
 
 <p>I think this is part of the reason the <a href="component.html" class="pattern">Component</a> pattern is so popular: games <em>can</em> be pretty effectively divided into different domains like physics, AI, and rendering. Components are the MVC of games.</p>
+<p>That&#x2019;s not to say MVC is <em>never</em> used in games. I have seen games built around it in a way that works well.</p>
 </aside>
 
-<p>Without a clear front-end/back-end separation, cramming MVC into a game is hard, so the observer pattern hasn&#x2019;t gotten a free ride there. When I ask other game programmers if they use it, some simply haven&#x2019;t heard of it. Some do use it, but I also hear the same couple of explanations for why they avoid it. The rest of this chapter is going to be about those challenges, what we can do to meet them, and why you might or might not want to bother.</p>
-<h2><a href="#it&#x2019;s-too-slow" name="it&#x2019;s-too-slow">It&#x2019;s Too Slow</a></h2>
-<p>The last time I asked around about this pattern, the first response I heard was that some people didn&#x2019;t like it because it&#x2019;s too "slow". They didn&#x2019;t know the details of the pattern, but their default impression of anything "design-patterny" is that it involves piles of classes and indirection and all sorts of other creative ways of wasting CPU cycles.</p>
-<p>The Observer pattern gets a particularly bad rap here because it&#x2019;s been known to hang around with some shady characters named "events", <span name="names">"messages"</span>, and even "data binding". Some of those systems, <em>can</em> be slow, often deliberately. They involve things like queuing or dynamically allocating and then later destroying objects that represent notifications.</p>
+<p>Without MVC, the Observer pattern hasn&#x2019;t gotten a free ride. Instead, when I&#x2019;ve asked other game developers what they think about it, I&#x2019;ve heard a few explanations for why not. (That is, when they&#x2019;ve even heard of it to begin with.)</p>
+<p>The rest of this chapter is going to be about those problems and what we can do to solve them. Once those are out of the way, we&#x2019;ll talk a bit about where I think the pattern makes sense and where it doesn&#x2019;t.</p>
+<h3><a href="#"it&#x2019;s-too-slow"" name=""it&#x2019;s-too-slow"">"It&#x2019;s Too Slow"</a></h3>
+<p>The first time I asked about this pattern, the response I got was, "It&#x2019;s too slow". They didn&#x2019;t know the details of the pattern, but their default stance on anything that smelled like a "design pattern" was that it involved piles of classes and indirection and other creative ways of squandering CPU cycles.</p>
+<p>The Observer pattern gets a particularly bad rap here because it&#x2019;s been known to hang around with some shady characters named "events", <span name="names">"messages"</span>, and even "data binding". Some of those systems <em>can</em> be slow (often deliberately). They involve things like queuing or doing dynamic allocation for each notification.</p>
 <aside name="names">
 
-<p>This is an example of why I think documenting patterns is so important. When we get fuzzy about terminology and what things mean, it&#x2019;s impossible to communicate clearly and succintly. You say, "Observer" and they hear "Messaging" because either no one bothered to write down the difference or they didn&#x2019;t happen to read it.</p>
+<p>This is why I think documenting patterns is important. When we get fuzzy about terminology, we lose the ability to communicate clearly and succintly. You say, "Observer" and someone hears "Messaging" because either no one bothered to write down the difference or they didn&#x2019;t happen to read it.</p>
+<p>That&#x2019;s what I&#x2019;m trying to do with this book. And, to cover my bases, I&#x2019;ve got a chapter on messaging too: <a href="message-queue.html" class="pattern">Message Queue</a>.</p>
 </aside>
 
-<p>But, now that we&#x2019;ve covered how the pattern is actually implemented, you can see that isn&#x2019;t the case. Sending a notification is just walking a list and calling some virtual methods. Granted, that&#x2019;s a <em>bit</em> slower than a statically dispatched method, but that performance hit is negligible in all but the most performance critical code.</p>
-<p>My experience is that this pattern is best used outside of critical code paths anyway, so you can usually afford the dispatch cost there. Outside of that, there&#x2019;s virtually no overhead. We aren&#x2019;t allocating objects for messages. There&#x2019;s no queueing. It&#x2019;s just an indirection over a method call.</p>
-<h3><a href="#too-*fast*" name="too-*fast*">Too <em>fast?</em></a></h3>
-<p>In fact, you have to be careful because the Observer pattern <em>is</em> synchronous. Since the subject invokes its observers directly, that means the subject can&#x2019;t resume its work until all of the observers have returned from their notification methods. A slow observer can block a subject.</p>
-<p>This sounds scary, but in practice it&#x2019;s not the end of the world. It&#x2019;s just something you have to be aware of. UI programmers, who&#x2019;ve been doing event-based programming like this for ages, have a deeply-ingrained mantra about this: "get off the UI thread". If you&#x2019;re responding to a UI event synchronously, you need to finish and return control as quickly as possible so that the UI doesn&#x2019;t lock up.</p>
-<p>If you have slow to work to do, push it onto another thread or some sort of work queue. It takes a little discipline, but it&#x2019;s not rocket science. If this is a problem for you, then maybe a queuing message system <em>is</em> what you want. Fortunately, I&#x2019;ve got a chapter just for that: <a href="message-queue" class="pattern">Message Queue</a>.</p>
-<h2><a href="#it-does-too-much-dynamic-allocation" name="it-does-too-much-dynamic-allocation">It Does Too Much Dynamic Allocation</a></h2>
-<p>Large swathes of the software world, including many game developers have moved
+<p>But, now that you&#x2019;ve seen how the pattern is actually implemented, you know that isn&#x2019;t the case. Sending a notification is just walking a list and calling some virtual methods. Granted, it&#x2019;s a <em>bit</em> slower than a statically dispatched method, but that cost is negligible in all but the most performance critical code.</p>
+<p>I find this pattern works best outside of critical code paths anyway, so you can usually afford the dispatch cost. Otherwise, there&#x2019;s virtually no overhead. We aren&#x2019;t allocating objects for messages. There&#x2019;s no queueing. It&#x2019;s just an indirection over a method call.</p>
+<h3><a href="#it&#x2019;s-too-*fast*" name="it&#x2019;s-too-*fast*">It&#x2019;s too <em>fast?</em></a></h3>
+<p>In fact, you have to be careful because the Observer pattern <em>is</em> synchronous. The subject invokes its observers directly, which means it can&#x2019;t resume its work until all of the observers have returned from their notification methods. A slow observer can block a subject.</p>
+<p>This sounds scary, but in practice it&#x2019;s not the end of the world. It&#x2019;s just something you have to be aware of. UI programmers&thinsp;&mdash;&thinsp;who&#x2019;ve been doing event-based programming like this for ages&thinsp;&mdash;&thinsp;have an enshrined tenet for this: "stay off the UI thread".</p>
+<p>If you&#x2019;re responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn&#x2019;t lock up. When you have slow to work to do, push it onto another thread or a work queue. It takes a little discipline, but it&#x2019;s not rocket science.</p>
+<h2><a href="#"it-does-too-much-dynamic-allocation"" name=""it-does-too-much-dynamic-allocation"">"It Does Too Much Dynamic Allocation"</a></h2>
+<p>Whole tribes of the programmer clan&thinsp;&mdash;&thinsp;including many game developers&thinsp;&mdash;&thinsp;have moved
 onto garbage collected languages, and dynamic allocation isn&#x2019;t the boogie man
 that it used to be for most people. But for performance critical software like
-games, memory allocation still matters, even in managed languages. Dynamic allocation takes time, as does reclaiming memory&thinsp;&mdash;&thinsp;either manually or automatically.</p>
-<p>Even more of a concern in games can be memory <span name="fragment">fragmentation</span>. As you allocate and free bits of memory over time, the heap gets increasingly broken into smaller contiguous chunks of free memory. Eventually, even if the <em>total</em> available memory is high, you may not find a single big enough chunk to allocate. In games, where you may need to run continuously for days without crashing in order to get certified, that&#x2019;s a real concern.</p>
+games, memory allocation still matters, even in managed languages. <span name="fragment">Dynamic</span> allocation takes time, as does reclaiming memory, even when it happens automatically.</p>
 <aside name="fragment">
 
-<p>The <a href="object-pool.html" class="pattern">Object Pool</a> chapter goes into more detail about fragmentation and how to avoid it.</p>
+<p>Many game developers are less worried about allocation and more worried about <em>fragmentation.</em> When your game needs to run continuously for days without crashing in order to get certified, an increasingly fragmented heap can prevent you from shipping.</p>
+<p>The <a href="object-pool.html" class="pattern">Object Pool</a> chapter goes into more detail about this and a common technique for avoiding it.</p>
 </aside>
 
-<p>In my sample code above, I just used a fixed array because I&#x2019;m trying to keep
+<p>In the example code above, I just used a fixed array because I&#x2019;m trying to keep
 things dead simple. In real implementations, the observer list is almost always
 a dynamically allocated array or list that grows and shrinks as observers are
 added and removed. That allocation spooks some people.</p>
-<p>The first thing you&#x2019;ll notice is that it only munges memory when things are being wired up. To send a notification, there&#x2019;s no memory allocation at all. It&#x2019;s just a method call. So, if you wire up your observers at the start of the game and don&#x2019;t mess with them much, the allocation churn here may be minimal. It may not be a problem at all.</p>
-<p>If it is, though, here&#x2019;s a way to implement the pattern without any dynamic
-allocation at all&hellip;</p>
+<p>Of course, the important thing to notice is that it only allocates memory when observers are being wired up. <em>Sending</em> a notification requires no memory allocation whatsoever: it&#x2019;s just a method call. If you wire up your observers at the start of the game and don&#x2019;t mess with them much, the allocation cost may be minimal.</p>
+<p>In case that is a problem, though, I&#x2019;ll walk through a way to implement adding and removing observers without any dynamic allocation at all.</p>
+<hr />
 <h3><a href="#linked-observers" name="linked-observers">Linked observers</a></h3>
 <p>For the pattern to work, the subject needs to maintain list of the objects that are observing it. Usually, it does that by owning a list that contains a bunch of pointers to observers. But notice that the <code>Observer</code> interface is a class. In most implementations, it&#x2019;s a pure virtual interface, and we all know interfaces are better than concrete, stateful classes.</p>
 <p>But if we <em>are</em> willing to put a bit of state in there, we can thread the list <em>through the observers themselves</em>. Instead of the subject having a separate list of pointers to observers, it will just point to the first one, which will in turn point to the next one, and on down the line.</p>
