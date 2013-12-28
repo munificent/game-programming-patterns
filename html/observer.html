@@ -258,13 +258,13 @@ pattern usually rides along with MVC, and that isn&#x2019;t very popular in game
 <p>I find this pattern works best outside of critical code paths anyway, so you can usually afford the dispatch cost. Otherwise, there&#x2019;s virtually no overhead. We aren&#x2019;t allocating objects for messages. There&#x2019;s no queueing. It&#x2019;s just an indirection over a method call.</p>
 <h3><a href="#it&#x2019;s-too-*fast*" name="it&#x2019;s-too-*fast*">It&#x2019;s too <em>fast?</em></a></h3>
 <p>In fact, you have to be careful because the Observer pattern <em>is</em> synchronous. The subject invokes its observers directly, which means it can&#x2019;t resume its work until all of the observers have returned from their notification methods. A slow observer can block a subject.</p>
-<p>This sounds scary, but in practice it&#x2019;s not the end of the world. It&#x2019;s just something you have to be aware of. UI programmers&thinsp;&mdash;&thinsp;who&#x2019;ve been doing event-based programming like this for ages&thinsp;&mdash;&thinsp;have an enshrined tenet for this: "stay off the UI thread".</p>
+<p>This sounds scary, but in practice it&#x2019;s not the end of the world. It&#x2019;s just something you have to be aware of. UI programmers&thinsp;&mdash;&thinsp;who&#x2019;ve been doing event-based programming like this for ages&thinsp;&mdash;&thinsp;have an established motto for this: "stay off the UI thread".</p>
 <p>If you&#x2019;re responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn&#x2019;t lock up. When you have slow to work to do, push it onto another thread or a work queue. It takes a little discipline, but it&#x2019;s not rocket science.</p>
 <h2><a href="#"it-does-too-much-dynamic-allocation"" name=""it-does-too-much-dynamic-allocation"">"It Does Too Much Dynamic Allocation"</a></h2>
 <p>Whole tribes of the programmer clan&thinsp;&mdash;&thinsp;including many game developers&thinsp;&mdash;&thinsp;have moved
 onto garbage collected languages, and dynamic allocation isn&#x2019;t the boogie man
 that it used to be for most people. But for performance critical software like
-games, memory allocation still matters, even in managed languages. <span name="fragment">Dynamic</span> allocation takes time, as does reclaiming memory, even when it happens automatically.</p>
+games, memory allocation still matters, even in managed languages. <span name="fragment">Dynamic</span> allocation takes time as does reclaiming memory, even if it happens automatically.</p>
 <aside name="fragment">
 
 <p>Many game developers are less worried about allocation and more worried about <em>fragmentation.</em> When your game needs to run continuously for days without crashing in order to get certified, an increasingly fragmented heap can prevent you from shipping.</p>
@@ -274,14 +274,13 @@ games, memory allocation still matters, even in managed languages. <span name="f
 <p>In the example code above, I just used a fixed array because I&#x2019;m trying to keep
 things dead simple. In real implementations, the observer list is almost always
 a dynamically allocated array or list that grows and shrinks as observers are
-added and removed. That allocation spooks some people.</p>
-<p>Of course, the important thing to notice is that it only allocates memory when observers are being wired up. <em>Sending</em> a notification requires no memory allocation whatsoever: it&#x2019;s just a method call. If you wire up your observers at the start of the game and don&#x2019;t mess with them much, the allocation cost may be minimal.</p>
-<p>In case that is a problem, though, I&#x2019;ll walk through a way to implement adding and removing observers without any dynamic allocation at all.</p>
-<hr />
+added and removed. That memory churn spooks some people.</p>
+<p>Of course, the first thing to notice is that it only allocates memory when observers are being wired up. <em>Sending</em> a notification requires no memory allocation whatsoever: it&#x2019;s just a method call. If you wire up your observers at the start of the game and don&#x2019;t mess with them much, the allocation cost may be minimal.</p>
+<p>If it&#x2019;s still a problem, though, I&#x2019;ll walk through a way to implement adding and removing observers without any dynamic allocation at all.</p>
 <h3><a href="#linked-observers" name="linked-observers">Linked observers</a></h3>
-<p>For the pattern to work, the subject needs to maintain list of the objects that are observing it. Usually, it does that by owning a list that contains a bunch of pointers to observers. But notice that the <code>Observer</code> interface is a class. In most implementations, it&#x2019;s a pure virtual interface, and we all know interfaces are better than concrete, stateful classes.</p>
-<p>But if we <em>are</em> willing to put a bit of state in there, we can thread the list <em>through the observers themselves</em>. Instead of the subject having a separate list of pointers to observers, it will just point to the first one, which will in turn point to the next one, and on down the line.</p>
-<p>First, we&#x2019;ll get rid of the array in <code>Subject</code> and replace it with a pointer to the head of the list of observers:</p>
+<p>In the code we&#x2019;ve seen so far, <code>Subject</code> owns a list of pointers to each <code>Observer</code> watching it. The <code>Observer</code> class itself has no reference to this list. It&#x2019;s just a pure virtual interface. Interfaces are preferred over concrete, stateful classes, so that&#x2019;s generally a good thing.</p>
+<p>But if we <em>are</em> willing to put a bit of state in there, we can thread the subject&#x2019;s list <em>through the observers themselves</em>. Instead of the subject having a separate collection of pointers, the observer objects become nodes in a linked list.</p>
+<p>To implement this, first we&#x2019;ll get rid of the array in <code>Subject</code> and replace it with a pointer to the head of the list of observers:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Subject</span>
 <span class="p">{</span>
   <span class="c1">// Methods...</span>
@@ -309,8 +308,8 @@ added and removed. That allocation spooks some people.</p>
 
 
 <p>We&#x2019;re also making <code>Subject</code> a friend here. The subject owns the API for adding and removing observers, but the list it will be managing is now inside the <code>Observer</code> class itself. The simplest way to give it the ability to poke at that list is by making it a friend.</p>
-<p>Wiring up an observer is just adding it to the list. I&#x2019;ll take the simplest
-option and push it onto the <em>head</em> of the list:</p>
+<p>Adding an observer is just wiring it into the list. We&#x2019;ll take the easy
+option and insert it at the front:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">addObserver</span><span class="p">(</span><span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">observer</span><span class="o">-&gt;</span><span class="n">next_</span> <span class="o">=</span> <span class="n">head_</span><span class="p">;</span>
@@ -319,11 +318,11 @@ option and push it onto the <em>head</em> of the list:</p>
 </pre></div>
 
 
-<p>The other option would be add it to the <em>end</em> of the linked list. Doing that would add a bit more complexity here: <code>Subject</code> would either have to walk the list to find the end, or keep track of a separate <code>tail_</code> pointer that always points to the last node.</p>
-<p>Adding it to the front of the list is simpler, but does have one side effect. When we walk that list to send a notification to every observer, the most recently registered observer will get notified first. If you register observers A, B, and C, in that order, when it notifies, they will be received in C, B, A order. That may not be what you expect.</p>
-<p>In theory, this doesn&#x2019;t matter one way or the other. It&#x2019;s a tenant of good observer discipline that two observers observing the same subject should have no ordering dependencies relative to each other. If the ordering <em>does</em> matter, it means those two observers have some subtle coupling that could end up biting you.</p>
-<p>Regardless of which end of the list we add the new observer, you can see we achieved our goal here: adding an observer is just a couple of pointer assignments. Not an allocation in sight!</p>
-<p>Let&#x2019;s get removing working:</p>
+<p>The other option would be add it to the end of the linked list. Doing that adds a bit more complexity: <code>Subject</code> has to either walk the list to find the end, or keep a separate <code>tail_</code> pointer that always points to the last node.</p>
+<p>Adding it to the front of the list is simpler, but does have one side effect. When we walk the list to send a notification to every observer, the most recently registered observer gets notified first. If you register observers A, B, and C, in that order, they will receive notifications in C, B, A order.</p>
+<p>In theory, this doesn&#x2019;t matter one way or the other. It&#x2019;s a tenet of good observer discipline that two observers observing the same subject should have no ordering dependencies relative to each other. If the ordering <em>does</em> matter, it means those two observers have some subtle coupling that could end up biting you.</p>
+<p>Regardless of which end of the list we add the new observer, you can see we achieved our goal here: adding an observer is just a couple of pointer assignments. Not an allocation in sight.</p>
+<p>Let&#x2019;s get remove working:</p>
 <p><span name="remove"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">removeObserver</span><span class="p">(</span><span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span><span class="p">)</span>
 <span class="p">{</span>
@@ -352,11 +351,11 @@ option and push it onto the <em>head</em> of the list:</p>
 
 <aside name="remove">
 
-<p>Removing a node from a linked list usually requires a bit of ugly special case handling for removing the very first node, like you see here. If you&#x2019;re comfortable with pointer shenanigans, there&#x2019;s a more elegant solution using a pointer to a pointer to a node. Consider it an exercise for the reader.</p>
+<p>Removing a node from a linked list usually requires a bit of ugly special case handling for removing the very first node, like you see here. There&#x2019;s a more elegant solution using a pointer to a pointer. Consider it an exercise for the reader.</p>
 </aside>
 
-<p>Because we have a singly linked list, we have to walk it to find the observer we&#x2019;re removing. We&#x2019;d have to do the same thing if we were using a regular array for that matter. If we use a <em>doubly</em> linked list, where each observer has a pointer to both the observer after it and before it in the list, we can remove an observer in constant time. If this were real code, I&#x2019;d do that. In my experience, I find doubly linked lists almost always more useful thank singly linked ones.</p>
-<p>The only thing left for us to do is implement sending a notification. That&#x2019;s as simple as walking the list:</p>
+<p>Because we have a singly linked list, we have to walk it to find the observer we&#x2019;re removing. We&#x2019;d have to do the same thing if we were using a regular array for that matter. If we use a <em>doubly</em> linked list, where each observer has a pointer to both the observer after it and before it, we can remove an observer in constant time. If this were real code, I&#x2019;d do that.</p>
+<p>The only thing left to do is sending a notification. That&#x2019;s as simple as walking the list:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">notify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span> <span class="o">=</span> <span class="n">head_</span><span class="p">;</span>
@@ -369,24 +368,24 @@ option and push it onto the <em>head</em> of the list:</p>
 </pre></div>
 
 
-<p>Not too bad, right? A subject can have as many observers as it wants, without doing a bit of memory management. Registering and unregistering is as fast as it was with a simple array. There&#x2019;s only two quibbles with this. The first is that walking a linked list means skipping around in memory more. That can cause <span name="cache">cache misses</span>, which harm your performance. In hot code paths, that may be unacceptable.</p>
+<p>Not too bad, right? A subject can have as many observers as it wants, without a single whiff of dynamic memory. Registering and unregistering is as fast as it was with a simple array. There&#x2019;s only two quibbles with this. The first is that walking a linked list means skipping around in memory more. That can cause <span name="cache">cache misses</span>, which harm your performance. In hot code paths, that may be unacceptable.</p>
 <aside name="cache">
 
 <p>See the chapter on <a href="data-locality.html" class="pattern">Data Locality</a> for a ton of more information on how CPU caching affects performance and what you can do about it.</p>
 </aside>
 
-<p>The other problem is a more basic limitation. With this design, an observer is <em>itself</em> in the list of observers for a given subject. Since it is only one object, that means an observer can only be in one of those lists. In other words, it can only observe one subject at a time. In a vanilla observer implementation where each subject has its own independent list, an observer can be in more than one of those lists without any problem.</p>
+<p>The other problem is a more fundamental. Since we are using the observer object itself as a list node, that implies it can only be part of one subject&#x2019;s observer list. In other words, it can only observe a single subject at a time. In a vanilla observer implementation where each subject has its own independent list, an observer can be in more than one of them simultaneously.</p>
 <h3><a href="#a-pool-of-list-nodes" name="a-pool-of-list-nodes">A pool of list nodes</a></h3>
-<p>You may be able to live with this limitation. I find it more common for a subject to have multiple observers than vice versa. If this limitation <em>is</em> a problem for you, there is another more complex solution you can use that still doesn&#x2019;t require dynamic allocation. It&#x2019;s too long to cram into this chapter, but I&#x2019;ll sketch it out an maybe you can fill in the blanks.</p>
-<p>The basic idea is that each subject will have a linked list of observers. Unlike the design we just saw, those nodes won&#x2019;t be observers themselves. Instead, they&#x2019;ll be separate little "node" objects that just contain a pointer to the actual observer and then a pointer to the next node in the list. This way, multiple nodes can point to the same observer.</p>
-<p>The way you avoid dynamic allocation is simple: Since all of those nodes are the same type, you can just create an <a href="object-pool.html" class="pattern">Object Pool</a> for them. That gives you a fixed-size pile of list nodes to work with, and you can use and reuse them as you need without having to hit an actual memory allocator.</p>
+<p>You may be able to live with that limitation. I find it more common for a subject to have multiple observers than vice versa. If it <em>is</em> a problem for you, there is another more complex solution you can use that still doesn&#x2019;t require dynamic allocation. It&#x2019;s too long to cram into this chapter, but I&#x2019;ll sketch it out and let you fill in the blanks.</p>
+<p>The basic idea is that each subject will have a linked list of observers. Unlike the design we just saw, those nodes won&#x2019;t be observers themselves. Instead, they&#x2019;ll be separate little "node" objects that contain a pointer to the observer and then a pointer to the next node in the list. This way, multiple nodes can point to the same observer.</p>
+<p>The way you avoid dynamic allocation is simple: Since all of those nodes are the same type, you create an <a href="object-pool.html" class="pattern">object pool</a> of them. That gives you a fixed-size pile of list nodes to work with, and you can use and reuse them as you need without having to hit an actual memory allocator.</p>
 <h2><a href="#it&#x2019;s-too-awesome" name="it&#x2019;s-too-awesome">It&#x2019;s Too Awesome?</a></h2>
-<p>I think I&#x2019;ve shown that you can overcome most of the techical limitations of the pattern. If that&#x2019;s what&#x2019;s holding you back, it shouldn&#x2019;t. But does that mean you <em>should</em> use it?</p>
-<p>That&#x2019;s a harder question. Like all design patterns the Observer pattern isn&#x2019;t a panacea. Even when implemented correctly and efficiently, it may not be the right solution. The reason design patterns get a bad rap is because people apply good patterns to the wrong problem and end up making things worse.</p>
-<p>There are two challenges with the Observer pattern, one technical and one at something more like the codebase usability level. We&#x2019;ll do the techical one first because those are always easier than human factors issues.</p>
+<p>By now, you shouldn&#x2019;t be frightened of the technical details of the pattern anymore. As you can see, it&#x2019;s quite simple and you can even tweak how it uses memory. But does that mean that you should observers all the time?</p>
+<p>That&#x2019;s a different question. Like all design patterns the Observer pattern isn&#x2019;t a cure-all. Even when implemented correctly and efficiently, it may not be the right solution. The reason design patterns get a bad rap is because people apply good patterns to the wrong problem and end up making things worse.</p>
+<p>There are two challenges with the Observer pattern, one technical and one at something more like the usability level. We&#x2019;ll do the techical one first because those are always easier than human factors issues.</p>
 <h3><a href="#destroying-subjects-and-observers" name="destroying-subjects-and-observers">Destroying subjects and observers</a></h3>
-<p>I think the sample code I&#x2019;ve walked through is solid for what it is, but it completely side-steps an important issue: when happens when you delete a subject or an observer? If you just blindly call <code>delete</code> on an observer, one or more subjects may still have pointers to it. Those are now dangling free. When a subject comes along and tries to send a notification to it, you&#x2019;re going to take a trip to that bad place called "Undefined Behavior" that makes people hate C and C++.</p>
-<p>Destroying the subject is easier since in most implementations the observer doesn&#x2019;t have any references to it. But even then, sending its bits straight to the memory manager&#x2019;s recycle bin may cause some problems. Those observers may still be expecting to receive notifications in the future, and they have no way of knowing that will never happen now. They really aren&#x2019;t observers at all any more, they just think they are.</p>
+<p>I think the sample code we walked through is solid for what it is, but it side-steps an important issue: when happens when you delete a subject or an observer? If you just wantonly call <code>delete</code> on some observer, a subject may still have a pointer to it. That&#x2019;s now a dangling pointer into deallocated memory. When that subject tries to send a notification to it, well&hellip; you&#x2019;re not going to end up in your Happy Place.</p>
+<p>Destroying the subject is easier since in most implementations the observer doesn&#x2019;t have any references to it. But even then, sending its bits straight to the memory manager&#x2019;s recycle bin may cause some problems. Those observers may still be expecting to receive notifications in the future, and they don&#x2019;t know that that will never happen now. They aren&#x2019;t observers at all any more, they just think they are.</p>
 <p>You can deal with this in a couple of different ways. The simplest is to do what I did and just punt on it. It&#x2019;s an observer&#x2019;s job to unregister itself from any subjects when it gets deleted. More often than not, the observer <em>does</em> know which subjects it&#x2019;s observing, so it&#x2019;s usually just a matter of <span name="destructor">adding</span> a <code>removeObserver()</code> call to its destructor.</p>
 <aside name="destructor">
 
@@ -394,8 +393,8 @@ option and push it onto the <em>head</em> of the list:</p>
 </aside>
 
 <p>If you don&#x2019;t want to leave observers hanging when a subject gives up the ghost, that&#x2019;s easy to fix. Just have the subject send one final "dying breath" notification right before it gets destroyed. That way any observer can receive that and take whatever action (mourn, send flowers, etc.) it thinks is appropriate.</p>
-<p>Both of these require you to remember to do the right thing in each class that touches this pattern. People, even we half-robot programmers, are reliably terrible at being reliable. That&#x2019;s why we invented computers: they never make mistakes.</p>
-<p>A safer answer is to make observers automatically unregister themselves from every subject when they get destroyed. If you implement the logic for that once in your basic observer class, everyone using it doesn&#x2019;t have to remember to do it themselves. This does add some complexity, though. It means each <em>observer</em> will need a list of the <em>subjects</em> its observing. You need pointers going in both directions.</p>
+<p>People, even those of us who&#x2019;ve spent enough time in the company of machines to have some of their precision rub off on us, are reliably terrible at being reliable. That&#x2019;s why we invented computers: they don&#x2019;t make the mistakes we so often do.</p>
+<p>A safer answer is to make observers automatically unregister themselves from every subject when they get destroyed. If you implement the logic for that once in your base observer class, everyone using it doesn&#x2019;t have to remember to do it themselves. This does add some complexity, though. It means each <em>observer</em> will need a list of the <em>subjects</em> its observing. You end up with pointers going in both directions.</p>
 <h3><a href="#it&#x2019;s-cool,-i&#x2019;ve-got-a-gc" name="it&#x2019;s-cool,-i&#x2019;ve-got-a-gc">It&#x2019;s cool, I&#x2019;ve got a GC</a></h3>
 <p>All of you cool kids with your hip modern languages with garbage collectors are feeling pretty smug right now. Think you don&#x2019;t have to worry about this because you never explicitly delete anything? Think again!</p>
 <p>Imagine this: you&#x2019;ve got some UI screen that shows a bunch of stats about the player&#x2019;s character like their health and stuff. The player can bring up the screen and dismiss it whenever they want. You implement the screen as an observer where the subject is the main character.</p>
@@ -408,33 +407,38 @@ option and push it onto the <em>head</em> of the list:</p>
 </aside>
 
 <h3><a href="#what&#x2019;s-going-on" name="what&#x2019;s-going-on">What&#x2019;s going on?</a></h3>
-<p>The other, deeper problem with the Observer pattern comes directly from the problem it solves. We reach for Observer because it prevents our code from being too tightly coupled. A subject can indirectly communicate with an observer without being statically bound to its code.</p>
+<p>The other, deeper problem with the Observer pattern comes directly from the problem it solves. We reach for Observer because it prevents our code from being too tightly coupled. A subject can indirectly communicate with an observer without being statically bound to it.</p>
 <p>For such a simple pattern, it accomplishes that quite well. But, if you&#x2019;ve ever had to debug a program that uses observers pervasively and isn&#x2019;t doing what it&#x2019;s supposed to do, you&#x2019;ve learned that it decouples things a bit <em>too</em> well.</p>
 <p>As you&#x2019;re tracing your way through the codebase, there&#x2019;s no easy way to see which parts of the program are communicating with which other parts. Instead of a simple direct named function call that you can look up, all you see is "send a notification".</p>
 <p>To figure out who <em>receives</em> that notification, you have to determine which set of observers happen to be bound to that subject at runtime. Instead of being able to <em>statically</em> reason about the communication structure of the program, you have to reason about its <em>imperative, dynamic</em> behavior.</p>
 <p>The coupling is still there. After all, those pieces of code do need to communicate. It&#x2019;s just that now the coupling is an <span name="emergent">emergent</span> property of how the observers happened to be wired up at runtime. When you&#x2019;ve got long chains of observers and subjects, debugging this communication network can be a nightmare.</p>
 <aside name="emergent">
 
-<p>I&#x2019;ve worked with programs that treated observers like the One True Religion and figuring out why something working was about as fun as figuring out why a string of Christmas lights won&#x2019;t come on, except instead of a string of them, it was a four-dimensional cyclic graph. And each light could spontaneously unplug itself.</p>
+<p>I&#x2019;ve worked with programs that treated observers like the One True Religion and figuring out why something wasn&#x2019;t working was about as fun as figuring out why a balled-up string of Christmas lights won&#x2019;t come on, except instead of a single string of them, it was a branching graph of wires full of lights that can spontaneously unplug each other.</p>
 </aside>
 
-<p>There is no perfect solution here. There are real valid reasons to not want to statically staple pieces of your codebase to each other. Maintaining tightly coupled code sucks: it makes it impossible to reason about parts of the program in isolation. And, when the game gets too big to fit in your head, you <em>need</em> to be able to reason about it locally. But replacing that coupling with something more dynamic does mean globally reasoning about your program is harder.</p>
+<p>There is no perfect solution here. There are real valid reasons to not want to statically staple pieces of your codebase to each other. Maintaining tightly coupled code sucks: it makes it impossible to reason about parts of the program in isolation. And, when the game gets too big to fit in your head, you <em>need</em> to be able to reason about it locally. But replacing that coupling with something more dynamic does mean <em>globally</em> reasoning about your program is harder.</p>
 <p>Don&#x2019;t cry yourself to sleep though. The trick with this is to use it where it helps and avoid it where it doesn&#x2019;t. Here&#x2019;s a simple guideline: <em>if the subject can&#x2019;t do its own work without having an observer, don&#x2019;t use this pattern</em>.</p>
 <p>This pattern is a good fit when the observer cares about the subject but the subject couldn&#x2019;t care less about the observer. If that isn&#x2019;t the case, then it implies there is a real, meaningful coupling between those two objects. In that case, it&#x2019;s usually better to avoid this pattern and make that coupling more explicit.</p>
 <p>The Observer pattern is a great way to layer "secondary" or "ancillary" behavior on top of a core shell of "real" work. Like in our example, the physics engine doesn&#x2019;t need an achievement system whatsoever. It&#x2019;s job is physics and it can do that just fine without anyone watching. It supports observers because that&#x2019;s the simplest, least coupled way we can get the achievement system working, but it doesn&#x2019;t do anything for the physics engine itself.</p>
 <h2><a href="#observers-today" name="observers-today">Observers Today</a></h2>
-<p>Design Patterns came out in the 90s. Back then object-oriented programming was <em>the</em> hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hiearchies.</p>
-<p>The Observer pattern got popular during that zeitgeist, so it&#x2019;s no surprise that it&#x2019;s class heavy. But mainstream programmers today are more familiar with functional programming. Having to implement an entire interface just to receive a notification doesn&#x2019;t fit in today&#x2019;s aesthetic.</p>
-<p>It feels heavyweight and rigid. It <em>is</em> heavyweight and rigid! It&#x2019;s impossible to have a single class that can use <span name="different">different methods</span> for observing different subjects.</p>
-<aside name="different">
+<p>Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was <em>the</em> hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hiearchies.</p>
+<aside name="90s">
 
-<p>This is why so many implementations of the pattern pass the subject into the notify method. Since an observer can only have a single notify method, if it&#x2019;s observing multiple subjects, it needs to know which one the notification is coming from.</p>
+<p>That same year, Ace of Bass had not one but three hit singles, so that may tell you something about our taste and judgment back then.</p>
 </aside>
 
-<p>A more modern approach is to have an observer just be a reference to a method or function. In languages with first class functions, and especially ones with <span name="closures">closures</span>, this is a much more common way to do observers.</p>
+<p>The Observer pattern got popular during that zeitgeist, so it&#x2019;s no surprise that it&#x2019;s class heavy. But mainstream coders now are more comfortable with functional programming. Having to implement an entire interface just to receive a notification doesn&#x2019;t fit today&#x2019;s aesthetic.</p>
+<p>It feels <span name="different">heavyweight</span> and rigid. It <em>is</em> heavyweight and rigid! It&#x2019;s impossible to have a single class that can use methods for observing different subjects.</p>
+<aside name="different">
+
+<p>This is why implementations pass the subject to the notify method. Since an observer only has a single notify method, if it&#x2019;s observing multiple subjects, it needs to be able to tell which one called it.</p>
+</aside>
+
+<p>A more modern approach is for an "observer" to just be a reference to a method or function. In languages with first class functions, and especially ones with <span name="closures">closures</span>, this is a much more common way to do observers.</p>
 <aside name="closures">
 
-<p>These days practically <em>every</em> language has closures. C++ managed to overcome the challenge of having closures in a language without garbage collection before Java managed to get its act together and introduce them in JDK 8.</p>
+<p>These days practically <em>every</em> language has closures. C++ overcame the challenge of closures in a language without garbage collection before Java got its act together and introduced them in JDK 8.</p>
 </aside>
 
 <p>For example, C# has "events" baked into the language. With those, the listener you register is just a "delegate", which is that language&#x2019;s term for a first-class reference to a method. In JavaScript&#x2019;s event system, observers can be objects supporting a special <code>EventListener</code> protocol, but they can also just be functions. The latter is almost always what people use.</p>
@@ -445,16 +449,16 @@ option and push it onto the <em>head</em> of the list:</p>
 </aside>
 
 <h2><a href="#observers-tomorrow" name="observers-tomorrow">Observers Tomorrow</a></h2>
-<p>Event systems and other observer-like patterns are incredibly common these days. They&#x2019;re a well-worn path. But if you write a few large apps using them, you start to notice something. A very large fraction of the code in your observers is really dumb boilerplate. It&#x2019;s usually something like:</p>
+<p>Event systems and other observer-like patterns are incredibly common these days. They&#x2019;re a well-worn path. But if you write a few large apps using them, you start to notice something. A lot of the code in your observers is pretty dumb boilerplate. It&#x2019;s usually something like:</p>
 <ol>
 <li>Get notified that some state has changed.</li>
 <li>Imperatively modify some chunk of UI to reflect the new state.</li>
 </ol>
-<p>It&#x2019;s all, "Oh, the hero health is 7 now? Let me set the width of the health bar to 70 pixels." After a while, it gets pretty tedious. Computer science academics and software engineer practitioners have been trying to eliminate that tedium for a <em>long</em> time. Their attempts have gone under a number of different names: "dataflow programming", "functional reactive programming", etc.</p>
+<p>It&#x2019;s all, "Oh, the hero health is 7 now? Let me set the width of the health bar to 70 pixels." After a while, that gets pretty tedious. Computer science academics and software engineers have been trying to eliminate that tedium for a <em>long</em> time. Their attempts have gone under a number of different names: "dataflow programming", "functional reactive programming", etc.</p>
 <p>While there have been some successes, usually in limited domains like audio processing or chip design, the holy grail still hasn&#x2019;t been found. In the meantime, a humbler step in that direction has started gaining traction. Many recent application frameworks now use "data binding".</p>
-<p>Unlike FRP, data binding doesn&#x2019;t try to entirely eliminate imperative code and doesn&#x2019;t try to architect your entire application around a giant declarative dataflow graph. What it does do is automate a bunch of the really tedious boilerplate where you&#x2019;re tweaking a UI element to reflect a change to some value.</p>
-<p>Like other declarative systems, data binding is probably a bit too sloow and complex to be a good fit for the core of a game engine. But I would be surprised if I didn&#x2019;t see it start making in-roads into less critical areas of the game like UI.</p>
-<p>In the meantime, the good old Observer pattern will still be there waiting for us. Sure, it&#x2019;s not as exciting as some hot technique that manages to cram both "functional" and "reactive" in its name, but it&#x2019;s dead simple and it works fine. To me, those are often the two most important criteria for a solution.</p>
+<p>Unlike more ambitious approaches, data binding doesn&#x2019;t try to entirely eliminate imperative code and doesn&#x2019;t try to architect your entire application around a giant declarative dataflow graph. What it does do is automate a bunch of obvious busywork where you&#x2019;re tweaking a UI element to reflect a change to some value.</p>
+<p>Like other declarative systems, data binding is probably a bit too slow and complex to fit inside the core of a game engine. But I would be surprised if I didn&#x2019;t see it start making in-roads into less critical areas of the game like UI.</p>
+<p>In the meantime, the good old Observer pattern will still be there waiting for us. Sure, it&#x2019;s not as exciting as some hot technique that manages to cram both "functional" and "reactive" in its name, but it&#x2019;s dead simple and it works. To me, those are often the two most important criteria for a solution.</p>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </div>
 </body>
