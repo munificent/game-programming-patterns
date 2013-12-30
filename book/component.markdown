@@ -1,5 +1,5 @@
 ^title Component
-^section Behaving Patterns
+^section Decoupling Patterns
 
 ## Intent
 

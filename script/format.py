@@ -121,12 +121,9 @@ def formatfile(path, nav, skip_up_to_date):
 
         if section != "":
             title_text = section + " / " + title
-            if section == "Sequencing Patterns":
-                section_header = ' / <a href="sequencing-patterns.html">' + section + '</a>'
-            elif section == "Optimization Patterns":
-                section_header = ' / <a href="optimization-patterns.html">' + section + '</a>'
-            else:
-                section_header = " / " + section
+            section_href = section.lower().replace(" ", "-")
+            section_header = ' / <a href="{}.html">{}</a>'.format(
+                section_href, section)
 
         contents = contents.replace('<aside', '<aside markdown="1"')
 

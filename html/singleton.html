@@ -22,7 +22,7 @@
 </head>
 <body id="top">
 <div class="content">
-<h1 class="book"><a href="index.html">Game Programming Patterns</a> / Design Patterns Revisited</h1>
+<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="design-patterns-revisited.html">Design Patterns Revisited</a></h1>
 <h1>Singleton</h1>
 <div class="in-progress">
   <span class="dismiss">&times;</span>
@@ -619,17 +619,14 @@ object with <em>global</em> scope, let&#x2019;s consider other ways our codebase
 get access to an object.</p>
 <h4><a href="#pass-it-in" name="pass-it-in">Pass it in</a></h4>
 <p>The simplest solution, and often the best, is to simply pass the
-object you need as argument to the functions that need it. It&#x2019;s worth
+object you need as an argument to the functions that need it. It&#x2019;s worth
 considering before we discard it as too cumbersome.</p>
 <p>Consider a function for rendering objects. In order to render, it
-needs access to an object that represents the graphics device and maintains the render state. Passing in this object as an argument to
-functions that need to render is a common solution, common enough to
-be a pattern in this book: <a class="pattern" href="context-object.html">Context Parameter</a>.</p>
+needs access to an object that represents the graphics device and maintains the render state. It&#x2019;s very common to just pass that in to all of the rendering functions, usually as a parameter named something like <code>context</code>.</p>
 <p>On the other hand, some objects don&#x2019;t belong in the signature of a
 method. For example, a function that handles AI may need to also write
 to a <span name="aop">log file</span>, but logging isn&#x2019;t its core concern. It would be strange
-to see <code>Log</code> show up in its argument list. For cross-cutting concerns
-like logging, we&#x2019;ll want to consider other options.</p>
+to see <code>Log</code> show up in its argument list, so for cases like that we&#x2019;ll want to consider other options.</p>
 <aside name="aop">
 
 <p>The term for things like logging that appear scattered throughout a codebase
@@ -750,12 +747,11 @@ implementation in a game. To ensure single instantiation, I usually
 simply use a static class. If that doesn&#x2019;t work, I&#x2019;ll use a static
 flag to check at runtime that only one instance of the class is
 constructed.</p>
-<p>To provide access to an object, there are several patterns in this
-book that don&#x2019;t cause the headache that global access causes. In rough
-order of frequency, I tend to use <a class="pattern"
-href="subclass-sandbox.html">Subclass Sandboxes</a>, <a class="pattern"
-href="context-object.html">Context Parameters</a>, and <a
-class="pattern" href="service-locator.html">Service Locators</a>.</p>
+<p>There are a couple of other chapters in this book that can also help here. The
+<a class="pattern" href="subclass-sandbox.html">Subclass Sandbox</a> pattern
+gives instances of a class access to some shared state without making it globally
+available. The <a class="pattern" href="service-locator.html">Service Locator</a>
+<em>does</em> make an object globally available, but it gives you more flexibility with how that object is configured.</p>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </div>
 </body>

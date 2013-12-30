@@ -1,5 +1,4 @@
 ^title Introduction
-^section Getting Started
 
 In fifth grade, my friends and I were given access to a little unused
 classroom housing a couple of very beat up TRS-80s. Hoping to inspire
@@ -60,13 +59,19 @@ head. Instead of just reading about &ldquo;How to Program in
 C++,&rdquo; I started trying to find books about how to *organize*
 programs.
 
-Fast-forward several years and a friend hands me a new book: *Design
+Fast-forward several years and a <span name="friend">new friend</span> hands me a book: *Design
 Patterns: Elements of Reusable Object-Oriented Software*. Finally! The
 book I'd been looking for since I was a teenager. I read it cover to
 cover in one sitting. I still struggled with my own programs, but it
 was such a relief to see that other people struggled too, and came up
 with solutions. I felt like I finally had a couple of *tools* to use
 instead of just my bare hands.
+
+<aside name="friend">
+
+This was the first time I'd met a friend of my best friend, and five minutes after meeting him, I sat down on his couch and spent the next few hours completely ignoring him and reading. I'd like to think my social skills have improved at least a little since then.
+
+</aside>
 
 In 2001, I landed my dream job: software engineer at Electronic Arts.
 I would be a real game programmer! I couldn't wait to get a look at

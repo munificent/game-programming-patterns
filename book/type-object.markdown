@@ -1,5 +1,5 @@
 ^title Type Object
-^section Behaving Patterns
+^section Behavioral Patterns
 
 ## Intent
 

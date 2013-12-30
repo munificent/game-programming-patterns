@@ -197,5 +197,3 @@ What I *am* confident of is that using flyweight objects shouldn't be dismissed 
     In order to return a previously created flyweight, you'll have to keep track of the pool of ones that you've already instantiated. As the name implies, that means that an <a href="object-pool.html" class="pattern">Object Pool</a> might be a helpful place to store them.
 
  *  When you're using the <a class="pattern" href="state.html">State</a> pattern, you often have "state" objects that don't have any fields that are specific to the machine that the state is being used in. The state's identity and methods are enough to be useful. In that case, you can apply this pattern and reuse that same state instance in multiple state machines at the same time without any problems.
-
- *  This pattern requires the flyweight to not have any state specific to its context, but sometimes a method in the flyweight needs *some* context to do its job. Since we can't *store* that data in the object, the only option is to pass it into the method. That's the <a href="context-parameter.html" class="pattern">Context Parameter</a> pattern.

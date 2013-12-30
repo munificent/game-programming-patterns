@@ -1,4 +1,4 @@
 ^title Bytecode
-^section Behaving Patterns
+^section Behavioral Patterns
 
 *Sorry, this chapter hasn't been written yet!*

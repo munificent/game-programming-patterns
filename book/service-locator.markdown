@@ -1,5 +1,5 @@
 ^title Service Locator
-^section Communicating Patterns
+^section Decoupling Patterns
 
 ## Intent
 

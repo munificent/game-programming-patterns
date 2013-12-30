@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 
-<title>Game Programming Patterns / Behaving Patterns / Subclass Sandbox</title>
+<title>Game Programming Patterns / Behavioral Patterns / Subclass Sandbox</title>
 
 <!-- Tell mobile browsers we're optimized for them and they don't need to crop
      the viewport. -->
@@ -22,7 +22,7 @@
 </head>
 <body id="top">
 <div class="content">
-<h1 class="book"><a href="index.html">Game Programming Patterns</a> / Behaving Patterns</h1>
+<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="behavioral-patterns.html">Behavioral Patterns</a></h1>
 <h1>Subclass Sandbox</h1>
 <div class="in-progress">
   <span class="dismiss">&times;</span>
@@ -184,9 +184,7 @@ class. Those together mean that making changes to it can be difficult without br
 <p>If you find this pattern is turning your base class into a giant bowl of
 code stew, consider pulling some of the provided operations out into separate
 classes that the base class can dole out responsibility to. The
-<a class="pattern" href="component.html">Component</a> and
-<a class="pattern" href="context-parameter.html">Context Parameter</a>
-patterns can help here.</p>
+<a class="pattern" href="component.html">Component</a> pattern can help here.</p>
 <h3><a href="#derived-classes-are-*only*-coupled-to-their-base-class" name="derived-classes-are-*only*-coupled-to-their-base-class">Derived classes are <em>only</em> coupled to their base class</a></h3>
 <p>The flip side of the coin is that since most of your coupling has been pushed
 up to the base class, the derived classes are now much more cleanly separated.
@@ -647,15 +645,6 @@ one by outside code, it just fetches it itself from the service locator.</p>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
 <li>
-<p>This pattern is a close cousin to
-    <a class="pattern" href="context-parameter.html">Context Parameter</a>.
-    It&#x2019;s basically a context parameter where the "parameter" is <code>this</code>.</p>
-<p>These patterns can be used in tandem. You may have a single sandbox
-method that provides some operations by making them protected on <code>this</code>
-(this pattern) and that also passes in a context parameter or two that
-provide other operations.</p>
-</li>
-<li>
 <p>When you apply the
     <a class="pattern href="update-method.html">Update Method</a> pattern, your
     update method will very often also be a sandbox method.</p>
@@ -665,9 +654,9 @@ provide other operations.</p>
     of this. In that pattern, the base class defines a single high-level
     method that it implements by calling primitive operations. These primitive
     operations are abstract and get implemented by the subclasses.</p>
-<p>So where this pattern provides the primitives and delegates the high-level
-behavior to subclasses, the Template Method Pattern provides the high-level
-behavior and delegates the primitives.</p>
+<p>So where the Subclass Sandbox pattern provides the primitives and delegates
+the high-level behavior to subclasses, the Template Method Pattern provides
+the high-level behavior and delegates the primitives.</p>
 </li>
 </ul>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>

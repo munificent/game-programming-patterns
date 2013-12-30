@@ -445,19 +445,16 @@ get access to an object.
 #### Pass it in
 
 The simplest solution, and often the best, is to simply pass the
-object you need as argument to the functions that need it. It's worth
+object you need as an argument to the functions that need it. It's worth
 considering before we discard it as too cumbersome.
 
 Consider a function for rendering objects. In order to render, it
-needs access to an object that represents the graphics device and maintains the render state. Passing in this object as an argument to
-functions that need to render is a common solution, common enough to
-be a pattern in this book: <a class="pattern" href="context-object.html">Context Parameter</a>.
+needs access to an object that represents the graphics device and maintains the render state. It's very common to just pass that in to all of the rendering functions, usually as a parameter named something like `context`.
 
 On the other hand, some objects don't belong in the signature of a
 method. For example, a function that handles AI may need to also write
 to a <span name="aop">log file</span>, but logging isn't its core concern. It would be strange
-to see `Log` show up in its argument list. For cross-cutting concerns
-like logging, we'll want to consider other options.
+to see `Log` show up in its argument list, so for cases like that we'll want to consider other options.
 
 <aside name="aop">
 
@@ -560,9 +557,8 @@ simply use a static class. If that doesn't work, I'll use a static
 flag to check at runtime that only one instance of the class is
 constructed.
 
-To provide access to an object, there are several patterns in this
-book that don't cause the headache that global access causes. In rough
-order of frequency, I tend to use <a class="pattern"
-href="subclass-sandbox.html">Subclass Sandboxes</a>, <a class="pattern"
-href="context-object.html">Context Parameters</a>, and <a
-class="pattern" href="service-locator.html">Service Locators</a>.
+There are a couple of other chapters in this book that can also help here. The
+<a class="pattern" href="subclass-sandbox.html">Subclass Sandbox</a> pattern
+gives instances of a class access to some shared state without making it globally
+available. The <a class="pattern" href="service-locator.html">Service Locator</a>
+*does* make an object globally available, but it gives you more flexibility with how that object is configured.

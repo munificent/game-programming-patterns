@@ -1,4 +1,4 @@
 ^title Message Queue
-^section Communicating Patterns
+^section Decoupling Patterns
 
 *Sorry, this chapter hasn't been written yet!*

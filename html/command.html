@@ -22,7 +22,7 @@
 </head>
 <body id="top">
 <div class="content">
-<h1 class="book"><a href="index.html">Game Programming Patterns</a> / Design Patterns Revisited</h1>
+<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="design-patterns-revisited.html">Design Patterns Revisited</a></h1>
 <h1>Command</h1>
 <div class="in-progress">
   <span class="dismiss">&times;</span>
@@ -390,11 +390,6 @@
 <p>If you&#x2019;re comfortable with a functional style, this way of doing things is natural. If you aren&#x2019;t, I hope this chapter helped you along the way a bit. For me, the lesson here is that the usefulness of the command pattern really shows how useful the functional paradigm is for many problems.</p>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
-<li>
-<p>Command objects almost always modify some state. They often store a reference to the state they change, but sometimes they need access to a larger context. Think seeing the entire chessboard for a command that moves a single piece.</p>
-<p>The command could store a reference to that too, but that can be a waste
-of space when every command will end up using the same context. A lighter-weight option is to pass it in when you execute the command. This is what the <a class="pattern" href="context-parameter.html">Context Parameter</a> pattern is about.</p>
-</li>
 <li>
 <p>You may end up with a lot of different command classes. In order to make it easier to implement those, it&#x2019;s often helpful to define a concrete base class with a bunch of convenient high-level methods that the derived commands can compose to define their behavior. That turns the command&#x2019;s main <code>execute</code> method into a <a href="subclass-sandbox.html" class="pattern">Subclass Sandbox</a>.</p>
 </li>

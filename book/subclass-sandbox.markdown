@@ -1,5 +1,5 @@
 ^title Subclass Sandbox
-^section Behaving Patterns
+^section Behavioral Patterns
 
 ## Intent
 
@@ -130,9 +130,7 @@ class. Those together mean that making changes to it can be difficult without br
 If you find this pattern is turning your base class into a giant bowl of
 code stew, consider pulling some of the provided operations out into separate
 classes that the base class can dole out responsibility to. The
-<a class="pattern" href="component.html">Component</a> and
-<a class="pattern" href="context-parameter.html">Context Parameter</a>
-patterns can help here.
+<a class="pattern" href="component.html">Component</a> pattern can help here.
 
 [brittle base class problem]: http://en.wikipedia.org/wiki/Fragile_base_class
 
@@ -433,15 +431,6 @@ particle system object, how would it get one?
 
 ## See Also
 
-*   This pattern is a close cousin to
-    <a class="pattern" href="context-parameter.html">Context Parameter</a>.
-    It's basically a context parameter where the "parameter" is `this`.
-
-    These patterns can be used in tandem. You may have a single sandbox
-    method that provides some operations by making them protected on `this`
-    (this pattern) and that also passes in a context parameter or two that
-    provide other operations.
-
 *   When you apply the
     <a class="pattern href="update-method.html">Update Method</a> pattern, your
     update method will very often also be a sandbox method.
@@ -451,6 +440,6 @@ particle system object, how would it get one?
     method that it implements by calling primitive operations. These primitive
     operations are abstract and get implemented by the subclasses.
 
-    So where this pattern provides the primitives and delegates the high-level
-    behavior to subclasses, the Template Method Pattern provides the high-level
-    behavior and delegates the primitives.
+    So where the Subclass Sandbox pattern provides the primitives and delegates
+    the high-level behavior to subclasses, the Template Method Pattern provides
+    the high-level behavior and delegates the primitives.
