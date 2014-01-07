@@ -1,6 +1,6 @@
 ^title Design Patterns Revisited
 
-*Design Patterns: Elements of Reusable Object-Oriented Software* is nearly twenty years old as I write this. Unless you're reading over my shoulder, there's a good chance *Design Patterns* is old enough to drink by now. For an industry as quickly moving as software, that's nearly ancient. It's endurance says something about the timelessness of design compared to many languages, technologies, and methodologies.
+*Design Patterns: Elements of Reusable Object-Oriented Software* is nearly twenty years old as I write this. Unless you're looking over my shoulder, there's a good chance *Design Patterns* will be old enough to drink by the time you read this. For an industry as quickly moving as software, that's practically ancient. The enduring popularity of the book says something about the timelessness of design compared to many technologies, languages, and methodologies.
 
 While I think *Design Patterns* is still relevant, we've learned a lot in the past couple of decades. In this section, we'll walk through a handful of the original patterns the Gang of Four documented. For each pattern, I hope to have something useful or interesting to say.
 
