@@ -47,7 +47,7 @@ That's fragmentation.
 
 <span name="heap"></span>
 
-<img src="images/object-pool-heap-fragment.gif" />
+<img src="images/object-pool-heap-fragment.png" />
 
 <aside name="heap">
 
