@@ -211,6 +211,10 @@ namespace ObserverPattern
     //^linked-subject
     class Subject
     {
+      Subject()
+      : head_(NULL)
+      {}
+
       // Methods...
       //^omit
       void addObserver(Observer* observer);
