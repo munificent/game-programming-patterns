@@ -13,7 +13,7 @@ Observer is one of the most widely used and widely known of the original Gang of
 
 ## Achievement Unlocked
 
-Say you're adding an <span name="weasel">achievements</span> system to your game. It will feature dozens of different badges players can earn for completing specific milestones like "Kill 100 Monkey Demons", "Fall of a Bridge", or "Complete a Level Wielding Only a Dead Weasel".
+Say you're adding an <span name="weasel">achievements</span> system to your game. It will feature dozens of different badges players can earn for completing specific milestones like "Kill 100 Monkey Demons", "Fall off a Bridge", or "Complete a Level Wielding Only a Dead Weasel".
 
 <aside name="weasel">
 
