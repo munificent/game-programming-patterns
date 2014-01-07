@@ -9,29 +9,29 @@ We'll cover that here, but I'll also show you other, more interesting places whe
 
 <aside name="original">
 
-I don't say "original" lightly here. *Design Patterns* cites Ivan Sutherland's legendary [Sketchpad](http://en.wikipedia.org/wiki/Sketchpad) project in *1963* as one of the first examples of this pattern in the wild. While everyone else was listening to Dylan and the Beatles, he was busy just, you know, inventing the basic concepts of CAD, interactive graphics, and object-oriented programming.
+I don't say "original" lightly here. *Design Patterns* cites Ivan Sutherland's legendary [Sketchpad](http://en.wikipedia.org/wiki/Sketchpad) project in *1963* as one of the first examples of this pattern in the wild. While everyone else was listening to Dylan and the Beatles, Sutherland was busy just, you know, inventing the basic concepts of CAD, interactive graphics, and object-oriented programming.
 
 Watch [the demo](http://www.youtube.com/watch?v=USyoT_Ha_bA) and prepare to be blown away.
 
 </aside>
 
-Pretend we're making a game in the style of Gauntlet. We've got creatures and fiends swarming around the hero, vying for their share of his flesh. These unsavory dinner companions enter the arena by way of generators, and there is a different generator for each kind of enemy.
+Pretend we're making a game in the style of Gauntlet. We've got creatures and fiends swarming around the hero, vying for their share of his flesh. These unsavory dinner companions enter the arena by way of "spawners", and there is a different spawner for each kind of enemy.
 
 For the sake of this example, let's say we have different types for each kind of monster in the game. We'll have actual C++ classes for `Ghost`, `Demon`, `Sorcerer`, etc., like:
 
 ^code monster-classes
 
-A generator constructs instances of one particular monster type. To support every monster in the game, we could brute-force it by having a generator class for each monster class, leading to a parallel class hierarchy:
+A spawner constructs instances of one particular monster type. To support every monster in the game, we could brute-force it by having a spawner class for each monster class, leading to a parallel class hierarchy:
 
 <img src="images/prototype-hierarchies.png" />
 
 Implementing it looks like this:
 
-^code generator-classes
+^code spawner-classes
 
 Unless you get paid by the line of code, this is pretty obviously not a fun way to hack this together. Lots of classes, lots of boilerplate, lots of redundancy, lots of duplication, lots of repeating myself...
 
-The prototype pattern offers a solution. The key idea is that *an object can be a generator of other objects similar to itself*. If you have one ghost, you can make more ghosts from it. If you have a demon, you can make other demons. Any monster can be treated as a *prototypical* monster used to spawn other versions of itself.
+The prototype pattern offers a solution. The key idea is that *an object can spawn other objects similar to itself*. If you have one ghost, you can make more ghosts from it. If you have a demon, you can make other demons. Any monster can be treated as a *prototypical* monster used to generate other versions of itself.
 
 To implement this, we give our base class, `Monster`, an abstract `clone()` method:
 
@@ -41,25 +41,25 @@ Each monster subclass provides an implementation that returns a new object ident
 
 ^code clone-ghost
 
-Once all our monsters support that, we no longer need a generator class for each monster class. Instead, we define a single one:
+Once all our monsters support that, we no longer need a spawner class for each monster class. Instead, we define a single one:
 
-^code generator-clone
+^code spawner-clone
 
-It internally holds a monster, a hidden one whose sole purpose is to be used by the generator as a template to stamp out more monsters like it, sort of like a queen bee who never leaves the hive.
+It internally holds a monster, a hidden one whose sole purpose is to be used by the spawner as a template to stamp out more monsters like it, sort of like a queen bee who never leaves the hive.
 
-<img src="images/prototype-generator.png" />
+<img src="images/prototype-spawner.png" />
 
-To create a ghost generator, we just create a prototypical ghost instance, and then create a generator holding that prototype:
+To create a ghost spawner, we just create a prototypical ghost instance, and then create a spawner holding that prototype:
 
-^code generate-ghost-clone
+^code spawn-ghost-clone
 
-One neat part about this pattern is that it doesn't just clone the *class* of the prototype, it clones its *state* too. This means we could make a generator for fast ghosts, or weak ones, or slow ones, just by creating an appropriate prototype ghost.
+One neat part about this pattern is that it doesn't just clone the *class* of the prototype, it clones its *state* too. This means we could make a spawner for fast ghosts, or weak ones, or slow ones, just by creating an appropriate prototype ghost.
 
-I find something both elegant and yet surprising about this pattern. I can't imagine coming up with it myself, but it's such a simple and natural concept.
+I find something both elegant and yet surprising about this pattern. I can't imagine coming up with it myself, but I can't imagine *not* knowing about it now that I do.
 
 ### How well does it work?
 
-Well, we don't have to create a separate generator class for each monster, so that's good. But we *do* have to implement `clone()` in each monster class. That's just about as much code as the generators.
+Well, we don't have to create a separate spawner class for each monster, so that's good. But we *do* have to implement `clone()` in each monster class. That's just about as much code as the spawners.
 
 There are also some nasty semantic ratholes when you sit down to try to write a correct `clone()`. Does it do a deep clone or shallow one? (I.e. when a field is a reference to an object, do we clone that object too, or just the reference?) How does it interact with ownership?
 
@@ -67,23 +67,23 @@ Also, not only does it not look like it's saving us much code in this contrived 
 
 Most of us learned the hard way that big class hierarchies like this are a pain to manage, which is why we instead use patterns like <a href="component.html" class="pattern">Component</a> and <a href="type-object.html" class="pattern">Type Object</a> to model different kinds of entities without enshrining each in its own class.
 
-### Generator functions
+### Spawn functions
 
-Even if we do have different classes for each monster, there are other ways to decorticate this *Felis catus*. Instead of making separate generator *classes* for each monster, we could make generator *functions*, like so:
+Even if we do have different classes for each monster, there are other ways to decorticate this *Felis catus*. Instead of making separate spawner *classes* for each monster, we could make spawn *functions*, like so:
 
 ^code callback
 
-This is less boilerplate than rolling a whole class for constructing a monster of some type. Then the one generator class can just store a function pointer:
+This is less boilerplate than rolling a whole class for constructing a monster of some type. Then the one spawner class can just store a function pointer:
 
-^code generator-callback
+^code spawner-callback
 
-To create a generator for ghosts, you just do:
+To create a spawner for ghosts, you just do:
 
-^code generate-ghost-callback
+^code spawn-ghost-callback
 
 ### Templates
 
-By <span name="templates">now</span>, most C++ developers are familiar with templates. Our generator class needs to construct instances of some type, but we don't want to hard code some specific monster class. The natural solution then is to make it a *type parameter*, which templates let us do:
+By <span name="templates">now</span>, most C++ developers are familiar with templates. Our spawner class needs to construct instances of some type, but we don't want to hard code some specific monster class. The natural solution then is to make it a *type parameter*, which templates let us do:
 
 <aside name="templates">
 
@@ -101,15 +101,15 @@ Using it looks like:
 
 <aside name="base">
 
-The `Generator` class here is so that code that doesn't care what kind of monster a generator creates can just use it and work with pointers to `Monster`.
+The `Spawner` class here is so that code that doesn't care what kind of monster a spawner creates can just use it and work with pointers to `Monster`.
 
-If we only had the templated class, there would be no single supertype they all shared, so any code that worked with generators of any monster type would itself need to take a template parameter.
+If we only had the `SpawnerFor<T>` class, there would be no single supertype the instantiations of that template all shared, so any code that worked with spawners of any monster type would itself need to take a template parameter.
 
 </aside>
 
 ### First-class types
 
-The previous two solutions address the need to have a class, `Generator`, which is parameterized by a type. In C++, types aren't generally first-class, so that requires some <span name="type-obj">gymnastics</span>. If you're using a dynamically-typed language like JavaScript, Python or Ruby where classes *are* just regular objects you can pass around, you can solve this much more directly.
+The previous two solutions address the need to have a class, `Spawner`, which is parameterized by a type. In C++, types aren't generally first-class, so that requires some <span name="type-obj">gymnastics</span>. If you're using a dynamically-typed language like JavaScript, Python or Ruby where classes *are* just regular objects you can pass around, you can solve this much more directly.
 
 <aside name="type-obj">
 
@@ -117,7 +117,7 @@ In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pat
 
 </aside>
 
-When you make a generator, just pass in the class of monster that it should construct -- literally the actual runtime object that represents the monster's class. Easy as pie.
+When you make a spawner, just pass in the class of monster that it should construct -- literally the actual runtime object that represents the monster's class. Easy as pie.
 
 With all of these options, I honestly can't say I've found a case where I felt the prototype *design pattern* was the best answer. Maybe your experience will be different, but for now let's put that away and talk about something else: prototypes as a *language paradigm*.
 

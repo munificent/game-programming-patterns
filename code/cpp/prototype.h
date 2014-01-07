@@ -16,34 +16,34 @@ namespace PrototypePattern
     class Sorcerer : public Monster {};
     //^monster-classes
 
-    //^generator-classes
-    class Generator
+    //^spawner-classes
+    class Spawner
     {
     public:
-      virtual ~Generator() {}
-      virtual Monster* generateMonster() = 0;
+      virtual ~Spawner() {}
+      virtual Monster* spawnMonster() = 0;
     };
 
-    class GhostGenerator : public Generator
+    class GhostSpawner : public Spawner
     {
     public:
-      Monster* generateMonster()
+      Monster* spawnMonster()
       {
         return new Ghost();
       }
     };
 
-    class DemonGenerator : public Generator
+    class DemonSpawner : public Spawner
     {
     public:
-      Monster* generateMonster()
+      Monster* spawnMonster()
       {
         return new Demon();
       }
     };
 
     // You get the idea...
-    //^generator-classes
+    //^spawner-classes
   }
 
   namespace Clone
@@ -79,15 +79,15 @@ namespace PrototypePattern
     //^clone-ghost
 
 
-    //^generator-clone
-    class Generator
+    //^spawner-clone
+    class Spawner
     {
     public:
-      Generator(Monster* prototype)
+      Spawner(Monster* prototype)
       : prototype_(prototype)
       {}
 
-      Monster* generateMonster()
+      Monster* spawnMonster()
       {
         return prototype_->clone();
       }
@@ -95,15 +95,15 @@ namespace PrototypePattern
     private:
       Monster* prototype_;
     };
-    //^generator-clone
+    //^spawner-clone
 
     void test()
     {
-      //^generate-ghost-clone
+      //^spawn-ghost-clone
       Monster* ghostPrototype = new Ghost(15, 3);
-      Generator* ghostGenerator = new Generator(ghostPrototype);
-      //^generate-ghost-clone
-      use(ghostGenerator);
+      Spawner* ghostSpawner = new Spawner(ghostPrototype);
+      //^spawn-ghost-clone
+      use(ghostSpawner);
     }
   }
 
@@ -117,38 +117,38 @@ namespace PrototypePattern
     class Ghost : public Monster {};
 
     //^callback
-    Monster* generateGhost()
+    Monster* spawnGhost()
     {
       return new Ghost();
     }
     //^callback
 
-    //^generator-callback
-    typedef Monster* (*GenerateCallback)();
+    //^spawn-callback
+    typedef Monster* (*SpawnCallback)();
 
-    class Generator
+    class Spawner
     {
     public:
-      Generator(GenerateCallback generate)
-      : generate_(generate)
+      Spawner(SpawnCallback spawn)
+      : spawn_(spawn)
       {}
 
-      Monster* generateMonster()
+      Monster* spawnMonster()
       {
-        return generate_();
+        return spawn_();
       }
 
     private:
-      GenerateCallback generate_;
+      SpawnCallback spawn_;
     };
-    //^generator-callback
+    //^spawn-callback
 
     void test()
     {
-      //^generate-ghost-callback
-      Generator* ghostGenerator = new Generator(generateGhost);
-      //^generate-ghost-callback
-      use(ghostGenerator);
+      //^spawn-ghost-callback
+      Spawner* ghostSpawner = new Spawner(spawnGhost);
+      //^spawn-ghost-callback
+      use(ghostSpawner);
     }
   }
 
@@ -162,27 +162,27 @@ namespace PrototypePattern
     class Ghost : public Monster {};
 
     //^templates
-    class Generator
+    class Spawner
     {
     public:
-      virtual ~Generator() {}
-      virtual Monster* generateMonster() = 0;
+      virtual ~Spawner() {}
+      virtual Monster* spawnMonster() = 0;
     };
 
     template <class T>
-    class GeneratorFor : public Generator
+    class SpawnerFor : public Spawner
     {
     public:
-      Monster* generateMonster() { return new T(); }
+      Monster* spawnMonster() { return new T(); }
     };
     //^templates
 
     void test()
     {
       //^use-templates
-      Generator* ghostGenerator = new GeneratorFor<Ghost>();
+      Spawner* ghostSpawner = new SpawnerFor<Ghost>();
       //^use-templates
-      use(ghostGenerator);
+      use(ghostSpawner);
     }
   }
 }
