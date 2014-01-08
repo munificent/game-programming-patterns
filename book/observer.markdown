@@ -13,7 +13,7 @@ Observer is one of the most widely used and widely known of the original Gang of
 
 ## Achievement Unlocked
 
-Say you're adding an <span name="weasel">achievements</span> system to your game. It will feature dozens of different badges players can earn for completing specific milestones like "Kill 100 Monkey Demons", "Fall of a Bridge", or "Complete a Level Wielding Only a Dead Weasel".
+Say you're adding an <span name="weasel">achievements</span> system to your game. It will feature dozens of different badges players can earn for completing specific milestones like "Kill 100 Monkey Demons", "Fall off a Bridge", or "Complete a Level Wielding Only a Dead Weasel".
 
 <aside name="weasel">
 
@@ -23,7 +23,7 @@ I swear I had no double meaning in mind when I drew this.
 
 </aside>
 
-This is tricky to implement cleanly since you have such a wide range of achievements that are unlocked by all sorts of different behaviors. If you aren't careful, tendrils of your achievement system will twine their way through every dark corner of your codebase. Sure, "Fall of a Bridge" is somehow tied to the <span name="physics">physics engine</span>, but do you really want to see a call to `unlockFallOffBridge()` right in the middle of the linear algebra in your collision resolution algorithm?
+This is tricky to implement cleanly since you have such a wide range of achievements that are unlocked by all sorts of different behaviors. If you aren't careful, tendrils of your achievement system will twine their way through every dark corner of your codebase. Sure, "Fall off a Bridge" is somehow tied to the <span name="physics">physics engine</span>, but do you really want to see a call to `unlockFallOffBridge()` right in the middle of the linear algebra in your collision resolution algorithm?
 
 <aside name="physics">
 
@@ -35,7 +35,7 @@ What we'd like, as always, is to have all the code concerned with one aspect of 
 
 That's what the observer pattern is for. It lets one piece of code announce that something interesting happened *without actually caring who receives the notification*.
 
-For example, you've got some physics code that handles gravity and tracks which bodies are relaxing on nice flat surfaces and which are plummeting towards sure demise. To implement the "Fall of a Bridge" badge, you could just jam the achievement code right in there, but that's a mess. Instead, you can just do:
+For example, you've got some physics code that handles gravity and tracks which bodies are relaxing on nice flat surfaces and which are plummeting towards sure demise. To implement the "Fall off a Bridge" badge, you could just jam the achievement code right in there, but that's a mess. Instead, you can just do:
 
 ^code physics-update
 
@@ -58,7 +58,7 @@ through it quickly.
 
 ### The observer
 
-We'll start with the nosy class that wants to know when another other object does something interesting. It accomplishes that by implementing this:
+We'll start with the nosy class that wants to know when another object does something interesting. It accomplishes that by implementing this:
 
 <span name="signature"></span>
 
@@ -139,7 +139,7 @@ The Observer pattern gets a particularly bad rap here because it's been known to
 
 <aside name="names">
 
-This is why I think documenting patterns is important. When we get fuzzy about terminology, we lose the ability to communicate clearly and succintly. You say, "Observer" and someone hears "Messaging" because either no one bothered to write down the difference or they didn't happen to read it.
+This is why I think documenting patterns is important. When we get fuzzy about terminology, we lose the ability to communicate clearly and succinctly. You say, "Observer" and someone hears "Messaging" because either no one bothered to write down the difference or they didn't happen to read it.
 
 That's what I'm trying to do with this book. And, to cover my bases, I've got a chapter on messaging too: <a href="message-queue.html" class="pattern">Message Queue</a>.
 
@@ -155,7 +155,7 @@ In fact, you have to be careful because the Observer pattern *is* synchronous. T
 
 This sounds scary, but in practice it's not the end of the world. It's just something you have to be aware of. UI programmers -- who've been doing event-based programming like this for ages -- have an established motto for this: "stay off the UI thread".
 
-If you're responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn't lock up. When you have slow to work to do, push it onto another thread or a work queue and you're good. It takes a little discipline, but it's not rocket science.
+If you're responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn't lock up. When you have slow work to do, push it onto another thread or a work queue and you're good. It takes a little discipline, but it's not rocket science.
 
 ## "It Does Too Much Dynamic Allocation"
 
@@ -228,7 +228,7 @@ It's a worthwhile exercise for you to do though: It helps you really think in te
 
 Because we have a singly linked list, we have to walk it to find the observer we're removing. We'd have to do the same thing if we were using a regular array for that matter. If we use a *doubly* linked list, where each observer has a pointer to both the observer after it and before it, we can remove an observer in constant time. If this were real code, I'd do that.
 
-The only thing left to do is sending a notification. That's as simple as walking the list:
+The only thing left to do is send a notification. That's as simple as walking the list:
 
 ^code linked-notify
 
@@ -244,7 +244,7 @@ Like before, each subject will have a linked list of observers. However, those l
 
 <img src="images/observer-nodes.png" />
 
-Since multiple nodes can all point to the same observer, that means an observer can be more than one subject's list at the same time. We're back to being able to observer multiple subjects simultaneously.
+Since multiple nodes can all point to the same observer, that means an observer can be in more than one subject's list at the same time. We're back to being able to observe multiple subjects simultaneously.
 
 <aside name="intrusive">
 
@@ -266,7 +266,7 @@ Two challenges remain, one technical and one at something more like the maintain
 
 ### Destroying subjects and observers
 
-The sample code we walked through is solid, but it <span name="destruct">side-steps</span> an important issue: when happens when you delete a subject or an observer? If you just wantonly call `delete` on some observer, a subject may still have a pointer to it. That's now a dangling pointer into deallocated memory. When that subject tries to send a notification, well... things like that are why people end up hating C++.
+The sample code we walked through is solid, but it <span name="destruct">side-steps</span> an important issue: what happens when you delete a subject or an observer? If you just wantonly call `delete` on some observer, a subject may still have a pointer to it. That's now a dangling pointer into deallocated memory. When that subject tries to send a notification, well... things like that are why people end up hating C++.
 
 <aside name="destruct">
 
