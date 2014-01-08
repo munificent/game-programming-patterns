@@ -69,14 +69,14 @@
 
 <p>Observer is one of the most widely used and widely known of the original Gang of Four patterns, but the game development world can be strangely cloistered at times, so maybe this is all news to you. In case you haven&#x2019;t left the abbey in a while, let me walk you through a motivating example.</p>
 <h2><a href="#achievement-unlocked" name="achievement-unlocked">Achievement Unlocked</a></h2>
-<p>Say you&#x2019;re adding an <span name="weasel">achievements</span> system to your game. It will feature dozens of different badges players can earn for completing specific milestones like "Kill 100 Monkey Demons", "Fall of a Bridge", or "Complete a Level Wielding Only a Dead Weasel".</p>
+<p>Say you&#x2019;re adding an <span name="weasel">achievements</span> system to your game. It will feature dozens of different badges players can earn for completing specific milestones like "Kill 100 Monkey Demons", "Fall off a Bridge", or "Complete a Level Wielding Only a Dead Weasel".</p>
 <aside name="weasel">
 
 <p><img src="images/observer-weasel-wielder.png" width="240" /></p>
 <p>I swear I had no double meaning in mind when I drew this.</p>
 </aside>
 
-<p>This is tricky to implement cleanly since you have such a wide range of achievements that are unlocked by all sorts of different behaviors. If you aren&#x2019;t careful, tendrils of your achievement system will twine their way through every dark corner of your codebase. Sure, "Fall of a Bridge" is somehow tied to the <span name="physics">physics engine</span>, but do you really want to see a call to <code>unlockFallOffBridge()</code> right in the middle of the linear algebra in your collision resolution algorithm?</p>
+<p>This is tricky to implement cleanly since you have such a wide range of achievements that are unlocked by all sorts of different behaviors. If you aren&#x2019;t careful, tendrils of your achievement system will twine their way through every dark corner of your codebase. Sure, "Fall off a Bridge" is somehow tied to the <span name="physics">physics engine</span>, but do you really want to see a call to <code>unlockFallOffBridge()</code> right in the middle of the linear algebra in your collision resolution algorithm?</p>
 <aside name="physics">
 
 <p>This is a rhetorical question. No self-respecting physics programmer would ever let you sully their beautiful mathematics with something as pedestrian as <em>gameplay</em>.</p>
@@ -84,7 +84,7 @@
 
 <p>What we&#x2019;d like, as always, is to have all the code concerned with one aspect of the game nicely lumped in one place. The challenge is that achievements are triggered by a bunch of different aspects of gameplay. How can that work without coupling the achievement code to all of them?</p>
 <p>That&#x2019;s what the observer pattern is for. It lets one piece of code announce that something interesting happened <em>without actually caring who receives the notification</em>.</p>
-<p>For example, you&#x2019;ve got some physics code that handles gravity and tracks which bodies are relaxing on nice flat surfaces and which are plummeting towards sure demise. To implement the "Fall of a Bridge" badge, you could just jam the achievement code right in there, but that&#x2019;s a mess. Instead, you can just do:</p>
+<p>For example, you&#x2019;ve got some physics code that handles gravity and tracks which bodies are relaxing on nice flat surfaces and which are plummeting towards sure demise. To implement the "Fall off a Bridge" badge, you could just jam the achievement code right in there, but that&#x2019;s a mess. Instead, you can just do:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Physics</span><span class="o">::</span><span class="n">updateBody</span><span class="p">(</span><span class="n">PhysicsBody</span><span class="o">&amp;</span> <span class="n">body</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">bool</span> <span class="n">wasOnSurface</span> <span class="o">=</span> <span class="n">body</span><span class="p">.</span><span class="n">isOnSurface</span><span class="p">();</span>
