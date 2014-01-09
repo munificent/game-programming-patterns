@@ -350,7 +350,7 @@ option and insert it at the front:</p>
 </aside>
 
 <p>Because we have a singly linked list, we have to walk it to find the observer we&#x2019;re removing. We&#x2019;d have to do the same thing if we were using a regular array for that matter. If we use a <em>doubly</em> linked list, where each observer has a pointer to both the observer after it and before it, we can remove an observer in constant time. If this were real code, I&#x2019;d do that.</p>
-<p>The only thing left to do is sending a notification. That&#x2019;s as simple as walking the list:</p>
+<p>The <span name="chain">only</span> thing left to do is sending a notification. That&#x2019;s as simple as walking the list:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">notify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span> <span class="o">=</span> <span class="n">head_</span><span class="p">;</span>
@@ -362,6 +362,12 @@ option and insert it at the front:</p>
 <span class="p">}</span>
 </pre></div>
 
+
+<aside name="chain">
+
+<p>Here, we walk the entire list and notify every single observer in it. This ensures that all of the observers get equal priority and are independent of each other.</p>
+<p>We could tweak this such that when an observer is notified, it can return a flag indicating whether the subject should keep walking the list or stop. If you do that, you&#x2019;re pretty close to having the <a href="http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern" class="gof-pattern">Chain of Responsibility</a> pattern.</p>
+</aside>
 
 <p>Not too bad, right? A subject can have as many observers as it wants, without a single whiff of dynamic memory. Registering and unregistering is as fast as it was with a simple array. We have sacrificed one small feature, though.</p>
 <p>Since we are using the observer object itself as a list node, that implies it can only be part of one subject&#x2019;s observer list. In other words, an observer can only observe a single subject at a time. In a more traditional implementation where each subject has its own independent list, an observer can be in more than one of them simultaneously.</p>

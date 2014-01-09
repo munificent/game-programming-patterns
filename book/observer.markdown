@@ -228,9 +228,17 @@ It's a worthwhile exercise for you to do though: It helps you really think in te
 
 Because we have a singly linked list, we have to walk it to find the observer we're removing. We'd have to do the same thing if we were using a regular array for that matter. If we use a *doubly* linked list, where each observer has a pointer to both the observer after it and before it, we can remove an observer in constant time. If this were real code, I'd do that.
 
-The only thing left to do is sending a notification. That's as simple as walking the list:
+The <span name="chain">only</span> thing left to do is sending a notification. That's as simple as walking the list:
 
 ^code linked-notify
+
+<aside name="chain">
+
+Here, we walk the entire list and notify every single observer in it. This ensures that all of the observers get equal priority and are independent of each other.
+
+We could tweak this such that when an observer is notified, it can return a flag indicating whether the subject should keep walking the list or stop. If you do that, you're pretty close to having the <a href="http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern" class="gof-pattern">Chain of Responsibility</a> pattern.
+
+</aside>
 
 Not too bad, right? A subject can have as many observers as it wants, without a single whiff of dynamic memory. Registering and unregistering is as fast as it was with a simple array. We have sacrificed one small feature, though.
 
@@ -256,7 +264,7 @@ The latter style is called an "intrusive" linked list because using an object in
 
 The way you avoid dynamic allocation is simple: Since all of those nodes are the same size and type, you pre-allocate an <a href="object-pool.html" class="pattern">Object Pool</a> of them. That gives you a fixed-size pile of list nodes to work with, and you can use and reuse them as you need without having to hit an actual memory allocator.
 
-## "It's Too Decoupled"
+## Remaining Problems
 
 I think we've banished the two main boogie men used to scare people off this pattern. As we've seen, it's simple, fast, and can be made to play nice with memory management. But does that mean that you should observers all the time?
 
@@ -264,7 +272,7 @@ Now, that's a different question. Like all design patterns, the Observer pattern
 
 Two challenges remain, one technical and one at something more like the maintainability level. We'll do the technical one first because those are always easiest.
 
-### Destroying subjects and observers
+## Destroying subjects and observers
 
 The sample code we walked through is solid, but it <span name="destruct">side-steps</span> an important issue: when happens when you delete a subject or an observer? If you just wantonly call `delete` on some observer, a subject may still have a pointer to it. That's now a dangling pointer into deallocated memory. When that subject tries to send a notification, well... things like that are why people end up hating C++.
 
@@ -314,7 +322,7 @@ An even surer sign of its significance: it has [a Wikipedia article](http://en.w
 
 </aside>
 
-### What's going on?
+## What's going on?
 
 The other, deeper issue with the Observer pattern is a direct consequence of its intended purpose. We use it because it helps us loosen the coupling between two pieces of code. It lets a subject indirectly communicate with some observer without being statically bound to it.
 
