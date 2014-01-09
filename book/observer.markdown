@@ -346,7 +346,7 @@ Design Patterns came out in the <span name="90s">90s</span>. Back then object-or
 
 <aside name="90s">
 
-That same year, Ace of Bass had not one but *three* hit singles, so that may tell you something about our taste and judgment back then.
+That same year, Ace of Base had not one but *three* hit singles, so that may tell you something about our taste and judgment back then.
 
 </aside>
 
