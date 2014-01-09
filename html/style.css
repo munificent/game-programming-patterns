@@ -126,7 +126,8 @@ aside.sidebar {
   .in-progress a {
     color: #cc7700; }
   .in-progress a:hover {
-    color: #994d00; }
+    color: #994d00;
+    border: none; }
   .in-progress .signature {
     text-align: right;
     font: italic 13px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
