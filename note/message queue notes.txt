@@ -1,0 +1,4 @@
+- talk about threading
+- with a global event queue, that means objects listening to queue can end up
+  with infinite lifetime if not explicitly unregistered. talk about memory
+  leak
