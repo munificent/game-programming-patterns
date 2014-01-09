@@ -218,7 +218,7 @@ through it quickly.</p>
 </pre></div>
 
 
-<p>This lets us make <code>notify()</code> in <code>Subject</code> protected. That way the physics engine can send notifications, but code outside of it cannot. Meanwhile, <code>addObserver()</code> and <code>removeObserver()</code> are public, so anything that can get to the physics system can observe it.</p>
+<p>This lets us make <code>notify()</code> in <code>Subject</code> protected. That way the derived physics engine class can call it to send notifications, but code outside of it cannot. Meanwhile, <code>addObserver()</code> and <code>removeObserver()</code> are public, so anything that can get to the physics system can observe it.</p>
 <aside name="event">
 
 <p>If this were real code, I would absolutely avoid using inheritance here. Instead, I&#x2019;d make <code>Physics</code> <em>have</em> an instance of <code>Subject</code>. Instead of observing the physics engine itself, the subject would be a separate "falling event" object. Observers could register themselves using something like:</p>
@@ -264,11 +264,11 @@ games, memory allocation still matters, even in managed languages. <span name="f
 things dead simple. In real implementations, the observer list is almost always
 a dynamically allocated collection that grows and shrinks as observers are
 added and removed. That memory churn spooks some people.</p>
-<p>Of course, the first thing to notice is that it only allocates memory when observers are being wired up. <em>Sending</em> a notification requires no memory allocation whatsoever: it&#x2019;s just a method call. If you wire up your observers at the start of the game and don&#x2019;t mess with them much, the amount of allocation is minimal.</p>
+<p>Of course, the first thing to notice is that it only allocates memory when observers are being wired up. <em>Sending</em> a notification requires no memory allocation whatsoever&thinsp;&mdash;&thinsp;it&#x2019;s just a method call. If you wire up your observers at the start of the game and don&#x2019;t mess with them much, the amount of allocation is minimal.</p>
 <p>If it&#x2019;s still a problem, though, I&#x2019;ll walk through a way to implement adding and removing observers without any dynamic allocation at all.</p>
 <h3><a href="#linked-observers" name="linked-observers">Linked observers</a></h3>
 <p>In the code we&#x2019;ve seen so far, <code>Subject</code> owns a list of pointers to each <code>Observer</code> watching it. The <code>Observer</code> class itself has no reference to this list. It&#x2019;s just a pure virtual interface. Interfaces are preferred over concrete, stateful classes, so that&#x2019;s generally a good thing.</p>
-<p>But if we <em>are</em> willing to put a bit of state in <code>Observer</code>, we can thread the subject&#x2019;s list <em>through the observers themselves</em>. Instead of the subject having a separate collection of pointers, the observer objects become nodes in a linked list:</p>
+<p>But if we <em>are</em> willing to put a bit of state in <code>Observer</code>, we can solve our allocation problem by threading the subject&#x2019;s list <em>through the observers themselves</em>. Instead of the subject having a separate collection of pointers, the observer objects become nodes in a linked list:</p>
 <p><img src="images/observer-linked.png" /></p>
 <p>To implement this, first we&#x2019;ll get rid of the array in <code>Subject</code> and replace it with a pointer to the head of the list of observers:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Subject</span>
@@ -313,9 +313,9 @@ option and insert it at the front:</p>
 
 
 <p>The other option is to add it to the end of the linked list. Doing that adds a bit more complexity: <code>Subject</code> has to either walk the list to find the end, or keep a separate <code>tail_</code> pointer that always points to the last node.</p>
-<p>Adding it to the front of the list is simpler, but does have one side effect. When we walk the list to send a notification to every observer, the most <em>recently</em> registered observer gets notified <em>first</em>. If you register observers A, B, and C, in that order, they will receive notifications in C, B, A order.</p>
+<p>Adding it to the front of the list is simpler, but does have one side effect. When we walk the list to send a notification to every observer, the most <em>recently</em> registered observer gets notified <em>first</em>. So if you register observers A, B, and C, in that order, they will receive notifications in C, B, A order.</p>
 <p>In theory, this doesn&#x2019;t matter one way or the other. It&#x2019;s a tenet of good observer discipline that two observers observing the same subject should have no ordering dependencies relative to each other. If the ordering <em>does</em> matter, it means those two observers have some subtle coupling that could end up biting you.</p>
-<p>Let&#x2019;s get remove working:</p>
+<p>Let&#x2019;s get removal working:</p>
 <p><span name="remove"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">removeObserver</span><span class="p">(</span><span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span><span class="p">)</span>
 <span class="p">{</span>
@@ -371,8 +371,8 @@ option and insert it at the front:</p>
 
 <p>Not too bad, right? A subject can have as many observers as it wants, without a single whiff of dynamic memory. Registering and unregistering is as fast as it was with a simple array. We have sacrificed one small feature, though.</p>
 <p>Since we are using the observer object itself as a list node, that implies it can only be part of one subject&#x2019;s observer list. In other words, an observer can only observe a single subject at a time. In a more traditional implementation where each subject has its own independent list, an observer can be in more than one of them simultaneously.</p>
+<p>You may be able to live with that limitation. I find it more common for a <em>subject</em> to have multiple <em>observers</em> than vice versa. If it <em>is</em> a problem for you, there is another more complex solution you can use that still doesn&#x2019;t require dynamic allocation. It&#x2019;s too long to cram into this chapter, but I&#x2019;ll sketch it out and let you fill in the blanks&hellip;</p>
 <h3><a href="#a-pool-of-list-nodes" name="a-pool-of-list-nodes">A pool of list nodes</a></h3>
-<p>You may be able to live with that limitation. I find it more common for a <em>subject</em> to have multiple <em>observers</em> than vice versa. If it <em>is</em> a problem for you, there is another more complex solution you can use that still doesn&#x2019;t require dynamic allocation. It&#x2019;s too long to cram into this chapter, but I&#x2019;ll sketch it out and let you fill in the blanks.</p>
 <p>Like before, each subject will have a linked list of observers. However, those list nodes won&#x2019;t be the observer objects themselves. Instead, they&#x2019;ll be separate little "list <span name="intrusive">node</span>" objects that contain a pointer to the observer and then a pointer to the next node in the list.</p>
 <p><img src="images/observer-nodes.png" /></p>
 <p>Since multiple nodes can all point to the same observer, that means an observer can be in more than one subject&#x2019;s list at the same time. We&#x2019;re back to being able to observe multiple subjects simultaneously.</p>
