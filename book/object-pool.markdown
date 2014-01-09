@@ -239,14 +239,17 @@ I'd be honored if you clear it to `0x1deadb0b`.
 
 ### Unused objects will remain in memory
 
-It's rare to use an Object Pool on a system that also has a garbage
-collector, but if you do, beware of a potential conflict between the
-two. Since the pool doesn't actually deallocate objects when no longer
-in use, they remain in memory. If they contain references to *other*
-objects, it will prevent the collector from reclaiming those objects.
+Object Pools are less common in systems that support garbage
+collection because the memory manager will usually deal
+with fragmentation for you. But pools are still useful there to avoid
+the cost of allocation and deallocation, especially on mobile
+devices with slower CPUs and simpler GC implementations.
 
-If you do use an Object Pool and a garbage collector together, there's
-a simple fix. When a pooled object is no longer in use, clear any
+If you do use an Object Pool there, beware of a potential conflict. Since
+the pool doesn't actually deallocate objects when no longer
+in use, they remain in memory. If they contain references to *other*
+objects, it will prevent the collector from reclaiming those too.
+To avoid this, when a pooled object is no longer in use, clear any
 references it has to other objects.
 
 ## Sample Code
