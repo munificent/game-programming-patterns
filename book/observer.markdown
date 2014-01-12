@@ -41,7 +41,7 @@ For example, you've got some physics code that handles gravity and tracks which 
 
 All it does is say, "Uh, I don't know if anyone cares, but this thing just fell. Do with that as you will."
 
-The achievement system registers itself so that whenever the physics code sends a notification, the achievement receives it. It can then check to see if the falling body is our less-than-gracful hero, and if his perch prior to this new, unpleasant encounter with classical mechanics was a bridge. If so, it unlocks the proper achievement with associated fireworks and fanfare, and all of this with no involvement from the physics code.
+The achievement system registers itself so that whenever the physics code sends a notification, the achievement receives it. It can then check to see if the falling body is our less-than-graceful hero, and if his perch prior to this new, unpleasant encounter with classical mechanics was a bridge. If so, it unlocks the proper achievement with associated fireworks and fanfare, and all of this with no involvement from the physics code.
 
 <span name="tear">In fact</span>, you can change the set of achievements or tear out the entire achievement system without touching a line of the physics engine. It will still send out its notifications, oblivious to the fact that nothing is receiving them anymore.
 
