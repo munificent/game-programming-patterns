@@ -1,3 +1,7 @@
+2013-01-12 - research and 718 words of notes for message queue
+2013-01-11 - research and apply for business license
+2013-01-10 - finish ape
+2013-01-09 - read half of ape
 2013-01-08 - fix or close #44, #58, #59, #63, #64, #65, #67, #68, #73. Merge #60, #66.
 2013-01-07 - publish chapter, tweet, r/gamedev, etc.
 2013-01-06 - photoshop six illustrations, finish observer
@@ -216,3 +220,466 @@
 2013-06-09 - 178 words on first draft of Game Loop
 2013-06-08 - 889 words on first draft of Game Loop
 2013-06-07 - 777 words on first draft of Game Loop
+
+2012/08/16 (:30)
+- read a bunch of blog posts on game loops
+- start outlining game loop
+- revise index to link to twitter instead of blog
+
+-- big gap here where I wasn't taking notes
+
+04/13 (:45)
++ Install Office
++ Download and read Apress docs
+
+02/14
+- Revise Component (1:45)
+  text : 8 files, 3419 non-empty lines, 31327 words
+  note : 11 files, 1244 non-empty lines, 7039 words
+  code : 11 files, 1860 lines, 288 comments
+
+02/08
++ Revise Component down to "How do components communicate..." (:45)
+
+01/28
++ Revise Component down to Sample Code (:30)
+
+01/24
++ Singleton / taking Andy's changes (:30)
+
+01/23
++ Component / design decisions (1:50) 5,591 words
+  text : 8 files, 3379 non-empty lines, 31413 words
+  note : 11 files, 1225 non-empty lines, 6945 words
+  code : 11 files, 1852 lines, 288 comments
+
+01/22
++ Component first draft / Sample code (2:10)
+  text : 8 files, 3263 non-empty lines, 30178 words
+  note : 11 files, 1220 non-empty lines, 6910 words
+  code : 11 files, 1784 lines, 282 comments
+
+01/21
++ Component first draft / Keep in Mind (:45)
+  text : 8 files, 3164 non-empty lines, 28632 words
+  note : 11 files, 1213 non-empty lines, 6860 words
+  code : 10 files, 1931 lines, 293 comments
+
+01/17
++ Component first draft / Motivation (1:00)
+
+01/17
++ Component sample code (1:30)
++ Component outline (:20)
+  text : 8 files, 3120 non-empty lines, 28076 words
+  note : 11 files, 1206 non-empty lines, 6808 words
+  code : 10 files, 1931 lines, 293 comments
+
+01/16
+- Component sample code (1:30)
+
+01/12
+- outline Component (:20)
+
+01/10
++ Type Object second revision (:20)
+
+01/09
+/ outline component / sample code (:40)
++ revise Type Object (1:40) (4973 words)
+  text : 7 files, 2774 non-empty lines, 25270 words
+  note : 11 files, 1194 non-empty lines, 6754 words
+  code : 9 files, 1431 lines, 233 comments
+
+01/07
++ outline component / keep in mind (:20)
+  text : 7 files, 2639 non-empty lines, 24565 words
+  note : 11 files, 1193 non-empty lines, 6744 words
+  code : 9 files, 1431 lines, 233 comments
+
+01/04
++ outline intro (:50)
+/ outline subcomponent (1:10)
++ research game engines for entity class (:20)
+- revise type object
+
+12/26
++ take andy's fixes for object pool
++ switch section order for object pool
+~ 1:00 hr
+
+12/22
+/ take andy's fixes for object pool
+~ 2:00
+
+12/21
+/ take andy's fixes for object pool
++ css support for definition lists
+~ :30 hr
+
+12/21
++ format script skips up-to-date chapters
++ draft type object / design alternatives
+~ 1:45 hr
+  text : 6 files, 2460 non-empty lines, 22916 words
+  note : 11 files, 993 non-empty lines, 4920 words
+  code : 9 files, 1428 lines, 231 comments
+
+12/18
+/ draft type object / sample code
+~ :30 hr
+
+12/14
+/ draft type object / sample code
+~ :40 hr
+
+12/09
+/ draft type object / sample code
+~ :45 hr
+  text : 6 files, 2420 non-empty lines, 22318 words
+  note : 11 files, 950 non-empty lines, 4645 words
+  code : 7 files, 1281 lines, 202 comments
+
+12/06
+/ draft type object / sample code
+~ :30 hr
+  text : 6 files, 2377 non-empty lines, 21915 words
+  note : 11 files, 947 non-empty lines, 4619 words
+  code : 7 files, 1231 lines, 193 comments
+
+12/05
++ draft type object / motivation
++ draft type object / when to use it
++ draft type object / keep in mind
+~ 2:20 hr
+  text : 6 files, 2376 non-empty lines, 21859 words
+  note : 11 files, 941 non-empty lines, 4582 words
+  code : 0 files, 0 lines, 0 comments
+
+12/04
++ outline type object
+~ :45 hr
+
+12/03
++ reorganize to support obj-c code
+/ outline type object
+~ 1:00 hr
+
+12/02
+/ outline type object
+~ :30 hr
+
+12/01
+- research metaclass (type object)
+~ 8:30
+
+11/27
++ revise double buffer
+~ :45 hr
+
+11/22
+/ revise double buffer (done down to play analogy)
+~ 1:00 hr
+  text : 5 files, 1978 non-empty lines, 18565 words
+  note : 10 files, 671 non-empty lines, 4154 words
+  code : 5 files, 1144 lines, 178 comments
+
+11/16
+/ double buffer / design alternatives
++ added 'back to top' to html
+~ :45 hr
+
+11/15
++ double buffer / sample code
+~ 3:30 hr
+  text : 5 files, 1882 non-empty lines, 17626 words
+  note : 10 files, 661 non-empty lines, 4104 words
+  code : 5 files, 1114 lines, 175 comments
+
+11/13
++ first draft double buffer / when to use it
++ first draft double buffer / keep in mind
+/ double buffer code
+~ :40 hr
+  text : 5 files, 1821 non-empty lines, 16818 words
+  note : 10 files, 655 non-empty lines, 4067 words
+  code : 5 files, 914 lines, 145 comments
+
+11/11
++ first draft double buffer / motivation
+~ 1:00 hr
+  text : 5 files, 1807 non-empty lines, 16584 words
+  note : 10 files, 647 non-empty lines, 4014 words
+  code : 4 files, 815 lines, 135 comments
+
+11/10
++ outline double buffer
+~ 1:00 hr
+
+11/03
+/ outline double buffer
+~ :30 hr
+
+11/02
++ service locator 2nd revision design alternatives
+~ :30 hr
+
+10/29
++ service locator second revision down to design alternatives
+  (down to 4559 words)
+~ 1:15hr
+
+10/27
++ revise service locator / motivation
+~ 1:00 hr
+  text : 4 files, 1567 non-empty lines, 14872 words
+  note : 9 files, 618 non-empty lines, 3842 words
+  code : 4 files, 813 lines, 139 comments
+
+10/22
++ revise service locator / design alternatives
++ revise service locator / see also
+~ :45 hr
+
+10/21
+/ revise service locator / design alternatives (down to 4930)
+~ :45 hr
+  text : 4 files, 1560 non-empty lines, 14615 words
+  note : 9 files, 612 non-empty lines, 3805 words
+  code : 4 files, 797 lines, 135 comments
+
+10/21
++ revise service locator / keep in mind
++ revise service locator / sample code (down to 5105 words)
+~ :45 hr
+  text : 4 files, 1575 non-empty lines, 14790 words
+  note : 9 files, 605 non-empty lines, 3755 words
+  code : 4 files, 797 lines, 135 comments
+
+10/20
+/ service locator revision (removed 31 words, down to 5341)
+~ :45 hr
+
+10/18
++ service locator / design decisions
++ service locator / sample code
+~ 2:30 hr
+  text : 4 files, 1599 non-empty lines, 15026 words
+  note : 8 files, 632 non-empty lines, 3890 words
+  code : 4 files, 961 lines, 144 comments
+
+10/14
+- service locator / design decisions
+~ 1:00 hr
+  text : 4 files, 1390 non-empty lines, 12990 words
+  note : 8 files, 622 non-empty lines, 3822 words
+  code : 4 files, 840 lines, 115 comments
+
+10/13
+- service locator / design decisions
+~ :30 hr
+  text : 4 files, 1332 non-empty lines, 12407 words
+  note : 8 files, 616 non-empty lines, 3786 words
+  code : 4 files, 825 lines, 110 comments
+
+10/10
++ service locator / when to use it
++ service locator / keep in mind
+~ :45 hr
+  text : 4 files, 1264 non-empty lines, 11774 words
+  note : 8 files, 606 non-empty lines, 3712 words
+  code : 4 files, 785 lines, 102 comments
+
+10/08
+/ work on service locator
+~ :30 hr
+
+09/22
++ revise singleton
++ remove feedback stuff
++ smart quotes
+~ 2:00 hr
+  text : 3 files, 1062 non-empty lines, 10025 words
+  note : 8 files, 531 non-empty lines, 3180 words
+  code : 4 files, 744 lines, 98 comments
+
+09/20
++ revise singleton
+~ 1:30 hr
+  text : 6 files, 1265 non-empty lines, 11787 words
+  note : 8 files, 520 non-empty lines, 3114 words
+  code : 4 files, 744 lines, 99 comments
+
+09/17
+/ revise singleton
+~ 1:15 hr
+
+09/16
+/ revise singleton
+~ :30 hr
+  text : 6 files, 1214 non-empty lines, 11381 words
+  note : 8 files, 506 non-empty lines, 3047 words
+  code : 4 files, 696 lines, 95 comments
+
+09/15
+/ revise singleton
+~ :20 hr
+
+09/14
++ draft singleton
++ revise introduction
+~ :40 hr
+
+09/13
+/ draft singleton
+~ :40 hr
+  text : 6 files, 1190 non-empty lines, 11195 words
+  note : 8 files, 490 non-empty lines, 2971 words
+  code : 4 files, 696 lines, 95 comments
+
+09/12
+/ draft singleton
+~ 2:30 hr
+  text : 6 files, 1142 non-empty lines, 10717 words
+  note : 8 files, 485 non-empty lines, 2941 words
+  code : 4 files, 610 lines, 86 comments
+
+09/08
++ service sample code
+~ :45 hr
+  text : 5 files, 844 non-empty lines, 7990 words
+  note : 8 files, 476 non-empty lines, 2900 words
+  code : 3 files, 323 lines, 59 comments
+
+09/07
++ css for links to other patterns
++ service motivation
++ service pattern and parts
+~ 1:00 hr
+
+09/04
++ Megan's revisions
++ revise fragments in outline
++ revise proposal
++ revise outline
++ put outline online
++ upload sample chapters and index
++ verify links in proposal work
++ illustrations
++ submit proposal!!!
+~ 3:00 hr
+
+09/03
++ revise outline to be full sentences
++ figure out other patterns to add
++ add example sections to each revisited pattern
++ fill in proposal
++ outline Area Effect
++ outline Update Method
++ outline Domain Component
++ outline Virtual Machine
++ outline Hit chapter
++ outline Metaclass chapter
++ outline Dead Pool chapter
+~ 4:20 hr
+  6:00 pm
+
+09/02
++ outline html generator
++ outline css
++ outline 4 more patterns
+~ 3:50 hr
+
+09/01
++ research how Service compares to Singleton
++ outline Service
++ outline Sandbox Method
+- outline Context Object
+~ 3:30 hr
+
+08/31
++ proposal
+  + tools
+  + writing sample
++ figure out average word count of oreilly book
+~ 1:15 hr
+
+08/28
++ feedback system
++ last modified on html
++ theme in title
++ upload html
++ tell people
++ script to upload html
+~ 4:00 hr
+  text : 2 files, 647 non-empty lines, 6234 words
+  note : 7 files, 444 non-empty lines, 3061 words
+  code : 2 files, 252 lines, 57 comments
+
+08/27
++ revise object pool
++ add feedback box to html
+~ 3:30 hr
+  text : 2 files, 645 non-empty lines, 6230 words
+  note : 7 files, 431 non-empty lines, 3001 words
+  code : 2 files, 252 lines, 57 comments
+
+
+08/26
++ revise intro
++ improve nav bar in html
+~ 2:30 hours
+  text : 2 files, 623 non-empty lines, 6043 words
+  note : 7 files, 424 non-empty lines, 2961 words
+  code : 2 files, 252 lines, 57 comments
+
+08/18
+~ 1:00 hour
+
+08/14
++ draft object pool pattern
+~ 3:15 hours
+  text : 2 files, 617 non-empty lines, 6032 words
+  note : 7 files, 414 non-empty lines, 2912 words
+  code : 2 files, 252 lines, 57 comments
+
+08/13
+/ draft object pool pattern
+  (in progress, still figuring out best structure)
++ fix list css
+~ 3.5 hours
+  text : 2 files, 509 non-empty lines, 4932 words
+  note : 7 files, 413 non-empty lines, 2911 words
+  code : 2 files, 217 lines, 41 comments
+
+08/11
++ research object pool
++ outline object pool chapter (all except implementation)
++ sample code for object pool chapter
++ first draft object pool intro
+~ 3 hours
+
+08/10
++ write first draft of intro chapter
++ simple navigation bar in generated html
+  + link to each generated page
+  + basic stylesheet
+- stretch: outline object pool chapter
+  - research it online (take notes!)
+  - outline
+~ 4 hours
+
+08/09
++ create a hello world pattern chapter
++ figure out a format for chapters
+  + markdown
++ create a stylesheet
+  . base off existing one from ruby stuff
++ get a hello world in c++ working
++ get code inclusion working
++ clean up directories
++ commit
++ figure out a format for the main book outline
+  ? separate html pages for each chapter?
++ outline the introduction
+~ 3 hours

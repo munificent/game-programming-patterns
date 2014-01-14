@@ -1,0 +1,38 @@
+- Purchase 10 ISBNs
+  Will need one for print and one for ebook, and 10 costs as much as two
+- Create account on Amazon Author Central
+  Need to have book on Amazon first
+- Write description for book
+- Publisher Genever/Bennington
+
+---
+
+leanpub.com
+gumroad
+e-junkie
+lulu
+blurb
+
+https://news.ycombinator.com/item?id=6052075
+https://news.ycombinator.com/item?id=7030112
+https://news.ycombinator.com/item?id=632104
+
+---
+
+My advice to anyone else considering self-publishing:
+* Start with Amazon KDP and CreateSpace. Both services are easy and fast. It's the quickest way to test an idea.
+* Be prepared to iterate quickly based on reader feedback.
+* Consider paying $100 or $200 for a decent cover. You can find designers lurking around the online writing communities (such as kboards.com for fiction) or hire someone on oDesk. Make sure they have experience designing book covers, which will save time and frustration.
+* Have someone proof your manuscript. I see lots of writers who skip this step, and suffer in the ratings and reviews as a result.
+* Have a cover blurb and Amazon description that grabs people. Also, make sure that readers can easily find out about you, either through the product listing page (which Amazon grabs from Amazon Author Central) or your own product website.
+* If you want to use other platforms, Apple's iBookstore seems most promising. It's hard to set up, though. "iTunes Producer" is a very rough piece of software. However, if you've worked on iOS apps in the past at least you will be familiar with iTunes Connect, which is used to set pricing and monitor sales.
+* I have sold many PDFs, but I am not sure how that would work for fiction. I started with e-junkie but switched to Gumroad (3) which has a much better interface.
+Marketing is tough. One thing you can do once you have a print version through CreateSpace or another service, join Goodreads (a social network for people who love to read) and set up a Goodreads Giveaway (4) (a contest for your book that Goodreads runs -- usually a few hundred people sign up, and you have to send out 10 or 20 copies to winners that GR selects). It's free to set up, but you'll have to purchase and send out copies of the book to the winners of the giveaway. The advantages of this: Readers often write reviews, which are seen by other GR members. Many other people will put the book on their "to-read" list, and some will go out and buy the book right away because they don't want to wait to see if they won a copy.
+Good luck!
+1. http://www.digitalmediamachine.com/2012/09/do-people-judge-e...
+2. http://in30minutes.com/
+3. https://gumroad.com/
+4. http://goodreads.com/giveaway
+
+http://snook.ca/archives/writing/selling-ebook-on-amazon
+http://apethebook.com/
