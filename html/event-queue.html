@@ -62,11 +62,119 @@
   </table>
 </div>
 <h2><a href="#intent" name="intent">Intent</a></h2>
-<p><em>italicized sentence</em></p>
+<p><em>Buffer messages or events to decouple the sender from when and how it is processed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p><strong>Bunch of paragraphs, maybe some subheaders</strong></p>
+<ul>
+<li>pattern can be used to solve a bunch of similar but not identical problems</li>
+<li>to get most of out chapter, use example that jams all problems together</li>
+<li>then we&#x2019;ll knock em down one after another</li>
+<li>in reality, of course, won&#x2019;t be such perfect fit</li>
+<li>this way can see lots of facets of pattern</li>
+</ul>
+<h3><a href="#say-what" name="say-what">Say what?</a></h3>
+<ul>
+<li>working on adding audio to game</li>
+<li>often overlooked facet of game dev</li>
+<li>humans are primarily visual but sound is deeply keyed to our emotions and sense of physical space</li>
+<li>
+<p>good sound can make you feel surrounded by the game and make heartstrings ring with every action the hero takes</p>
+</li>
+<li>
+<p>lots of things trigger sounds: collisions in physics engine, using items, gameplay events like leveling up, level events like opening door, npc ai yelling at you, and hero herself</p>
+</li>
+<li>start with simple approach</li>
+<li>have little "audio engine" in game</li>
+<li>it has api for playing a sound given id and volume
+  (3d sound would have more complex api)</li>
+<li>
+<p>knows how to find appropriate sound file and throw it at hardware to make it
+  play</p>
+</li>
+<li>
+<p>start sprinkling call throughout codebase</p>
+</li>
+<li>in physics code, when objects collide trigger sound</li>
+<li>run into first problem: audio api takes a little while to locate sound
+  resource and copy buffer of data to somewhere hardware can play it</li>
+<li>
+<p>since api is synchronous, that blocks the physics engine!</p>
+</li>
+<li>
+<p><strong>problem 1: requesting a sound to play blocks the caller until the audio
+  engine has started playing the sound</strong></p>
+</li>
+<li>
+<p>ignoring that for now, we move on. in code for monster, trigger "oof" when
+  takes damage from hero</p>
+</li>
+<li>
+<p>works pretty well, but occasional problem</p>
+</li>
+<li>can sometimes hit two monsters in exact same frame</li>
+<li>when that happens, plays sound twice at <em>exact</em> same time</li>
+<li>if you know anything about audio, knows that basically stacks the waveforms</li>
+<li>do that with the <em>same</em> waveform and it&#x2019;s just like multiplying it</li>
+<li>in other words, sounds like <em>one</em> "oof" sound played twice as long</li>
+<li>sounds jarring and wrong</li>
+<li>
+<p>[ran into exact problem in hatsworth]</p>
+</li>
+<li>
+<p><strong>problem 2: redundant requests are handled individual and behave wrongly since they are unaware of each other</strong></p>
+</li>
+<li>
+<p>things get worse in big boss fights with lots of enemies and action going on</p>
+</li>
+<li>hardware can only play so many sounds at one time</li>
+<li>if try to play too many sounds at once, some get dropped or cut off</li>
+<li>sounds designers anticipated this by recording some "multi sounds"</li>
+<li>so, if have bunch of small explosions around same time, instead of using a bunch of channels on them, can use a single channel to play one "big bang" sound</li>
+<li>but need to know that we&#x2019;re playing a bunch of small sounds at once</li>
+<li>
+<p>since audio just gets individual api calls, can&#x2019;t look at them in aggregate</p>
+</li>
+<li>
+<p><strong>problem 3: can&#x2019;t analyze, group, and process a series of requests at once</strong></p>
+</li>
+<li>
+<p>now let&#x2019;s get to real nasty problem</p>
+</li>
+<li>got lots of calls to audio api in game now, coming from lots of different
+  systems</li>
+<li>scary part is many of those systems running on different threads!</li>
+<li>since audio api is sync, code runs on <em>caller&#x2019;s</em> thread</li>
+<li>if gameplay thread triggers sound at same time as physics thread, all hell
+  breaks loose</li>
+<li>or have to do careful sync, which slows down both threads</li>
+<li>and (as typical) want audio to be on its <em>own</em> thread</li>
+</ul>
+<h3><a href="#leave-a-message" name="leave-a-message">Leave a message</a></h3>
+<ul>
+<li>common thread in these problems is that audio api we expose means play sound
+  <em>right now</em></li>
+<li>the right-now-ness is the problem</li>
+<li>point in time that caller requests a sound is time that&#x2019;s convenient for
+  <em>caller</em>, not audio engine</li>
+<li>
+<p>to solve, decouple when we request sound be played and when audio engine
+  actually plays it</p>
+</li>
+<li>
+<p>simplest way to do that would be to have a slot in audio engine for "requested sound"</p>
+</li>
+<li>calling api just stores sound id in that slot and returns</li>
+<li>later, when audio engine is updated by game loop, checks slot and starts sound</li>
+<li>problem is that if you make <em>two</em> audio calls before engine processes first,
+  slot is already full</li>
+<li>want a bunch of slots</li>
+<li>calling api will fill next available one</li>
+<li>updating audio engine walks them in the order they were filled so oldest
+  request is handled first</li>
+<li>that&#x2019;s a queue!</li>
+</ul>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
-<p><strong>Paragraph</strong></p>
+<p>A <strong>queue</strong> stores a series of <strong>notifications or requests</strong> in last-in, first-out order. Sending a notification simply <strong>enqueues the request and returns</strong>. The request processor then <strong>processes items from the queue later</strong> at an appropriate time.</p>
+<p>Requests can be <strong>handled directly</strong>, or <strong>routed to interested parties</strong>. This <strong>decouples the sender from the receiever</strong> both <strong>statically</strong> and <strong>in time</strong>.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p><strong>Couple of paras</strong></p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
