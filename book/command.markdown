@@ -127,7 +127,13 @@ In practice, that's not a common feature. But there is a similar use case that *
 
 The decoupling here between the AI that selects commands, and the actor code that performs them gives us a lot of flexibility. We can use different AI modules for different actors. Or we can mix and match AI for different kinds of behavior. Want a more aggressive opponent? Just plug-in a more aggressive AI to generate commands for it. In fact, we can even bolt AI onto the *player's* character, which can be useful for things like demo mode where the game needs to run on auto-pilot.
 
-By making the commands that control an actor first class objects, we've removed the tight coupling of a direct method call. Instead, think of it as a queue or stream of commands.
+<span name="queue">By</span> making the commands that control an actor first class objects, we've removed the tight coupling of a direct method call. Instead, think of it as a queue or stream of commands.
+
+<aside name="queue">
+
+For lots more on what queueing can do for you, see <a href="event-queue.html" class="pattern">Event Queue</a>.
+
+</aside>
 
 <span name="stream"></span>
 
@@ -139,9 +145,9 @@ Why did I feel the need to draw a picture of a "stream" for you? And why does it
 
 </aside>
 
-Some code (the input handler or AI) <span name="queue">produces</span> commands and places them in the stream. Other code (the dispatcher or actor itself) consumes commands and invokes them. By sticking that queue in the middle, we've decoupled the producer on one end from the consumer on the other.
+Some code (the input handler or AI) <span name="network">produces</span> commands and places them in the stream. Other code (the dispatcher or actor itself) consumes commands and invokes them. By sticking that queue in the middle, we've decoupled the producer on one end from the consumer on the other.
 
-<aside name="queue">
+<aside name="network">
 
 If we take those commands and make them *serializable*, we could send the stream of them over the network. We can take the player's input, push it over the network to another machine, and then replay it. That's one important piece of making a networked multi-player game.
 

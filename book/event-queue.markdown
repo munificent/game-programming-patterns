@@ -1,4 +1,4 @@
-^title Message Queue
+^title Event Queue
 ^section Decoupling Patterns
 
 

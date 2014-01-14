@@ -139,9 +139,9 @@ The Observer pattern gets a particularly bad rap here because it's been known to
 
 <aside name="names">
 
-This is why I think documenting patterns is important. When we get fuzzy about terminology, we lose the ability to communicate clearly and succinctly. You say, "Observer" and someone hears "Messaging" because either no one bothered to write down the difference or they didn't happen to read it.
+This is why I think documenting patterns is important. When we get fuzzy about terminology, we lose the ability to communicate clearly and succinctly. You say, "Observer" and someone hears "Events" or "Messaging" because either no one bothered to write down the difference or they didn't happen to read it.
 
-That's what I'm trying to do with this book. And, to cover my bases, I've got a chapter on messaging too: <a href="message-queue.html" class="pattern">Message Queue</a>.
+That's what I'm trying to do with this book. And, to cover my bases, I've got a chapter on events and messages too: <a href="event-queue.html" class="pattern">Event Queue</a>.
 
 </aside>
 

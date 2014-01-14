@@ -633,11 +633,18 @@ the same time in your designs.
 
         ^code 20
 
-        Now, if a component has access to its container, it can send
+        <span name="queue">Now</span>, if a component has access to its container, it can send
         messages to it which will in turn be rebroadcast to all of its
         sibling components. (And back to itself for that matter; be
         careful that you don't get stuck in a feedback loop!) This has
         a couple of consequences:
+
+        <aside name="queue">
+
+        If you really want to get fancy, you can even make this message system
+        *queue* messages to be delivered later. For more on this, see <a href="event-queue.html" class="pattern">Event Queue</a>.
+
+        </aside>
 
      *  *Sibling components are decoupled.* By going <span name="mediator">through</span> the parent
         container object, like our shared state alternative, we ensure
