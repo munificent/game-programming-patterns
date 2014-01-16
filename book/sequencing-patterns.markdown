@@ -8,6 +8,6 @@ The patterns in this section are tools for doing just that. A [Game Loop](game-l
 
 ## The Patterns
 
+* [Double Buffer](double-buffer.html)
 * [Game Loop](game-loop.html)
 * [Update Method](update-method.html)
-* [Double Buffer](double-buffer.html)
