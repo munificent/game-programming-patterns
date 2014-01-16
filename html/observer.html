@@ -22,8 +22,6 @@
 </head>
 <body id="top">
 <div class="content">
-<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="design-patterns-revisited.html">Design Patterns Revisited</a></h1>
-<h1>Observer</h1>
 <div class="in-progress">
   <span class="dismiss">&times;</span>
   <p><strong>This book is a work in progress!</strong></p>
@@ -61,6 +59,8 @@
     </tr>
   </table>
 </div>
+<h1>Observer</h1>
+<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="design-patterns-revisited.html">Design Patterns Revisited</a></h1>
 <p>You can&#x2019;t throw a rock at a hard drive without hitting an application built using the <span name="devised"><a href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">Model-View-Controller</a></span> architecture, and underlying that is the Observer pattern. Observer is so pervasive that Java put it in its core library (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Observer.html"><code>java.util.Observer</code></a>) and C# baked it right into the <em>language</em> (the <a href="http://msdn.microsoft.com/en-us/library/8627sbea.aspx"><code>event</code></a> keyword).</p>
 <aside name="devised">
 
@@ -467,8 +467,8 @@ option and insert it at the front:</p>
 <p>Unlike more radical models, data binding doesn&#x2019;t try to entirely eliminate imperative code and doesn&#x2019;t try to architect your entire application around a giant declarative dataflow graph. What it does do is automate the busywork where you&#x2019;re tweaking a UI element or calculated property to reflect a change to some value.</p>
 <p>Like other declarative systems, data binding is probably a bit too slow and complex to fit inside the core of a game engine. But I would be surprised if I didn&#x2019;t see it start making in-roads into less critical areas of the game like UI.</p>
 <p>In the meantime, the good old Observer pattern will still be here waiting for us. Sure, it&#x2019;s not as exciting as some hot technique that manages to cram both "functional" and "reactive" in its name, but it&#x2019;s dead simple and it works. To me, those are often the two most important criteria for a solution.</p>
-<p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </div>
+<p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </body>
 <script src="jquery-1.10.1.min.js"></script>
 <script src="script.js"></script>

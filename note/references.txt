@@ -5,3 +5,5 @@ http://eventuallyconsistent.net/2013/08/12/messaging-as-a-programming-model-part
 http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf
 
 angel 2d
+
+http://entity-systems.wikidot.com/

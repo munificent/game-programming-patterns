@@ -3,39 +3,45 @@ body, h1, h2, h3, h4, p, blockquote, code, ul, ol, dl, dd, img {
 
 body {
   line-height: 24px;
-  padding: 24px;
   color: #222;
-  font: normal 16px/24px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif; }
+  font: normal 16px/24px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  background: #e8e6e3; }
 
 .content {
-  max-width: 520px;
+  max-width: 560px;
   margin: 0 auto;
-  position: relative; }
+  padding: 0 30px 30px 30px;
+  position: relative;
+  background: white;
+  border-left: solid 1px #bbb;
+  border-right: solid 1px #bbb;
+  border-bottom: solid 1px #999;
+  box-shadow: 0 0 40px rgba(71, 51, 31, 0.2); }
 
 .content.sidebar {
-  padding-right: 280px; }
+  padding-right: 300px; }
 
 h1 {
   color: #000;
-  font: bold 36px/44px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  margin-bottom: 24px;
-  padding: 0 0 8px 0;
-  border-bottom: solid 4px #eeeeee; }
+  font: bold 48px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  padding: 100px 0 4px 0;
+  border-bottom: solid 1px #ddd; }
 
 h1.book {
   color: #777;
   font: normal 16px/20px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  padding-bottom: 12px;
+  padding: 6px 0 30px 0;
   border: none; }
 
 h2 {
-  color: #3366cc;
-  font: bold 24px/30px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  margin: 24px 0 12px 0; }
+  color: #1481b8;
+  font: bold 28px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  margin: 24px 0 12px 0;
+  border-bottom: solid 1px #ddd; }
 
 h3 {
-  color: #3366cc;
-  font: bold 18px/24px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  color: #1481b8;
+  font: bold 20px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
   margin: 24px 0 12px 0; }
 
 h4 {
@@ -44,17 +50,18 @@ h4 {
   margin: 24px 0 0 0; }
 
 p {
-  margin: 12px 0; }
+  margin: 15px 0; }
 
 ul, ol {
   padding: 0 0 0 24px; }
 
 a {
-  color: #3366cc;
+  color: #1481b8;
   text-decoration: none; }
 
 img {
-  max-width: 100%; }
+  max-width: 100%;
+  border-radius: 2px; }
 
 img.arrow {
   vertical-align: middle;
@@ -70,14 +77,15 @@ blockquote p {
   color: #777; }
 
 code {
-  color: #444;
+  color: #477085;
   font: normal 15px "Source Code Pro", Menlo, Consolas, Monaco, monospace; }
 
 pre {
   color: #444;
   font: normal 13px/16px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
-  padding: 0 0 0 12px;
-  border-left: solid 4px #eeeeee;
+  padding: 12px;
+  background: #f8fbfc;
+  border-radius: 4px;
   overflow: auto; }
 
 aside {
@@ -103,18 +111,23 @@ aside {
 aside.sidebar {
   position: absolute;
   width: 240px;
-  right: 0;
+  right: 30px;
   padding: 0;
   border-bottom: none; }
 
 .in-progress {
+  display: none;
   position: relative;
   background: #fff7e5;
-  padding: 0 18px;
+  padding: 6px 18px;
   font: normal 15px/24px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
   color: #8f6d3d;
-  border: solid 4px #f9e7c8;
-  margin-bottom: 24px; }
+  margin-bottom: 24px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-left: solid 1px #faecd1;
+  border-right: solid 1px #faecd1;
+  border-bottom: solid 1px #f5daa3; }
   .in-progress .dismiss {
     position: absolute;
     right: 8px;
@@ -151,7 +164,7 @@ a.pattern:after,
 a.gof-pattern:after,
 a.pdf:after {
   font: 9px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
-  color: #99b2e5;
+  color: #89c0db;
   vertical-align: super; }
 
 a.pattern:after {
@@ -167,9 +180,7 @@ p.footer {
   text-align: center;
   color: #777;
   font: 14px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
-  margin: 24px 0 24px 0;
-  padding: 20px 0 0 0;
-  border-top: solid 4px #eeeeee; }
+  margin: 24px 0 24px 0; }
 
 .outline-note {
   margin-right: 240px;
@@ -194,10 +205,10 @@ a.outline:after {
   content: ")"; }
 
 .codehilite .k {
-  color: #3366cc; }
+  color: #1481b8; }
 
 .codehilite .kd {
-  color: #3366cc; }
+  color: #1481b8; }
 
 .codehilite .kt {
   color: #09a; }
@@ -224,10 +235,10 @@ a.outline:after {
   color: #594; }
 
 .codehilite .nl {
-  color: #3366cc; }
+  color: #1481b8; }
 
 .codehilite .nt {
-  color: #3366cc; }
+  color: #1481b8; }
 
 #mc_embed_signup table {
   border-spacing: 0px; }

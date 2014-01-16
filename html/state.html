@@ -22,8 +22,6 @@
 </head>
 <body id="top">
 <div class="content">
-<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="design-patterns-revisited.html">Design Patterns Revisited</a></h1>
-<h1>State</h1>
 <div class="in-progress">
   <span class="dismiss">&times;</span>
   <p><strong>This book is a work in progress!</strong></p>
@@ -61,6 +59,8 @@
     </tr>
   </table>
 </div>
+<h1>State</h1>
+<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="design-patterns-revisited.html">Design Patterns Revisited</a></h1>
 <p>Confession time: I went a little overboard and packed way too much into this chapter. It&#x2019;s ostensibly about the <a href="http://en.wikipedia.org/wiki/State_pattern" class="gof-pattern">State design pattern</a>. But I can&#x2019;t talk about that and games without going into the more fundamental concept of <em>finite state machines</em> (or "FSMs"). But then once I went there, I figured I might as well introduce <em>hierarchical state machines</em> and <em>pushdown automata</em>.</p>
 <p>That&#x2019;s a lot to cover, so to keep things as short as possible, the code samples here leave out a few details that you&#x2019;ll have to fill in on your own. I hope they&#x2019;re still clear enough for you to get the big picture.</p>
 <p>Don&#x2019;t feel sad if you&#x2019;ve never heard of a state machine. While well known to <span name="two-camps">AI and compiler</span> hackers, they aren&#x2019;t that familiar to other programming circles. I think they should be more widely known, so I&#x2019;m going to throw them at a different kind of problem here.</p>
@@ -671,8 +671,8 @@
 <li>The entity responds to a series of inputs or events over time.</li>
 </ol>
 <p>In games, they are most known for being used in AI, but they are also common in implementations of user input handling, navigating menu screens parsing text, network protocols, and other asynchronous behavior.</p>
-<p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </div>
+<p class="footer">&copy; 2009-2013 Bob Nystrom</p>
 </body>
 <script src="jquery-1.10.1.min.js"></script>
 <script src="script.js"></script>

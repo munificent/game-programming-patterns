@@ -1,4 +1,4 @@
-$primary: hsl(220, 60%, 50%);
+$primary: hsl(200, 80%, 40%);
 $serif: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
 $mono: "Source Code Pro", Menlo, Consolas, Monaco, monospace;
 $sans: 'Lato', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
@@ -12,21 +12,32 @@ body, h1, h2, h3, h4, p, blockquote, code, ul, ol, dl, dd, img {
 
 body {
   line-height: 24px;
-  padding: 24px;
   color: #222;
   font: normal 16px/24px $serif;
+
+  background: hsl(40, 10%, 90%);
+  //background-image: url("images/noise.png");
 }
 
 .content {
-  max-width: 520px;
+  max-width: 560px;
   margin: 0 auto;
+  padding: 0 30px 30px 30px;
 
   // So that asides are positioned relative to it.
   position: relative;
+
+  background: white;
+
+  border-left: solid 1px #bbb;
+  border-right: solid 1px #bbb;
+  border-bottom: solid 1px #999;
+
+  box-shadow: 0 0 40px hsla(30, 40%, 20%, 0.2);
 }
 
 .content.sidebar {
-  padding-right: 280px;
+  padding-right: 300px;
 }
 
 // Note: We use explicit line heights here so that the positions of the
@@ -35,28 +46,30 @@ body {
 
 h1 {
   color: #000;
-  font: bold 36px/44px $header;
-  margin-bottom: 24px;
-  padding: 0 0 8px 0;
-  border-bottom: solid 4px $hairline;
+  font: bold 48px $header;
+  //margin-bottom: 24px;
+  padding: 100px 0 4px 0;
+  //border-bottom: solid 4px $hairline;
+  border-bottom: solid 1px #ddd;
 }
 
 h1.book {
   color: #777;
   font: normal 16px/20px $header;
-  padding-bottom: 12px;
+  padding: 6px 0 30px 0;
   border: none;
 }
 
 h2 {
   color: $primary;
-  font: bold 24px/30px $header;
+  font: bold 28px $header;
   margin: 24px 0 12px 0;
+  border-bottom: solid 1px #ddd;
 }
 
 h3 {
   color: $primary;
-  font: bold 18px/24px $header;
+  font: bold 20px $header;
   margin: 24px 0 12px 0;
 }
 
@@ -67,7 +80,7 @@ h4 {
 }
 
 p {
-  margin: 12px 0;
+  margin: 15px 0;
 }
 
 ul, ol {
@@ -81,6 +94,9 @@ a {
 
 img {
   max-width: 100%;
+
+  //border: solid 1px hsla(0, 0%, 0%, 0.05);
+  border-radius: 2px;
 }
 
 // Hackish way of scaling it down for retina.
@@ -101,15 +117,20 @@ blockquote p {
 }
 
 code {
-  color: #444;
+  color: hsl(200, 30%, 40%);
   font: normal 15px $mono;
 }
 
 pre {
   color: #444;
   font: normal 13px/16px $mono;
-  padding: 0 0 0 12px;
-  border-left: solid 4px $hairline;
+  padding: 12px;
+  //border-left: solid 4px $hairline;
+
+  background: hsl(200, 40%, 98%);
+  //border: solid 1px hsl(200, 30%, 92%);
+  //border-bottom: solid 1px hsl(200, 30%, 85%);
+  border-radius: 4px;
 
   // Scroll horizontally if not wide enough.
   overflow: auto;
@@ -154,7 +175,7 @@ aside {
 aside.sidebar {
   position: absolute;
   width: 240px;
-  right: 0;
+  right: 30px;
 
   padding: 0;
   border-bottom: none;
@@ -162,13 +183,20 @@ aside.sidebar {
 
 // In-progress banner.
 .in-progress {
+display: none;
   position: relative;
   background: hsl(40, 100%, 95%);
-  padding: 0 18px;
+  padding: 6px 18px;
   font: normal 15px/24px $sans;
   color: hsl(35, 40%, 40%);
-  border: solid 4px hsl(38, 80%, 88%);
   margin-bottom: 24px;
+
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+
+  border-left: solid 1px hsl(40, 80%, 90%);
+  border-right: solid 1px hsl(40, 80%, 90%);
+  border-bottom: solid 1px hsl(40, 80%, 80%);
 
   .dismiss {
     position: absolute;
@@ -248,8 +276,6 @@ p.footer {
   color: #777;
   font: 14px $sans;
   margin: 24px 0 24px 0;
-  padding: 20px 0 0 0;
-  border-top: solid 4px $hairline;
 }
 
 // Outline.
