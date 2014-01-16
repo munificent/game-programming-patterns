@@ -223,9 +223,9 @@ buffer is now publicly visible. The old current buffer is now
 available to be reused as the new next buffer.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>This pattern is one of those ones where you&#x2019;ll know when you need it.
-If you have a system that lacks double-buffering, it will probably
+If you have a system that lacks double buffering, it will probably
 look visibly wrong (tearing, etc.) or will behave incorrectly. But saying, "you&#x2019;ll know when you need it" doesn&#x2019;t give you much to go
-on. More specifically, this pattern is appropriate when these three
+on. More specifically, this pattern is appropriate when these four
 things are true:</p>
 <ol>
 <li>
@@ -244,7 +244,7 @@ things are true:</p>
 </li>
 </ol>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
-<p>Unlike larger architectural patterns, double-buffering exists at a
+<p>Unlike larger architectural patterns, double buffering exists at a
 lower implementation level. Because of this, it has fewer consequences
 for the rest of the codebase&thinsp;&mdash;&thinsp;most of the game won&#x2019;t even be
 aware of the difference. There are a couple of caveats, though.</p>
@@ -359,7 +359,7 @@ run into problems. The trouble is that the video driver can call
 mouth will disappear for a single frame. The next frame, it could
 get interrupted at some other point. The end result is horribly
 flickering graphics and angry users.</p>
-<p>We&#x2019;ll fix this with double-buffering:</p>
+<p>We&#x2019;ll fix this with double buffering:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Scene</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -403,7 +403,7 @@ members, <code>next_</code> and <code>current_</code>, that point into that arra
 draw, we draw onto the next buffer, referenced by <code>next_</code>. When the
 video driver needs to get at the pixels, it always accesses the
 <em>other</em> buffer through <code>current_</code>.</p>
-<p>This way, the video driver nevers sees the buffer that we&#x2019;re working
+<p>This way, the video driver never sees the buffer that we&#x2019;re working
 on. The only remaining piece of the puzzle is the call to <code>swap()</code>
 when the scene is done drawing the frame. That swaps the two buffers
 by simply switching the <code>next_</code> and <code>current_</code> references. The next
@@ -453,7 +453,7 @@ pattern.</p>
 
 <p>Every frame, the game is responsible for calling <code>update()</code> on it so
 that it has a chance to do some processing. Critically, from the
-user&#x2019;s perspective <em>all actors should appear to update
+user&#x2019;s perspective, <em>all actors should appear to update
 simultaneously</em>.</p>
 <p>Actors can also interact with each other, if by "interacting", we mean
 "they can slap each other around." When updating, the actor can call
@@ -708,7 +708,7 @@ this option.</p>
 
 <p>You&#x2019;ll note that when we go to draw the third frame, the data
 already on the buffer is from frame <em>one</em>, not the more
-recent second frame. In most cases, this isn&#x2019;t an issue: we
+recent second frame. In most cases, this isn&#x2019;t an issue&thinsp;&mdash;&thinsp;we
 usually just clear the whole buffer right before drawing.
 But, if we intend to <span name="blur">reuse</span> some of the existing data on the
 buffer, it&#x2019;s important to take into account that that data
@@ -736,10 +736,9 @@ buffer would.</p>
 <li>
 <p><em>Data on the next buffer is only a single frame old.</em> This is
     the nice thing about copying the data as opposed to
-    ping-ponging back and forth between the two buffers. Our next
-    buffer is <em>always</em> the next buffer, so it always has the frame
-    we just wrote on it. If we need access to previous buffer
-    data, this will give us more up-to-date data to work with.</p>
+    ping-ponging back and forth between the two buffers. If we
+    need access to previous buffer data, this will give us more
+    up-to-date data to work with.</p>
 </li>
 <li>
 <p><em>Swapping can take more time.</em> This, of course, is the big
@@ -747,7 +746,7 @@ buffer would.</p>
     entire buffer in memory. If the buffer is large, like an
     entire framebuffer, it can a signficant chunk of time to do
     this. Since nothing can read or write to <em>either</em> buffer
-    while this is happening, that can be a big limitation.</p>
+    while this is happening, that&#x2019;s a big limitation.</p>
 </li>
 </ul>
 </li>
