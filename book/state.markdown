@@ -381,4 +381,4 @@ This doesn't mean finite state machines, pushdown automata, and other simple sys
 2. That state can be rigidly divided into one of a relatively small number of distinct options.
 3. The entity responds to a series of inputs or events over time.
 
-In games, they are most known for being used in AI, but they are also common in implementations of user input handling, navigating menu screens parsing text, network protocols, and other asynchronous behavior.
+In games, they are most known for being used in AI, but they are also common in implementations of user input handling, navigating menu screens, parsing text, network protocols, and other asynchronous behavior.
