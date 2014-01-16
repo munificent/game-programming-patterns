@@ -329,7 +329,7 @@
 
 
 <p>The <code>new</code> here invokes the body of the <code>Weapon</code> function with <code>this</code> bound to a new empty object. The body adds a bunch of fields to it, then the now-filled-in object is automatically returned.</p>
-<p>The <code>new</code> also does one other thing for you. When it creates that blank object, it automatically sets its to delegate to a prototype object. You can get to that object directly using <code>Weapon.prototype</code>.</p>
+<p>The <code>new</code> also does one other thing for you. When it creates that blank object, it wires it up to delegate to a prototype object. You can get to that object directly using <code>Weapon.prototype</code>.</p>
 <p>While state is added in the constructor body, to define <em>behavior</em>, you usually add methods to the prototype object. Something like this:</p>
 <div class="codehilite"><pre><span class="nx">Weapon</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">attack</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">distanceTo</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="o">&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">range</span><span class="p">)</span> <span class="p">{</span>
