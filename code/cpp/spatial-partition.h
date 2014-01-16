@@ -112,9 +112,9 @@ namespace SpatialPartition
       Grid()
       {
         // Clear the grid.
-        for (int y = 0; y < NUM_CELLS; y++)
+        for (int x = 0; x < NUM_CELLS; x++)
         {
-          for (int x = 0; x < NUM_CELLS; x++)
+          for (int y = 0; y < NUM_CELLS; y++)
           {
             cells_[x][y] = NULL;
           }
@@ -225,9 +225,9 @@ namespace SpatialPartition
       Grid()
       {
         // Clear the grid.
-        for (int y = 0; y < NUM_CELLS; y++)
+        for (int x = 0; x < NUM_CELLS; x++)
         {
-          for (int x = 0; x < NUM_CELLS; x++)
+          for (int y = 0; y < NUM_CELLS; y++)
           {
             cells_[x][y] = NULL;
           }
@@ -458,9 +458,9 @@ namespace SpatialPartition
       Grid()
       {
         // Clear the grid.
-        for (int y = 0; y < NUM_CELLS; y++)
+        for (int x = 0; x < NUM_CELLS; x++)
         {
-          for (int x = 0; x < NUM_CELLS; x++)
+          for (int y = 0; y < NUM_CELLS; y++)
           {
             cells_[x][y] = NULL;
           }
@@ -512,9 +512,9 @@ namespace SpatialPartition
     // TODO(bob): Need tests for this.
     void Grid::handleMelee()
     {
-      for (int y = 0; y < NUM_CELLS; y++)
+      for (int x = 0; x < NUM_CELLS; x++)
       {
-        for (int x = 0; x < NUM_CELLS; x++)
+        for (int y = 0; y < NUM_CELLS; y++)
         {
           handleCell(x, y);
         }

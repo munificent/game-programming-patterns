@@ -58,7 +58,7 @@ You can visualize it like this:
 
 This looks a lot like the <a href="type-object.html" class="pattern">Type Object</a> pattern. Both involve delegating part of an object's state to some other object shared between a number of instances. However, the intent behind the patterns differs.
 
-With a Type Object, the goal is to minimize the number of classes you have to define by lifting "types" into your own object model. Any memory sharing you get from that is just bonus. This pattern is purely about efficiency.
+With a Type Object, the goal is to minimize the number of classes you have to define by lifting "types" into your own object model. Any memory sharing you get from that is just bonus. The Flyweight pattern is purely about efficiency.
 
 </aside>
 
@@ -148,7 +148,11 @@ That's probably not what you want. Sharing objects to save memory should be an o
 
 But we don't want to pay the cost of having an instance of that for each tile in the world. If you look at that class, you'll notice that there's actually *nothing* in there that's specific to *where* that tile is. In flyweight terms, *all* of a terrain's state is "intrinsic" or "context-free".
 
-Given that, there's no reason to have more than one of each terrain type. Every grass tile on the ground is identical to every other one. Instead of having the world be a grid of enums or Terrain objects, it will be a grid of *pointers* to `Terrain` objects. Each tile that uses the same terrain will point to the same terrain instance.
+Given that, there's no reason to have more than one of each terrain type. Every grass tile on the ground is identical to every other one. Instead of having the world be a grid of enums or Terrain objects, it will be a grid of *pointers* to `Terrain` objects:
+
+^code world-terrain-pointers
+
+Each tile that uses the same terrain will point to the same terrain instance.
 
 <img src="images/flyweight-tiles.png" />
 
