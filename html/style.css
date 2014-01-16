@@ -108,6 +108,7 @@ aside.sidebar {
   border-bottom: none; }
 
 .in-progress {
+  display: none;
   position: relative;
   background: #fff7e5;
   padding: 0 18px;
