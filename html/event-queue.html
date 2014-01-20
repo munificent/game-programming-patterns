@@ -62,66 +62,67 @@
   </table>
 </div>
 <h2><a href="#intent" name="intent">Intent</a></h2>
-<p><em>Buffer messages or events to decouple the sender from when and how it is processed.</em></p>
+<p><em>Decouple when a message or event is generated from when it is processed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<ul>
-<li>good chance you&#x2019;ve already heard of "event queues" before</li>
-<li>if not, maybe "message queue", "message pump", "event loop"</li>
-<li>all related</li>
-<li>comes up a lot because pattern solves bunch of different patterns</li>
-<li>just to refresh memory, walk through two common places where might have
-  heard of it</li>
-</ul>
-<h3><a href="#event-based-prog" name="event-based-prog">event based prog</a></h3>
-<ul>
-<li>if done any gui programming, already dealt with event queue</li>
-<li>way native apps on win, mac, etc. work is os receives raw user input like
-  mouse moves and mouse clicks</li>
-<li>queues those up</li>
-<li>core of your app is loop that says, "get next event"</li>
-<li>your job as app dev is to figure out what that event means "oh clicked save
-  menu item" and do appropriate behavior</li>
-<li>
-<p>when done, unwind all the way back to main event loop and get ready for next
-  event</p>
-</li>
-<li>
-<p>[event driven prog paradigm]</p>
-</li>
-</ul>
-<h3><a href="#main-event-loop" name="main-event-loop">main event loop</a></h3>
-<ul>
-<li>most games, even ones that run on native os, aren&#x2019;t event driven</li>
-<li>[see game loop chapter]</li>
-<li>but pretty common for game to have own central event queue</li>
-<li>[game coding complete chapter]</li>
-<li>used for high level communication between game systems</li>
-<li>for example, maybe tutorial system needs to know when you open door for first
-  time</li>
-<li>to do this, often have global event queue</li>
-<li>any game system can send event to it</li>
-<li>so gameplay code could send "door opened"</li>
-<li>likewise, any system can watch for events of certain types and get notified</li>
-<li>so tutorial system says "let me know when door opened event happens"</li>
-<li>
-<p>[blackboard system]</p>
-</li>
-<li>
-<p>pretty common and could work for this chapter</p>
-</li>
-<li>but not fan of global stuff</li>
-<li>also, some think global is only way to do event queue</li>
-<li>to give different perspective, use different example</li>
-<li>
-<p>talk about variations later</p>
-</li>
-<li>
-<p>to get most of out chapter, example will jams all problems together</p>
-</li>
-<li>then we&#x2019;ll knock em down one after another</li>
-<li>in reality, of course, won&#x2019;t be such perfect fit</li>
-<li>this way can see lots of facets of pattern</li>
-</ul>
+<p>Unless you live under one of the few rocks that still lacks reliable Internet access, there&#x2019;s a good chance you&#x2019;ve already heard of an "event queue" before. If not, maybe "message queue", or "event loop", or "message pump" will ring a bell. These are all related terms for a roughly similar idea.</p>
+<p>This pattern comes up frequently under a number of guises because it solves a bunch of different problems. To refresh your memory, I&#x2019;ll walk through a couple of the most common manifestations of it.</p>
+<h3><a href="#gui-event-loops" name="gui-event-loops">GUI event loops</a></h3>
+<p>If you&#x2019;ve ever done any <span name="event-driven">user interface</span> programming, then you&#x2019;re well acquainted with the <em>events</em>. Every time the user interacts with your program&thinsp;&mdash;&thinsp;clicks a button, pulls down a menu, or presses a key&thinsp;&mdash;&thinsp;the operating system turns this into an event object. It sends this object at your app, and your job is to receive it and hook it up to some interesting behavior.</p>
+<aside name="event-driven">
+
+<p>This application architecture is so common, it&#x2019;s considered a paradigm: <a href="http://en.wikipedia.org/wiki/Event-driven_programming"><em>event-driven programming</em></a>.</p>
+</aside>
+
+<p>It&#x2019;s rare for application programmers to write this code these days, but the way this works is that somewhere deep in the bowels of your code is an <em>event loop</em>. It looks something roughly like this:</p>
+<div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="n">running</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">Event</span> <span class="n">event</span> <span class="o">=</span> <span class="n">getNextEvent</span><span class="p">();</span>
+  <span class="c1">// Handle event...</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>When you call <code>getNextEvent()</code> that pulls the some unprocessed user input into your app. Then you route it to the appropriate event handler and, like magic, your application comes to life.</p>
+<p>The <span name="interrupt">interesting</span> part is that the application <em>pulls</em> in an event when <em>it</em> wants it. When the user presses the mouse, the operating system doesn&#x2019;t just immediately invoke some code in your app that <em>pushes</em> the event in.</p>
+<aside name="interrupt">
+
+<p>In constrast, <em>interrupts</em> from the operating system <em>do</em> work like that. When an interrupt happens, the OS stops whatever your app was doing and forces it to jump to an interrupt handler. This abruptness is why interrupts are so hard to work with.</p>
+</aside>
+
+<p>That means when the user input comes in, it needs to go&hellip; somewhere&hellip; so that we don&#x2019;t lose it between when the user does something and when your app gets around to calling <code>getNextEvent()</code>. That "somewhere" is a <em>queue</em>.</p>
+<p>When user input comes in, the OS adds it to a queue of unprocessed events. When you call <code>getNextEvent()</code>, it pulls the oldest event off the queue and hands it to your application. (If there are no events in the queue, it usually blocks and waits until one comes in.)</p>
+<p>As an application programmer, you don&#x2019;t usually see this event queue, but it&#x2019;s there.</p>
+<h3><a href="#central-event-bus" name="central-event-bus">Central event bus</a></h3>
+<p>If the above section is news to you, don&#x2019;t sweat it. Most <span name="game-loop">games</span> aren&#x2019;t event-driven like this. Instead, the cadence that drive&#x2019;s the game&#x2019;s core application loop is usually time.</p>
+<aside name="game-loop">
+
+<p>For all of the gory details behind this, crack open the <a href="game-loop.html" class="pattern">Game Loop</a> chapter.</p>
+</aside>
+
+<p>But it <em>is</em> pretty common for games to have some other central event queue as part of the backbone of the nervous system of the program. You&#x2019;ll often here "central" or "global" or "main" used to describe it. It&#x2019;s used for high level communication between game systems that want to stay decoupled.</p>
+<p>For example, say your game has a <span name="tutorial">tutorial</span> system. You need little help popups to appear queued off of specific in-game events. For example, the first time the player vanquishes a foul beastie, you want to show a little help balloon that says, "Press X to grab the loot!"</p>
+<p>Your gameplay and combat code is likely complex enough as it is. The last thing you want to do is stuff a bunch of checks for triggering tutorials in there. (Not to mention all of the other places in the codebase that end up triggering a help balloon.)</p>
+<aside name="tutorial">
+
+<p>In-game tutorials are one of those features that always seems to be a challenge to implement gracefully. Worse, it&#x2019;s a chunk of code that any given player will only use once or twice in the entire lifetime of the game.</p>
+<p>That makes it easy to underestimate how helpful a good tutorial can be. It&#x2019;s a hassle, but your user will love you for it.</p>
+</aside>
+
+<p>Instead, what some games do is have an event queue. This is publicly visible to pretty much the entire game. Any game system can throw an event on the queue. For example, the combat code can add a "enemy died" event every time you slay a foe.</p>
+<p><span name="blackboard">Likewise</span>, any game system can receive events from the queue. So the tutorial
+engine would register itself with the queue and indicate it wants to known about "enemy died" events. This way, knowledge of an enemy dying makes its way from the combat system over to the tutorial engine without the two being directly aware of each other.</p>
+<aside name="blackboard">
+
+<p>In the field of AI, there is a very similar architectural pattern called a <a href="http://en.wikipedia.org/wiki/Blackboard_system">blackboard system</a>.</p>
+</aside>
+
+<p>This would have made a decent example for the rest of this chapter. But I&#x2019;m not generally a fan of global systems like this. It is a common technique, but I don&#x2019;t want you to think that event queues <em>have</em> to be global.</p>
+<p>Instead, we&#x2019;ll use something more scoped. Event queues can solve a bunch of different problems. To get the most mileage out of this chapter, I&#x2019;m going to contrive a <span name="perfect">motivating</span> example that jams all of those problems together. Then we&#x2019;ll slap a queue in and watch it knock those problems down, one after the other.</p>
+<aside name="perfect">
+
+<p>Of course, in your games, you&#x2019;re unlikely to find problems so cleanly suited to a particular pattern. This is the luxury of getting to cherry-pick examples for a book.</p>
+</aside>
+
 <h3><a href="#say-what" name="say-what">Say what?</a></h3>
 <ul>
 <li>working on adding audio to game</li>
@@ -903,9 +904,14 @@
 <li>depends on sender and intended receiver</li>
 <li>if queue is global, event is usually what happened</li>
 <li>if queue is specific to obj or system, usually message: request for action</li>
-<li>if sender and intended receiver are in different domains (physics and audio)
+<li>
+<p>if sender and intended receiver are in different domains (physics and audio)
     then usually event. if in same domain (audio component of actor and audio
-    engine) to be command or message</li>
+    engine) to be command or message</p>
+</li>
+<li>
+<p>can we talk about how queues let you go from push to pull?</p>
+</li>
 </ul>
 <p>http://www.gamedev.net/topic/136778-event-queue-and-events-in-games/
 http://gamedev.stackexchange.com/questions/14383/best-way-to-manage-in-game-events

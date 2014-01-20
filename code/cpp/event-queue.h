@@ -18,6 +18,27 @@ namespace EventQueue
   int findOpenChannel() { return -1; }
   void startSound(ResourceId resource, int channel, int volume) {}
 
+  namespace EventLoop
+  {
+    typedef int Event;
+    Event getNextEvent() { return 0; }
+
+    void eventLoop()
+    {
+      bool running = true;
+      //^event-loop
+      while (running)
+      {
+        Event event = getNextEvent();
+        // Handle event...
+        //^omit
+        use(event);
+        //^omit
+      }
+      //^event-loop
+    }
+  }
+
   namespace Unqueued
   {
     class Audio
