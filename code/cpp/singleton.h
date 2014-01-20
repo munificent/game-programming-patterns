@@ -104,7 +104,7 @@ namespace Singleton2
       //^omit
     }
     
-    virtual void  writeFile(char* path, char* contents)
+    virtual void writeFile(char* path, char* contents)
     {
       // Use Nintendo file IO API...
     }

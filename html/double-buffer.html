@@ -497,7 +497,7 @@ actor he faces.</p>
 <span class="nl">public:</span>
   <span class="kt">void</span> <span class="n">face</span><span class="p">(</span><span class="n">Actor</span><span class="o">*</span> <span class="n">actor</span><span class="p">)</span> <span class="p">{</span> <span class="n">facing_</span> <span class="o">=</span> <span class="n">actor</span><span class="p">;</span> <span class="p">}</span>
 
-  <span class="kt">void</span> <span class="n">update</span><span class="p">()</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">wasSlapped</span><span class="p">())</span> <span class="n">facing_</span><span class="o">-&gt;</span><span class="n">slap</span><span class="p">();</span>
   <span class="p">}</span>

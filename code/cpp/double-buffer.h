@@ -170,7 +170,7 @@ namespace UnbufferedSlapstick
     //^omit
     void face(Actor* actor) { facing_ = actor; }
 
-    void update()
+    virtual void update()
     {
       //^omit
       if (wasSlapped()) std::cout << name_ << " was slapped" << std::endl;
@@ -321,7 +321,7 @@ namespace BufferedSlapstick
     //^omit
     void face(Actor* actor) { facing_ = actor; }
 
-    void update()
+    virtual void update()
     {
       //^omit
       if (wasSlapped()) std::cout << name_ << " was slapped" << std::endl;

@@ -131,7 +131,7 @@ through it quickly.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Achievements</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Observer</span>
 <span class="p">{</span>
 <span class="nl">protected:</span>
-  <span class="kt">void</span> <span class="n">onNotify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">onNotify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">switch</span> <span class="p">(</span><span class="n">event</span><span class="p">)</span>
     <span class="p">{</span>

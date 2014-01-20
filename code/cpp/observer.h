@@ -72,7 +72,7 @@ namespace ObserverPattern
     class Achievements : public Observer
     {
     protected:
-      void onNotify(const Entity& entity, Event event)
+      virtual void onNotify(const Entity& entity, Event event)
       {
         switch (event)
         {
@@ -173,7 +173,7 @@ namespace ObserverPattern
       Subject entityFell_;
       Subject& entityFell() { return entityFell_; }
 
-      void onNotify(const Entity& entity, Event event) {}
+      virtual void onNotify(const Entity& entity, Event event) {}
 
       void physicsEvent()
       {
@@ -201,7 +201,7 @@ namespace ObserverPattern
 
       // Other stuff...
       //^omit
-      void onNotify(const Entity& entity, Event event) {}
+      virtual void onNotify(const Entity& entity, Event event) {}
       //^omit
     private:
       Observer* next_;
@@ -423,7 +423,7 @@ namespace ObserverPattern
       int numObserved = 0;
 
     protected:
-      void onNotify(Observable & observable)
+      virtual void onNotify(Observable & observable)
       {
         numObserved++;
         cout << name_ << " heard it!" << endl;
