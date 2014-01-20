@@ -16,7 +16,7 @@ body {
   font: normal 16px/24px $serif;
 
   background: hsl(40, 10%, 90%);
-  //background-image: url("images/noise.png");
+  background-image: url("images/background.png");
 }
 
 .content {
@@ -47,10 +47,8 @@ body {
 h1 {
   color: #000;
   font: bold 48px $header;
-  //margin-bottom: 24px;
   padding: 100px 0 4px 0;
-  //border-bottom: solid 4px $hairline;
-  border-bottom: solid 1px #ddd;
+  border-bottom: solid 1px $hairline;
 }
 
 h1.book {
@@ -62,15 +60,16 @@ h1.book {
 
 h2 {
   color: $primary;
-  font: bold 28px $header;
-  margin: 24px 0 12px 0;
-  border-bottom: solid 1px #ddd;
+  font: bold 30px $header;
+  margin: 30px 0 10px 0;
+  padding: 0 0 2px 0;
+  //border-bottom: solid 1px $hairline;
 }
 
 h3 {
   color: $primary;
   font: bold 20px $header;
-  margin: 24px 0 12px 0;
+  margin: 30px 0 10px 0;
 }
 
 h4 {
@@ -80,7 +79,11 @@ h4 {
 }
 
 p {
-  margin: 15px 0;
+  margin: 10px 0;
+}
+
+p + p {
+  margin-top: 20px;
 }
 
 ul, ol {
@@ -95,8 +98,8 @@ a {
 img {
   max-width: 100%;
 
-  //border: solid 1px hsla(0, 0%, 0%, 0.05);
-  border-radius: 2px;
+  border: solid 1px hsl(40, 30%, 95%);
+  border-radius: 3px;
 }
 
 // Hackish way of scaling it down for retina.
@@ -125,12 +128,11 @@ pre {
   color: #444;
   font: normal 13px/16px $mono;
   padding: 12px;
-  //border-left: solid 4px $hairline;
 
   background: hsl(200, 40%, 98%);
-  //border: solid 1px hsl(200, 30%, 92%);
-  //border-bottom: solid 1px hsl(200, 30%, 85%);
-  border-radius: 4px;
+  border: solid 1px hsl(200, 30%, 94%);
+  border-top: solid 1px hsl(200, 30%, 85%);
+  border-radius: 3px;
 
   // Scroll horizontally if not wide enough.
   overflow: auto;
@@ -155,6 +157,10 @@ aside {
 
   >p:last-child {
     margin-bottom: 0;
+  }
+
+  p + p {
+    margin-top: 10px;
   }
 
   ul, ol {

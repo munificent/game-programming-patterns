@@ -5,7 +5,8 @@ body {
   line-height: 24px;
   color: #222;
   font: normal 16px/24px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  background: #e8e6e3; }
+  background: #e8e6e3;
+  background-image: url("images/noise.png"); }
 
 .content {
   max-width: 560px;
@@ -25,7 +26,7 @@ h1 {
   color: #000;
   font: bold 48px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
   padding: 100px 0 4px 0;
-  border-bottom: solid 1px #ddd; }
+  border-bottom: solid 1px #eeeeee; }
 
 h1.book {
   color: #777;
@@ -35,14 +36,14 @@ h1.book {
 
 h2 {
   color: #1481b8;
-  font: bold 28px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  margin: 24px 0 12px 0;
-  border-bottom: solid 1px #ddd; }
+  font: bold 30px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  margin: 30px 0 10px 0;
+  padding: 0 0 2px 0; }
 
 h3 {
   color: #1481b8;
   font: bold 20px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  margin: 24px 0 12px 0; }
+  margin: 30px 0 10px 0; }
 
 h4 {
   color: #777;
@@ -50,7 +51,10 @@ h4 {
   margin: 24px 0 0 0; }
 
 p {
-  margin: 15px 0; }
+  margin: 10px 0; }
+
+p + p {
+  margin-top: 20px; }
 
 ul, ol {
   padding: 0 0 0 24px; }
@@ -61,7 +65,8 @@ a {
 
 img {
   max-width: 100%;
-  border-radius: 2px; }
+  border: solid 1px #f6f4ee;
+  border-radius: 3px; }
 
 img.arrow {
   vertical-align: middle;
@@ -85,7 +90,9 @@ pre {
   font: normal 13px/16px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
   padding: 12px;
   background: #f8fbfc;
-  border-radius: 4px;
+  border: solid 1px #ebf1f4;
+  border-top: solid 1px #cddde4;
+  border-radius: 3px;
   overflow: auto; }
 
 aside {
@@ -99,6 +106,8 @@ aside {
     margin-top: 0; }
   aside > p:last-child {
     margin-bottom: 0; }
+  aside p + p {
+    margin-top: 10px; }
   aside ul, aside ol {
     padding: 0 0 0 18px; }
   aside code {
