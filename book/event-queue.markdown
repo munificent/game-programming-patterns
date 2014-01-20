@@ -7,13 +7,53 @@
 
 ## Motivation
 
-- pattern can be used to solve a bunch of similar but not identical problems
-- to get most of out chapter, use example that jams all problems together
+- good chance you've already heard of "event queues" before
+- if not, maybe "message queue", "message pump", "event loop"
+- all related
+- comes up a lot because pattern solves bunch of different patterns
+- just to refresh memory, walk through two common places where might have
+  heard of it
+
+### event based prog
+
+- if done any gui programming, already dealt with event queue
+- way native apps on win, mac, etc. work is os receives raw user input like
+  mouse moves and mouse clicks
+- queues those up
+- core of your app is loop that says, "get next event"
+- your job as app dev is to figure out what that event means "oh clicked save
+  menu item" and do appropriate behavior
+- when done, unwind all the way back to main event loop and get ready for next
+  event
+
+- [event driven prog paradigm]
+
+### main event loop
+
+- most games, even ones that run on native os, aren't event driven
+- [see game loop chapter]
+- but pretty common for game to have own central event queue
+- [game coding complete chapter]
+- used for high level communication between game systems
+- for example, maybe tutorial system needs to know when you open door for first
+  time
+- to do this, often have global event queue
+- any game system can send event to it
+- so gameplay code could send "door opened"
+- likewise, any system can watch for events of certain types and get notified
+- so tutorial system says "let me know when door opened event happens"
+- [blackboard system]
+
+- pretty common and could work for this chapter
+- but not fan of global stuff
+- also, some think global is only way to do event queue
+- to give different perspective, use different example
+- talk about variations later
+
+- to get most of out chapter, example will jams all problems together
 - then we'll knock em down one after another
 - in reality, of course, won't be such perfect fit
 - this way can see lots of facets of pattern
-
-**todo: can fit discussion of event/message/command here? mention global event queue**
 
 ### Say what?
 
@@ -31,10 +71,10 @@
   play
 
 - start sprinkling call throughout codebase
-- in physics code, when objects collide trigger sound
+- in ui code, when selected menu item changes, trigger sound
 - run into first problem: audio api takes a little while to locate sound
   resource and copy buffer of data to somewhere hardware can play it
-- since api is synchronous, that blocks the physics engine!
+- since api is synchronous, that blocks ui! hitches for a few frames
 
 - **problem 1: requesting a sound to play blocks the caller until the audio
   engine has started playing the sound**
@@ -72,6 +112,8 @@
   breaks loose
 - or have to do careful sync, which slows down both threads
 - and (as typical) want audio to be on its *own* thread
+
+- **problem 4: can't respond to requests on different thread from caller
 
 ### Leave a message
 
@@ -203,11 +245,321 @@ Requests can be **handled directly**, or **routed to interested parties**. This 
 
 ## Sample Code
 
-**Bunch of paragraphs, maybe some subheaders**
+- before start solving problems, let's create them
+- set up synchronous audio api
+- shows needed functionality
+
+- have audio class
+- likely to be singleton, though pains me to admit
+- any code that wants to play sound calls into it:
+
+    sync code
+
+- good to note first off that code does have one good thing going for it
+- its simple
+- always best to start simple and make sure actually have problem before start
+  layering on complexity to solve it
+
+- let's see how does
+- first problem was that audio api was synchronous
+- indeed, now that we have code can see it is
+- loads resource, and that blocks until sound is memory
+- if not cached and has to hit disc, slow!
+- playSound doesn't return until that's done so this would indeed block ui
+  and cause hitching
+
+### a deferred call
+
+- let's go with simplest solution can come up with
+- make playSound return quickly by deferring call
+- first, define little struct that represents request to play sound
+
+    struct
+
+- audio will have instance of this
+- when call play sound, just fill it out and set it as present
+
+    store and set flag
+
+- this way playSound returns instantly
+- but do still actually have to play sound
+- so add update method [see pattern] to audio
+
+    update
+
+- we'll call this at appropriate time in game loop
+- [see game loop]
+- so we can handle it taking little while
+- possibly even run on different thread
+- or make load api call itself async
+
+- great, playsound is fast and ui is quick now
+
+- but what happens if we try to play two sounds between calls to update?
+- if already have one call deferred, can't handle deferring another one
+- since we have multiple sound channels, entirely valid to play more than one
+
+### buffer
+
+- solution is to have audio have room for multiple deferred calls
+- will have collection of sounds that have been requested but not yet processed
+- playsound adds to collection
+- update removes them all
+
+- while algo prof may have told you otherwise, when you have bunch of items
+  best way to store them is almost always just a flat contiguous array:
+
+  1. no dynamic allocation [see obj pool]
+  2. no memory overhead for pointers and bookkeeping
+  3. super fast, cache friendly
+
+- let's try that
+- give audio fixed array of requests and keep track of how many are in it
+
+    fields in class
+
+- adding item is simple: just insert in next open slot
+
+    playsound
+
+- update now just processes all of them
+
+    update all
+
+- works ok, but assumes we can process every request in one frame
+- probably true in our example, but chapter is event *queue*, not event buffer
+- how would we handle not processing them all in one lump?
+- need to be able to remove one at a time
+- in other words, need an actual queue
+
+- bunch of ways you can implement queues, this just one
+- one of favorites
+
+### ring buffer
+
+- want this to work like queue, so update should process oldest request first
+- that means first item in array
+
+- i know what you're thinking
+- this is why you learned how great linked lists are: super easy to remove node
+  from list
+- if we remove the first item from array, don't we have to shift all the others
+  over to fill gap?
+- isn't that super slow?
+
+- this is where it gets clever
+- not just dumb array: "ring buffer"
+- called "ring" because instead of fixed array with beginning and end cells,
+  treat it like a *circle* of cells
+
+- right now, oldest request is always at index zero
+- newest is at numRequests - 1
+- as items are added, head of queue grows to right
+- when items are removed, instead of *shifting* to left, we just move *tail*
+  end
+
+**TODO: illustration**
+
+- need to add one field: head
+- index of slot that *next* request will go in
+- in other words, one past more recent request
+
+- whenever add item, increase nummessage, and also bump head
+
+    code
+
+- now can implement remove
+- all need to do is dec nummessages
+- will implicitly move tail to the right
+- no shifting required
+
+- problem now is queue keeps crawling forward through array
+- what happens when head reaches end of array?
+
+- this is cool part: just wraps around
+- when increment head, mod it with size
+- when it goes off end, will automatically wrap around to beginning
+- since tail has moved to right already, those cells are now free to be reused
+- as long as nummessages stays below max, never go ouroboros and have head
+  start eating into tail
+
+- just need to update remove to correctly calculate tail pos
+- needs to handle wrapping around to
+
+    mod in remove
+
+- there we go, a growable queue (up to max) with no alloc, constant time ops,
+  and super cache friendly
+
+### dupes
+
+- solved first problem, move to next
+- can queue up bunch of requests to play same sound
+- will defer processing to update call
+- but that still processes all of them individually
+- if get bunch of requests to play same sound, will stack and sound busted
+
+- easy to solve now
+- we know which requests are already pending for next frame
+- when enqueuing another request, just check for dupe first
+- if have one, ignore other request
+
+    check for dupe
+
+- here, doing collapsing in called because simplest and keeps queue less full
+- does put bit of processing in caller
+
+- other option would be to collapse dupes in update
+- to do that, every time dequeue request, also scan and zero out any identical
+  ones
+
+    collapse in update
+
+### aggregates
+
+- technique also lets us solve third problem
+- if have a  bunch of requests for small bang sound enqueued, want to replace
+  with call to single loud sound
+- when see request for little bang, look for others
+- if find some, bump up intensity of first and zero out others
+
+### hopping threads
+
+- last problem was threading
+- with sync api, code to play sound was directly called by code that wanted to
+  trigger sound
+- whatever thread caller was on is thread api would run on
+- often not what you want
+- audio often run on separate thread
+
+- now that have queue in place, in much better shape to handle that
+
+- have three critical pieces already
+- code for requesting sound is decoupled from code that plays sound
+- have queue between two
+- queue is encapsulated from rest of program
+
+- all that's left is to make requesting a sound and processing the queue
+  threadsafe
+- would like to show concrete code here, but book avoids specific apis
+- threading in particular hard to show in clear way
+- in our case, basics are pretty simple
+- requesting sound can acquire mutex
+- processing sounds aquires same mutex
+- if queue is empty, process waits on condition var until stuff to process
 
 ## Design Decisions
 
-**Few subheader questions, bullet list of answers for each
+### what is queued?
+
+- talked about few different uses of this pattern
+- in addition to audio ex also os event queue and global event queue
+- now draw attention to *what* being queued
+- in audio ex, queuing "requests", or "messages"
+- [or "commands" see pattern]
+- think of queue as holding verbs, things you want to do in future
+
+- in many uses, queue holds "events" things that happened in the past
+- put in queue because want to *respond* to events in future
+- depending problem solving, will do one or the other
+
+* **queue of events**
+
+    - basically refinement of observer pattern
+
+    * more likely to allow multiple listeners
+        - since queue describes things that happened, sender less likely to
+          care who knows about it
+
+    * more likely to be global
+        - often use this as way to broadcast to any interested party
+        - to allow max flex for "interested party", tends to be more central
+          and more global
+
+    * more common
+
+* **queue of messages**
+
+    - think of this as asynchronous api
+    - outside code specifically wants action to happen, and often wants to
+      control who does action
+    - just doesn't control *when* action is done
+
+    * more likely to be single listener
+
+      - like in our example since queue has specific requests, tied to thing
+        that will handle
+      - doesn't have to be though
+
+### how many can read from queue?
+
+- in example, only audio engine processes queued items
+- in os event loop, reading event is public api
+
+* **one reader**
+
+  - natural answer when queue is part of class's api
+  - queue becomes implementation detail of class
+  - from caller's perspective, reader isn't visible as distinct thing
+  - more encapsulated, which is always good
+
+* **many readers**
+
+  - readers *receive* from queue, but don't *consume*
+  - if have ten readers, all ten will see same item
+  - don't parcel them out one at a time to each reader
+  - is broadcast mechanism, not subdividing work
+  - [worker queues are useful too, of course, just different pattern]
+
+  - means events usually dropped if no readers
+  - basic model is events are queued
+  - when processed, send queued events to all listeners at that point
+    time
+  - if not listeners, event usually discarded
+  - with explicit single listener, if reader doesn't process, usually
+    stays in queue
+
+  - ex: user input events are discarded if you don't register listener
+    in your app
+  - if you wait ten minutes while the user clicks around, then register
+    mouse handler, don't immediately get a spew of events for every
+    click already happened
+  - single reader like watching something on tape
+  - many reader like "tuning into a show already in progress"
+
+  * usually need some kind of filtering
+
+  - if have lot of events and lot of readers, can end up sending a *lot*
+    of objects around
+  - to be efficient, listeners can usually specify which "kind" of events
+    they care about
+  - think "mousemove" "mousedown" etc.
+  - often as simple as a type id like that
+  - can be more sophisticated
+
+### how many can write to queue?
+
+- flip side of above option
+- pattern accomodates all configs: 1-1 1-many, many-1, many-many
+
+- in example, requesting sound was public api, so any part of code could write
+  request to queue
+
+- in things like global event bus, anyone can send event
+
+* **one writer**
+
+  - closest to observer pattern
+  - have one priveleged object that raises events
+  - other objects can tune in
+  - usually allow multiple readers
+
+  - encapsulated, which is good
+
+* **many writers**
+
+  - if have multiple readers, basically "global" event bus
+  - very similar to blackboard pattern in ai
 
 ## See Also
 
@@ -235,6 +587,8 @@ Requests can be **handled directly**, or **routed to interested parties**. This 
   - very similar model
   - usually used to describe behavior of distributed systems, and not within
     single application
+
+- queue itself is often special purpose example of object pool
 
 ---
 

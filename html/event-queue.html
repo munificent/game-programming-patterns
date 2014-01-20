@@ -65,13 +65,63 @@
 <p><em>Buffer messages or events to decouple the sender from when and how it is processed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
 <ul>
-<li>pattern can be used to solve a bunch of similar but not identical problems</li>
-<li>to get most of out chapter, use example that jams all problems together</li>
+<li>good chance you&#x2019;ve already heard of "event queues" before</li>
+<li>if not, maybe "message queue", "message pump", "event loop"</li>
+<li>all related</li>
+<li>comes up a lot because pattern solves bunch of different patterns</li>
+<li>just to refresh memory, walk through two common places where might have
+  heard of it</li>
+</ul>
+<h3><a href="#event-based-prog" name="event-based-prog">event based prog</a></h3>
+<ul>
+<li>if done any gui programming, already dealt with event queue</li>
+<li>way native apps on win, mac, etc. work is os receives raw user input like
+  mouse moves and mouse clicks</li>
+<li>queues those up</li>
+<li>core of your app is loop that says, "get next event"</li>
+<li>your job as app dev is to figure out what that event means "oh clicked save
+  menu item" and do appropriate behavior</li>
+<li>
+<p>when done, unwind all the way back to main event loop and get ready for next
+  event</p>
+</li>
+<li>
+<p>[event driven prog paradigm]</p>
+</li>
+</ul>
+<h3><a href="#main-event-loop" name="main-event-loop">main event loop</a></h3>
+<ul>
+<li>most games, even ones that run on native os, aren&#x2019;t event driven</li>
+<li>[see game loop chapter]</li>
+<li>but pretty common for game to have own central event queue</li>
+<li>[game coding complete chapter]</li>
+<li>used for high level communication between game systems</li>
+<li>for example, maybe tutorial system needs to know when you open door for first
+  time</li>
+<li>to do this, often have global event queue</li>
+<li>any game system can send event to it</li>
+<li>so gameplay code could send "door opened"</li>
+<li>likewise, any system can watch for events of certain types and get notified</li>
+<li>so tutorial system says "let me know when door opened event happens"</li>
+<li>
+<p>[blackboard system]</p>
+</li>
+<li>
+<p>pretty common and could work for this chapter</p>
+</li>
+<li>but not fan of global stuff</li>
+<li>also, some think global is only way to do event queue</li>
+<li>to give different perspective, use different example</li>
+<li>
+<p>talk about variations later</p>
+</li>
+<li>
+<p>to get most of out chapter, example will jams all problems together</p>
+</li>
 <li>then we&#x2019;ll knock em down one after another</li>
 <li>in reality, of course, won&#x2019;t be such perfect fit</li>
 <li>this way can see lots of facets of pattern</li>
 </ul>
-<p><strong>todo: can fit discussion of event/message/command here? mention global event queue</strong></p>
 <h3><a href="#say-what" name="say-what">Say what?</a></h3>
 <ul>
 <li>working on adding audio to game</li>
@@ -94,11 +144,11 @@
 <li>
 <p>start sprinkling call throughout codebase</p>
 </li>
-<li>in physics code, when objects collide trigger sound</li>
+<li>in ui code, when selected menu item changes, trigger sound</li>
 <li>run into first problem: audio api takes a little while to locate sound
   resource and copy buffer of data to somewhere hardware can play it</li>
 <li>
-<p>since api is synchronous, that blocks the physics engine!</p>
+<p>since api is synchronous, that blocks ui! hitches for a few frames</p>
 </li>
 <li>
 <p><strong>problem 1: requesting a sound to play blocks the caller until the audio
@@ -147,7 +197,12 @@
 <li>if gameplay thread triggers sound at same time as physics thread, all hell
   breaks loose</li>
 <li>or have to do careful sync, which slows down both threads</li>
-<li>and (as typical) want audio to be on its <em>own</em> thread</li>
+<li>
+<p>and (as typical) want audio to be on its <em>own</em> thread</p>
+</li>
+<li>
+<p>**problem 4: can&#x2019;t respond to requests on different thread from caller</p>
+</li>
 </ul>
 <h3><a href="#leave-a-message" name="leave-a-message">Leave a message</a></h3>
 <ul>
@@ -298,9 +353,442 @@
 <li>good guideline is to avoid sending events in code that is responding to one</li>
 </ul>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
-<p><strong>Bunch of paragraphs, maybe some subheaders</strong></p>
+<ul>
+<li>before start solving problems, let&#x2019;s create them</li>
+<li>set up synchronous audio api</li>
+<li>
+<p>shows needed functionality</p>
+</li>
+<li>
+<p>have audio class</p>
+</li>
+<li>likely to be singleton, though pains me to admit</li>
+<li>
+<p>any code that wants to play sound calls into it:</p>
+<p>sync code</p>
+</li>
+<li>
+<p>good to note first off that code does have one good thing going for it</p>
+</li>
+<li>its simple</li>
+<li>
+<p>always best to start simple and make sure actually have problem before start
+  layering on complexity to solve it</p>
+</li>
+<li>
+<p>let&#x2019;s see how does</p>
+</li>
+<li>first problem was that audio api was synchronous</li>
+<li>indeed, now that we have code can see it is</li>
+<li>loads resource, and that blocks until sound is memory</li>
+<li>if not cached and has to hit disc, slow!</li>
+<li>playSound doesn&#x2019;t return until that&#x2019;s done so this would indeed block ui
+  and cause hitching</li>
+</ul>
+<h3><a href="#a-deferred-call" name="a-deferred-call">a deferred call</a></h3>
+<ul>
+<li>let&#x2019;s go with simplest solution can come up with</li>
+<li>make playSound return quickly by deferring call</li>
+<li>
+<p>first, define little struct that represents request to play sound</p>
+<p>struct</p>
+</li>
+<li>
+<p>audio will have instance of this</p>
+</li>
+<li>
+<p>when call play sound, just fill it out and set it as present</p>
+<p>store and set flag</p>
+</li>
+<li>
+<p>this way playSound returns instantly</p>
+</li>
+<li>but do still actually have to play sound</li>
+<li>
+<p>so add update method [see pattern] to audio</p>
+<p>update</p>
+</li>
+<li>
+<p>we&#x2019;ll call this at appropriate time in game loop</p>
+</li>
+<li>[see game loop]</li>
+<li>so we can handle it taking little while</li>
+<li>possibly even run on different thread</li>
+<li>
+<p>or make load api call itself async</p>
+</li>
+<li>
+<p>great, playsound is fast and ui is quick now</p>
+</li>
+<li>
+<p>but what happens if we try to play two sounds between calls to update?</p>
+</li>
+<li>if already have one call deferred, can&#x2019;t handle deferring another one</li>
+<li>since we have multiple sound channels, entirely valid to play more than one</li>
+</ul>
+<h3><a href="#buffer" name="buffer">buffer</a></h3>
+<ul>
+<li>solution is to have audio have room for multiple deferred calls</li>
+<li>will have collection of sounds that have been requested but not yet processed</li>
+<li>playsound adds to collection</li>
+<li>
+<p>update removes them all</p>
+</li>
+<li>
+<p>while algo prof may have told you otherwise, when you have bunch of items
+  best way to store them is almost always just a flat contiguous array:</p>
+</li>
+<li>
+<p>no dynamic allocation [see obj pool]</p>
+</li>
+<li>no memory overhead for pointers and bookkeeping</li>
+<li>
+<p>super fast, cache friendly</p>
+</li>
+<li>
+<p>let&#x2019;s try that</p>
+</li>
+<li>
+<p>give audio fixed array of requests and keep track of how many are in it</p>
+<p>fields in class</p>
+</li>
+<li>
+<p>adding item is simple: just insert in next open slot</p>
+<p>playsound</p>
+</li>
+<li>
+<p>update now just processes all of them</p>
+<p>update all</p>
+</li>
+<li>
+<p>works ok, but assumes we can process every request in one frame</p>
+</li>
+<li>probably true in our example, but chapter is event <em>queue</em>, not event buffer</li>
+<li>how would we handle not processing them all in one lump?</li>
+<li>need to be able to remove one at a time</li>
+<li>
+<p>in other words, need an actual queue</p>
+</li>
+<li>
+<p>bunch of ways you can implement queues, this just one</p>
+</li>
+<li>one of favorites</li>
+</ul>
+<h3><a href="#ring-buffer" name="ring-buffer">ring buffer</a></h3>
+<ul>
+<li>want this to work like queue, so update should process oldest request first</li>
+<li>
+<p>that means first item in array</p>
+</li>
+<li>
+<p>i know what you&#x2019;re thinking</p>
+</li>
+<li>this is why you learned how great linked lists are: super easy to remove node
+  from list</li>
+<li>if we remove the first item from array, don&#x2019;t we have to shift all the others
+  over to fill gap?</li>
+<li>
+<p>isn&#x2019;t that super slow?</p>
+</li>
+<li>
+<p>this is where it gets clever</p>
+</li>
+<li>not just dumb array: "ring buffer"</li>
+<li>
+<p>called "ring" because instead of fixed array with beginning and end cells,
+  treat it like a <em>circle</em> of cells</p>
+</li>
+<li>
+<p>right now, oldest request is always at index zero</p>
+</li>
+<li>newest is at numRequests - 1</li>
+<li>as items are added, head of queue grows to right</li>
+<li>when items are removed, instead of <em>shifting</em> to left, we just move <em>tail</em>
+  end</li>
+</ul>
+<p><strong>TODO: illustration</strong></p>
+<ul>
+<li>need to add one field: head</li>
+<li>index of slot that <em>next</em> request will go in</li>
+<li>
+<p>in other words, one past more recent request</p>
+</li>
+<li>
+<p>whenever add item, increase nummessage, and also bump head</p>
+<p>code</p>
+</li>
+<li>
+<p>now can implement remove</p>
+</li>
+<li>all need to do is dec nummessages</li>
+<li>will implicitly move tail to the right</li>
+<li>
+<p>no shifting required</p>
+</li>
+<li>
+<p>problem now is queue keeps crawling forward through array</p>
+</li>
+<li>
+<p>what happens when head reaches end of array?</p>
+</li>
+<li>
+<p>this is cool part: just wraps around</p>
+</li>
+<li>when increment head, mod it with size</li>
+<li>when it goes off end, will automatically wrap around to beginning</li>
+<li>since tail has moved to right already, those cells are now free to be reused</li>
+<li>
+<p>as long as nummessages stays below max, never go ouroboros and have head
+  start eating into tail</p>
+</li>
+<li>
+<p>just need to update remove to correctly calculate tail pos</p>
+</li>
+<li>
+<p>needs to handle wrapping around to</p>
+<p>mod in remove</p>
+</li>
+<li>
+<p>there we go, a growable queue (up to max) with no alloc, constant time ops,
+  and super cache friendly</p>
+</li>
+</ul>
+<h3><a href="#dupes" name="dupes">dupes</a></h3>
+<ul>
+<li>solved first problem, move to next</li>
+<li>can queue up bunch of requests to play same sound</li>
+<li>will defer processing to update call</li>
+<li>but that still processes all of them individually</li>
+<li>
+<p>if get bunch of requests to play same sound, will stack and sound busted</p>
+</li>
+<li>
+<p>easy to solve now</p>
+</li>
+<li>we know which requests are already pending for next frame</li>
+<li>when enqueuing another request, just check for dupe first</li>
+<li>
+<p>if have one, ignore other request</p>
+<p>check for dupe</p>
+</li>
+<li>
+<p>here, doing collapsing in called because simplest and keeps queue less full</p>
+</li>
+<li>
+<p>does put bit of processing in caller</p>
+</li>
+<li>
+<p>other option would be to collapse dupes in update</p>
+</li>
+<li>
+<p>to do that, every time dequeue request, also scan and zero out any identical
+  ones</p>
+<p>collapse in update</p>
+</li>
+</ul>
+<h3><a href="#aggregates" name="aggregates">aggregates</a></h3>
+<ul>
+<li>technique also lets us solve third problem</li>
+<li>if have a  bunch of requests for small bang sound enqueued, want to replace
+  with call to single loud sound</li>
+<li>when see request for little bang, look for others</li>
+<li>if find some, bump up intensity of first and zero out others</li>
+</ul>
+<h3><a href="#hopping-threads" name="hopping-threads">hopping threads</a></h3>
+<ul>
+<li>last problem was threading</li>
+<li>with sync api, code to play sound was directly called by code that wanted to
+  trigger sound</li>
+<li>whatever thread caller was on is thread api would run on</li>
+<li>often not what you want</li>
+<li>
+<p>audio often run on separate thread</p>
+</li>
+<li>
+<p>now that have queue in place, in much better shape to handle that</p>
+</li>
+<li>
+<p>have three critical pieces already</p>
+</li>
+<li>code for requesting sound is decoupled from code that plays sound</li>
+<li>have queue between two</li>
+<li>
+<p>queue is encapsulated from rest of program</p>
+</li>
+<li>
+<p>all that&#x2019;s left is to make requesting a sound and processing the queue
+  threadsafe</p>
+</li>
+<li>would like to show concrete code here, but book avoids specific apis</li>
+<li>threading in particular hard to show in clear way</li>
+<li>in our case, basics are pretty simple</li>
+<li>requesting sound can acquire mutex</li>
+<li>processing sounds aquires same mutex</li>
+<li>if queue is empty, process waits on condition var until stuff to process</li>
+</ul>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
-<p>**Few subheader questions, bullet list of answers for each</p>
+<h3><a href="#what-is-queued" name="what-is-queued">what is queued?</a></h3>
+<ul>
+<li>talked about few different uses of this pattern</li>
+<li>in addition to audio ex also os event queue and global event queue</li>
+<li>now draw attention to <em>what</em> being queued</li>
+<li>in audio ex, queuing "requests", or "messages"</li>
+<li>[or "commands" see pattern]</li>
+<li>
+<p>think of queue as holding verbs, things you want to do in future</p>
+</li>
+<li>
+<p>in many uses, queue holds "events" things that happened in the past</p>
+</li>
+<li>put in queue because want to <em>respond</em> to events in future</li>
+<li>
+<p>depending problem solving, will do one or the other</p>
+</li>
+<li>
+<p><strong>queue of events</strong></p>
+<ul>
+<li>
+<p>basically refinement of observer pattern</p>
+</li>
+<li>
+<p>more likely to allow multiple listeners</p>
+<ul>
+<li>since queue describes things that happened, sender less likely to
+  care who knows about it</li>
+</ul>
+</li>
+<li>
+<p>more likely to be global</p>
+<ul>
+<li>often use this as way to broadcast to any interested party</li>
+<li>to allow max flex for "interested party", tends to be more central
+  and more global</li>
+</ul>
+</li>
+<li>
+<p>more common</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>queue of messages</strong></p>
+<ul>
+<li>think of this as asynchronous api</li>
+<li>outside code specifically wants action to happen, and often wants to
+  control who does action</li>
+<li>
+<p>just doesn&#x2019;t control <em>when</em> action is done</p>
+</li>
+<li>
+<p>more likely to be single listener</p>
+</li>
+<li>
+<p>like in our example since queue has specific requests, tied to thing
+    that will handle</p>
+</li>
+<li>doesn&#x2019;t have to be though</li>
+</ul>
+</li>
+</ul>
+<h3><a href="#how-many-can-read-from-queue" name="how-many-can-read-from-queue">how many can read from queue?</a></h3>
+<ul>
+<li>in example, only audio engine processes queued items</li>
+<li>
+<p>in os event loop, reading event is public api</p>
+</li>
+<li>
+<p><strong>one reader</strong></p>
+</li>
+<li>
+<p>natural answer when queue is part of class&#x2019;s api</p>
+</li>
+<li>queue becomes implementation detail of class</li>
+<li>from caller&#x2019;s perspective, reader isn&#x2019;t visible as distinct thing</li>
+<li>
+<p>more encapsulated, which is always good</p>
+</li>
+<li>
+<p><strong>many readers</strong></p>
+</li>
+<li>
+<p>readers <em>receive</em> from queue, but don&#x2019;t <em>consume</em></p>
+</li>
+<li>if have ten readers, all ten will see same item</li>
+<li>don&#x2019;t parcel them out one at a time to each reader</li>
+<li>is broadcast mechanism, not subdividing work</li>
+<li>
+<p>[worker queues are useful too, of course, just different pattern]</p>
+</li>
+<li>
+<p>means events usually dropped if no readers</p>
+</li>
+<li>basic model is events are queued</li>
+<li>when processed, send queued events to all listeners at that point
+    time</li>
+<li>if not listeners, event usually discarded</li>
+<li>
+<p>with explicit single listener, if reader doesn&#x2019;t process, usually
+    stays in queue</p>
+</li>
+<li>
+<p>ex: user input events are discarded if you don&#x2019;t register listener
+    in your app</p>
+</li>
+<li>if you wait ten minutes while the user clicks around, then register
+    mouse handler, don&#x2019;t immediately get a spew of events for every
+    click already happened</li>
+<li>single reader like watching something on tape</li>
+<li>
+<p>many reader like "tuning into a show already in progress"</p>
+</li>
+<li>
+<p>usually need some kind of filtering</p>
+</li>
+<li>
+<p>if have lot of events and lot of readers, can end up sending a <em>lot</em>
+    of objects around</p>
+</li>
+<li>to be efficient, listeners can usually specify which "kind" of events
+    they care about</li>
+<li>think "mousemove" "mousedown" etc.</li>
+<li>often as simple as a type id like that</li>
+<li>can be more sophisticated</li>
+</ul>
+<h3><a href="#how-many-can-write-to-queue" name="how-many-can-write-to-queue">how many can write to queue?</a></h3>
+<ul>
+<li>flip side of above option</li>
+<li>
+<p>pattern accomodates all configs: 1-1 1-many, many-1, many-many</p>
+</li>
+<li>
+<p>in example, requesting sound was public api, so any part of code could write
+  request to queue</p>
+</li>
+<li>
+<p>in things like global event bus, anyone can send event</p>
+</li>
+<li>
+<p><strong>one writer</strong></p>
+</li>
+<li>
+<p>closest to observer pattern</p>
+</li>
+<li>have one priveleged object that raises events</li>
+<li>other objects can tune in</li>
+<li>
+<p>usually allow multiple readers</p>
+</li>
+<li>
+<p>encapsulated, which is good</p>
+</li>
+<li>
+<p><strong>many writers</strong></p>
+</li>
+<li>
+<p>if have multiple readers, basically "global" event bus</p>
+</li>
+<li>very similar to blackboard pattern in ai</li>
+</ul>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
 <li>
@@ -336,8 +824,13 @@
 <p>"publish/subscribe"</p>
 </li>
 <li>very similar model</li>
-<li>usually used to describe behavior of distributed systems, and not within
-    single application</li>
+<li>
+<p>usually used to describe behavior of distributed systems, and not within
+    single application</p>
+</li>
+<li>
+<p>queue itself is often special purpose example of object pool</p>
+</li>
 </ul>
 <hr />
 <p>random notes:</p>
