@@ -16,9 +16,7 @@ public:
   {
     // Determine which direction the user is currently
     // pressing on the joystick...
-    //^omit
     return DIR_NONE;
-    //^omit
   }
 };
 
@@ -48,6 +46,25 @@ public:
     // modify position and velocity if needed...
   }
 };
+
+namespace Motivation
+{
+  bool collidingWithFloor() { return false; }
+  static const int INVISIBLE = 1;
+  int getRenderState() { return INVISIBLE; }
+  void playSound(int sound) {}
+  static const int HIT_FLOOR = 1;
+  
+  void temp()
+  {
+    //^gordian
+    if (collidingWithFloor() && (getRenderState() != INVISIBLE))
+    {
+      playSound(HIT_FLOOR);
+    }
+    //^gordian
+  }
+}
 
 namespace Monolithic
 {

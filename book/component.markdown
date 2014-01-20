@@ -49,10 +49,7 @@ Even worse than the simple scale problem is the <span name="coupling">coupling
 </span> one. All of the different systems in our game have been tied into a
 giant knotted ball of code like:
 
-    if (collidingWithFloor() && (getRenderState() != INVISIBLE))
-    {
-        playSound(HIT_FLOOR);
-    }
+^code gordian
 
 Any programmer trying to make a change in code like that will need to
 know something about physics, graphics, and sound just to make sure
