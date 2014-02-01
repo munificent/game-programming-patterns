@@ -1,11 +1,3 @@
-//
-//  event-queue.h
-//  cpp
-//
-//  Created by Bob Nystrom on 1/16/14.
-//  Copyright (c) 2014 Bob Nystrom. All rights reserved.
-//
-
 #ifndef cpp_event_queue_h
 #define cpp_event_queue_h
 
@@ -13,6 +5,9 @@ namespace EventQueue
 {
   typedef int ResourceId;
   typedef int SoundId;
+
+  static const int SOUND_BLOOP = 1;
+  static const int VOL_MAX = 1;
 
   ResourceId loadSound(SoundId id) { return 0; }
   int findOpenChannel() { return -1; }
@@ -41,22 +36,318 @@ namespace EventQueue
 
   namespace Unqueued
   {
+    //^sync-api
     class Audio
     {
     public:
-      void playSound(SoundId id, int volume)
+      static void playSound(SoundId id, int volume);
+    };
+    //^sync-api
+
+    //^sync-impl
+    void Audio::playSound(SoundId id, int volume)
+    {
+      ResourceId resource = loadSound(id);
+      int channel = findOpenChannel();
+      if (channel == -1) return;
+      startSound(resource, channel, volume);
+    }
+    //^sync-impl
+
+    class Menu
+    {
+    public:
+      void onSelect(int index);
+    };
+
+    //^menu-bloop
+    void Menu::onSelect(int index)
+    {
+      Audio::playSound(SOUND_BLOOP, VOL_MAX);
+      // Other stuff...
+    }
+    //^menu-bloop
+  }
+
+  //^play-message
+  struct PlayMessage
+  {
+    SoundId id;
+    int volume;
+  };
+  //^play-message
+
+  namespace Deferred
+  {
+    //^pending
+    class Audio
+    {
+    public:
+      static void init()
       {
-        ResourceId resource = loadSound(id);
-        int channel = findOpenChannel();
-        if (channel == -1) return;
-        startSound(resource, channel, volume);
+        hasPending_ = false;
       }
 
+      static void playSound(SoundId id, int volume)
+      {
+        pending_.id = id;
+        pending_.volume = volume;
+        hasPending_ = true;
+      }
+
+      //^omit
+      static void update();
+      //^omit
+    private:
+      static PlayMessage pending_;
+      static bool hasPending_;
     };
-    // Problems:
-    // Loading resource could be slow.
-    // Not thread safe.
-    // Fails if no open channel.
+    //^pending
+
+    //^defer-update
+    void Audio::update()
+    {
+      if (!hasPending_) return;
+
+      ResourceId resource = loadSound(pending_.id);
+      int channel = findOpenChannel();
+      if (channel == -1) return;
+      startSound(resource, channel, pending_.volume);
+
+      hasPending_ = false;
+    }
+    //^defer-update
+
+    PlayMessage Audio::pending_;
+    bool Audio::hasPending_;
+  }
+
+  namespace DeferList
+  {
+    //^pending-array
+    class Audio
+    {
+    public:
+      static void init()
+      {
+        numPending_ = 0;
+      }
+
+      //^omit
+      static void playSound(SoundId id, int volume);
+      static void update();
+      //^omit
+    private:
+      static const int MAX_PENDING = 16;
+
+      static PlayMessage pending_[MAX_PENDING];
+      static int numPending_;
+    };
+    //^pending-array
+
+    //^array-play
+    void Audio::playSound(SoundId id, int volume)
+    {
+      assert(numPending_ < MAX_PENDING);
+
+      // Add to the end of the list.
+      pending_[numPending_].id = id;
+      pending_[numPending_].volume = volume;
+      numPending_++;
+    }
+    //^array-play
+
+    //^array-update
+    void Audio::update()
+    {
+      for (int i = 0; i < numPending_; i++)
+      {
+        ResourceId resource = loadSound(pending_[i].id);
+        int channel = findOpenChannel();
+        if (channel == -1) return;
+        startSound(resource, channel, pending_[i].volume);
+      }
+
+      numPending_ = 0;
+    }
+    //^array-update
+
+    PlayMessage Audio::pending_[MAX_PENDING];
+    int Audio::numPending_;
+  }
+
+  namespace HeadTail
+  {
+    //^head-tail
+    class Audio
+    {
+    public:
+      static void init()
+      {
+        head_ = 0;
+        tail_ = 0;
+      }
+
+      //^omit
+      static void playSound(SoundId id, int volume);
+      static void update();
+      //^omit
+    private:
+      static const int MAX_PENDING = 16;
+
+      static PlayMessage pending_[MAX_PENDING];
+      static int head_;
+      static int tail_;
+    };
+    //^head-tail
+
+    //^tail-play
+    void Audio::playSound(SoundId id, int volume)
+    {
+      assert(tail_ < MAX_PENDING);
+
+      // Add to the end of the list.
+      pending_[tail_].id = id;
+      pending_[tail_].volume = volume;
+      tail_++;
+    }
+    //^tail-play
+
+    //^tail-update
+    void Audio::update()
+    {
+      // If there are no pending requests, do nothing.
+      if (head_ == tail_) return;
+
+      ResourceId resource = loadSound(pending_[head_].id);
+      int channel = findOpenChannel();
+      if (channel == -1) return;
+      startSound(resource, channel, pending_[head_].volume);
+
+      head_++;
+    }
+    //^tail-update
+
+    PlayMessage Audio::pending_[MAX_PENDING];
+    int Audio::tail_;
+    int Audio::head_;
+  }
+
+  namespace Ring
+  {
+    class Audio
+    {
+    public:
+      static void init()
+      {
+        head_ = 0;
+        tail_ = 0;
+      }
+
+      static void playSound(SoundId id, int volume);
+      static void update();
+    private:
+      static const int MAX_PENDING = 16;
+
+      static PlayMessage pending_[MAX_PENDING];
+      static int head_;
+      static int tail_;
+    };
+
+    //^ring-play
+    void Audio::playSound(SoundId id, int volume)
+    {
+      assert((tail_ + 1) % MAX_PENDING != head_);
+
+      // Add to the end of the list.
+      pending_[tail_].id = id;
+      pending_[tail_].volume = volume;
+      tail_ = (tail_ + 1) % MAX_PENDING;
+    }
+    //^ring-play
+
+    //^ring-update
+    void Audio::update()
+    {
+      // If there are no pending requests, do nothing.
+      if (head_ == tail_) return;
+
+      ResourceId resource = loadSound(pending_[head_].id);
+      int channel = findOpenChannel();
+      if (channel == -1) return;
+      startSound(resource, channel, pending_[head_].volume);
+
+      head_ = (head_ + 1) % MAX_PENDING;
+    }
+    //^ring-update
+
+    PlayMessage Audio::pending_[MAX_PENDING];
+    int Audio::tail_;
+    int Audio::head_;
+  }
+
+  namespace Duplicate
+  {
+    class Audio
+    {
+    public:
+      static void init()
+      {
+        head_ = 0;
+        tail_ = 0;
+      }
+
+      static void playSound(SoundId id, int volume);
+      static void update();
+    private:
+      static const int MAX_PENDING = 16;
+
+      static PlayMessage pending_[MAX_PENDING];
+      static int head_;
+      static int tail_;
+    };
+
+    int max(int a, int b) { return a; }
+
+    //^drop-dupe-play
+    void Audio::playSound(SoundId id, int volume)
+    {
+      // See if a duplicate request is pending.
+      for (int i = head_; i != tail_;
+           i = (i + 1) % MAX_PENDING)
+      {
+        if (pending_[i].id == id)
+        {
+          // Use the larger of the two volumes.
+          pending_[i].volume = max(volume, pending_[i].volume);
+
+          // Don't need to enqueue.
+          return;
+        }
+      }
+
+      // Previous code...
+    }
+    //^drop-dupe-play
+
+    //^ring-update
+    void Audio::update()
+    {
+      // If there are no pending requests, do nothing.
+      if (head_ == tail_) return;
+
+      ResourceId resource = loadSound(pending_[head_].id);
+      int channel = findOpenChannel();
+      if (channel == -1) return;
+      startSound(resource, channel, pending_[head_].volume);
+
+      head_ = (head_ + 1) % MAX_PENDING;
+    }
+    //^ring-update
+
+    PlayMessage Audio::pending_[MAX_PENDING];
+    int Audio::tail_;
+    int Audio::head_;
   }
 
   namespace Queued

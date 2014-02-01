@@ -1,3 +1,15 @@
+2013-01-31 - 961 words, first draft event queue
+2013-01-30 - 441 words, first draft event queue
+2013-01-29 - 378 words, first draft event queue
+2013-01-28 - 816 words, first draft event queue
+2013-01-27 - 186 words, ~100 lines of sample code
+2013-01-26 - 400 words, first draft event queue
+2013-01-25 - 535 words, first draft event queue
+2013-01-24 - 439 words, first draft event queue
+2013-01-23 - 537 words, first draft event queue
+2013-01-22 - 233 words, first draft event queue
+2013-01-21 - 854 words, first draft event queue
+2013-01-20 - 921 words, first draft event queue. fix #85, #88.
 2013-01-19 - 689 words, finish outline event queue
 2013-01-18 - 359 words outline
 2013-01-17 - 708 words outline event queue
