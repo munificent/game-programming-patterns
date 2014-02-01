@@ -1,8 +1,11 @@
 $primary: hsl(200, 80%, 40%);
-$serif: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+$serif: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua",
+    Georgia, serif;
 $mono: "Source Code Pro", Menlo, Consolas, Monaco, monospace;
-$sans: 'Lato', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
-$header: 'Lato', Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+$sans: "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode",
+    Verdana, sans-serif;
+$header: "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD",
+    "Book Antiqua", Georgia, serif;
 
 $hairline: #eee;
 
@@ -19,24 +22,29 @@ body {
   background-image: url("images/background.png");
 }
 
-.content {
-  max-width: 560px;
+.page {
+  background: hsl(40, 30%, 98%);
+  max-width: 640px;
   margin: 0 auto;
-  padding: 0 30px 30px 30px;
-
-  // So that asides are positioned relative to it.
-  position: relative;
-
-  background: white;
 
   border-left: solid 1px #bbb;
   border-right: solid 1px #bbb;
   border-bottom: solid 1px #999;
 
+  // So that asides are positioned relative to it.
+  position: relative;
+
   box-shadow: 0 0 40px hsla(30, 40%, 20%, 0.2);
 }
 
-.content.sidebar {
+.content {
+  padding: 0 40px 40px 40px;
+
+  background: white;
+  box-shadow: 0 0 20px hsla(30, 40%, 20%, 0.05);
+}
+
+.page.sidebar {
   padding-right: 300px;
 }
 
@@ -45,8 +53,7 @@ body {
 // when we position the asides procedurally, they are in the right place.
 
 h1 {
-  color: #000;
-  font: bold 48px $header;
+  font: 200 60px $header;
   padding: 100px 0 4px 0;
   border-bottom: solid 1px $hairline;
 }
@@ -60,30 +67,25 @@ h1.book {
 
 h2 {
   color: $primary;
-  font: bold 30px $header;
-  margin: 30px 0 10px 0;
+  font: 400 30px $header;
+  margin: 20px 0 0 0;
   padding: 0 0 2px 0;
-  //border-bottom: solid 1px $hairline;
 }
 
 h3 {
   color: $primary;
-  font: bold 20px $header;
-  margin: 30px 0 10px 0;
+  font: 400 20px $header;
+  margin: 20px 0 0 0;
 }
 
 h4 {
   color: #777;
   font: 16px/18px $header;
-  margin: 24px 0 0 0;
+  margin: 20px 0 0 0;
 }
 
 p {
-  margin: 10px 0;
-}
-
-p + p {
-  margin-top: 20px;
+  margin: 15px 0;
 }
 
 ul, ol {
@@ -111,7 +113,7 @@ img.arrow {
 }
 
 blockquote {
-  padding: 0 12px;
+  padding: 0 20px;
 }
 
 blockquote p {
@@ -127,11 +129,11 @@ code {
 pre {
   color: #444;
   font: normal 13px/16px $mono;
-  padding: 12px;
+  padding: 10px;
 
   background: hsl(200, 40%, 98%);
-  border: solid 1px hsl(200, 30%, 94%);
-  border-top: solid 1px hsl(200, 30%, 85%);
+  border: solid 1px hsl(200, 40%, 96%);
+  border-bottom: solid 1px hsl(200, 50%, 90%);
   border-radius: 3px;
 
   // Scroll horizontally if not wide enough.
@@ -141,11 +143,14 @@ pre {
 // Asides.
 
 aside {
-  padding: 6px 0;
   color: #666;
 
-  border-top: solid 1px $hairline;
-  border-bottom: solid 1px $hairline;
+  // These are only used when the asides are inline with the text.
+  padding: 10px 10px;
+  background: hsl(40, 30%, 98%);
+  border: solid 1px hsl(40, 40%, 96%);
+  border-bottom: solid 1px hsl(40, 50%, 90%);
+  border-radius: 3px;
 
   p, li {
     font: 13px/20px $sans;
@@ -157,10 +162,6 @@ aside {
 
   >p:last-child {
     margin-bottom: 0;
-  }
-
-  p + p {
-    margin-top: 10px;
   }
 
   ul, ol {
@@ -183,8 +184,10 @@ aside.sidebar {
   width: 240px;
   right: 30px;
 
+  // Clear out the inline aside styles.
   padding: 0;
-  border-bottom: none;
+  background: none;
+  border: none;
 }
 
 // In-progress banner.

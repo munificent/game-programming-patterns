@@ -6,55 +6,55 @@ body {
   color: #222;
   font: normal 16px/24px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
   background: #e8e6e3;
-  background-image: url("images/noise.png"); }
+  background-image: url("images/background.png"); }
 
-.content {
-  max-width: 560px;
+.page {
+  background: #fbfaf8;
+  max-width: 640px;
   margin: 0 auto;
-  padding: 0 30px 30px 30px;
-  position: relative;
-  background: white;
   border-left: solid 1px #bbb;
   border-right: solid 1px #bbb;
   border-bottom: solid 1px #999;
+  position: relative;
   box-shadow: 0 0 40px rgba(71, 51, 31, 0.2); }
 
-.content.sidebar {
+.content {
+  padding: 0 40px 40px 40px;
+  background: white;
+  box-shadow: 0 0 20px rgba(71, 51, 31, 0.05); }
+
+.page.sidebar {
   padding-right: 300px; }
 
 h1 {
-  color: #000;
-  font: bold 48px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  font: 200 60px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
   padding: 100px 0 4px 0;
   border-bottom: solid 1px #eeeeee; }
 
 h1.book {
   color: #777;
-  font: normal 16px/20px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  font: normal 16px/20px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
   padding: 6px 0 30px 0;
   border: none; }
 
 h2 {
   color: #1481b8;
-  font: bold 30px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  margin: 30px 0 10px 0;
+  font: 400 30px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  margin: 20px 0 0 0;
   padding: 0 0 2px 0; }
 
 h3 {
   color: #1481b8;
-  font: bold 20px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  margin: 30px 0 10px 0; }
+  font: 400 20px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  margin: 20px 0 0 0; }
 
 h4 {
   color: #777;
-  font: 16px/18px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  margin: 24px 0 0 0; }
+  font: 16px/18px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  margin: 20px 0 0 0; }
 
 p {
-  margin: 10px 0; }
-
-p + p {
-  margin-top: 20px; }
+  margin: 15px 0; }
 
 ul, ol {
   padding: 0 0 0 24px; }
@@ -75,7 +75,7 @@ img.arrow {
   height: 20px; }
 
 blockquote {
-  padding: 0 12px; }
+  padding: 0 20px; }
 
 blockquote p {
   font: italic 17px/26px Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
@@ -88,26 +88,26 @@ code {
 pre {
   color: #444;
   font: normal 13px/16px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
-  padding: 12px;
+  padding: 10px;
   background: #f8fbfc;
-  border: solid 1px #ebf1f4;
-  border-top: solid 1px #cddde4;
+  border: solid 1px #f1f6f9;
+  border-bottom: solid 1px #d9eaf2;
   border-radius: 3px;
   overflow: auto; }
 
 aside {
-  padding: 6px 0;
   color: #666;
-  border-top: solid 1px #eeeeee;
-  border-bottom: solid 1px #eeeeee; }
+  padding: 10px 10px;
+  background: #fbfaf8;
+  border: solid 1px #f9f6f1;
+  border-bottom: solid 1px #f2ead9;
+  border-radius: 3px; }
   aside p, aside li {
-    font: 13px/20px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
+    font: 13px/20px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
   aside > p:first-child {
     margin-top: 0; }
   aside > p:last-child {
     margin-bottom: 0; }
-  aside p + p {
-    margin-top: 10px; }
   aside ul, aside ol {
     padding: 0 0 0 18px; }
   aside code {
@@ -122,14 +122,15 @@ aside.sidebar {
   width: 240px;
   right: 30px;
   padding: 0;
-  border-bottom: none; }
+  background: none;
+  border: none; }
 
 .in-progress {
   display: none;
   position: relative;
   background: #fff7e5;
   padding: 6px 18px;
-  font: normal 15px/24px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+  font: normal 15px/24px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
   color: #8f6d3d;
   margin-bottom: 24px;
   border-bottom-left-radius: 4px;
@@ -141,7 +142,7 @@ aside.sidebar {
     position: absolute;
     right: 8px;
     top: 0;
-    font: bold 24px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+    font: bold 24px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
     padding: 4px;
     cursor: pointer;
     display: none; }
@@ -152,7 +153,7 @@ aside.sidebar {
     border: none; }
   .in-progress .signature {
     text-align: right;
-    font: italic 13px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
+    font: italic 13px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
 
 p.note {
   display: none;
@@ -172,7 +173,7 @@ a:hover {
 a.pattern:after,
 a.gof-pattern:after,
 a.pdf:after {
-  font: 9px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+  font: 9px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
   color: #89c0db;
   vertical-align: super; }
 
@@ -188,7 +189,7 @@ a.pdf:after {
 p.footer {
   text-align: center;
   color: #777;
-  font: 14px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+  font: 14px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
   margin: 24px 0 24px 0; }
 
 .outline-note {
@@ -325,11 +326,11 @@ a.outline:after {
 
 @media only screen and (max-width: 479px) {
   h2 {
-    font: bold 20px/26px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+    font: bold 20px/26px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
     margin: 20px 0 5px 0; }
 
   h3 {
-    font: bold 16px/20px "Lato", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+    font: bold 16px/20px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
     margin: 20px 0 5px 0; }
 
   p {
@@ -358,9 +359,9 @@ a.outline:after {
 
   .in-progress {
     padding: 4px 12px;
-    font: normal 13px/20px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+    font: normal 13px/20px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
     margin-bottom: 18px; }
     .in-progress p {
-      font: normal 13px/20px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
+      font: normal 13px/20px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
     .in-progress .signature {
-      font: italic 12px "Lato", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; } }
+      font: italic 12px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; } }

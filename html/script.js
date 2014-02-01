@@ -37,13 +37,13 @@ function refreshAsides() {
 
 // Moves the asides into the main content column.
 function inlineAsides() {
-  $(".content").removeClass("sidebar");
+  $(".page").removeClass("sidebar");
   $("aside").removeClass("sidebar");
 }
 
 // Moves the asides to a second column on the right.
 function sidebarAsides() {
-  $(".content").addClass("sidebar");
+  $(".page").addClass("sidebar");
   $("aside").each(function() {
     var aside = $(this);
 
@@ -56,6 +56,6 @@ function sidebarAsides() {
     }
 
     aside.addClass("sidebar");
-    aside.offset({top: span.position().top + 21});
+    aside.offset({top: span.position().top - 3});
   });
 }
