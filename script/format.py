@@ -136,6 +136,8 @@ def formatfile(path, nav, skip_up_to_date):
         html = html.replace("{{section_header}}", section_header)
         html = html.replace("{{header}}", title)
         html = html.replace("{{body}}", body)
+        html = html.replace("{{navigation}}",
+            navigationtohtml(title, navigation))
 
         out.write(html)
 
@@ -163,11 +165,11 @@ def formatfile(path, nav, skip_up_to_date):
             GREEN, DEFAULT, basename, word_count)
 
 
-def navigationtohtml(section, chapter, headers):
-    nav = '<div class="nav">\n'
-    nav += '<h1><a href="#top">' + chapter + '</a></h1>\n'
+def navigationtohtml(chapter, headers):
+    nav = ''
 
-    currentdepth = 1 # section headers start two levels deep
+    # Section headers start two levels deep.
+    currentdepth = 1
     for depth, header, anchor in headers:
         if currentdepth == depth:
             nav += '</li><li>\n'
@@ -183,7 +185,7 @@ def navigationtohtml(section, chapter, headers):
         nav += '<a href="#' + anchor + '">' + header + '</a>'
 
 
-    # close the lists
+    # Close the lists.
     while currentdepth > 1:
         nav += '</li></ul>\n'
         currentdepth -= 1
