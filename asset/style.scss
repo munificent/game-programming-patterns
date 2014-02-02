@@ -192,7 +192,9 @@ aside.sidebar {
 
 // In-progress banner.
 .in-progress {
-display: none;
+  // It will be shown by JavaScript if the cookie isn't set.
+  display: none;
+
   position: relative;
   background: hsl(40, 100%, 95%);
   padding: 6px 18px;

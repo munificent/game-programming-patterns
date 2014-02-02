@@ -196,9 +196,9 @@ available to be reused as the new next buffer.
 ## When to Use It
 
 This pattern is one of those ones where you'll know when you need it.
-If you have a system that lacks double-buffering, it will probably
+If you have a system that lacks double buffering, it will probably
 look visibly wrong (tearing, etc.) or will behave incorrectly. But saying, "you'll know when you need it" doesn't give you much to go
-on. More specifically, this pattern is appropriate when these three
+on. More specifically, this pattern is appropriate when these four
 things are true:
 
 1.  We have some state that is being modified incrementally.
@@ -213,7 +213,7 @@ things are true:
 
 ## Keep in Mind
 
-Unlike larger architectural patterns, double-buffering exists at a
+Unlike larger architectural patterns, double buffering exists at a
 lower implementation level. Because of this, it has fewer consequences
 for the rest of the codebase -- most of the game won't even be
 aware of the difference. There are a couple of caveats, though.
@@ -285,7 +285,7 @@ mouth will disappear for a single frame. The next frame, it could
 get interrupted at some other point. The end result is horribly
 flickering graphics and angry users.
 
-We'll fix this with double-buffering:
+We'll fix this with double buffering:
 
 ^code 4
 
@@ -296,7 +296,7 @@ draw, we draw onto the next buffer, referenced by `next_`. When the
 video driver needs to get at the pixels, it always accesses the
 *other* buffer through `current_`.
 
-This way, the video driver nevers sees the buffer that we're working
+This way, the video driver never sees the buffer that we're working
 on. The only remaining piece of the puzzle is the call to `swap()`
 when the scene is done drawing the frame. That swaps the two buffers
 by simply switching the `next_` and `current_` references. The next
@@ -338,7 +338,7 @@ pattern.
 
 Every frame, the game is responsible for calling `update()` on it so
 that it has a chance to do some processing. Critically, from the
-user's perspective *all actors should appear to update
+user's perspective, *all actors should appear to update
 simultaneously*.
 
 Actors can also interact with each other, if by "interacting", we mean
@@ -515,7 +515,7 @@ quickly as possible.
 
         You'll note that when we go to draw the third frame, the data
         already on the buffer is from frame *one*, not the more
-        recent second frame. In most cases, this isn't an issue: we
+        recent second frame. In most cases, this isn't an issue -- we
         usually just clear the whole buffer right before drawing.
         But, if we intend to <span name="blur">reuse</span> some of the existing data on the
         buffer, it's important to take into account that that data
@@ -541,17 +541,16 @@ quickly as possible.
 
     *   *Data on the next buffer is only a single frame old.* This is
         the nice thing about copying the data as opposed to
-        ping-ponging back and forth between the two buffers. Our next
-        buffer is *always* the next buffer, so it always has the frame
-        we just wrote on it. If we need access to previous buffer
-        data, this will give us more up-to-date data to work with.
+        ping-ponging back and forth between the two buffers. If we
+        need access to previous buffer data, this will give us more
+        up-to-date data to work with.
 
     *   *Swapping can take more time.* This, of course, is the big
         negative point. Our swap operation now means copying the
         entire buffer in memory. If the buffer is large, like an
         entire framebuffer, it can a signficant chunk of time to do
         this. Since nothing can read or write to *either* buffer
-        while this is happening, that can be a big limitation.
+        while this is happening, that's a big limitation.
 
 ### What is the granularity of the buffer?
 

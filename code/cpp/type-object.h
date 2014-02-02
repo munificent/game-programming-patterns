@@ -33,7 +33,7 @@ namespace Subclasses
   {
   public:
     Troll() : Monster(48) {}
-    const char* getAttack() {
+    virtual const char* getAttack() {
       return "The troll clubs you!";
     }
   };

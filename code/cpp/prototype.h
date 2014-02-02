@@ -27,7 +27,7 @@ namespace PrototypePattern
     class GhostSpawner : public Spawner
     {
     public:
-      Monster* spawnMonster()
+      virtual Monster* spawnMonster()
       {
         return new Ghost();
       }
@@ -36,7 +36,7 @@ namespace PrototypePattern
     class DemonSpawner : public Spawner
     {
     public:
-      Monster* spawnMonster()
+      virtual Monster* spawnMonster()
       {
         return new Demon();
       }
@@ -67,7 +67,7 @@ namespace PrototypePattern
         speed_(speed)
       {}
 
-      Monster* clone()
+      virtual Monster* clone()
       {
         return new Ghost(health_, speed_);
       }
@@ -173,7 +173,7 @@ namespace PrototypePattern
     class SpawnerFor : public Spawner
     {
     public:
-      Monster* spawnMonster() { return new T(); }
+      virtual Monster* spawnMonster() { return new T(); }
     };
     //^templates
 

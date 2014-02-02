@@ -378,12 +378,12 @@ namespace State
       friend class StandingState;
       //^omit
     public:
-      void handleInput(Input input)
+      virtual void handleInput(Input input)
       {
         state_->handleInput(*this, input);
       }
       
-      void update()
+      virtual void update()
       {
         state_->update(*this);
       }
@@ -409,7 +409,7 @@ namespace State
       : chargeTime_(0)
       {}
 
-      void handleInput(Heroine& heroine, Input input) {
+      virtual void handleInput(Heroine& heroine, Input input) {
         if (input == RELEASE_DOWN)
         {
           // Change to standing state...
@@ -417,7 +417,7 @@ namespace State
         }
       }
 
-      void update(Heroine& heroine) {
+      virtual void update(Heroine& heroine) {
         chargeTime_++;
         if (chargeTime_ > MAX_CHARGE)
         {
@@ -433,7 +433,7 @@ namespace State
     class StandingState : public HeroineState
     {
     public:
-      void handleInput(Heroine& heroine, Input input) {
+      virtual void handleInput(Heroine& heroine, Input input) {
         //^jump
         if (input == PRESS_B)
         {
@@ -514,7 +514,7 @@ namespace State
       {}
 
       //^omit
-      void enter(Heroine& heroine)
+      virtual void enter(Heroine& heroine)
       {
         chargeTime_ = 0;
         heroine.setGraphics(IMAGE_DUCK);
@@ -540,7 +540,7 @@ namespace State
     class StandingState : public HeroineState
     {
     public:
-      void handleInput(Heroine& heroine, Input input)
+      virtual void handleInput(Heroine& heroine, Input input)
       {
         //^enter-ducking
         if (input == PRESS_DOWN)
@@ -566,7 +566,7 @@ namespace State
     {
       // Other code...
       //^omit
-      void handleInput(Input input);
+      virtual void handleInput(Input input);
       //^omit
 
     private:
@@ -606,7 +606,7 @@ namespace State
     class OnGroundState : public HeroineState
     {
     public:
-      void handleInput(Heroine& heroine, Input input)
+      virtual void handleInput(Heroine& heroine, Input input)
       {
         if (input == PRESS_B)
         {
@@ -624,7 +624,7 @@ namespace State
     class DuckingState : public OnGroundState
     {
     public:
-      void handleInput(Heroine& heroine, Input input)
+      virtual void handleInput(Heroine& heroine, Input input)
       {
         if (input == RELEASE_DOWN)
         {

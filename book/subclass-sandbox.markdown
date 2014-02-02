@@ -37,9 +37,9 @@ Let's say we just unleash our team and get them writing superpower classes. What
 *   *Every part of the game engine will get coupled to these classes.* Without
     knowing better, people will write code that calls into subsystems
     that were never meant to be tied directly to the superpower classes. If your
-    renderer is organized into three nice neat layers, only one of which
+    renderer is organized into several nice neat layers, only one of which
     is intended to be used by code outside of the graphics engine, we can bet
-    that we'll have superpower code that pokes its way into all three.
+    that we'll have superpower code that pokes into every one of them.
 
 *   *When these outside systems need to change, odds are good some random
     superpower code will get broken.* Once we have different superpower classes
@@ -254,9 +254,9 @@ So where to draw the line? Here's a few rules of thumb:
     the same time that it's being modified. If you aren't careful you can end
     up with bogus data.
 
-    Another nasty case is if your game is deterministic (which some online
-    games are in order to keep all players in sync). If you access something
-    that isn't in the set of controlled, deterministic game state, you can
+    Another nasty case is if your game state is strictly deterministic (which
+    many online games are in order to keep players in sync). If you access
+    something outside of the set of synchronized game state, you can
     cause incredibly painful non-determinism bugs.
 
     </aside>

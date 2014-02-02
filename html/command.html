@@ -130,13 +130,13 @@
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">JumpCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="kt">void</span> <span class="n">execute</span><span class="p">()</span> <span class="p">{</span> <span class="n">jump</span><span class="p">();</span> <span class="p">}</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">execute</span><span class="p">()</span> <span class="p">{</span> <span class="n">jump</span><span class="p">();</span> <span class="p">}</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">FireCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="kt">void</span> <span class="n">execute</span><span class="p">()</span> <span class="p">{</span> <span class="n">fireGun</span><span class="p">();</span> <span class="p">}</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">execute</span><span class="p">()</span> <span class="p">{</span> <span class="n">fireGun</span><span class="p">();</span> <span class="p">}</span>
 <span class="p">};</span>
 
 <span class="c1">// You get the idea...</span>
@@ -197,7 +197,7 @@
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">JumpCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="kt">void</span> <span class="n">execute</span><span class="p">(</span><span class="n">GameActor</span><span class="o">&amp;</span> <span class="n">actor</span><span class="p">)</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">execute</span><span class="p">(</span><span class="n">GameActor</span><span class="o">&amp;</span> <span class="n">actor</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">actor</span><span class="p">.</span><span class="n">jump</span><span class="p">();</span>
   <span class="p">}</span>

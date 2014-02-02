@@ -9,7 +9,9 @@ Despite noble intentions, the <a class="gof-pattern"
 href="http://c2.com/cgi/wiki?SingletonPattern">Singleton</a> pattern
 described by the Gang of Four usually does more harm than good. While
 they stress that the pattern should be used sparingly, that message
-was often lost in translation to the <span name="instance">game industry</span>. Like any pattern,
+was often lost in translation to the <span name="instance">game industry</span>.
+
+Like any pattern,
 though, using it where it doesn't belong is about as helpful as
 treating a bullet wound with a splint. Since it's so overused, most
 of this chapter will be about *avoiding* Singletons, but first, let's

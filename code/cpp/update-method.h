@@ -208,7 +208,7 @@ namespace UpdateMethod
       : patrollingLeft_(false)
       {}
       
-      void update()
+      virtual void update()
       {
         if (patrollingLeft_)
         {
@@ -236,7 +236,7 @@ namespace UpdateMethod
         delay_(delay)
       {}
 
-      void update()
+      virtual void update()
       {
         if (frames_-- == 0)
         {

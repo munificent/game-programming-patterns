@@ -35,6 +35,7 @@ def pretty(text):
     return (text.replace("'", "&#x2019;")
                 .replace("...", "&hellip;")
                 .replace(" -- ", "&thinsp;&mdash;&thinsp;")
+                .replace("à", "&agrave;")
                 .replace("ï", "&iuml;")
                 .replace("ø", "&oslash;")
                 .replace("æ", "&aelig;"))

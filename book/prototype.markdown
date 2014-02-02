@@ -241,7 +241,7 @@ This creates a new object and initializes its fields. You invoke it like:
 
 The `new` here invokes the body of the `Weapon` function with `this` bound to a new empty object. The body adds a bunch of fields to it, then the now-filled-in object is automatically returned.
 
-The `new` also does one other thing for you. When it creates that blank object, it automatically sets its to delegate to a prototype object. You can get to that object directly using `Weapon.prototype`.
+The `new` also does one other thing for you. When it creates that blank object, it wires it up to delegate to a prototype object. You can get to that object directly using `Weapon.prototype`.
 
 While state is added in the constructor body, to define *behavior*, you usually add methods to the prototype object. Something like this:
 

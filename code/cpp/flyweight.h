@@ -88,7 +88,7 @@ namespace Flyweight
     class World
     {
     private:
-      Terrain tiles_[HEIGHT][WIDTH];
+      Terrain tiles_[WIDTH][HEIGHT];
       //^omit
       int getMovementCost(int x, int y);
       bool isWater(int x, int y);
@@ -99,7 +99,7 @@ namespace Flyweight
     //^enum-data
     int World::getMovementCost(int x, int y)
     {
-      switch (tiles_[y][x])
+      switch (tiles_[x][y])
       {
         case TERRAIN_GRASS: return 1;
         case TERRAIN_HILL:  return 3;
@@ -110,7 +110,7 @@ namespace Flyweight
 
     bool World::isWater(int x, int y)
     {
-      switch (tiles_[y][x])
+      switch (tiles_[x][y])
       {
         case TERRAIN_GRASS: return false;
         case TERRAIN_HILL:  return false;
@@ -146,6 +146,7 @@ namespace Flyweight
     };
     //^terrain-class
 
+    //^world-terrain-pointers
     class World
     {
       //^omit
@@ -159,6 +160,8 @@ namespace Flyweight
       //^omit
     private:
       Terrain* tiles_[HEIGHT][WIDTH];
+
+      // Other stuff...
       //^omit
       Terrain grassTerrain_;
       Terrain hillTerrain_;
@@ -166,23 +169,24 @@ namespace Flyweight
       void generateTerrain();
       //^omit
     };
+    //^world-terrain-pointers
 
     //^generate
     void World::generateTerrain()
     {
       // Fill the ground with grass.
-      for (int y = 0; y < HEIGHT; y++)
+      for (int x = 0; x < WIDTH; x++)
       {
-        for (int x = 0; x < WIDTH; x++)
+        for (int y = 0; y < HEIGHT; y++)
         {
           // Sprinkle some hills.
           if (random(10) == 0)
           {
-            tiles_[y][x] = &hillTerrain_;
+            tiles_[x][y] = &hillTerrain_;
           }
           else
           {
-            tiles_[y][x] = &grassTerrain_;
+            tiles_[x][y] = &grassTerrain_;
           }
         }
       }
@@ -190,7 +194,7 @@ namespace Flyweight
       // Lay a river.
       int x = random(WIDTH);
       for (int y = 0; y < HEIGHT; y++) {
-        tiles_[y][x] = &riverTerrain_;
+        tiles_[x][y] = &riverTerrain_;
       }
     }
     //^generate
@@ -198,7 +202,7 @@ namespace Flyweight
     //^get-tile
     const Terrain& World::getTile(int x, int y) const
     {
-      return *tiles_[y][x];
+      return *tiles_[x][y];
     }
     //^get-tile
 

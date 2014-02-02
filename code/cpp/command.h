@@ -63,13 +63,13 @@ namespace CommandPattern
     class JumpCommand : public Command
     {
     public:
-      void execute() { jump(); }
+      virtual void execute() { jump(); }
     };
 
     class FireCommand : public Command
     {
     public:
-      void execute() { fireGun(); }
+      virtual void execute() { fireGun(); }
     };
 
     // You get the idea...
@@ -123,7 +123,7 @@ namespace CommandPattern
     class JumpCommand : public Command
     {
     public:
-      void execute(GameActor& actor)
+      virtual void execute(GameActor& actor)
       {
         actor.jump();
       }

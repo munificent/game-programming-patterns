@@ -367,7 +367,7 @@
   <span class="o">:</span> <span class="n">chargeTime_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
   <span class="p">{}</span>
 
-  <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span> <span class="n">Input</span> <span class="n">input</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span> <span class="n">Input</span> <span class="n">input</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">RELEASE_DOWN</span><span class="p">)</span>
     <span class="p">{</span>
       <span class="c1">// Change to standing state...</span>
@@ -375,7 +375,7 @@
     <span class="p">}</span>
   <span class="p">}</span>
 
-  <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">chargeTime_</span><span class="o">++</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">chargeTime_</span> <span class="o">&gt;</span> <span class="n">MAX_CHARGE</span><span class="p">)</span>
     <span class="p">{</span>
@@ -396,12 +396,12 @@
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Heroine</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">state_</span><span class="o">-&gt;</span><span class="n">handleInput</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
   <span class="p">}</span>
 
-  <span class="kt">void</span> <span class="n">update</span><span class="p">()</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="n">state_</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
   <span class="p">}</span>
@@ -503,7 +503,7 @@
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">DuckingState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">HeroineState</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="kt">void</span> <span class="n">enter</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">)</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">enter</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">chargeTime_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="n">heroine</span><span class="p">.</span><span class="n">setGraphics</span><span class="p">(</span><span class="n">IMAGE_DUCK</span><span class="p">);</span>
@@ -604,7 +604,7 @@
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">OnGroundState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">HeroineState</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span> <span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span> <span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
     <span class="p">{</span>
@@ -623,7 +623,7 @@
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">DuckingState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">OnGroundState</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span> <span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span> <span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">RELEASE_DOWN</span><span class="p">)</span>
     <span class="p">{</span>
@@ -671,7 +671,12 @@
 <li>That state can be rigidly divided into one of a relatively small number of distinct options.</li>
 <li>The entity responds to a series of inputs or events over time.</li>
 </ol>
+<<<<<<< HEAD
 <p>In games, they are most known for being used in AI, but they are also common in implementations of user input handling, navigating menu screens parsing text, network protocols, and other asynchronous behavior.</p>
+=======
+<p>In games, they are most known for being used in AI, but they are also common in implementations of user input handling, navigating menu screens, parsing text, network protocols, and other asynchronous behavior.</p>
+<p class="footer">&copy; 2009-2013 Bob Nystrom</p>
+>>>>>>> master
 </div>
 </div>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>

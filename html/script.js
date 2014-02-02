@@ -1,11 +1,24 @@
+// From: http://www.quirksmode.org/js/cookies.html.
+function createCookie(days) {
+  var date = new Date();
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+  document.cookie =
+      "hideinprogress=true; expires=" + date.toGMTString() + "; path=/";
+}
+
 $(document).ready(function() {
   $(window).resize(refreshAsides);
-  refreshAsides();
 
   $(".dismiss").show().click(function() {
+    createCookie(10);
+
     $(".in-progress").hide();
     refreshAsides();
   });
+
+  if (document.cookie.indexOf("hideinprogress") == -1) {
+    $(".in-progress").show();
+  }
 
   // Since we may not have the height correct for the images, adjust the asides
   // too when an image is loaded.
@@ -24,6 +37,8 @@ $(document).ready(function() {
   // loaded to hack around the fact that the metrics changed a bit and the
   // help box has gotten a line taller.
   window.setTimeout(refreshAsides, 200);
+
+  refreshAsides();
 });
 
 function refreshAsides() {
