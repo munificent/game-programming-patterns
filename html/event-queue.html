@@ -171,10 +171,6 @@ engine would register itself with the queue and indicate it wants to known about
 <ul>
 <li><strong>Problem 1: Using the API the caller until the audio engine has completely processed the request.</strong></li>
 </ul>
-<<<<<<< HEAD
-<p><strong>todo: can fit discussion of event/message/command here? mention global event queue</strong></p>
-<h3><a href="#say-what" name="say-what">Say what?</a></h3>
-=======
 <p>Our <code>playSound()</code> function is <em>synchronous</em>&thinsp;&mdash;&thinsp;it doesn&#x2019;t return back to the caller until it&#x2019;s actually playing the sound. If the audio resource has be be loaded off the disc, that can take a good while.</p>
 <p>Ignoring that for now, we move on. In the AI code for an enemy, we add a call to play an "argh" wail of pain whenever it takes damage from the player. Nothing brings joy to a gamer quite like causing detailed simulated pain in another.</p>
 <p>It works pretty well, but there&#x2019;s occasionally a weird issue. Sometimes, if the hero does a big attack, it can hurt two enemies in the exact same frame. That causes the sound to be played twice simultaneously.</p>
@@ -387,7 +383,6 @@ engine would register itself with the queue and indicate it wants to known about
 <p>There are a bunch of ways to implement queues, but my favorite is called a <em>ring buffer</em>. It preserves everything that&#x2019;s good about a simple array, but lets us incrementally remove items from the front of the queue.</p>
 <p>Now, I know what you&#x2019;re thinking. If we remove items from the beginning of the array, don&#x2019;t we have to shift all of the remaining items over? Isn&#x2019;t that slow?</p>
 <p>This is why you learned how great linked lists are: it&#x2019;s super easy to remove nodes from the list without having to shift things around. Well, it turns out you can implement a queue without any shifting in a simple array too. I&#x2019;ll walk you through it, but first let&#x2019;s get precise on some terms.</p>
->>>>>>> master
 <ul>
 <li>
 <p>The <strong>head</strong> of the queue is the oldest pending request, and the one that will be processed <em>next</em>. Since <code>playSound()</code> appends to the end of the array, it&#x2019;s the element in there with the lowest index.</p>
@@ -591,160 +586,6 @@ engine would register itself with the queue and indicate it wants to known about
 <p>To cut that down to size, most broadcast event systems let a listener control which subset of the events they care about. For example, you may say you only want to receive mouse events, or events within a certain region of the UI.</p>
 </li>
 </ul>
-<<<<<<< HEAD
-<h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
-<p>A <strong>queue</strong> stores a series of <strong>notifications or requests</strong> in last-in, first-out order. Sending a notification simply <strong>enqueues the request and returns</strong>. The request processor then <strong>processes items from the queue later</strong> at an appropriate time.</p>
-<p>Requests can be <strong>handled directly</strong>, or <strong>routed to interested parties</strong>. This <strong>decouples the sender from the receiever</strong> both <strong>statically</strong> and <strong>in time</strong>.</p>
-<h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
-<ul>
-<li>queueing is useful when you have stream of stuff coming in&thinsp;&mdash;&thinsp;events, request
-  notifications</li>
-<li>want to isolate source of requests from object or objects that will be
-  responding to or processing them</li>
-<li>lots of patterns decouple stuff like that: observer and command are two
-  similar ones</li>
-<li>difference here is queue decouples sender/receiver <em>temporally</em></li>
-<li>
-<p>sender not only doesn&#x2019;t know who will respond, doesn&#x2019;t know when</p>
-</li>
-<li>
-<p>gives responder more control and context over handling stuff</p>
-</li>
-<li>can see entire list of things to respond</li>
-<li>can respond at appropriate time in game loop, or on different thread</li>
-<li>
-<p>sender sacrifices control</p>
-</li>
-<li>
-<p>good bit more complex than other solutions</p>
-</li>
-<li>queue takes memory</li>
-<li>have to make sure gets processed in timely manner</li>
-<li>normally i start with something simpler and sync like observer and then go
-  to queue when know i need it</li>
-<li>
-<p>"need it" usually means sending event or message is causing problems for
-  sender</p>
-</li>
-<li>
-<p>this is probably obvious, but queues are poor fit when sender needs response</p>
-</li>
-<li>fire and forget</li>
-<li>sometimes see async responses too: send async event, handler sends async
-  response</li>
-<li>then original sender processes it</li>
-<li>works <em>sometimes</em> but sketchy. original sender may have changed state or not
-  be in good place to handle response by time it gets it</li>
-<li>do you really want effective complexity of networking code <em>inside</em> game
-  engine?</li>
-</ul>
-<h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
-<h3><a href="#global-queue-is-still-global" name="global-queue-is-still-global">global queue is still global</a></h3>
-<ul>
-<li>many games have global event queue for sharing high-level events with any
-  system that wants them</li>
-<li>useful for broadcasting events to any system that wants them</li>
-<li>lets high-level parts of codebase interact without coupling</li>
-<li>think playing sounds based on physics</li>
-<li>
-<p>showing tutorial hints as player progresses through level, etc.</p>
-</li>
-<li>
-<p>but global is still bad</p>
-</li>
-<li>global queue has same problems as other globals</li>
-<li>big mutable blog of data anything in game can write to (send event) and
-  read to (receive event)</li>
-</ul>
-<h3><a href="#state-of-world-may-have-changed-between-senderreceiver" name="state-of-world-may-have-changed-between-senderreceiver">state of world may have changed between sender/receiver</a></h3>
-<ul>
-<li>say using above global queue</li>
-<li>say game entity sends "died" event when dies</li>
-<li>now say achievement system wants to monitor that to see if you kill certain
-  number of some kind of entity</li>
-<li>with synchronous event system, even can just be simple event enum</li>
-<li>event receiver can then go inspec world to see what happened</li>
-<li>
-<p>so achievement system gets died event, looks to see which entity in world has
-  zero hp, etc.</p>
-</li>
-<li>
-<p>now consider queued event</p>
-</li>
-<li>dying entity enqueues "die" event</li>
-<li>at end of frame, entity is removed from world</li>
-<li>next frame, go to process queue</li>
-<li>achievement system sees died event, but can no longer find entity</li>
-<li>since don&#x2019;t know when event will be handled, can&#x2019;t rely on state of world
-  being same between when sent and when handled</li>
-<li>means event/message objects themselves larger and more self-contained</li>
-<li>with sync events, it&#x2019;s basically "something happened, look at world to figure
-  out what"</li>
-<li>with queued, it&#x2019;s "here&#x2019;s exactly what happened"</li>
-</ul>
-<h3><a href="#lifecycle-of-eventmessage-object" name="lifecycle-of-eventmessage-object">lifecycle of event/message object</a></h3>
-<ul>
-<li>with sync notification, event itself can be just couple of parameters to
-  fn, or object on stack</li>
-<li>since done with it by time sending message is done, lifetime is easy</li>
-<li>
-<p>since queue decouples when event is handled, event object needs to live longer
-  than call to send it</p>
-</li>
-<li>
-<p>not particularly hard, but important to remember</p>
-</li>
-<li>discuss options below</li>
-</ul>
-<h3><a href="#feedback-cycles" name="feedback-cycles">feedback cycles</a></h3>
-<ul>
-<li>all event systems have to worry about cycles:</li>
-<li>sender sends event, receiver responds to it by sending event which is in turn
-  handled by original sender</li>
-<li>if not careful, can get stuck in loop</li>
-<li>with sync system, will quickly overflow stack and crash</li>
-<li>
-<p>easy bug to notice and fix</p>
-</li>
-<li>
-<p>queues won&#x2019;t crash, which is "better"</p>
-</li>
-<li>can actually support feedback loops correctly</li>
-<li>but often don&#x2019;t want feedback loop</li>
-<li>even if handled safely, not usually what you&#x2019;re trying to express</li>
-<li>keep eye on events and make sure don&#x2019;t see same series of them bouncing
-  around</li>
-<li>good guideline is to avoid sending events in code that is responding to one</li>
-</ul>
-<h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
-<p><strong>Bunch of paragraphs, maybe some subheaders</strong></p>
-<h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
-<p>**Few subheader questions, bullet list of answers for each</p>
-<h2><a href="#see-also" name="see-also">See Also</a></h2>
-<ul>
-<li>
-<p>if want something lighter-weight and faster, observer is close cousin</p>
-</li>
-<li>
-<p>commands often queued</p>
-</li>
-<li>
-<p>finite state machines often respond to stream of inputs</p>
-</li>
-<li>if don&#x2019;t want them to respond synchronously, can give fsm queue to handle
-  them. often call &#x2019;mailbox&#x2019;</li>
-<li>state chapter has more on fsms</li>
-<li>when have bunch of fsms with mailboxes sending messages to each other, have
-  re-invented actor model</li>
-<li>
-<p>[erlang language based on this]</p>
-</li>
-<li>
-<p>like many patterns, often has a lot of names:</p>
-</li>
-<li>
-<p>"message queue" is established term for same pattern</p>
-=======
 </li>
 <li>
 <p><strong>A work queue:</strong></p>
@@ -773,34 +614,13 @@ engine would register itself with the queue and indicate it wants to known about
 <p><strong>You usually allow multiple readers.</strong> You can have a strict one-sender-one-receiver queue, but those are less common and start to feel less like the communication structure this pattern is about and more just a plain queue data structure.</p>
 </li>
 </ul>
->>>>>>> master
-</li>
-<li>usually used to talk about messaging at higher level between applications
-    and not as much within them</li>
-<li>
-<<<<<<< HEAD
-<p>lots of middleware for this: zeromq, rabbitmq, etc. if see "mq" in name
-    now know what stands for</p>
 </li>
 <li>
-<p>"publish/subscribe"</p>
-</li>
-<li>very similar model</li>
-<li>usually used to describe behavior of distributed systems, and not within
-    single application</li>
-</ul>
-<hr />
-<p>random notes:</p>
-<ul>
-<li>
-<p>dovetails really nicely with fsms, which want to receive stream of events</p>
-=======
 <p><strong>With multiple writers:</strong></p>
 <p>This is how our audio engine example works. Since <code>playSound()</code> is a public API call, any part of the codebase can add a request to the queue. "Global" or "central" event buses work like this too.</p>
 <ul>
 <li>
 <p><strong>You have to be more careful of cycles.</strong> Since anything can potentially put something onto the queue, it&#x2019;s easier to accidentally enqueue something in the middle of handling an event. If you aren&#x2019;t careful, that will trigger a cascade.</p>
->>>>>>> master
 </li>
 <li>
 <p><strong>You&#x2019;ll likely want some reference the sender in the event itself.</strong>
@@ -821,23 +641,6 @@ When a listener gets an event, it doesn&#x2019;t know who sent it, since it coul
 <p><strong>Share ownership:</strong></p>
 <p>These days, now that even C++ programmers are more comfortable with garbage collection, shared ownership &agrave; la <code>shared_ptr</code> is more typical. With this, the message will stick around as long as needed and be automatically freed when its fully processed.</p>
 </li>
-<<<<<<< HEAD
-<li>with observer, message receiver always runs on <em>sender&#x2019;s</em> thread</li>
-<li>with queue, can hop threads so receiver runs on thread it expects to run on</li>
-<li>with a global event queue, that means objects listening to queue can end up
-  with infinite lifetime if not explicitly unregistered. talk about memory
-  leak</li>
-<li>event priority to handle too many queued events</li>
-<li>talk about ordering. is it a strict queue or can things be delivered out of
-  order? how does threading affect that?</li>
-<li>relate to job systems and worker threads?</li>
-<li>relate to event-based programming</li>
-<li>game loop is sort of like event loop where "event" is a tick</li>
-<li>some simple games can actually use os event loop for game loop by updating
-    game on "idle" events. not precise enough for real-time games</li>
-<li>
-<p>sample code should walk through ring buffer</p>
-=======
 <li>
 <p><strong>The queue owns it:</strong></p>
 <p><span name="pool">Another option</span> is to have messages <em>always</em> live on the queue. Instead of allocating the message itself, it requests a "fresh" one from the queue. The queue returns a reference to a message already in memory inside the queue, and the sender fills it in. When the message gets processed, the receiver just refers to the same message in the queue.</p>
@@ -846,7 +649,6 @@ When a listener gets an event, it doesn&#x2019;t know who sent it, since it coul
 <p>In other words, the queue is also implementing the <a href="object-pool.html" class="pattern">Object Pool</a> pattern.</p>
 </aside>
 
->>>>>>> master
 </li>
 </ul>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
@@ -870,13 +672,6 @@ When a listener gets an event, it doesn&#x2019;t know who sent it, since it coul
 <p>Another similar term is "publish/subscribe", sometimes abbreviated to "pubsub". Like "message queue", those terms usually refer to larger distributed systems and less the humble coding patterns we&#x2019;re focused on.</p>
 </li>
 </ul>
-<<<<<<< HEAD
-<p>http://www.gamedev.net/topic/136778-event-queue-and-events-in-games/
-http://gamedev.stackexchange.com/questions/14383/best-way-to-manage-in-game-events
-http://gamedev.stackexchange.com/questions/7718/event-driven-communication-in-game-engine-yes-or-no?rq=1</p>
-=======
-<p class="footer">&copy; 2009-2013 Bob Nystrom</p>
->>>>>>> master
 </div>
 </div>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>

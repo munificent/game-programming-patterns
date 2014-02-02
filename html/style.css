@@ -21,7 +21,8 @@ body {
 .content {
   padding: 0 40px 40px 40px;
   background: white;
-  box-shadow: 0 0 20px rgba(71, 51, 31, 0.05); }
+  box-shadow: 0 0 20px rgba(71, 51, 31, 0.05);
+  z-index: 2; }
 
 .page.sidebar {
   padding-right: 300px; }
@@ -40,13 +41,16 @@ h1.book {
 h2 {
   color: #1481b8;
   font: 300 35px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  margin: 20px 0 0 0;
-  padding: 0 0 2px 0; }
+  margin: 20px 0 0 -38px;
+  padding: 0 0 2px 30px;
+  border-left: solid 8px #d9eaf2; }
 
 h3 {
   color: #1481b8;
   font: 400 20px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-  margin: 20px 0 0 0; }
+  margin: 20px 0 0 -38px;
+  padding-left: 30px;
+  border-left: solid 8px #d9eaf2; }
 
 h4 {
   color: #777;
@@ -123,7 +127,10 @@ aside.sidebar {
   right: 30px;
   padding: 0;
   background: none;
-  border: none; }
+  border: none;
+  padding-left: 22px;
+  border-radius: 0;
+  border-left: solid 8px #f3efe7; }
 
 .in-progress {
   display: none;
