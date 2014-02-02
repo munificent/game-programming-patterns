@@ -50,7 +50,7 @@ h3 {
 
 h4 {
   color: #777;
-  font: 16px/18px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  font: 16px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
   margin: 20px 0 0 0; }
 
 p {
@@ -325,12 +325,18 @@ a.outline:after {
   padding: .5em 0; }
 
 @media only screen and (max-width: 479px) {
+  .content {
+    padding: 0 20px 20px 20px; }
+
+  h1 {
+    font-size: 50px; }
+
   h2 {
-    font: bold 20px/26px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+    font: bold 24px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
     margin: 20px 0 5px 0; }
 
   h3 {
-    font: bold 16px/20px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+    font: bold 18px "Source Sans Pro", Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
     margin: 20px 0 5px 0; }
 
   p {
@@ -349,13 +355,11 @@ a.outline:after {
     font-size: 14px; }
 
   pre {
-    font: normal 12px/14px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
-    padding: 0;
-    border: none;
+    font: normal 12px/15px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
     overflow: auto; }
 
   ul, ol {
-    padding: 0 0 0 15px; }
+    padding: 0 0 0 20px; }
 
   .in-progress {
     padding: 4px 12px;

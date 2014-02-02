@@ -80,7 +80,7 @@ h3 {
 
 h4 {
   color: #777;
-  font: 16px/18px $header;
+  font: 16px $header;
   margin: 20px 0 0 0;
 }
 
@@ -385,13 +385,21 @@ a.outline:after {
 #mc_embed_signup label.error {display:block; float:none; width:auto; margin-left:1.05em; text-align:left; padding:.5em 0;}
 
 @media only screen and (max-width: 479px) {
+  .content {
+    padding: 0 20px 20px 20px;
+  }
+
+  h1 {
+    font-size: 50px;
+  }
+
   h2 {
-    font: bold 20px/26px $header;
+    font: bold 24px $header;
     margin: 20px 0 5px 0;
   }
 
   h3 {
-    font: bold 16px/20px $header;
+    font: bold 18px $header;
     margin: 20px 0 5px 0;
   }
 
@@ -416,16 +424,14 @@ a.outline:after {
   }
 
   pre {
-    font: normal 12px/14px $mono;
-    padding: 0;
-    border: none;
+    font: normal 12px/15px $mono;
 
     // Scroll horizontally if not wide enough.
     overflow: auto;
   }
 
   ul, ol {
-    padding: 0 0 0 15px;
+    padding: 0 0 0 20px;
   }
 
   .in-progress {
