@@ -220,30 +220,6 @@ When you receive an event, you have to be careful not to make too many assumptio
 
 The practical consequence of this is that events and messages in a queued system tend to be a little more data heavy than in a synchronous style. With the latter, the notification can just be "hey, something happened" and the receiver can then look around to see what actually occurred and its details. With a queue, some of that data needs to be captured at the moment the event is sent and stuffed into the event object itself as a snapshot of that ephemeral moment in the past.
 
-### You have to worry about the lifetime of the queued objects
-
-This dovetails with the former point. With synchronous notifications, by the time execution has returned back to the message sender, all processing of the message is done. That means the message itself can safely live on the stack.
-
-When you've got a queue in there, the message needs to outlive the call to enqueue it. If you're using a garbage collected language, you don't need to worry about this too much. Just stuff it in the queue and it will stick around as long as it's needed.
-
-In C++, you'll need to decide how you want to ensure the object sticks around. You've got a couple of options. If you want to pass around actual message objects, then you can either manage explicit ownership or have shared ownership.
-
-The former is the traditional way to do things when managing memory manually. When a message gets queued, the queue claims it and the sender no longer owns it. When it gets processed, the receiver takes ownership and is responsible for deallocating it.
-
-These days, now that even C++ programmers are more comfortable with garbage collection, shared ownership à la `shared_ptr` is more typical. With this, the message will stick around as long as needed and be automatically freed when its fully processed.
-
-<span name="pool">Another option</span> is to have messages always live on the queue. Instead of allocating the message itself, it requests a "fresh" one from the queue. The queue returns a reference to a message already in memory inside the queue, and the sender fills it in. When the message gets processed, the receiver just refers to the same message in the queue.
-
-<aside name="pool">
-
-In other words, the queue is also implementing the <a href="object-pool.html" class="pattern">Object Pool</a> pattern.
-
-</aside>
-
-**TODO: move this to design decisions**
-
-None of these options are particularly hard, but you'll have to choose one deliberately.
-
 ### You can get stuck in feedback loops
 
 All event and message systems have to worry about cycles:
@@ -519,118 +495,71 @@ In our audio example, the queue was internal to the API and only the audio engin
 
     * *You have to schedule.* Since any given item will only go to one listener, the queue has to have some logic to figure out the best way to choose which listener is best for a given message. This may be as simple as a round robin, or something more complex based on priority or tracking which listeners are still busy and which aren't.
 
-### how many can write to queue?
+### How many can write to the queue?
 
-- flip side of above option
-- pattern accomodates all configs: 1-1 1-many, many-1, many-many
+This is the flip side of the previous design choice. This pattern can accomodate all of possible <span name="configs">configurations</span>: one-to-one, one-to-many, many-to-one, or many-to-many.
 
-- in example, requesting sound was public api, so any part of code could write
-  request to queue
+<aside name="configs">
 
-- in things like global event bus, anyone can send event
+You sometimes here "fan-in" used to describe many-to-one communication systems, and "fan-out" for one-to-many.
 
-* **one writer**
+</aside>
 
-  - closest to observer pattern
-  - have one priveleged object that raises events
-  - other objects can tune in
-  - usually allow multiple readers
+* **With one writer:**
 
-  - encapsulated, which is good
+    This is style is most similar to the synchronous Observer pattern. You have one priveleged object that generates events that others can then receive. This is how GUI application event systems work, where the operating system itself is the one generator of events.
 
-* **many writers**
+    * **You implicitly know where the event is coming from.** Since there's only one object that can add to the queue, any listener knows where it's coming from.
 
-  - if have multiple readers, basically "global" event bus
-  - very similar to blackboard pattern in ai
+    * **You usually allow multiple readers.** You can have a strict one-sender-one-receiver queue, but those are less common and start to feel less like the communication structure this pattern is about and more just a plain queue data structure.
+
+* **With multiple writers:**
+
+    This is how our audio engine example works. Since `playSound()` is a public API call, any part of the codebase can add a request to the queue. "Global" or "central" event buses work like this too.
+
+    * **You have to be more careful of cycles.** Since anything can potentially put something onto the queue, it's easier to accidentally enqueue something in the middle of handling an event. If you aren't careful, that will trigger a cascade.
+
+    * **You'll likely want some reference the sender in the event itself.**
+    When a listener gets an event, it doesn't know who sent it, since it could be anyone. If that's something they need to know, you'll need to pack that into the event object so that the listener can use it.
+
+### What is the lifetime of the objects in the queue?
+
+With synchronous notifications, by the time execution has returned back to the message sender, all processing of the message is done. That means the message itself can safely live on the stack.
+
+Now that we've got a queue in there, the message needs to outlive the call to enqueue it. If you're using a garbage collected language, you don't need to worry about this too much. Just stuff it in the queue and it will stick around as long as it's needed. In C++, you'll need to decide how you want to ensure the object sticks around.
+
+* **Pass ownership:**
+
+    This is the traditional way to do things when managing memory manually. When a message gets queued, the queue claims it and the sender no longer owns it. When it gets processed, the receiver takes ownership and is responsible for deallocating it.
+
+* **Share ownership:**
+
+    These days, now that even C++ programmers are more comfortable with garbage collection, shared ownership à la `shared_ptr` is more typical. With this, the message will stick around as long as needed and be automatically freed when its fully processed.
+
+* **The queue owns it:**
+
+    <span name="pool">Another option</span> is to have messages *always* live on the queue. Instead of allocating the message itself, it requests a "fresh" one from the queue. The queue returns a reference to a message already in memory inside the queue, and the sender fills it in. When the message gets processed, the receiver just refers to the same message in the queue.
+
+    <aside name="pool">
+
+    In other words, the queue is also implementing the <a href="object-pool.html" class="pattern">Object Pool</a> pattern.
+
+    </aside>
 
 ## See Also
 
-- if want something lighter-weight and faster, observer is close cousin
+* I've mentioned this a few times already, but in many ways, this pattern is the asynchronous cousin to the well-known <a href="observer.html class="gif-pattern">Observer pattern</a>. Unless you actually need the asynchrony, observers are a simpler and often faster choice.
 
-- commands often queued
+* When the queue contains "messages" or "requests" for something to be done, those objects start to sound very similar to <a href="command.html" class="gof-pattern">Commands</a>.
 
-- finite state machines often respond to stream of inputs
-- if don't want them to respond synchronously, can give fsm queue to handle
-  them. often call 'mailbox'
-- state chapter has more on fsms
-- when have bunch of fsms with mailboxes sending messages to each other, have
-  re-invented actor model
-- [erlang language based on this]
+* [Finite state machines](http://en.wikipedia.org/wiki/Finite-state_machine), which are similar to the Gang of Four's <a href="state.html" class="gof-pattern">State pattern</a> respond to an incoming stream of inputs.
 
-- like many patterns, often has a lot of names:
+    If you don't want your state machine to respond to inputs synchronously, it may make sense to put a queue in there. If you have a bunch of these state machines communicating with each other, each with a little queue of pending inputs -- usually called a *mailbox* -- then you've basically re-invented the [actor model](http://en.wikipedia.org/wiki/Actor_model) of computation.
 
-- "message queue" is established term for same pattern
-  - usually used to talk about messaging at higher level between applications
-    and not as much within them
-  - lots of middleware for this: zeromq, rabbitmq, etc. if see "mq" in name
-    now know what stands for
+    The [Erlang](http://www.erlang.org/) programming language is based around this model. Where event queues are a *pattern* you have to implement yourself in other languages, in Erlang, they are built right in. Channels in the [Go](http://golang.org/) programming language
 
-- "publish/subscribe"
-  - very similar model
-  - usually used to describe behavior of distributed systems, and not within
-    single application
+* Like many patterns, this one has a number of aliases. One of the more established terms is "message queue". That's describes a similar communication pattern, but is usually used to talk about a higher level manifestation of it. Where we talked about event queues *within* an application, "message queues" usually refer to systems for communicating *between* applications.
 
-- queue itself is often special purpose example of object pool
+    There are a number of established middleware packages for this: ZeroMQ, RabbitMQ, etc. If you see "MQ" in the name, now you know what it stands for.
 
----
-
-random notes:
-
-**TODO: mention use "event" and "message" interchangeably**
-
-- dovetails really nicely with fsms, which want to receive stream of events
-
-- 1-many, many-1, and many-to-many queues
-  - 1-many: broadcast events. like observer pattern
-    - more likely to use "events"
-  - many-1: sink. think audio engine where anything can tell it to play a sound
-    and it has one internal queue is uses to process those requests
-    - more likely to use "messages"
-  - many-many: like global event bus. anything can announce something
-    interesting. anything can receive it. filtering becomes much more important.
-    - see also blackboards
-
-- talk about threading
-  - with observer, message receiver always runs on *sender's* thread
-  - with queue, can hop threads so receiver runs on thread it expects to run on
-- with a global event queue, that means objects listening to queue can end up
-  with infinite lifetime if not explicitly unregistered. talk about memory
-  leak
-- event priority to handle too many queued events
-- talk about ordering. is it a strict queue or can things be delivered out of
-  order? how does threading affect that?
-- relate to job systems and worker threads?
-- relate to event-based programming
-- game loop is sort of like event loop where "event" is a tick
-  - some simple games can actually use os event loop for game loop by updating
-    game on "idle" events. not precise enough for real-time games
-- sample code should walk through ring buffer
-
-- channels in go
-- talk a bit about message queues as middleware in business apps: zeromq, etc.
-- queueing is helpful for networking.
-  - gives meaningful serializable thing to send to server
-  - see command pattern
-
-- talk about how user input is usually queue
-  - link to game loop which discusses pulling input versus push
-  - also talk about in general about when to pull events off queues and how that
-    ties to game loop
-
-- have to think about what event/message represents. is it notice that thing
-  happened, or request for thing to happen?
-  - for example, do we sent "object collided" event and wait for audio engine
-    to receive that and play sound, or do we sent "play collision sound"
-    message?
-  - depends on sender and intended receiver
-  - if queue is global, event is usually what happened
-  - if queue is specific to obj or system, usually message: request for action
-  - if sender and intended receiver are in different domains (physics and audio)
-    then usually event. if in same domain (audio component of actor and audio
-    engine) to be command or message
-
-- can we talk about how queues let you go from push to pull?
-
-http://www.gamedev.net/topic/136778-event-queue-and-events-in-games/
-http://gamedev.stackexchange.com/questions/14383/best-way-to-manage-in-game-events
-http://gamedev.stackexchange.com/questions/7718/event-driven-communication-in-game-engine-yes-or-no?rq=1
+* Another similar term is "publish/subscribe", sometimes abbreviated to "pubsub". Like "message queue", those terms usually refer to larger distributed systems and less the humble coding patterns we're focused on.

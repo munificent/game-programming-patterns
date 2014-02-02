@@ -1,3 +1,4 @@
+2013-02-01 - 811 words, finish first draft event queue, bunch of work on new design
 2013-01-31 - 961 words, first draft event queue
 2013-01-30 - 441 words, first draft event queue
 2013-01-29 - 378 words, first draft event queue
