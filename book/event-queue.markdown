@@ -3,37 +3,33 @@
 
 ## Intent
 
-*Decouple when a message or event is generated from when it is processed.*
+*Decouple when a message or event is sent from when it is received.*
 
 ## Motivation
 
-Unless you live under one of the few rocks that still lacks reliable Internet access, there's a good chance you've already heard of an <span name="message">"event queue"</span> before. If not, maybe "message queue", or "event loop", or "message pump" will ring a bell. These are all related terms for a roughly similar idea.
+Unless you live under one of the few rocks that still lacks Internet access, you've probably already heard of an <span name="message">"event queue"</span>. If not, maybe "message queue", or "event loop", or "message pump" rings a bell. To refresh your memory, let's walk through a couple of common manifestations of the pattern.
 
 <aside name="message">
 
-Throughout most of this chapter, I'll use "event" and "message" interchangeably. In the few sections where the distinction matters, it will be obvious. Otherwise, just read both of those words as "thing you stick in a queue" and you'll be fine.
+For most of the chapter, I use "event" and "message" interchangeably. In the few places where the distinction matters, it will be obvious. Otherwise, just read both of those words as "thing you stick in a queue".
 
 </aside>
-
-This pattern comes up frequently under a number of guises because it solves a bunch of different problems. To refresh your memory, I'll walk through a couple of the most common manifestations of it.
 
 ### GUI event loops
 
-If you've ever done any <span name="event-driven">user interface</span> programming, then you're well acquainted with the *events*. Every time the user interacts with your program -- clicks a button, pulls down a menu, or presses a key -- the operating system turns this into an event object. It sends this object at your app, and your job is to receive it and hook it up to some interesting behavior.
+If you've ever done any <span name="event-driven">user interface</span> programming, then you're well acquainted with the *events*. Every time the user interacts with your program -- clicks a button, pulls down a menu, or presses a key -- the operating system generates an event. It throws this object at your app, and your job is to grab it and hook it up to some interesting behavior.
 
 <aside name="event-driven">
 
-This application architecture is so common, it's considered a paradigm: <a href="http://en.wikipedia.org/wiki/Event-driven_programming">*event-driven programming*</a>.
+This application style is so common, it's considered a paradigm: <a href="http://en.wikipedia.org/wiki/Event-driven_programming">*event-driven programming*</a>.
 
 </aside>
 
-It's rare for application programmers to write this code these days, but the way this works is that somewhere deep in the bowels of your code is an *event loop*. It looks something roughly like this:
+You rarely write this plumbing code yourself, but the way this works is that somewhere deep in the bowels of your code is an *event loop*. It looks roughly like this:
 
 ^code event-loop
 
-When you call `getNextEvent()` that pulls the some unprocessed user input into your app. Then you route it to the appropriate event handler and, like magic, your application comes to life.
-
-The <span name="interrupt">interesting</span> part is that the application *pulls* in an event when *it* wants it. When the user presses the mouse, the operating system doesn't just immediately invoke some code in your app that *pushes* the event in.
+The call to `getNextEvent()` pulls the next unprocessed user input into your app. You route it to an event handler and, like magic, your application comes to life. The interesting part is that the application *pulls* in the event when *it* wants it. The operating system doesn't just immediately <span name="interrupt">jump</span> to some code in your app when the user pokes at a peripheral.
 
 <aside name="interrupt">
 
@@ -41,94 +37,71 @@ In constrast, *interrupts* from the operating system *do* work like that. When a
 
 </aside>
 
-That means when the user input comes in, it needs to go... somewhere... so that we don't lose it between when the user does something and when your app gets around to calling `getNextEvent()`. That "somewhere" is a *queue*.
+That means when user input comes in, it needs to go somewhere so that the operating system doesn't lose it between when the user does something and when your app gets around to calling `getNextEvent()`. That "somewhere" is a *queue*.
 
 When user input comes in, the OS adds it to a queue of unprocessed events. When you call `getNextEvent()`, it pulls the oldest event off the queue and hands it to your application. (If there are no events in the queue, it usually blocks and waits until one comes in.)
 
-As an application programmer, you don't usually see this event queue, but it's there.
-
 ### Central event bus
 
-If the above section is news to you, don't sweat it. Most <span name="game-loop">games</span> aren't event-driven like this. Instead, the cadence that drives the game's core application loop is usually time.
+If the above section is news to you, don't sweat it. Most <span name="game-loop">games</span> aren't event-driven like this, but it is common for a game to have it's own event queue as the backbone of its nervous system. You'll often hear "central" or "global" or "main" used to describe it. It's used for high level communication between game systems that want to stay decoupled.
 
 <aside name="game-loop">
 
-For all of the gory details behind this, crack open the <a href="game-loop.html" class="pattern">Game Loop</a> chapter.
+If you want to *why* they aren't, crack open the <a href="game-loop.html" class="pattern">Game Loop</a> chapter.
 
 </aside>
 
-But it *is* pretty common for games to have some other central event queue as part of the backbone of the nervous system of the program. You'll often hear "central" or "global" or "main" used to describe it. It's used for high level communication between game systems that want to stay decoupled.
-
-For example, say your game has a <span name="tutorial">tutorial</span> system. You need little help popups to appear cued off of specific in-game events. For example, the first time the player vanquishes a foul beastie, you want to show a little help balloon that says, "Press X to grab the loot!"
-
-Your gameplay and combat code is likely complex enough as it is. The last thing you want to do is stuff a bunch of checks for triggering tutorials in there. (Not to mention all of the other places in the codebase that end up triggering a help balloon.)
+Say your game has a <span name="tutorial">tutorial</span> system to show help popups cued off of specific in-game events. For example, the first time the player vanquishes a foul beastie, you want to show a little balloon that says, "Press X to grab the loot!"
 
 <aside name="tutorial">
 
-In-game tutorials are one of those features that always seems to be a challenge to implement gracefully. Worse, it's a chunk of code that any given player will only use once or twice in the entire lifetime of the game.
-
-That makes it easy to underestimate how helpful a good tutorial can be. It's a hassle, but your user will love you for it.
+Tutorial systems are a pain to implement gracefully and most players will spend only a fraction of their time using it, so it feels like they aren't worth the effort. But that fraction where they *are* using the tutorial can be invaluable for easing the player into your game.
 
 </aside>
 
-Instead, what some games do is have an event queue. This is publicly visible to pretty much the entire game. Any game system can throw an event on the queue. For example, the combat code can add an "enemy died" event every time you slay a foe.
+Your gameplay and combat code is likely complex enough as it is. The last thing you want to do is stuff a bunch of checks for triggering tutorials in there. Instead, what some games do is have a central event queue. Any game system can throw an event on it, so the combat code can add an "enemy died" event every time you slay a foe.
 
-<span name="blackboard">Likewise</span>, any game system can receive events from the queue. So the tutorial
-engine would register itself with the queue and indicate it wants to known about "enemy died" events. This way, knowledge of an enemy dying makes its way from the combat system over to the tutorial engine without the two being directly aware of each other.
+<span name="blackboard">Likewise</span>, any game system can *receive* events from the queue. The tutorial engine registers itself with the queue and indicates it wants to receive "enemy died" events. This way, knowledge of an enemy dying makes its way from the combat system over to the tutorial engine without the two being directly aware of each other.
 
 <aside name="blackboard">
 
-In the field of AI, there is a very similar architectural pattern called a <a href="http://en.wikipedia.org/wiki/Blackboard_system">blackboard system</a>.
+This model where you have a shared space where entities can post information and get notified when others post is similar to <a href="http://en.wikipedia.org/wiki/Blackboard_system">blackboard systems</a> in the AI field.
 
 </aside>
 
-This would have made a decent example for the rest of this chapter. But I'm not generally a fan of global systems like this. It is a common technique, but I don't want you to think that event queues *have* to be global.
-
-Instead, we'll use something more scoped. Event queues can solve a bunch of different problems. To get the most mileage out of this chapter, I'm going to contrive a <span name="perfect">motivating</span> example that jams all of those problems together. Then we'll slap a queue in and watch it knock those problems down, one after the other.
-
-<aside name="perfect">
-
-Of course, in your games, you're unlikely to find problems so cleanly suited to a particular pattern. This is the luxury of getting to cherry-pick examples for a book.
-
-</aside>
+I thought about using this as the example for the rest of the chapter, but I'm not generally a fan of global systems. It is a common technique, but I don't want you to think that event queues *have* to be global. Instead, we'll use something more scoped.
 
 ### Say what?
 
-Speaking of often underappreciated features, let's say we're adding sound to our game. Humans are primarily visual creatures, but hearing is deeply connected to our emotions and our sense of physical space. The right simulated echo can make you feel you're in an enormous cavern, and a well-timed violin adagio can make your heartstrings hum in sympathetic resonance.
+Speaking of often underappreciated features, let's add sound to our game. Humans are visual creatures, but hearing is deeply connected to our emotions and our sense of physical space. The right simulated echo can make a black screen feel like an enormous cavern, and a well-timed violin adagio can make your heartstrings hum in sympathetic resonance.
 
-Lots of things trigger sounds: bodies colliding in the physics engine, using items or special powers, gameplay events like leveling up, interacting with the world like opening a door, NPCs communicating with you, and, last but not least, the player's avatar in the world itself.
-
-To start getting this stuff wound for sound, we'll start with the simplest possible approach. We'll have a little <span name="singleton">"audio engine"</span> in the game. It has an API for playing a sound with some given identifier at a given volume.
+To get our game wound for sound, we'll start with the simplest possible approach and see how it goes. We add a little <span name="singleton">"audio engine"</span> to the game. It has an API for playing a sound with some given identifier at a given volume:
 
 <aside name="singleton">
 
-While I almost always shy away from the <a href="singleton.html" class="gof-pattern">Singleton</a> pattern, this may be one of the few places where it makes sense. Here, I'm doing something simpler and just making it a static method.
+While I almost always shy away from the <a href="singleton.html" class="gof-pattern">Singleton</a> pattern, this is one of the places where it make make sense. I'm doing something simpler and just making the API static.
 
 </aside>
 
-Something like this:
-
 ^code sync-api
 
-Its implementation is responsible for loading the appropriate sound resource, finding an available channel to play it on, and starting it up. This chapter isn't about actually implementing audio playback, so I'll conjure up an imaginary low-level API. Using that, we can code it up like so:
+Its implementation is responsible for loading the appropriate sound resource, finding an available channel to play it on, and starting it up. This chapter isn't about some hardware's actual audio API, so I'll conjure up an imaginary one. Using it, we write our method like so:
 
 ^code sync-impl
 
-We check that in, create a few sound files, and define some IDs for them. Then we start sprinkling `playSound()` calls throughout our codebase like some sort of magical audio fairy. In our UI code, when the selected menu item changes, we play a little bloop:
+We check that in, create a few sound files, and then start sprinkling `playSound()` calls throughout our codebase like some magical audio fairy. In our UI code, when the selected menu item changes, we play a little bloop:
 
 ^code menu-bloop
 
-Nice and clean. But we've our UI designer notices a problem: Sometimes when they switch menu items, the whole screen freezes for a few frames. This stutter is jarring and unacceptable.
+This would be a short chapter if that API worked without any problems, so let's see where it goes awry. The first thing we notice is that sometimes when you switch menu items, the whole screen freezes for a few frames. We've hit our first issue:
 
-* **Problem 1: Using the API the caller until the audio engine has completely processed the request.**
+* **Problem 1: The API blocks the caller until the audio engine has completely processed the request.**
 
-Our `playSound()` function is *synchronous* -- it doesn't return back to the caller until it's actually playing the sound. If the audio resource has be be loaded off the disc, that can take a good while.
+Our `playSound()` method is *synchronous* -- it doesn't return back to the caller until noise is coming out of the speakers. If a sound file has be be loaded off the disc, that may be a while.
 
-Ignoring that for now, we move on. In the AI code for an enemy, we add a call to play an "argh" wail of pain whenever it takes damage from the player. Nothing brings joy to a gamer quite like causing detailed simulated pain in another.
+Ignoring that for now, we move on. In the AI code for an enemy, we add a call to let out a wail of anguish whenever it takes damage from the player. Nothing warms a gamer's heart quite like inflicting simulated pain on a virtual living being.
 
-It works pretty well, but there's occasionally a weird issue. Sometimes, if the hero does a big attack, it can hurt two enemies in the exact same frame. That causes the sound to be played twice simultaneously.
-
-<span name="hatsworth">If</span> you know anything about audio, you know that playing multiple sounds basically just stacks their waveforms on top of each other. If that's two copies of the *same* waveform, then stacking them is equivalent to multiplying one. In other words, it sounds like *one* "argh" sound played *twice as loud*.
+It works, but occasionally causes a weird issue. Sometimes when the hero does a mighty attack, it hits two enemies in the exact same frame. In response to that, we try to play the wail sound twice simultaneously. <span name="hatsworth">If</span> you know anything about audio, you know playing multiple sounds stacks their waveforms on top of each other. When those are the *same* waveform, it sounds like *one* sound played *twice as loud*.
 
 <aside name="hatsworth">
 
@@ -136,35 +109,33 @@ I ran into this exact issue working on <a href="http://en.wikipedia.org/wiki/Hen
 
 </aside>
 
-This problem gets even worse in big boss fights where you have piles of minions running around and all sorts of action going down. The hardware can only play so many sounds at one time. If you try to go over that limit, some will get ignored or audibly cut off.
+There's a similar problem in big boss fights where we have piles of minions running around and all sorts of action going on. The hardware can only play so many sounds at one time. When we try to go over that limit, sounds get dropped or audibly cut off.
 
-What we'd like is a way to look at the entire *set* of sounds we're about to play and be able to group and prioritize them. Unfortunately, our audio API handles each `playSound()` call independently and forgets about the previous ones as soon as it returns. It only sees sounds through a pinhole, one request at a time.
+To fix that, we need to look at the entire *set* of sounds we're playing and aggregate and prioritize them. Unfortunately, our audio API handles each `playSound()` call independently and forgets about the previous ones as soon as it returns. It only sees sounds through a pinhole, one request at a time.
 
-* **Problem 2: Requests cannot be analyzed, grouped, or aggregated together.**
+* **Problem 2: Requests cannot be analyzed or aggregated.**
 
-Out of sheer obstinance at this point, we ignore all of these issues until the real deal-breaker falls in our lap. By this point, we've got calls to our audio API strewn throughout the codebase, coming from lots of different game systems.
+These problems seem like mere annoyances once the real deal-breaker falls in our lap. By this point, we've got calls to our audio API strewn throughout the codebase in lots of different game systems. But our game engine is running on modern multi-core hardware. To take advantage of those cores, we those game systems on different threads -- rendering on one, AI on another, etc.
 
-But our game engine is running on modern multi-core hardware. To take advantage of those cores, we've spread our code over a few different threads. Rendering is on one thread, AI runs on a few worker threads, physics is on its own, etc.
-
-Since our API is synchronous, it runs on the *caller's* thread. Since we're calling it all over the place, that means we're hitting our API concurrently from a number of threads. Go back and look at that sameple code. See any thread synchronization? Me either.
+Since our API is synchronous, it runs on the *caller's* thread. When we call it from different game systems, we're hitting our API concurrently from a number of threads. Look at that sample code. See any thread synchronization? Me either.
 
 All hell breaks lose. This is particularly egregious because we intended to have a *separate* thread for audio. So it's just sitting there totally idle now.
 
-* **Problem 3: Requests cannot be processed a on different thread from the caller.**
+* **Problem 3: Requests are processed on the wrong threads.**
 
 ### Leave a message
 
-The common thread of all of these problems is that calling `playSound()` is interpreted by the audio engine to mean "Oh God drop everything and play the source right now and don't you dare return until you have". That immediacy is a problem for the audio implementation.
+The common theme to these problems is that a call to `playSound()` is interpreted by the audio engine to mean, "Drop everything and play the sound right now!" That immediacy is a problem for the audio implementation.
 
-The caller calls `playSound()` at *its* convenience (and on the caller's thread!), not necessarily when it's convenient for the audio engine to process that request. To fix that, we want to decouple when a request comes in from when it's actually processed. This way, we can receive the request as quickly as possible and return control back to the caller. Meanwhile, we'll handle those requests when we're good and ready.
-
-During the time between when a request came in and when we're ready to handle it, it needs to sit *somewhere*. That somewhere is a queue. We'll add requests to the end of the queue when they come in. When we want to process some, we'll pull them off the front.
+The game system calls `playSound()` at *its* convenience, but not necessarily when it's convenient for the audio engine to *process* that request. To fix that, we want to decouple *receiving* a request from *processing* it. Just like a GUI event system, the place where messages hang out between when the request came in and when the audio engine processes it is a queue.
 
 ## The Pattern
 
 A **queue** stores a series of **notifications or requests** in last-in, first-out order. Sending a notification simply **enqueues the request and returns**. The request processor then **processes items from the queue later** at an appropriate time.
 
 Requests can be **handled directly**, or **routed to interested parties**. This **decouples the sender from the receiever** both **statically** and **in time**.
+
+---
 
 ## When to Use It
 
