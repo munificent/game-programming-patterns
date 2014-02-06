@@ -1,12 +1,13 @@
-- write observer chapter
-- write message queue chapter
+- write event queue chapter
 - write bytecode chapter
-- decide about cutting context parameter
-- reorganize patterns into sections if context parameter is cut
-- write intro for behaving patterns section
-- write intro for communicating patterns section
-- write intro for optimizing patterns section
 - write "games, architecture, and performance" intro chapter
-- redo object pool fragmentation illustration
+- write intro for behavioral patterns section
+- write intro for decoupling patterns section
+- illustrate timelines in game loop
+- get rid of h4s
+- illustrate pushdown automata in state
+- illustrate sequences in double buffer
 - redo double buffer tearing illustration
+- illustration for subclass sandbox
 - decide style guide questions and then apply style guide to everything
+- smarten quotes

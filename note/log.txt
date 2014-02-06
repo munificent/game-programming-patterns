@@ -1,3 +1,6 @@
+2013-02-06 - 1015 words (delete 110), second draft event queue
+2013-02-05 - 1166 words (delete 271), second draft event queue
+2013-02-04 - 952 words (delete 406), second draft event queue
 2013-02-03 - 532 words (delete 99), second draft event queue
 2013-02-02 - 1206 words (delete 282), second draft event queue
 2013-02-01 - 811 words, finish first draft event queue, bunch of work on new design

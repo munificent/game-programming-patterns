@@ -88,21 +88,24 @@ namespace EventQueue
         hasPending_ = false;
       }
 
-      static void playSound(SoundId id, int volume)
-      {
-        pending_.id = id;
-        pending_.volume = volume;
-        hasPending_ = true;
-      }
-
       //^omit
       static void update();
+      static void playSound(SoundId id, int volume);
       //^omit
     private:
       static PlayMessage pending_;
       static bool hasPending_;
     };
     //^pending
+
+    //^defer-play
+    void Audio::playSound(SoundId id, int volume)
+    {
+      pending_.id = id;
+      pending_.volume = volume;
+      hasPending_ = true;
+    }
+    //^defer-play
 
     //^defer-update
     void Audio::update()
@@ -312,7 +315,7 @@ namespace EventQueue
     //^drop-dupe-play
     void Audio::playSound(SoundId id, int volume)
     {
-      // See if a duplicate request is pending.
+      // Walk the pending requests.
       for (int i = head_; i != tail_;
            i = (i + 1) % MAX_PENDING)
       {

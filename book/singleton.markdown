@@ -463,7 +463,7 @@ to see `Log` show up in its argument list, so for cases like that we'll want to 
 The term for things like logging that appear scattered throughout a codebase
 is a "cross-cutting concern". Handling cross-cutting concerns gracefully is a continuing architectural challenge, especially in statically typed languages.
 
-"Aspect-oriented programming" was designed to address just
+[Aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) was designed to address
 these concerns.
 
 </aside>

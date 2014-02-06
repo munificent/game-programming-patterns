@@ -121,75 +121,57 @@ Since our API is synchronous, it runs on the *caller's* thread. When we call it 
 
 All hell breaks lose. This is particularly egregious because we intended to have a *separate* thread for audio. So it's just sitting there totally idle now.
 
-* **Problem 3: Requests are processed on the wrong threads.**
+* **Problem 3: Requests are processed on the wrong thread.**
 
 ### Leave a message
 
-The common theme to these problems is that a call to `playSound()` is interpreted by the audio engine to mean, "Drop everything and play the sound right now!" That immediacy is a problem for the audio implementation.
-
-The game system calls `playSound()` at *its* convenience, but not necessarily when it's convenient for the audio engine to *process* that request. To fix that, we want to decouple *receiving* a request from *processing* it. Just like a GUI event system, the place where messages hang out between when the request came in and when the audio engine processes it is a queue.
+The common theme to these problems is that a call to `playSound()` is interpreted by the audio engine to mean, "Drop everything and play the sound right now!" That immediacy is the problem. The game system calls `playSound()` at *its* convenience, but not necessarily when it's convenient for the audio engine to handle that request. To fix that, we'll decouple *receiving* a request from *processing* it.
 
 ## The Pattern
 
-A **queue** stores a series of **notifications or requests** in last-in, first-out order. Sending a notification simply **enqueues the request and returns**. The request processor then **processes items from the queue later** at an appropriate time.
+A **queue** stores a series of **notifications or requests** in last-in, first-out order. Sending a notification **enqueues the request and returns**. The request processor then **processes items from the queue** at a later time.
 
 Requests can be **handled directly**, or **routed to interested parties**. This **decouples the sender from the receiever** both **statically** and **in time**.
 
----
-
 ## When to Use It
 
-I sometimes see people reach for event queues when they want to decouple the event sender from an event receiver. Queues definitely do this, but if *all* you need to do is decouple *who* is sending from *who* is receiving, it may be overkill. The <span name="simple">simple</span> <a href="observer.html" class="pattern">Observer</a> and <a href="command.html">Command</a> patterns or other abstract interfaces are enough to handle that.
+I sometimes see people use event queues when they just want to decouple a sender from its receiver. Queues do that, but so do <span name="simple">simpler</span> patterns like <a href="observer.html" class="pattern">Observer</a> and <a href="command.html">Command</a>, or even just abstract interfaces.
 
 <aside name="simple">
 
-I feel like I mention this in practically every chapter, but it's worth emphasizing. As a programmer, your most precious resource is often *simplicity*. As you work on your game, you'll be adding features, adding code, adding *stuff*. That almost always comes at the expense of simplicity.
+I mention this in nearly every chapter, but it's worth emphasizing. Your most precious resource is often *simplicity*. As you work on your game, you'll spend that as you pile on features and code.
 
-Few things burn time as much as just trying to cope with your program's complexity, so hold on to as much simplicity as you can while you can.
+Few things burn time as much as simply coping with your program's complexity, so hold on to as much simplicity as you can.
 
 </aside>
 
-Queues do more than that. There are a bunch of ways to express it, but I like to think of it in terms of pushing and pulling. Often, you have some piece of code that wants another piece of code to do some work. The most natural way for the former to express that is to explicitly initiate the request. It *pushes* that request to the code that will do the work.
+You only need to reach for a queue when you want to decouple something *in time*. I think of it in terms of pushing and pulling. You have some chunk of code that wants another chunk to do some work. The natural way to initiate that is by *pushing* the request to the code that will do the work.
 
-At the same time, the most natural way for the worker to process that request is to *pull* in a request at some appropriate later time in its run cycle. When you have a push model and one side and a pull model on the other, you need some mechanism to handle that slippage. That's what a queue can do that other decoupling interfaces don't. They let you decouple not just *who*, but *when*.
+Meanwhile, the natural way for the worker to process that request is by *pulling* it in at a convenient time in its run cycle. When you have a push model and one end and a pull model on the other, you need a buffer between them. That's what a queue does that simpler decoupling patterns don't.
 
 This is a powerful difference, but it doesn't come for free. Queues are more complex and use more memory than synchronous messaging. You have to be careful to ensure the queue doesn't overflow or grow in an unbounded way.
 
-Queues give the code processing items more control: they can aggregate or discard requsts and generally have a more global view of the set of outstanding requests. But they take control from the sender. All it can do is throw it on the queue and hope something good will come of it.
-
-In particular, queues are a poor fit when the sender requires a response. Not only will the response not be available immediately, it can't even guarantee it will come at all. If the queue is full or the code processing it decides to ignore it, the request may fall on the floor. Queues work best when you can fire and forget.
-
-You *can* make responses work with a queue. Typically the response is asynchronous too. This is common when you have a "global" event queue that anything can push to and pull from. Here, A can send an asynchronous request that gets consumed by B. B then responds by throwing another thing on the queue which gets consumed in return by A.
-
-<span name="distributed">As</span> you can imagine orchestrating this kind of communication is complex. Do you really want to turn the internals of your game into a distributed programming problem?
-
-<aside name="distributed">
-
-Of course, if your game uses networking, it already *is* a distributed programming problem, but that doesn't mean you should make things even harder on yourself.
-
-</aside>
+Queues give control to the code reading from it: it can delay processing, aggregate requests, or discard them entirely. But it does this by taking control away from the sender. All it can do is throw a request on the queue and hope for the best. This means queues are a particularly poor fit when the sender requires a response.
 
 ## Keep in Mind
 
 ### A "global" event queue is still a global
 
-One common use of this pattern is for a sort of Grand Central Station that any part of the game can send to and receive from. It's a powerful piece of infrastructure. But "powerful" doesn't always mean "good".
+One common use of this pattern is for a sort of Grand Central Station that any part of the game can send to and receive from. It's a powerful piece of infrastructure. But *powerful* doesn't always mean *good*.
 
-It took a while, but most of us finally learned the hard way that globals are bad. When you have a piece of state that any part of the program can poke at, all sorts of subtle interdependencies can creep in. While this pattern wraps that state up in a nice managed data structure, it's still effectively a global, with all of the danger that that implies.
+It took a while, but most of us learned the hard way that global variables are bad. When you have a piece of state that any part of the program can poke at, all sorts of subtle interdependencies creep in. This pattern wraps that state in a nice little data structure, but it's still a global, with all of the danger that entails.
 
-### The state of the world may change between when a message is sent and received
+### State may change between when a message is sent and received
 
-Say we've got this event queue for our game systems to talk to each other. The AI for an entity in the game posts a "entity died" event to that queue when some virtual minion shuffles off its mortal coil. That hangs out in the queue for who knows how many frames until it eventually works its way to the front and gets processed.
+Say we've got an event queue for our game systems to talk to each other. The AI code posts an "entity died" event when a virtual minion shuffles off its mortal coil. That event hangs out in the queue for who knows how many frames until it eventually works its way to the front and gets processed.
 
-Meanwhile, we've got an experience system that wants to track the heroine's bodycount and reward her for her grisly efficiency. It receives these "entity died" events so it can determine what kind of entity was slain and perhaps how difficult the kill was so it can calculate an appropriate reward.
+Meanwhile, our experience system wants to track the heroine's bodycount and reward her for her grisly efficiency. It receives these "entity died" events so it can determine what kind of entity was slain and perhaps how difficult the kill was so it can dish out an appropriate reward.
 
-To do that determination requires looking at various pieces of state in the world. At the very least, the experience system will want to get a hold of the entity that died to see what sort it was. It may want to inspect its surroundings to see what other obstacles or entities were nearby.
+Determining that reward requires various pieces of state in the world. We need the entity that died to see what sort it was. We may want to inspect its surroundings to see what other obstacles or entities were nearby. But if the event isn't received until later, that stuff may be gone. The entity may have been deallocated, and other nearby objects may have wandered off.
 
-But if the event isn't received until later, that stuff may be gone. The entity may have been deallocated, and other nearby objects may have wandered off.
+When you receive an event, you have to be careful not to make assumptions about how the *current* state of the world lines up with how the world was *when the event was raised*.
 
-When you receive an event, you have to be careful not to make too many assumptions about how the *current* state of the world lines up with how the world was *when the event was raised*.
-
-The practical consequence of this is that events and messages in a queued system tend to be a little more data heavy than in a synchronous style. With the latter, the notification can just be "hey, something happened" and the receiver can then look around to see what actually occurred and its details. With a queue, some of that data needs to be captured at the moment the event is sent and stuffed into the event object itself as a snapshot of that ephemeral moment in the past.
+This means events and messages in queues tend to be more data heavy than in synchronous systems. With the latter, the notification can just say " something happened" and the receiver can look around to find the details it cares about. With a queue, that data must be captured at the moment the event is sent so that snapshot of the ephemeral past can be used later.
 
 ### You can get stuck in feedback loops
 
@@ -197,15 +179,10 @@ All event and message systems have to worry about cycles:
 
 1. A sends an event.
 2. B receives it and responds by sending an event.
-3. That event happens to be one that A cares about, so it receives it.
-4. In response, it sends an event...
+3. That event happens to be one that A cares about, so it receives it. In response, it sends an event...
 5. Go to 2.
 
-Unless your event senders and receivers are strictly partitioned in a way that prevents communication cycles, the above can happen. If your messaging system is *synchronous*, you'll find about a cycle quite quickly: it will overflow the stack and crash your game.
-
-When you have a queue in place, the asynchrony gives the game a chance to unwind the stack. That means a feedback loop may not actually crash the game. Instead, it will probably keep running but behave in a way that's clearly busted. A more pernicious possibility is that it will keep running in a way that's *not* clearly busted.
-
-If the endless loop of events cascading through the system aren't very <span name="log">visible</span> in the game, you may just end up wasting CPU cycles processing them without realizing it. One guideline for avoiding this problem is to avoid sending events from within code that's called in response to a event.
+When your messaging system is *synchronous*, you tend to find cycles quickly: they overflow the stack and crash your game. With a queue, the asynchrony lets the game unwind the stack, so the game may keep running but be wrong in some <span name="log">obvious</span> or subtle way. Or you may just waste CPU cycles processing events without realizing it. A simple rule to avoid this problem is to prohibit sending events from within an event handler.
 
 <aside name="log">
 
@@ -215,21 +192,25 @@ A little debug logging in your event system is probably a good idea.
 
 ## Sample Code
 
-We've gotten a head start on this section already. The beginning of this chapter walked through the synchronous audio API and the problems that caused. It has the right functionality -- the public API we want, and the right low level audio calls. All that's left for us to do now is fix the problems with it.
+We've already seen some code. It has problems, but it has the right functionality -- the public API we want, and the right low level audio calls. All that's left for us to do now is fix those problems.
 
 ### Deferring a sound request
 
-The first problem is that our API is *blocking*. When some piece of code wants to play a sound, it can't get back to the other things its doing until `playSound()` finishes loading a sound resource and actually starts making the speaker wiggle.
+The first problem is that our API *blocks*. When a piece of code plays a sound, it can't do anything else until `playSound()` finishes loading the resource and actually starts making the speaker wiggle.
 
-Let's try the simplest solution we can come up with. We'll make `playSound()` return quickly by deferring the work. First, we define a little data structure to store the details of the request:
+Let's try the simplest solution we can come up with. We'll make `playSound()` return quickly by deferring the work. First, a little structure to store the request:
 
 ^code play-message
 
-Then we'll give `Audio` a field to store an instance of it, along with a little flag to track if it's been set. Now, `playSound()` just fills that in:
+Then we'll store an instance of this in `Audio`, along with a little flag to tell if a request is pending.
 
 ^code pending
 
-This way, `playSound()` returns virtually instantly -- it's not really doing anything anymore. But we do still actually have to play the sound, of course. We can't just delete that code. It needs to go somewhere, and that somewhere is an `update()` method:
+Calling `playSound()` just fills those in:
+
+^code defer-play
+
+This way, `playSound()` returns almost instantly, but we do still have to play the sound, of course. That code needs to go somewhere, and that somewhere is an `update()` method:
 
 <span name="update"></span>
 
@@ -237,11 +218,11 @@ This way, `playSound()` returns virtually instantly -- it's not really doing any
 
 <aside name="update">
 
-Yup, you guessed it. This is the <a href="update-method.html" class="pattern">Update Method</a> pattern.
+As the name implies, this is the <a href="update-method.html" class="pattern">Update Method</a> pattern.
 
 </aside>
 
-All it does is check to see if there is a pending request. If so, it processes it and clears it. Now we just need to call this. The typical answer is to invoke it from your main <span name="game loop">game loop</span>.
+This takes care of playing the pending sound request if there is one. Now we just need to call from somewhere convenient. What "convenient" means depends on your game. It may mean calling from the main <span name="game loop">game loop</span>, or from a dedicated audio thread. Maybe you'll have an asynchronous method for loading resources off disc calls `update()` once the sound is ready.
 
 <aside name="game loop">
 
@@ -249,25 +230,21 @@ Another pattern, <a href="game-loop.html" class="pattern">Game Loop</a>! They al
 
 </aside>
 
-This lets us call it at an appropriate time where we're OK with the processing taking a little while. In real code, you actually don't want to do a blocking call to load a resource right from your game loop. Instead, you'd throw this on a separate thread or use an asynchronous lower-level API. In the interest of simplicity, please tolerate a little hand waving here.
-
-We seem to have solved our first problem. Calling `playSound()` is now super fast, and we actually do the processing at a better, well-defined point in our execution. But what if we try to call `playSound()` *twice* before we get a chance to call `update()`?
-
-Our simplest-possible-idea only supports a single pending request. To go beyond that takes us a step closer to the heart of this pattern...
+Calling `playSound()` is now super fast, and we processing requests when it makes the most sense to, but what if we try to call `playSound()` *twice* before we get a chance to call `update()`? Our solution only supports a single pending request. To go beyond that takes us a step closer to the heart of this pattern...
 
 ### Multiple sound messages
 
-Obviously, we need `Audio` to have room to store multiple pending play messages. Now, your <span name="prof">algorithm professor</span> may have told you to to use something more existing here. Maybe a heap, or a hash table, or at least a linked list. But, in practice, the best way to store a collection of homogenous items is almost always just a flat array:
+We need `Audio` to have room for multiple pending play messages. Now, your <span name="prof">algorithm professor</span> tell you to use some exciting data structure here like a [Fibonacci heap](http://en.wikipedia.org/wiki/Fibonacci_heap) or a [skip list](http://en.wikipedia.org/wiki/Skip_list), or, hell at least a *linked* list. But, in practice, the best way to store a bunch of homogenous things is almost always a plain old array:
 
 <aside name="prof">
 
-As an algorithm professor, their job is publish novel analyses of data structures. They aren't exactly incentivized to get you to stick to simple ones!
+Algorithm researchers get paid to publish analyses of novel data structures. They aren't exactly incentivized to stick to the basics.
 
 </aside>
 
-1. It doesn't do any dynamic allocation.
-2. There's no memory overhead for bookkeeping information or pointers.
-3. It's contiguous in memory, which is <span name="locality">cache</span> friendly.
+1. No dynamic allocation.
+2. No memory overhead for bookkeeping information or pointers.
+3. <span name="locality">Cache-friendly</span> contiguous memory usage.
 
 <aside name="locality">
 
@@ -279,31 +256,31 @@ So let's do that:
 
 ^code pending-array
 
-We can tune the size of the array to have as much room as we need to cover our worst case. To play a sound, we just add a new message to the end of the array:
+We can tune the size of the array to cover our worst case. To play a sound, we just add a new message to the end of the array:
 
 ^code array-play
 
-Then when we update, we'll process all of the pending messages:
+When we update, we process all of the pending messages:
 
 ^code array-update
 
-This works fine, but it does presume we can process every sound request in a single call to `update()`. That's probably true in our example, but this chapter is about event *queues*, not event *buffers*.
-
-In order for `update()` to work on just a few requests at a time, it needs to be able to pull requests out of the buffer while leaving others in there. We want to ensure that the oldest pending requests get priority, so it needs to process those first. In other words, we need an actual queue.
+This works fine, but it does presume we can process *every* sound request in a single call to `update()`. If loading those resources happens asynchronously, that won't work. For `update()` to work on just a few requests at a time, it needs to be able to pull requests out of the buffer while leaving the rest. In other words, we need an actual queue.
 
 ### A ring buffer
 
-There are a bunch of ways to implement queues, but my favorite is called a *ring buffer*. It preserves everything that's good about a simple array, but lets us incrementally remove items from the front of the queue.
+There are a bunch of ways to implement queues, but my favorite is called a *ring buffer*. It preserves everything that's great about arrays, but lets us incrementally remove items from the front of the queue.
 
 Now, I know what you're thinking. If we remove items from the beginning of the array, don't we have to shift all of the remaining items over? Isn't that slow?
 
-This is why you learned how great linked lists are: it's super easy to remove nodes from the list without having to shift things around. Well, it turns out you can implement a queue without any shifting in a simple array too. I'll walk you through it, but first let's get precise on some terms.
+This is why they made us learn about linked lists: you can remove nodes from them without having to shift things around. Well, it turns out you can implement a queue without any shifting in an array too. I'll walk you through it, but first let's get precise on some terms.
 
-* The **head** of the queue is the oldest pending request, and the one that will be processed *next*. Since `playSound()` appends to the end of the array, it's the element in there with the lowest index.
+**TODO: Illustrate.**
 
-* The **tail** is the other end of the queue. It's the slot in the array where the next enqueued request will go. Note that it's just *past* the end of the queue. You can think of it as a half-open range if that helps.
+* The **head** of the queue is where requests are *read* from. The head is the oldest pending request.
 
-In other words, in our array, the head is on the left, and the tail of the queue grows towards the right. Let's code that up. First, we'll tweak our fields a bit to make these two markers explicit in the class:
+* The **tail** is the other end. It's the slot in the array where the next enqueued request will be *written*. Note that it's just *past* the end of the queue. You can think of it as a half-open range if that helps.
+
+Since `playSound()` appends new requests at the end of the array, the head starts at element zero and the tail grows to the right. Let's code that up. First, we'll tweak our fields a bit to make these two markers explicit in the class:
 
 ^code head-tail
 
@@ -311,29 +288,37 @@ In the implementation of `playSound()`, `numPending_` has been replaced by `tail
 
 ^code tail-play
 
-The more interesting change is in `update()`. To keep things simple in the example, let's say that we only process a single request at a time in a call to update. That looks like this:
+The more interesting change is in `update()`. For simplicity's sake, we'll process a single request per update call, like so:
 
 ^code tail-update
 
-The changes are pretty small. It just processes the request at the current head and then discards that by bumping the index of the head to the right. We tell if the queue is empty by seeing if there's no distance between the head and tail. Now we've got a queue: we can add to the end and remove from the front.
+We process the request at the head and then discard it by advancing the head to the right. We detect an <span name="empty">empty queue</span> by seeing if there's no distance between the head and tail. Now we've got a queue: we can add to the end and remove from the front.
 
-We have an obvious problem, though. As we run stuff through this queue, over time the head and tail will keep crawling to the right. Eventually, `tail_` will hit the end of the array, that `assert()` will fire, and party time is over.
+<aside name="empty">
 
-In our implementation now, `MAX_PENDING` isn't the maximum number of queued requests, it's the maximum number of requests we can handle, ever!
+This is why we made the tail one *past* the last item. It means that the queue will be empty if the head and tail are the same index.
 
-This is where it gets clever. If you'll notice, while the tail is creeping forward, the head is too. That means we've got array elements at the beginning of the array that aren't being used any more.
+</aside>
 
-So what we'll do is make the tail of the queue wrap back around to the beginning of the array when it runs off the end. That's why it's called a *ring* buffer: it acts like a circular array of cells.
+There's an obvious problem, though. As we run requests through the queue, the head and tail keep crawling to the right. Eventually, `tail_` will hit the end of the array, that `assert()` will fire, and <span name="party">party time</span> is over.
 
-Implementing this is surprisingly simple. When we enqueue an item, we just need to make sure the tail wraps around to the beginning of the array when it reaches the end, like so:
+<aside name="party">
+
+Do you want party time to be over? No. You do not.
+
+</aside>
+
+This is where it gets clever. Notice that while the tail is creeping forward, the *head* is too. That means we've got array elements at the *beginning* of the array that aren't being used any more. So what we do is wrap the tail back around to the beginning of the array when it runs off the end. That's why it's called a *ring* buffer: it acts like a circular array of cells.
+
+**TODO: Illustration.**
+
+Implementing that is remarkably easy. When we enqueue an item, we just need to make sure the tail wraps around to the beginning of the array when it reaches the end, like so:
 
 ^code ring-play
 
-See how the `tail_++` was replaced with an increment and a modulo? That wraps back around for us. The other change is the assert. We need to ensure the queue doesn't overflow. We can't determine that just by the position of the `tail_`, since the queue will work its way throughout the whole array.
+Replacing `tail_++` with an increment modulo the array size causes it to wrap back around. The other change is the assertion. We need to ensure the queue doesn't overflow. As long as there are fewer than `MAX_PENDING` requests in the queue, there will be a little gap of unused cells between the head and tail. If the queue fills up, those will be gone and -- like some weird backwards Ouroboros -- the tail will collide with the head and start overwriting it. The assertion ensures that doesn't happen.
 
-Instead, we need to check if the head and tail have *collided*. As long as there are fewer than `MAX_PENDING` requests in the queue, there will be a little chunk of unused cells between the head and tail. If the queue fills up, those will be gone and -- like some weird backwards Ouroboros -- adding a new item to the end of the tail will start wiping out items in the head. The assertion checks to ensure that won't happen.
-
-Implementing `update()` is equally simple. We just wrap the head around too:
+In `update()`, we wrap the head around too:
 
 ^code ring-update
 
@@ -341,25 +326,21 @@ There we go: A growable queue with a <span name="capacity">fixed maximum capacit
 
 <aside name="capacity">
 
-If the hardcoded maximum capacity bugs you, you could use a growable array. When the queue gets full, you allocate a new array twice (or some other constant multiplier) the size of the current array, then copy all of the items over.
-
-While that seems like it might be a performance hit, you can prove that even when you grow like this, enqueuing an item has constant *amortized* complexity.
+If the fixed capacity bugs you, you can use a growable array. When the queue gets full, allocate a new array twice the size of the current array (or some other multiple), then copy the items over. Even though you have to copy, you can prove enqueuing an item still has constant *amortized* complexity.
 
 </aside>
 
 ### Aggregating requests
 
-We've solved our first problem and now we've got a basic asynchronous queue up and running. Let's move on to some of the knock-on issues. The next one is that if we have two requests to play the same sound, they interfere with other.
+Now that we've got a queue in place and tackled our first problem, let's take on the others. The next is that multiple requests to play the same sound interfere with other. Since we know which requests are waiting to be processed now, all we need to do is merge a request if it matches an already pending one:
 
-This is easy to solve now. Since we have a queue, we know which requests are going to be processed. All we need to do is discard a request if its identical to one that's already pending:
+^code drop-dupe-play
 
-^code drop-dupe-request
+When we get two requests to play the same sound, we collapse them to a single request for whichever was loudest. This "aggregation" is pretty rudimentary, but you can use the same idea to do more interesting batch processing of requests.
 
-When we have two requests to play the same sound, we collapse them to a single request for whichever was loudest. This "aggregation" is pretty rudimentary, but you could use the same technique to do more interesting batch processing of requests depending on your needs.
+Note that we're merging when the request is *enqueued*, not when it's *processed*. That's a easier on our queue since we don't waste slots on redundant requests that will end up being collapsed later. It's also simpler to implement.
 
-Note that we're doing the aggregation when the request is being enqueued, not when it's being processed. That's a little easier on our queue since we don't waste slots on duplicate requests that will end up being collapsed. It's also simpler to implement this way.
-
-It does, however, put the processing burden on the caller. Since this is in `playSound()` we will walk the queue synchronously before it returns. If the queue is particularly large, that could be <span name="slow">slow</span>. In that case, it may make more sense to aggregate in `update()` instead.
+It does, however, put the processing burden on the caller. A call to `playSound()` we will walk the entire queue before it returns, which could be <span name="slow">slow</span> if the queue is large. It may make more sense to aggregate in `update()` instead.
 
 <aside name="slow">
 
@@ -367,72 +348,76 @@ Another way to avoid the *O(n)* cost of the scanning the queue is to use a diffe
 
 </aside>
 
-There's an important consideration to keep in mind here. When we're doing this aggregation, our window into the set of "simultaneous" requests is only as big as the queue. If we process requests more quickly and the queue size stays small, then we'll have fewer opportunities to batch things together. Likewise, if processing lags behind and the queue gets more full, we'll find more things to collapse.
+There's something important to keep in mind here. The window of "simultaneous" requests that we can aggregate is only as big as the queue. If we process requests more quickly and the queue size stays small, then we'll have fewer opportunities to batch things together. Likewise, if processing lags behind and the queue gets full, we'll find more things to collapse.
 
-The intent of this pattern is to make it so that the requester doesn't care when the request gets processed. But if you start scanning the queue and treating it like a live data structure to be played with, then lag between request and processing can become visible to the user. Make sure you're OK with that.
+This pattern insulates the requester from caring when the request gets processed, but when you scan the entire queue and treat it like a live data structure to be played with, then lag between request and processing can visibly affect behavior. Make sure you're OK with that.
 
 ### Spanning threads
 
-The last problem was the most pernicious one. With a synchronous audio API, whatever thread is running the code that calls `playSound()` will be the thread that processes that request. That's often not what you want.
+Finally, the most pernicious problem. With our synchronous audio API, whatever thread called `playSound()` was the thread that processed the request. That's often not what we want.
 
-On today's <span name="multicore">multi-core</span> hardware, you need more than one thread if you want to get the most out of your chip. There an infinite array of ways to distribute a game's processing across multiple threads, but a common strategy is to move each domain of the game code onto its own thread: audio, rendering, AI, etc.
+On today's <span name="multicore">multi-core</span> hardware, you need more than one thread if you want to get the most out of your chip. There are infinite ways to distribute code across multiple threads, but a common strategy is to move each domain of the game onto its own thread -- audio, rendering, AI, etc.
 
 <aside name="multicore">
 
-Straight-line code only runs on a single core at a time. If you don't use threads, even if you do the crazy asynchronous-style programming that's popular these days, the best you'll do is keep one core busy. On a four core chip, that means you're only using 25% of the CPU that you could be.
+Straight-line code only runs on a single core at a time. If you don't use threads, even if you do the asynchronous-style programming that's in vogue, the best you'll do is keep one core busy, which is a fraction of your CPU's abilities.
 
-Outside of games, programmers compensate for that by splitting their application into multiple independent *processes*. Each can run on a different core and the OS will keep them all busy. Games (the game client itself, game *servers* are a bit different) are almost always a monolithic process, so a bit of threading really helps.
+Server programmers compensate for that by splitting their application into multiple independent *processes*. Each runs on a different core and the OS keeps them all busy. Games are almost always a single process, so a bit of threading really helps.
 
 </aside>
 
-By this point, we're in much better shape to handle that. We have three critical pieces already:
+We're in good shape to do that now that we have three critical pieces already:
 
 1. The code for requesting a sound is decoupled from the code that plays it.
 2. We have a queue for marshalling between the two.
-3. That queue is completely encapsulated from the rest of the program.
+3. The queue is completely encapsulated from the rest of the program.
 
-All that's left for us is to make the two functions that modify the queue -- `playSound()` and `update()` thread-safe. Ideally, I'd whip up a bit of concrete sample code to show you how to do that. But, since this is a book about architecture and patterns, I try not to get mired in the details of any specific API.
+All that's left is to make the method that modify the queue -- `playSound()` and `update()` -- thread-safe. Normally, I'd whip up some concrete code to do that, but since this is a book about architecture, I don't want to get mired in the details of any specific API.
 
-Threaded code is particularly hard to show in a lucid way. There are a lot of subtle corner cases that are easy to get wrong, and even the most trivial threading problem seems to spur fierce debate about the best way to do it. Mutex? Semaphor? Condition variables? Critical section?
+Threaded code is particularly difficult to show in small examples. There are a lot of subtle corner cases that are easy to get wrong, and even trivial threading problems spur endless debate about the best way to do it. Mutex? Semaphor? Condition variables? Critical section?
 
-Any of those can work. At a high level, all that really needs to happen is that we ensure that queue isn't modified concurrently. Since `playSound()` does a very small amount of work -- basically just assigning a few fields -- it can lock very a short period of time without causing much stress on the game. Likewise, `update()` can wait on something like a condition variable so that it doesn't burn any CPU time unless there's actual work to be done. Thread-safe *and* efficient!
+Any of those can work. At a high level, all we need to do is ensure that the queue isn't modified concurrently. Since `playSound()` does a very small amount of work -- basically just assigning a few fields -- it can lock without blocking the processing for long. In `update()` we wait on something like a condition variable so that we don't burn CPU cycles until there's a request to process.
 
 ## Design Decisions
 
 ### What goes in the queue?
 
-I've been using "event" and "meesage" as if they were synonymous because, for most purposes, it doesn't matter what you're stuffing in the queue. You get the same decoupling and aggregation capabilities regardless of what goes through the pipe.
+I've treated "event" and "message" as synonymous because it mostly doesn't matter what you're stuffing in the queue. You get the same decoupling and aggregation abilities regardless of what goes through the pipe.
 
-But it is useful to think about what your queing. In our audio example, it was *requests*, or <span name="command">*messages*</a>. Think of them as verbs. We put them in the queue because we want to perform them later.
+But it is useful to think about what you're queing. In our audio example, it was *requests* or <span name="command">*messages*</a>: concrete actions we want to perform later. In other cases, the queue holds *events* or *notifications*: actions that were already performed. We enqueue them so that we can *respond* to them later.
 
 <aside name="command">
 
-Another word for "verb" here is "command". And, indeed, this is close to the <a href="command.html" class="gof-pattern">Command pattern</a>, and queues are often used there too.
+Another word for "action to perform" is "command". Messages are indeed similar to the <a href="command.html" class="gof-pattern">Command pattern</a>, and queues can be used with those too.
 
 </aside>
 
-In other use cases we've talked about, the queue holds "events" -- things that happened in the past. We put them in the queue because we want to *respond* to them later. Depending on the problem you're trying to solve, you'll naturally do one or the other.
-
-* **When you queue events:**
+* **If you queue events:**
 
     You're basically doing an asynchronous <a href="observer.html" class="gof-pattern">Observer pattern</a>.
 
     * *You are likely to allow multiple listeners.* Since the queue contains
-        things that already happened, the sender probably doesn't care what responds to it. From it's perspective, it's in the past and is already forgotten. That means is easy to allow *multiple* things to respond without confusion.
+        things that already happened, the sender probably doesn't care what responds to it. From its perspective, the event is in the past and is already forgotten.
 
-    * *The scope of the queue tends to be broader.* Event queues are often used to *broadcast* events to any and all interested parties. To allow maximum flexibility for which parties can be interested, these queues tend to be less encapsulated.
+    * *The scope of the queue tends to be broader.* Event queues are often used to *broadcast* events to any and all interested parties. To allow maximum flexibility for which parties can be interested, these queues tend to be more globally visible.
 
 * **When you queue messages:**
 
-    You can think of this more as an asynchronous API to a specific service. You have some outside code that wants an action to happen and often knows *who* should do that action. It just doesn't control *when* the action was done.
+    You can think of this more as an asynchronous API to a specific service. You have some outside code that wants an action to happen and often knows *who* should do that action. It just doesn't control *when* the action will be done.
 
-    * *You are more likely to have a single listener.* Like in our audio API example, the queued messages are requests specifically for *the audio API* to play a sound. If other random parts of the game engine started stealing messages off the queue, it wouldn't do us much good.
+    * *You are more <span name="locator">likely</span> to have a single listener.* Like in our audio API example, the queued messages are requests specifically for *the audio API* to play a sound. If other random parts of the game engine started stealing messages off the queue, it wouldn't do much good.
 
-        I say "more likely" here though, because it is still possible to enqueue messages without caring which specific system processes it, as long as it gets processed the way you expect. In that case, you're doing something akin to the <a href="service-locator.html" class="pattern">Service Locator pattern</a>, where you decouple a caller from the concrete type implementing the call.
+        <aside name="locator">
+
+        I say "more likely" here, because you can enqueue messages without caring which code processes it, as long as it gets processed *how* you expect. In that case, you're doing something akin to a <a href="service-locator.html" class="pattern">Service Locator</a>.
+
+        </aside>
+
+---
 
 ### Who can read from the queue?
 
-In our audio example, the queue was internal to the API and only the audio engine itself dequeued items. In something an event loop for a user interface, multiple places in the application can register event listeners. You sometimes hear the terms "single-cast" and "broadcast" to distinguish these, and both are useful.
+In our audio example, the queue was internal to the audio system and only it dequeued requests. In something an event loop for a user interface, multiple places in the application can register event listeners. You sometimes hear the terms "single-cast" and "broadcast" to distinguish these, and both are useful.
 
 * **A single-cast queue:**
 
