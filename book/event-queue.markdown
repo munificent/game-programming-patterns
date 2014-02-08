@@ -369,10 +369,12 @@ Server programmers compensate for that by splitting their application into multi
 We're in good shape to do that now that we have three critical pieces already:
 
 1. The code for requesting a sound is decoupled from the code that plays it.
+
 2. We have a queue for marshalling between the two.
+
 3. The queue is completely encapsulated from the rest of the program.
 
-All that's left is to make the method that modify the queue -- `playSound()` and `update()` -- thread-safe. Normally, I'd whip up some concrete code to do that, but since this is a book about architecture, I don't want to get mired in the details of any specific API.
+All that's left is to make the methods that modify the queue, `playSound()` and `update()`, thread-safe. Normally, I'd whip up some concrete code to do that, but since this is a book about architecture, I don't want to get mired in the details of any specific API.
 
 Threaded code is particularly difficult to show in small examples. There are a lot of subtle corner cases that are easy to get wrong, and even trivial threading problems spur endless debate about the best way to do it. Mutex? Semaphor? Condition variables? Critical section?
 
@@ -382,28 +384,25 @@ Any of those can work. At a high level, all we need to do is ensure that the que
 
 ### What goes in the queue?
 
-I've treated "event" and "message" as synonymous because it mostly doesn't matter what you're stuffing in the queue. You get the same decoupling and aggregation abilities regardless of what goes through the pipe.
-
-But it is useful to think about what you're queing. In our audio example, it was *requests* or <span name="command">*messages*</a>: concrete actions we want to perform later. In other cases, the queue holds *events* or *notifications*: actions that were already performed. We enqueue them so that we can *respond* to them later.
-
-<aside name="command">
-
-Another word for "action to perform" is "command". Messages are indeed similar to the <a href="command.html" class="gof-pattern">Command pattern</a>, and queues can be used with those too.
-
-</aside>
+I've used "event" and "message" interchangeably so far because it mostly doesn't matter what you're stuffing in the queue. You get the same decoupling and aggregation abilities regardless of what goes through the pipe.
 
 * **If you queue events:**
 
-    You're basically doing an asynchronous <a href="observer.html" class="gof-pattern">Observer pattern</a>.
+    You're basically doing an asynchronous <a href="observer.html" class="gof-pattern">Observer pattern</a>. The queue holds *events* or *notifications*: actions that were already performed. We enqueue them so that we can *respond* to them later.
 
-    * *You are likely to allow multiple listeners.* Since the queue contains
-        things that already happened, the sender probably doesn't care what responds to it. From its perspective, the event is in the past and is already forgotten.
+    * *You are likely to allow multiple listeners.* Since the queue contains things that already happened, the sender probably doesn't care what responds to it. From its perspective, the event is in the past and is already forgotten.
 
     * *The scope of the queue tends to be broader.* Event queues are often used to *broadcast* events to any and all interested parties. To allow maximum flexibility for which parties can be interested, these queues tend to be more globally visible.
 
 * **When you queue messages:**
 
-    You can think of this more as an asynchronous API to a specific service. You have some outside code that wants an action to happen and often knows *who* should do that action. It just doesn't control *when* the action will be done.
+    You can think of this as an asynchronous <span name="command">API</span> to a service, like our audio example. We have some outside code that wants an action to happen and often knows *who* should do that action. It just doesn't control *when* the action will be done.
+
+    <aside name="command">
+
+    Another word for "action" is "command", as in the <a href="command.html" class="gof-pattern">Command pattern</a>, and queues can be used there too.
+
+    </aside>
 
     * *You are more <span name="locator">likely</span> to have a single listener.* Like in our audio API example, the queued messages are requests specifically for *the audio API* to play a sound. If other random parts of the game engine started stealing messages off the queue, it wouldn't do much good.
 
@@ -413,11 +412,9 @@ Another word for "action to perform" is "command". Messages are indeed similar t
 
         </aside>
 
----
-
 ### Who can read from the queue?
 
-In our audio example, the queue was internal to the audio system and only it dequeued requests. In something an event loop for a user interface, multiple places in the application can register event listeners. You sometimes hear the terms "single-cast" and "broadcast" to distinguish these, and both are useful.
+In our audio example, the queue was internal to the audio system and only it read from it. In a user interface's event system, you can register listeners to your heart's content. You sometimes hear the terms "single-cast" and "broadcast" to distinguish these, and both styles are useful.
 
 * **A single-cast queue:**
 
@@ -427,7 +424,7 @@ In our audio example, the queue was internal to the audio system and only it deq
 
     * *The queue is more encapsulated.* All other things being equal, more  encapsulation is usually better.
 
-    * *You don't have to worry about contention between listeners.* When multiple things can read from the queue, you have to decide if they *all* get every item (broadcast) or if *each* item in the queue is parcelled out to *one* listener (something more like a work queue).
+    * *You don't have to worry about contention between listeners.* With multiple listeners, you have to decide if they *all* get every item (broadcast) or if *each* item in the queue is parcelled out to *one* listener (something more like a work queue).
 
         In either case, the listeners may end up doing redundant work or interfere with each other, and you have to think carefully about the behavior you want. With a single listener, that complexity disappears.
 
@@ -437,60 +434,68 @@ In our audio example, the queue was internal to the audio system and only it deq
 
     * *Events can get dropped on the floor.* A corollary to the above is that if you have *zero* listeners, all zero of them will see the event. In most broadcast systems, if there are no listeners at the point in time that an event is processed, the event just gets discarded.
 
-        For something like user input, this is typically what you want. It would be strange if those events were kept in the queue indefinitely. If you registered a mouse event handler later after your program had been running for a while, all of the sudden you would get a huge stream of events for every twitch the user had done since your app started.
+    * *You often need to filter events.* Broadcast queues are often widely visible to much of the program, and you can end up with tons of listeners. Multiply lots of events times lots of listeners, and you end up with a ton of event handlers to invoke.
 
-        Where a single-cast queue feels like "listening" means putting on a record and starting at the beginning, a broadcast queue -- as the name implies -- is more like tuning into a show already in progress. You only catch things that happen after you tune in.
-
-    * *You often need to filter events.* To enable many listeners, broadcast queues are usually publicly visible to much of the program. This means you can have many listeners. With many events and many listeners, you can end up with *m &times; n* event handlers to invoke.
-
-        To cut that down to size, most broadcast event systems let a listener control which subset of the events they care about. For example, you may say you only want to receive mouse events, or events within a certain region of the UI.
+        To cut that down to size, most broadcast event systems let a listener winnow down the set of events they receive. For example, you may say you only want to receive mouse events, or events within a certain region of the UI.
 
 * **A work queue:**
 
-    This is similar to a broadcast queue where you have multiple listeners. The difference is that each item in the queue will only go to *one* of them. This is a common pattern for doing work concurrently where you have incoming jobs and a pool of threads that can handle them.
+    Like a broadcast queue, here you have multiple listeners too. The difference is that each item in the queue only goes to *one* of them. This is a common pattern for parcelling out jobs to a pool of concurrently running threads.
 
-    * *You have to schedule.* Since any given item will only go to one listener, the queue has to have some logic to figure out the best way to choose which listener is best for a given message. This may be as simple as a round robin, or something more complex based on priority or tracking which listeners are still busy and which aren't.
+    * *You have to schedule.* Since an item only goes to one listener, the queue needs logic to figure out the best one to choose. This may be as simple as round robin or random choice, or more some more complex prioritizing system.
 
-### How many can write to the queue?
+### Who can write to the queue?
 
-This is the flip side of the previous design choice. This pattern can accomodate all of possible <span name="configs">configurations</span>: one-to-one, one-to-many, many-to-one, or many-to-many.
+This is the flip side of the previous design choice. This pattern works with all of the possible <span name="configs">configurations</span>: one-to-one, one-to-many, many-to-one, or many-to-many.
 
 <aside name="configs">
 
-You sometimes here "fan-in" used to describe many-to-one communication systems, and "fan-out" for one-to-many.
+You sometimes hear "fan-in" used to describe many-to-one communication systems, and "fan-out" for one-to-many.
 
 </aside>
 
 * **With one writer:**
 
-    This is style is most similar to the synchronous Observer pattern. You have one priveleged object that generates events that others can then receive. This is how GUI application event systems work, where the operating system itself is the one generator of events.
+    This style is most similar to the synchronous Observer pattern. You have one privileged object that generates events that others can then receive. This is how GUI application event systems work, where the operating system itself is the generator of events.
 
-    * **You implicitly know where the event is coming from.** Since there's only one object that can add to the queue, any listener knows where it's coming from.
+    * *You implicitly know where the event is coming from.* Since there's only one object that can add to the queue, any listener knows where it's coming from.
 
-    * **You usually allow multiple readers.** You can have a strict one-sender-one-receiver queue, but those are less common and start to feel less like the communication structure this pattern is about and more just a plain queue data structure.
+    * *You usually allow multiple readers.* You can have a one-sender-one-receiver queue, but that starts to feel less like the communication system this pattern is about and more a vanilla queue data structure.
 
 * **With multiple writers:**
 
-    This is how our audio engine example works. Since `playSound()` is a public API call, any part of the codebase can add a request to the queue. "Global" or "central" event buses work like this too.
+    This is how our audio engine example works. Since `playSound()` is a public method, any part of the codebase can add a request to the queue. "Global" or "central" event buses work like this too.
 
-    * **You have to be more careful of cycles.** Since anything can potentially put something onto the queue, it's easier to accidentally enqueue something in the middle of handling an event. If you aren't careful, that will trigger a cascade.
+    * **You have to be more careful of cycles.** Since anything can potentially put something onto the queue, it's easier to accidentally enqueue something in the middle of handling an event. If you aren't careful, that will trigger a feedback loop.
 
     * **You'll likely want some reference the sender in the event itself.**
     When a listener gets an event, it doesn't know who sent it, since it could be anyone. If that's something they need to know, you'll need to pack that into the event object so that the listener can use it.
 
 ### What is the lifetime of the objects in the queue?
 
-With synchronous notifications, by the time execution has returned back to the message sender, all processing of the message is done. That means the message itself can safely live on the stack.
+With a synchronous notification, execution doesn't return to the sender until all of the receivers have finished processing the message. That means the message itself can safely live on the stack. With a queue, the message outlives the call that enqueues it.
 
-Now that we've got a queue in there, the message needs to outlive the call to enqueue it. If you're using a garbage collected language, you don't need to worry about this too much. Just stuff it in the queue and it will stick around as long as it's needed. In C++, you'll need to decide how you want to ensure the object sticks around.
+If you're using a garbage collected language, you don't need to worry about this too much. Stuff the message in the queue and it will stick around in memory as long as it's needed. In C or C++, it's up to you to ensure the object lives long enough.
 
 * **Pass ownership:**
 
-    This is the traditional way to do things when managing memory manually. When a message gets queued, the queue claims it and the sender no longer owns it. When it gets processed, the receiver takes ownership and is responsible for deallocating it.
+    This is the <span name="unique">traditional</span> way to do things when managing memory manually. When a message gets queued, the queue claims it and the sender no longer owns it. When it gets processed, the receiver takes ownership and is responsible for deallocating it.
+
+    <aside name="unique">
+
+    In C++, `unique_ptr<T>` gives you these exact semantics out of the box.
+
+    </aside>
 
 * **Share ownership:**
 
-    These days, now that even C++ programmers are more comfortable with garbage collection, shared ownership à la `shared_ptr` is more typical. With this, the message will stick around as long as needed and be automatically freed when its fully processed.
+    These days, now that even C++ programmers are more comfortable with garbage collection, <span name="shared">shared</span> ownership is more typical. With this, the message sticks around as long as anything has a reference to it and is automatically freed when forgotten.
+
+    <aside name="shared">
+
+    Likewise, the C++ type for this is `shared_ptr<T>`.
+
+    </aside>
 
 * **The queue owns it:**
 
@@ -498,24 +503,20 @@ Now that we've got a queue in there, the message needs to outlive the call to en
 
     <aside name="pool">
 
-    In other words, the queue is also implementing the <a href="object-pool.html" class="pattern">Object Pool</a> pattern.
+    In other words, the backing store for the queue is an <a href="object-pool.html" class="pattern">Object Pool</a>.
 
     </aside>
 
 ## See Also
 
-* I've mentioned this a few times already, but in many ways, this pattern is the asynchronous cousin to the well-known <a href="observer.html class="gif-pattern">Observer pattern</a>. Unless you actually need the asynchrony, observers are a simpler and often faster choice.
+* I've mentioned this a few times already, but in many ways, this pattern is the asynchronous cousin to the well-known <a href="observer.html class="gif-pattern">Observer pattern</a>. Unless you actually need the asynchrony, observers are usually a better choice.
 
-* When the queue contains "messages" or "requests" for something to be done, those objects start to sound very similar to <a href="command.html" class="gof-pattern">Commands</a>.
+* Like many patterns, event queues go by a number of aliases. One established term is "message queue". It describes a similar communication pattern, but usually talks about a higher level manifestation of it. Where our event queues were *within* an application, message queues are usually used for communicating *between* them.
 
-* [Finite state machines](http://en.wikipedia.org/wiki/Finite-state_machine), which are similar to the Gang of Four's <a href="state.html" class="gof-pattern">State pattern</a> respond to an incoming stream of inputs.
+    Another similar term is "publish/subscribe", sometimes abbreviated to "pubsub". Like "message queue", it usuallys refer to larger distributed systems and less the humble coding pattern we're focused on.
 
-    If you don't want your state machine to respond to inputs synchronously, it may make sense to put a queue in there. If you have a bunch of these state machines communicating with each other, each with a little queue of pending inputs -- usually called a *mailbox* -- then you've basically re-invented the [actor model](http://en.wikipedia.org/wiki/Actor_model) of computation.
+* A [finite state machine](http://en.wikipedia.org/wiki/Finite-state_machine), similar to the Gang of Four's <a href="state.html" class="gof-pattern">State pattern</a>, acts on a stream of inputs. If you want it to respond to those asynchronously, it makes sense to queue them.
 
-    The [Erlang](http://www.erlang.org/) programming language is based around this model. Where event queues are a *pattern* you have to implement yourself in other languages, in Erlang, they are built right in. Channels in the [Go](http://golang.org/) programming language
+    When you have a bunch of state machines communicating sending messages to each other, each with a little queue of pending inputs (called a *mailbox*) then you've re-invented the [actor model](http://en.wikipedia.org/wiki/Actor_model) of computation. The [Erlang](http://www.erlang.org/) programming language supports actors natively, and most other languages have libraries for them.
 
-* Like many patterns, this one has a number of aliases. One of the more established terms is "message queue". That's describes a similar communication pattern, but is usually used to talk about a higher level manifestation of it. Where we talked about event queues *within* an application, "message queues" usually refer to systems for communicating *between* applications.
-
-    There are a number of established middleware packages for this: ZeroMQ, RabbitMQ, etc. If you see "MQ" in the name, now you know what it stands for.
-
-* Another similar term is "publish/subscribe", sometimes abbreviated to "pubsub". Like "message queue", those terms usually refer to larger distributed systems and less the humble coding patterns we're focused on.
+* The [Go](http://golang.org/) programming language's built-in "channel" type is essentially an event or message queue.
