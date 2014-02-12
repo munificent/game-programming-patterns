@@ -93,12 +93,13 @@
 </aside>
 
 <p>That means when user input comes in, it needs to go somewhere so that the operating system doesn&#x2019;t lose it between when the user does something and when your app gets around to calling <code>getNextEvent()</code>. That "somewhere" is a <em>queue</em>.</p>
+<p><img src="images/event-queue-loop.png" /></p>
 <p>When user input comes in, the OS adds it to a queue of unprocessed events. When you call <code>getNextEvent()</code>, it pulls the oldest event off the queue and hands it to your application. (If there are no events in the queue, it usually blocks and waits until one comes in.)</p>
 <h3><a href="#central-event-bus" name="central-event-bus">Central event bus</a></h3>
 <p>If the above section is news to you, don&#x2019;t sweat it. Most <span name="game-loop">games</span> aren&#x2019;t event-driven like this, but it is common for a game to have it&#x2019;s own event queue as the backbone of its nervous system. You&#x2019;ll often hear "central" or "global" or "main" used to describe it. It&#x2019;s used for high level communication between game systems that want to stay decoupled.</p>
 <aside name="game-loop">
 
-<p>If you want to <em>why</em> they aren&#x2019;t, crack open the <a href="game-loop.html" class="pattern">Game Loop</a> chapter.</p>
+<p>If you want to know <em>why</em> they aren&#x2019;t, crack open the <a href="game-loop.html" class="pattern">Game Loop</a> chapter.</p>
 </aside>
 
 <p>Say your game has a <span name="tutorial">tutorial</span> system to show help popups cued off of specific in-game events. For example, the first time the player vanquishes a foul beastie, you want to show a little balloon that says, "Press X to grab the loot!"</p>
@@ -107,13 +108,14 @@
 <p>Tutorial systems are a pain to implement gracefully and most players will spend only a fraction of their time using it, so it feels like they aren&#x2019;t worth the effort. But that fraction where they <em>are</em> using the tutorial can be invaluable for easing the player into your game.</p>
 </aside>
 
-<p>Your gameplay and combat code is likely complex enough as it is. The last thing you want to do is stuff a bunch of checks for triggering tutorials in there. Instead, what some games do is have a central event queue. Any game system can throw an event on it, so the combat code can add an "enemy died" event every time you slay a foe.</p>
+<p>Your gameplay and combat code is likely complex enough as it is. The last thing you want to do is stuff a bunch of checks for triggering tutorials in there. Instead, what some games do is have a <em>central event queue</em>. Any game system can throw an event on it, so the combat code can add an "enemy died" event every time you slay a foe.</p>
 <p><span name="blackboard">Likewise</span>, any game system can <em>receive</em> events from the queue. The tutorial engine registers itself with the queue and indicates it wants to receive "enemy died" events. This way, knowledge of an enemy dying makes its way from the combat system over to the tutorial engine without the two being directly aware of each other.</p>
 <aside name="blackboard">
 
 <p>This model where you have a shared space where entities can post information and get notified when others post is similar to <a href="http://en.wikipedia.org/wiki/Blackboard_system">blackboard systems</a> in the AI field.</p>
 </aside>
 
+<p><img src="images/event-queue-central.png" /></p>
 <p>I thought about using this as the example for the rest of the chapter, but I&#x2019;m not generally a fan of global systems. It is a common technique, but I don&#x2019;t want you to think that event queues <em>have</em> to be global. Instead, we&#x2019;ll use something more scoped.</p>
 <h3><a href="#say-what" name="say-what">Say what?</a></h3>
 <p>Speaking of often underappreciated features, let&#x2019;s add sound to our game. Humans are visual creatures, but hearing is deeply connected to our emotions and our sense of physical space. The right simulated echo can make a black screen feel like an enormous cavern, and a well-timed violin adagio can make your heartstrings hum in sympathetic resonance.</p>
@@ -174,7 +176,6 @@
 <ul>
 <li><strong>Problem 3: Requests are processed on the wrong thread.</strong></li>
 </ul>
-<h3><a href="#leave-a-message" name="leave-a-message">Leave a message</a></h3>
 <p>The common theme to these problems is that a call to <code>playSound()</code> is interpreted by the audio engine to mean, "Drop everything and play the sound right now!" That immediacy is the problem. The game system calls <code>playSound()</code> at <em>its</em> convenience, but not necessarily when it&#x2019;s convenient for the audio engine to handle that request. To fix that, we&#x2019;ll decouple <em>receiving</em> a request from <em>processing</em> it.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>A <strong>queue</strong> stores a series of <strong>notifications or requests</strong> in last-in, first-out order. Sending a notification <strong>enqueues the request and returns</strong>. The request processor then <strong>processes items from the queue</strong> at a later time.</p>
@@ -218,6 +219,7 @@
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>We&#x2019;ve already seen some code. It has problems, but it has the right functionality&thinsp;&mdash;&thinsp;the public API we want, and the right low level audio calls. All that&#x2019;s left for us to do now is fix those problems.</p>
 <h3><a href="#deferring-a-sound-request" name="deferring-a-sound-request">Deferring a sound request</a></h3>
+<p><strong>TODO: Cut this</strong></p>
 <p>The first problem is that our API <em>blocks</em>. When a piece of code plays a sound, it can&#x2019;t do anything else until <code>playSound()</code> finishes loading the resource and actually starts making the speaker wiggle.</p>
 <p>Let&#x2019;s try the simplest solution we can come up with. We&#x2019;ll make <code>playSound()</code> return quickly by deferring the work. First, a little structure to store the request:</p>
 <div class="codehilite"><pre><span class="k">struct</span> <span class="n">PlayMessage</span>
@@ -351,7 +353,6 @@
 <p>There are a bunch of ways to implement queues, but my favorite is called a <em>ring buffer</em>. It preserves everything that&#x2019;s great about arrays, but lets us incrementally remove items from the front of the queue.</p>
 <p>Now, I know what you&#x2019;re thinking. If we remove items from the beginning of the array, don&#x2019;t we have to shift all of the remaining items over? Isn&#x2019;t that slow?</p>
 <p>This is why they made us learn about linked lists: you can remove nodes from them without having to shift things around. Well, it turns out you can implement a queue without any shifting in an array too. I&#x2019;ll walk you through it, but first let&#x2019;s get precise on some terms.</p>
-<p><strong>TODO: Illustrate.</strong></p>
 <ul>
 <li>
 <p>The <strong>head</strong> of the queue is where requests are <em>read</em> from. The head is the oldest pending request.</p>
@@ -360,7 +361,9 @@
 <p>The <strong>tail</strong> is the other end. It&#x2019;s the slot in the array where the next enqueued request will be <em>written</em>. Note that it&#x2019;s just <em>past</em> the end of the queue. You can think of it as a half-open range if that helps.</p>
 </li>
 </ul>
-<p>Since <code>playSound()</code> appends new requests at the end of the array, the head starts at element zero and the tail grows to the right. Let&#x2019;s code that up. First, we&#x2019;ll tweak our fields a bit to make these two markers explicit in the class:</p>
+<p>Since <code>playSound()</code> appends new requests at the end of the array, the head starts at element zero and the tail grows to the right.</p>
+<p><img src="images/event-queue-queue.png" /></p>
+<p>Let&#x2019;s code that up. First, we&#x2019;ll tweak our fields a bit to make these two markers explicit in the class:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Audio</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -409,20 +412,22 @@
 </pre></div>
 
 
-<p>We process the request at the head and then discard it by advancing the head to the right. We detect an <span name="empty">empty queue</span> by seeing if there&#x2019;s no distance between the head and tail. Now we&#x2019;ve got a queue: we can add to the end and remove from the front.</p>
+<p>We process the request at the head and then discard it by advancing the head to the right. We detect an <span name="empty">empty queue</span> by seeing if there&#x2019;s no distance between the head and tail.</p>
 <aside name="empty">
 
 <p>This is why we made the tail one <em>past</em> the last item. It means that the queue will be empty if the head and tail are the same index.</p>
 </aside>
 
-<p>There&#x2019;s an obvious problem, though. As we run requests through the queue, the head and tail keep crawling to the right. Eventually, <code>tail_</code> will hit the end of the array, that <code>assert()</code> will fire, and <span name="party">party time</span> is over.</p>
+<p>Now we&#x2019;ve got a queue&thinsp;&mdash;&thinsp;we can add to the end and remove from the front. There&#x2019;s an obvious problem, though. As we run requests through the queue, the head and tail keep crawling to the right.</p>
+<p><img src="images/event-queue-crawl.png" /></p>
+<p>Eventually, <code>tail_</code> will hit the end of the array, that <code>assert()</code> will fire, and <span name="party">party time</span> is over. This is where it gets clever.</p>
 <aside name="party">
 
 <p>Do you want party time to be over? No. You do not.</p>
 </aside>
 
-<p>This is where it gets clever. Notice that while the tail is creeping forward, the <em>head</em> is too. That means we&#x2019;ve got array elements at the <em>beginning</em> of the array that aren&#x2019;t being used any more. So what we do is wrap the tail back around to the beginning of the array when it runs off the end. That&#x2019;s why it&#x2019;s called a <em>ring</em> buffer: it acts like a circular array of cells.</p>
-<p><strong>TODO: Illustration.</strong></p>
+<p>Notice that while the tail is creeping forward, the <em>head</em> is too. That means we&#x2019;ve got array elements at the <em>beginning</em> of the array that aren&#x2019;t being used any more. So what we do is wrap the tail back around to the beginning of the array when it runs off the end. That&#x2019;s why it&#x2019;s called a <em>ring</em> buffer: it acts like a circular array of cells.</p>
+<p><img src="images/event-queue-ring.png" /></p>
 <p>Implementing that is remarkably easy. When we enqueue an item, we just need to make sure the tail wraps around to the beginning of the array when it reaches the end, like so:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Audio</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">id</span><span class="p">,</span> <span class="kt">int</span> <span class="n">volume</span><span class="p">)</span>
 <span class="p">{</span>

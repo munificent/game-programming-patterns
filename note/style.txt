@@ -19,6 +19,7 @@
 - Q: Are "enum", "struct", "int", etc. normal words or `code font`?
 - Q: Hide fields behind getters (better style) or allow public fields (less
      boilerplate)?
+- Don't use ":" in sentence before illustration.
 
 ## Terminology
 

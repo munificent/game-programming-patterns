@@ -39,6 +39,8 @@ In constrast, *interrupts* from the operating system *do* work like that. When a
 
 That means when user input comes in, it needs to go somewhere so that the operating system doesn't lose it between when the user does something and when your app gets around to calling `getNextEvent()`. That "somewhere" is a *queue*.
 
+<img src="images/event-queue-loop.png" />
+
 When user input comes in, the OS adds it to a queue of unprocessed events. When you call `getNextEvent()`, it pulls the oldest event off the queue and hands it to your application. (If there are no events in the queue, it usually blocks and waits until one comes in.)
 
 ### Central event bus
@@ -47,7 +49,7 @@ If the above section is news to you, don't sweat it. Most <span name="game-loop"
 
 <aside name="game-loop">
 
-If you want to *why* they aren't, crack open the <a href="game-loop.html" class="pattern">Game Loop</a> chapter.
+If you want to know *why* they aren't, crack open the <a href="game-loop.html" class="pattern">Game Loop</a> chapter.
 
 </aside>
 
@@ -59,7 +61,7 @@ Tutorial systems are a pain to implement gracefully and most players will spend 
 
 </aside>
 
-Your gameplay and combat code is likely complex enough as it is. The last thing you want to do is stuff a bunch of checks for triggering tutorials in there. Instead, what some games do is have a central event queue. Any game system can throw an event on it, so the combat code can add an "enemy died" event every time you slay a foe.
+Your gameplay and combat code is likely complex enough as it is. The last thing you want to do is stuff a bunch of checks for triggering tutorials in there. Instead, what some games do is have a *central event queue*. Any game system can throw an event on it, so the combat code can add an "enemy died" event every time you slay a foe.
 
 <span name="blackboard">Likewise</span>, any game system can *receive* events from the queue. The tutorial engine registers itself with the queue and indicates it wants to receive "enemy died" events. This way, knowledge of an enemy dying makes its way from the combat system over to the tutorial engine without the two being directly aware of each other.
 
@@ -68,6 +70,8 @@ Your gameplay and combat code is likely complex enough as it is. The last thing 
 This model where you have a shared space where entities can post information and get notified when others post is similar to <a href="http://en.wikipedia.org/wiki/Blackboard_system">blackboard systems</a> in the AI field.
 
 </aside>
+
+<img src="images/event-queue-central.png" />
 
 I thought about using this as the example for the rest of the chapter, but I'm not generally a fan of global systems. It is a common technique, but I don't want you to think that event queues *have* to be global. Instead, we'll use something more scoped.
 
@@ -122,8 +126,6 @@ Since our API is synchronous, it runs on the *caller's* thread. When we call it 
 All hell breaks lose. This is particularly egregious because we intended to have a *separate* thread for audio. So it's just sitting there totally idle now.
 
 * **Problem 3: Requests are processed on the wrong thread.**
-
-### Leave a message
 
 The common theme to these problems is that a call to `playSound()` is interpreted by the audio engine to mean, "Drop everything and play the sound right now!" That immediacy is the problem. The game system calls `playSound()` at *its* convenience, but not necessarily when it's convenient for the audio engine to handle that request. To fix that, we'll decouple *receiving* a request from *processing* it.
 
@@ -195,6 +197,8 @@ A little debug logging in your event system is probably a good idea.
 We've already seen some code. It has problems, but it has the right functionality -- the public API we want, and the right low level audio calls. All that's left for us to do now is fix those problems.
 
 ### Deferring a sound request
+
+**TODO: Cut this**
 
 The first problem is that our API *blocks*. When a piece of code plays a sound, it can't do anything else until `playSound()` finishes loading the resource and actually starts making the speaker wiggle.
 
@@ -274,13 +278,15 @@ Now, I know what you're thinking. If we remove items from the beginning of the a
 
 This is why they made us learn about linked lists: you can remove nodes from them without having to shift things around. Well, it turns out you can implement a queue without any shifting in an array too. I'll walk you through it, but first let's get precise on some terms.
 
-**TODO: Illustrate.**
-
 * The **head** of the queue is where requests are *read* from. The head is the oldest pending request.
 
 * The **tail** is the other end. It's the slot in the array where the next enqueued request will be *written*. Note that it's just *past* the end of the queue. You can think of it as a half-open range if that helps.
 
-Since `playSound()` appends new requests at the end of the array, the head starts at element zero and the tail grows to the right. Let's code that up. First, we'll tweak our fields a bit to make these two markers explicit in the class:
+Since `playSound()` appends new requests at the end of the array, the head starts at element zero and the tail grows to the right.
+
+<img src="images/event-queue-queue.png" />
+
+Let's code that up. First, we'll tweak our fields a bit to make these two markers explicit in the class:
 
 ^code head-tail
 
@@ -292,7 +298,7 @@ The more interesting change is in `update()`. For simplicity's sake, we'll proce
 
 ^code tail-update
 
-We process the request at the head and then discard it by advancing the head to the right. We detect an <span name="empty">empty queue</span> by seeing if there's no distance between the head and tail. Now we've got a queue: we can add to the end and remove from the front.
+We process the request at the head and then discard it by advancing the head to the right. We detect an <span name="empty">empty queue</span> by seeing if there's no distance between the head and tail.
 
 <aside name="empty">
 
@@ -300,7 +306,11 @@ This is why we made the tail one *past* the last item. It means that the queue w
 
 </aside>
 
-There's an obvious problem, though. As we run requests through the queue, the head and tail keep crawling to the right. Eventually, `tail_` will hit the end of the array, that `assert()` will fire, and <span name="party">party time</span> is over.
+Now we've got a queue -- we can add to the end and remove from the front. There's an obvious problem, though. As we run requests through the queue, the head and tail keep crawling to the right.
+
+<img src="images/event-queue-crawl.png" />
+
+Eventually, `tail_` will hit the end of the array, that `assert()` will fire, and <span name="party">party time</span> is over. This is where it gets clever.
 
 <aside name="party">
 
@@ -308,9 +318,9 @@ Do you want party time to be over? No. You do not.
 
 </aside>
 
-This is where it gets clever. Notice that while the tail is creeping forward, the *head* is too. That means we've got array elements at the *beginning* of the array that aren't being used any more. So what we do is wrap the tail back around to the beginning of the array when it runs off the end. That's why it's called a *ring* buffer: it acts like a circular array of cells.
+Notice that while the tail is creeping forward, the *head* is too. That means we've got array elements at the *beginning* of the array that aren't being used any more. So what we do is wrap the tail back around to the beginning of the array when it runs off the end. That's why it's called a *ring* buffer: it acts like a circular array of cells.
 
-**TODO: Illustration.**
+<img src="images/event-queue-ring.png" />
 
 Implementing that is remarkably easy. When we enqueue an item, we just need to make sure the tail wraps around to the beginning of the array when it reaches the end, like so:
 
