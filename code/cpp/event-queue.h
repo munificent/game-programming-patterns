@@ -77,54 +77,6 @@ namespace EventQueue
   };
   //^play-message
 
-  namespace Deferred
-  {
-    //^pending
-    class Audio
-    {
-    public:
-      static void init()
-      {
-        hasPending_ = false;
-      }
-
-      //^omit
-      static void update();
-      static void playSound(SoundId id, int volume);
-      //^omit
-    private:
-      static PlayMessage pending_;
-      static bool hasPending_;
-    };
-    //^pending
-
-    //^defer-play
-    void Audio::playSound(SoundId id, int volume)
-    {
-      pending_.id = id;
-      pending_.volume = volume;
-      hasPending_ = true;
-    }
-    //^defer-play
-
-    //^defer-update
-    void Audio::update()
-    {
-      if (!hasPending_) return;
-
-      ResourceId resource = loadSound(pending_.id);
-      int channel = findOpenChannel();
-      if (channel == -1) return;
-      startSound(resource, channel, pending_.volume);
-
-      hasPending_ = false;
-    }
-    //^defer-update
-
-    PlayMessage Audio::pending_;
-    bool Audio::hasPending_;
-  }
-
   namespace DeferList
   {
     //^pending-array
@@ -153,7 +105,6 @@ namespace EventQueue
     {
       assert(numPending_ < MAX_PENDING);
 
-      // Add to the end of the list.
       pending_[numPending_].id = id;
       pending_[numPending_].volume = volume;
       numPending_++;
@@ -191,16 +142,21 @@ namespace EventQueue
         tail_ = 0;
       }
 
+      // Methods...
       //^omit
       static void playSound(SoundId id, int volume);
       static void update();
       //^omit
     private:
+      //^omit
       static const int MAX_PENDING = 16;
 
       static PlayMessage pending_[MAX_PENDING];
+      //^omit
       static int head_;
       static int tail_;
+
+      // Array...
     };
     //^head-tail
 
