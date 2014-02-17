@@ -179,7 +179,7 @@
 <p>The common theme to these problems is that the audio engine interprets a call to <code>playSound()</code> to mean, "Drop everything and play the sound right now!" <em>Immediacy</em> is the problem. Other game systems call <code>playSound()</code> at <em>their</em> convenience, but not necessarily when it&#x2019;s convenient for the audio engine to handle that request. To fix that, we&#x2019;ll decouple <em>receiving</em> a request from <em>processing</em> it.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>A <strong>queue</strong> stores a series of <strong>notifications or requests</strong> in first-in, first-out order. Sending a notification <strong>enqueues the request and returns</strong>. The request processor then <strong>processes items from the queue</strong> at a later time.</p>
-<p>Requests can be <strong>handled directly</strong>, or <strong>routed to interested parties</strong>. This <strong>decouples the sender from the receiever</strong> both <strong>statically</strong> and <strong>in time</strong>.</p>
+<p>Requests can be <strong>handled directly</strong>, or <strong>routed to interested parties</strong>. This <strong>decouples the sender from the receiver</strong> both <strong>statically</strong> and <strong>in time</strong>.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>If you just want to decouple <em>who</em> receives a message from its sender, patterns like <href="observer.html" class="pattern">Observer</a> and <a href="command.html">Command</a> will take care of you with less <span name="simple">complexity</span>. You only need a queue when you want to decouple something <em>in time</em>.</p>
 <aside name="simple">

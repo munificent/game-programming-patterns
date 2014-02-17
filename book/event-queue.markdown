@@ -133,7 +133,7 @@ The common theme to these problems is that the audio engine interprets a call to
 
 A **queue** stores a series of **notifications or requests** in first-in, first-out order. Sending a notification **enqueues the request and returns**. The request processor then **processes items from the queue** at a later time.
 
-Requests can be **handled directly**, or **routed to interested parties**. This **decouples the sender from the receiever** both **statically** and **in time**.
+Requests can be **handled directly**, or **routed to interested parties**. This **decouples the sender from the receiver** both **statically** and **in time**.
 
 ## When to Use It
 
