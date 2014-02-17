@@ -511,6 +511,7 @@ quickly as possible.
         the last frame.* Successive frames are drawn on alternating
         buffers, with no data copied between them, like so:
 
+            :::text
             Frame 1 drawn on buffer A
             Frame 2 drawn on buffer B
             Frame 3 drawn on buffer A

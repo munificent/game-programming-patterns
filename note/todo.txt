@@ -1,7 +1,6 @@
 - write bytecode chapter
 - write "games, architecture, and performance" intro chapter
 - write intro for behavioral patterns section
-- write intro for decoupling patterns section
 - get rid of h4s
 - illustrate sequences in double buffer
 - illustration for subclass sandbox

@@ -1,8 +1,7 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-# converts from the source markup format to (right now at least)
-# html for the web version.
+# Converts from the source markup format to HTML for the web version.
 
 import glob
 import markdown
@@ -31,9 +30,11 @@ def cpppath(pattern):
     return 'code/cpp/' + pattern + '.h'
 
 def pretty(text):
-    # user nicer html entities and special characters
+    # Use nicer HTML entities and special characters.
     return (text.replace("'", "&#x2019;")
                 .replace("...", "&hellip;")
+                # Hack: Don't replace ... in double buffer pre-formatted.
+                .replace("    &hellip;", "    ...")
                 .replace(" -- ", "&thinsp;&mdash;&thinsp;")
                 .replace("à", "&agrave;")
                 .replace("ï", "&iuml;")
@@ -44,11 +45,7 @@ def formatfile(path, nav, skip_up_to_date):
     basename = os.path.basename(path)
     basename = basename.split('.')[0]
 
-    # skip "temp" chapters that start with -
-    if basename.startswith('-'):
-        return
-
-    # see if the html is up to date
+    # See if the HTML is up to date.
     sourcemod = os.path.getmtime(path)
     sourcemod = max(sourcemod, os.path.getmtime('asset/template.html'))
     if os.path.exists(cpppath(basename)):
@@ -67,10 +64,10 @@ def formatfile(path, nav, skip_up_to_date):
 
     navigation = []
 
-    # read the markdown file and preprocess it
+    # Read the markdown file and preprocess it.
     contents = ''
     with open(path, 'r') as input:
-        # read each line, preprocessing the special codes
+        # Read each line, preprocessing the special codes.
         for line in input:
             stripped = line.lstrip()
             indentation = line[:len(line) - len(stripped)]
@@ -91,18 +88,18 @@ def formatfile(path, nav, skip_up_to_date):
                     print "UNKNOWN COMMAND:", command, args
 
             elif stripped.startswith('#'):
-                # build the page navigation from the headers
+                # Build the page navigation from the headers.
                 index = stripped.find(" ")
                 headertype = stripped[:index]
                 header = pretty(stripped[index:].strip())
                 anchor = header.lower().replace(' ', '-')
                 anchor = anchor.translate(None, '.?!:/')
 
-                # add an anchor to the header
+                # Add an anchor to the header.
                 contents += indentation + headertype
                 contents += '<a href="#' + anchor + '" name="' + anchor + '">' + header + '</a>\n'
 
-                # build the navigation
+                # Build the navigation.
                 if len(headertype) == 2:
                     navigation.append((len(headertype), header, anchor))
 
@@ -115,7 +112,7 @@ def formatfile(path, nav, skip_up_to_date):
     with open("asset/template.html") as f:
         template = f.read()
 
-    # write the html output
+    # Write the HTML output.
     with open(htmlpath(basename), 'w') as out:
         title_text = title
         section_header = ""
@@ -168,7 +165,8 @@ def navigationtohtml(section, chapter, headers):
     nav = '<div class="nav">\n'
     nav += '<h1><a href="#top">' + chapter + '</a></h1>\n'
 
-    currentdepth = 1 # section headers start two levels deep
+    # Section headers start two levels deep.
+    currentdepth = 1
     for depth, header, anchor in headers:
         if currentdepth == depth:
             nav += '</li><li>\n'
@@ -184,7 +182,7 @@ def navigationtohtml(section, chapter, headers):
         nav += '<a href="#' + anchor + '">' + header + '</a>'
 
 
-    # close the lists
+    # Close the lists.
     while currentdepth > 1:
         nav += '</li></ul>\n'
         currentdepth -= 1
@@ -206,21 +204,21 @@ def includecode(pattern, index, indentation):
 
             if inblock:
                 if stripped == '//^' + index:
-                    # end of our block
+                    # End of our block.
                     break
 
                 elif stripped == '//^omit':
                     omitting = not omitting
 
                 elif stripped == '//^omit ' + index:
-                    # omitting a section just for this block. other blocks that
-                    # contain this code may not omit it.
+                    # Omitting a section just for this block. Other blocks that
+                    # Contain this code may not omit it.
                     omitting_name = not omitting_name
 
                 elif stripped.startswith('//^'):
-                    # a code block comment for another block,
-                    # so just ignore it. this can occur with
-                    # nested code blocks
+                    # A code block comment for another block,
+                    # so just ignore it. This can occur with
+                    # nested code blocks.
                     pass
 
                 elif not omitting and not omitting_name:
@@ -243,7 +241,7 @@ def buildnav(searchpath):
     nav = '<div class="nav">\n'
     nav = nav + '<h1><a href="index.html">Navigation</a></h1>\n'
 
-    # read the chapter outline from the index page
+    # Read the chapter outline from the index page.
     with open('html/index.html', 'r') as source:
         innav = False
 
@@ -262,7 +260,7 @@ def buildnav(searchpath):
     return nav
 
 
-# process each markdown file
+# Process each markdown file.
 def formatfiles(file_filter, skip_up_to_date):
     for f in glob.iglob(searchpath):
         if file_filter == None or file_filter in f:
@@ -288,7 +286,7 @@ if len(sys.argv) == 2 and sys.argv[1] == '--watch':
         check_sass()
         time.sleep(0.3)
 else:
-    # can specify a file name filter to just regenerate a subset of the files
+    # Can specify a file name filter to just regenerate a subset of the files.
     file_filter = None
     if len(sys.argv) > 1:
         file_filter = sys.argv[1]

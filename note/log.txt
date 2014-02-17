@@ -1,3 +1,4 @@
+2014-02-16 - 5 illustrations, decoupling section intro, mail, twitter, proggit
 2014-02-15 - 548 words, finish third draft event queue
 2014-02-14 - 1879 words (delete ~90), third draft event queue
 2014-02-13 - 1420 words (delete 120), third draft event queue
