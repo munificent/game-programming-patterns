@@ -98,7 +98,12 @@
 </pre></div>
 
 
-<p>All it does is say, "Uh, I don&#x2019;t know if anyone cares, but this thing just fell. Do with that as you will."</p>
+<p><span name="subtle">All</span> it does is say, "Uh, I don&#x2019;t know if anyone cares, but this thing just fell. Do with that as you will."</p>
+<aside name="subtle">
+
+<p>The physics engine does have to decide what notifications to send, so it isn&#x2019;t entirely decoupled. But in architecture, we&#x2019;re most often trying to make systems <em>better</em>, not <em>perfect</em>.</p>
+</aside>
+
 <p>The achievement system registers itself so that whenever the physics code sends a notification, the achievement receives it. It can then check to see if the falling body is our less-than-graceful hero, and if his perch prior to this new, unpleasant encounter with classical mechanics was a bridge. If so, it unlocks the proper achievement with associated fireworks and fanfare, and all of this with no involvement from the physics code.</p>
 <p><span name="tear">In fact</span>, you can change the set of achievements or tear out the entire achievement system without touching a line of the physics engine. It will still send out its notifications, oblivious to the fact that nothing is receiving them anymore.</p>
 <aside name="tear">
