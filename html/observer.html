@@ -248,7 +248,8 @@ through it quickly.</p>
 <h3><a href="#it&#x2019;s-too-*fast*" name="it&#x2019;s-too-*fast*">It&#x2019;s too <em>fast?</em></a></h3>
 <p>In fact, you have to be careful because the Observer pattern <em>is</em> synchronous. The subject invokes its observers directly, which means it does&#x2019;t resume its own work until all of the observers have returned from their notification methods. A slow observer can block a subject.</p>
 <p>This sounds scary, but in practice it&#x2019;s not the end of the world. It&#x2019;s just something you have to be aware of. UI programmers&thinsp;&mdash;&thinsp;who&#x2019;ve been doing event-based programming like this for ages&thinsp;&mdash;&thinsp;have an established motto for this: "stay off the UI thread".</p>
-<p>If you&#x2019;re responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn&#x2019;t lock up. When you have slow work to do, push it onto another thread or a work queue and you&#x2019;re good. It takes a little discipline, but it&#x2019;s not rocket science.</p>
+<p>If you&#x2019;re responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn&#x2019;t lock up. When you have slow work to do, push it onto another thread or a work queue.</p>
+<p>You do have to be careful mixing observers with threads and explicit locks, though. If an observer tries to grab a lock that the subject has, you can deadlock the game. In a highly threaded engine, you may be better off with asynchronous communication using an <a href="event-queue.html" class="pattern">Event Queue</a>.</p>
 <h2><a href="#"it-does-too-much-dynamic-allocation"" name=""it-does-too-much-dynamic-allocation"">"It Does Too Much Dynamic Allocation"</a></h2>
 <p>Whole tribes of the programmer clan&thinsp;&mdash;&thinsp;including many game developers&thinsp;&mdash;&thinsp;have moved
 onto garbage collected languages, and dynamic allocation isn&#x2019;t the boogie man
@@ -394,7 +395,7 @@ option and insert it at the front:</p>
 <p>Not to point fingers, but I&#x2019;ll note that <em>Design Patterns</em> doesn&#x2019;t mention this issue at all.</p>
 </aside>
 
-<p>Destroying the subject is easier since in most implementations the observer doesn&#x2019;t have any references to it. But even then, sending the subject&#x2019;s bits to the memory manager&#x2019;s recycle bin may cause some problems. Those observers may still be expecting to receive notifications in the future, and they don&#x2019;t know that that will never happen now. They aren&#x2019;t observers at all, really, they just think they are.</p>
+<p>Destroying the subject is easier since in most implementations, the observer doesn&#x2019;t have any references to it. But even then, sending the subject&#x2019;s bits to the memory manager&#x2019;s recycle bin may cause some problems. Those observers may still be expecting to receive notifications in the future, and they don&#x2019;t know that that will never happen now. They aren&#x2019;t observers at all, really, they just think they are.</p>
 <p>You can deal with this in a couple of different ways. The simplest is to do what I did and just punt on it. It&#x2019;s an observer&#x2019;s job to unregister itself from any subjects when it gets deleted. More often than not, the observer <em>does</em> know which subjects it&#x2019;s observing, so it&#x2019;s usually just a matter of <span name="destructor">adding</span> a <code>removeObserver()</code> call to its destructor.</p>
 <aside name="destructor">
 
@@ -430,7 +431,7 @@ option and insert it at the front:</p>
 <p>The observer pattern is a great way to let those mostly unrelated lumps talk to each other without them merging into one big lump. It&#x2019;s less useful <em>within</em> a single lump of code dedicated to one feature or aspect.</p>
 <p>That&#x2019;s why it fit our example well: achievements and physics are almost entirely unrelated domains, likely implemented by different people. We want the bare minimum of communication between them so that working on either one doesn&#x2019;t require much knowledge of the other.</p>
 <h2><a href="#observers-today" name="observers-today">Observers Today</a></h2>
-<p>Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was <em>the</em> hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hiearchies.</p>
+<p>Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was <em>the</em> hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hierarchies.</p>
 <aside name="90s">
 
 <p>That same year, Ace of Base had not one but <em>three</em> hit singles, so that may tell you something about our taste and judgment back then.</p>

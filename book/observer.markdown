@@ -155,7 +155,9 @@ In fact, you have to be careful because the Observer pattern *is* synchronous. T
 
 This sounds scary, but in practice it's not the end of the world. It's just something you have to be aware of. UI programmers -- who've been doing event-based programming like this for ages -- have an established motto for this: "stay off the UI thread".
 
-If you're responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn't lock up. When you have slow work to do, push it onto another thread or a work queue and you're good. It takes a little discipline, but it's not rocket science.
+If you're responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn't lock up. When you have slow work to do, push it onto another thread or a work queue.
+
+You do have to be careful mixing observers with threads and explicit locks, though. If an observer tries to grab a lock that the subject has, you can deadlock the game. In a highly threaded engine, you may be better off with asynchronous communication using an <a href="event-queue.html" class="pattern">Event Queue</a>.
 
 ## "It Does Too Much Dynamic Allocation"
 
@@ -282,7 +284,7 @@ Not to point fingers, but I'll note that *Design Patterns* doesn't mention this 
 
 </aside>
 
-Destroying the subject is easier since in most implementations the observer doesn't have any references to it. But even then, sending the subject's bits to the memory manager's recycle bin may cause some problems. Those observers may still be expecting to receive notifications in the future, and they don't know that that will never happen now. They aren't observers at all, really, they just think they are.
+Destroying the subject is easier since in most implementations, the observer doesn't have any references to it. But even then, sending the subject's bits to the memory manager's recycle bin may cause some problems. Those observers may still be expecting to receive notifications in the future, and they don't know that that will never happen now. They aren't observers at all, really, they just think they are.
 
 You can deal with this in a couple of different ways. The simplest is to do what I did and just punt on it. It's an observer's job to unregister itself from any subjects when it gets deleted. More often than not, the observer *does* know which subjects it's observing, so it's usually just a matter of <span name="destructor">adding</span> a `removeObserver()` call to its destructor.
 
@@ -342,7 +344,7 @@ That's why it fit our example well: achievements and physics are almost entirely
 
 ## Observers Today
 
-Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was *the* hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hiearchies.
+Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was *the* hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hierarchies.
 
 <aside name="90s">
 
