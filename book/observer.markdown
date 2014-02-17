@@ -109,7 +109,15 @@ That means those two systems would be interfering with each other -- and in a pa
 
 The other job of the subject is sending notifications:
 
+<span name="concurrent"></span>
+
 ^code subject-notify
+
+<aside name="concurrent">
+
+Note that this code assumes observers don't modify the list in their `onNotify` methods. A more robust implementation would either prevent or gracefully handle concurrent modification like that.
+
+</aside>
 
 ### Observable physics
 
