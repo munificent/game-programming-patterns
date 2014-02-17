@@ -96,7 +96,7 @@
 <p><img src="images/event-queue-loop.png" /></p>
 <p>When user input comes in, the OS adds it to a queue of unprocessed events. When you call <code>getNextEvent()</code>, it pulls the oldest event off the queue and hands it to your application.</p>
 <h3><a href="#central-event-bus" name="central-event-bus">Central event bus</a></h3>
-<p>Most <span name="game-loop">games</span> aren&#x2019;t event-driven like this, but it is common for a game to have it&#x2019;s own event queue as the backbone of its nervous system. You&#x2019;ll often hear "central" or "global" or "main" used to describe it. It&#x2019;s used for high level communication between game systems that want to stay decoupled.</p>
+<p>Most <span name="game-loop">games</span> aren&#x2019;t event-driven like this, but it is common for a game to have its own event queue as the backbone of its nervous system. You&#x2019;ll often hear "central" or "global" or "main" used to describe it. It&#x2019;s used for high level communication between game systems that want to stay decoupled.</p>
 <aside name="game-loop">
 
 <p>If you want to know <em>why</em> they aren&#x2019;t, crack open the <a href="game-loop.html" class="pattern">Game Loop</a> chapter.</p>

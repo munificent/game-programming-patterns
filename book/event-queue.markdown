@@ -45,7 +45,7 @@ When user input comes in, the OS adds it to a queue of unprocessed events. When 
 
 ### Central event bus
 
-Most <span name="game-loop">games</span> aren't event-driven like this, but it is common for a game to have it's own event queue as the backbone of its nervous system. You'll often hear "central" or "global" or "main" used to describe it. It's used for high level communication between game systems that want to stay decoupled.
+Most <span name="game-loop">games</span> aren't event-driven like this, but it is common for a game to have its own event queue as the backbone of its nervous system. You'll often hear "central" or "global" or "main" used to describe it. It's used for high level communication between game systems that want to stay decoupled.
 
 <aside name="game-loop">
 
