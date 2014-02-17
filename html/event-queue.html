@@ -187,7 +187,7 @@
 <p>I mention this in nearly every chapter, but it&#x2019;s worth emphasizing. Complexity slows you down, so treat simplicity as a precious resource.</p>
 </aside>
 
-<p>I think of it in terms of pushing and pulling. You have some code A that wants another chunk B to do some work. The natural way to for A initiate that is by <em>pushing</em> the request to B.</p>
+<p>I think of it in terms of pushing and pulling. You have some code A that wants another chunk B to do some work. The natural way for A to initiate that is by <em>pushing</em> the request to B.</p>
 <p>Meanwhile, the natural way for B to process that request is by <em>pulling</em> it in at a convenient time in <em>its</em> run cycle. When you have a push model on one end and a pull model on the other, you need a buffer between them. That&#x2019;s what a queue provides that simpler decoupling patterns don&#x2019;t.</p>
 <p>Queues give control to the code that pulls from it: the receiver can delay processing, aggregate requests, or discard them entirely. But it does this by taking control <em>away</em> from the sender. All it can do is throw a request on the queue and hope for the best. This makes queues a poor fit when the sender needs a response.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>

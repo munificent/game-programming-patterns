@@ -145,7 +145,7 @@ I mention this in nearly every chapter, but it's worth emphasizing. Complexity s
 
 </aside>
 
-I think of it in terms of pushing and pulling. You have some code A that wants another chunk B to do some work. The natural way to for A initiate that is by *pushing* the request to B.
+I think of it in terms of pushing and pulling. You have some code A that wants another chunk B to do some work. The natural way for A to initiate that is by *pushing* the request to B.
 
 Meanwhile, the natural way for B to process that request is by *pulling* it in at a convenient time in *its* run cycle. When you have a push model on one end and a pull model on the other, you need a buffer between them. That's what a queue provides that simpler decoupling patterns don't.
 
