@@ -287,23 +287,14 @@ There's one issue we're left with, and that's residual lag. We update the game a
 
 Here's a timeline:
 
-      update   update   update   update   update   update
-         |        |        |        |        |        |
-    -------------------------------------------------------->
-         |                 |             |         |
-       render            render        render    render
-
+<img src="images/game-loop-timeline.png" />
 
 As you can see, we update at a nice tight fixed interval. Meanwhile, we render
 whenever we can. It's less frequent than updating, and isn't steady either.
 Both of those are OK. The lame part is that we don't always render right at the
 point of updating. Look at the third render time. It's right between two updates:
 
-        update   update
-           |        |
-    - - ----------------
-                |
-              render
+<img src="images/game-loop-timeline-close.png" />
 
 Imagine a bullet is flying across the screen. On the first update, it's on the left side. The second update moves it to the right side. The game is rendered at a point in time right between those two updates, so the user expects to see that bullet in the center of the screen. With our current implementation, it will still just be on the left side. This means motion looks jagged or stuttery.
 

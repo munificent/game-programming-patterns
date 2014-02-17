@@ -139,15 +139,16 @@ right as we&#x2019;re writing to it. As it scans across the pixels we&#x2019;ve
 written, our circle starts to appear. But then it outpaces us and
 moves into pixels we haven&#x2019;t gotten to yet. The result is <em>tearing:</em> a
 hideous visual bug where you see half of something drawn on screen.</p>
-<p><span name="tearing"></span><img src="images/double-buffer-tearing.gif" /></p>
+<p><span name="tearing"></span></p>
+<p><img src="images/double-buffer-tearing.png" /></p>
 <aside name="tearing">
 
-<p>We start filling pixels in the circle just as the video driver starts
-reading from the framebuffer (Figure 1). The video driver eventually
-catches up to our renderer and then races past it to pixels we haven&#x2019;t
-written yet (Figure 2). We finish drawing (Figure 3), but the driver
-doesn&#x2019;t catch those new pixels. The result (Figure 4) is that the
-user sees half of a circle on screen.</p>
+<p>We start drawing pixels just as the video driver starts
+reading from the framebuffer (Fig. 1). The video driver eventually
+catches up to the renderer and then races past it to pixels we haven&#x2019;t
+written yet (Fig. 2). We finish drawing (Fig. 3), but the driver
+doesn&#x2019;t catch those new pixels.</p>
+<p>The result (Fig. 4) is that the user sees half of the drawing. The name "tearing" comes from the fact that it looks like the bottom half was torn off.</p>
 </aside>
 
 <p>This is why we need this pattern. Our program renders the pixels one

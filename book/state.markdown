@@ -369,6 +369,8 @@ Where a finite state machine has a *single* pointer to a state, a pushdown autom
 
 2. You can *pop* the topmost state off the stack. That state is discarded, and the state under it becomes the new current state.
 
+<img src="images/state-pushdown.png" />
+
 This is just what we need for firing. We create a *single* firing state. When the fire button is pressed while in any other state, we *push* the firing state onto the stack. When the firing animation is done, we *pop* that state off, and the pushdown automaton automatically transitions us right back to the state we were in before.
 
 ## So How Useful Are They?

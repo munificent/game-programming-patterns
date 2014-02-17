@@ -661,6 +661,7 @@
 <p>You can <em>pop</em> the topmost state off the stack. That state is discarded, and the state under it becomes the new current state.</p>
 </li>
 </ol>
+<p><img src="images/state-pushdown.png" /></p>
 <p>This is just what we need for firing. We create a <em>single</em> firing state. When the fire button is pressed while in any other state, we <em>push</em> the firing state onto the stack. When the firing animation is done, we <em>pop</em> that state off, and the pushdown automaton automatically transitions us right back to the state we were in before.</p>
 <h2><a href="#so-how-useful-are-they" name="so-how-useful-are-they">So How Useful Are They?</a></h2>
 <p>Even with those common extensions to state machines, they are still pretty limited. The trend these days in game AI is more towards exciting things like <a href="http://www.altdevblogaday.com/2011/02/24/introduction-to-behavior-trees/">behavior trees</a> and <a href="http://web.media.mit.edu/~jorkin/goap.html">planning systems</a>. If AI is what you&#x2019;re interested in, all this chapter has done is whet your appetite. You&#x2019;ll want to read other books to satisfy it.</p>
