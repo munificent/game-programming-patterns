@@ -316,13 +316,15 @@ A safer answer is to make observers automatically unregister themselves from eve
 
 All you cool kids with your hip modern languages with garbage collectors are feeling pretty smug right now. Think you don't have to worry about this because you never explicitly delete anything? Think again!
 
-Imagine this: you've got some UI screen that shows a bunch of stats about the player's character like their health and stuff. The player can bring up the screen and dismiss it whenever they want. You implement the screen as an observer where the subject is the main character.
+Imagine this: you've got some UI screen that shows a bunch of stats about the player's character like their health and stuff. When the player brings up the screen, you instantiate a new object for it. When they close it, you just forget about the object and let the GC clean it up.
 
 Every time the character takes a punch to the face (or elsewhere, I suppose), it sends a notification. The UI screen observes that and updates the little health bar. Great. Now what happens when the player dismisses the screen, but you don't unregister the observer?
 
-The UI won't be visible anymore, but it will still be in memory. The entire time the player is playing the game, running around, getting in fights, the character will be sending notifications. Those will get sent to the UI screen, which will then reposition a bunch of UI elements and do other utterly pointless work.
+The UI isn't visible anymore, but won't get garbage collected since the character's observer list still has a reference to it. Every time the screen is loaded, we add a new instance of it to that increasingly long list.
 
-This is such a common issue in notification systems that it has a name: the <span name="lapsed">*lapsed listener problem*</span>. Even though the user may not see anything fishy, you're wasting memory and CPU cycles on some zombie UI. The lesson here is that you have to be disciplined about unregistration.
+The entire time the player is playing the game, running around, getting in fights, the character is sending notifications that get received by *all* of those screens. They aren't on screen, but they receive notifications and waste CPU cycles updating invisible UI elements. If they do other things like play sounds, you'll get noticeably wrong behavior.
+
+This is such a common issue in notification systems that it has a name: the <span name="lapsed">*lapsed listener problem*</span>. Since subjects retain references to their listeners, you can end up with zombie UI objects lingering in memory. The lesson here is to be disciplined about unregistration.
 
 <aside name="lapsed">
 
