@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro|Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -21,9 +21,8 @@
 </script>
 </head>
 <body id="top">
+<div class="page">
 <div class="content">
-<h1 class="book"><a href="index.html">Game Programming Patterns</a></h1>
-<h1>Decoupling Patterns</h1>
 <div class="in-progress">
   <span class="dismiss">&times;</span>
   <p><strong>This book is a work in progress!</strong></p>
@@ -61,6 +60,8 @@
     </tr>
   </table>
 </div>
+<h1>Decoupling Patterns</h1>
+<h1 class="book"><a href="index.html">Game Programming Patterns</a></h1>
 <p>Writing code to do what you want is actually pretty easy. What&#x2019;s hard is writing code that&#x2019;s easy to adapt when what you want <em>changes</em>. Rarely do we have the luxury of a perfect feature set before we&#x2019;ve fired up our editor.</p>
 <p>A powerful tool we have for making change easier is <em>decoupling</em>. When we say two pieces of code are "decoupled", we mean a change in one usually doesn&#x2019;t require a change in the other. When you change some feature in your game, the fewer places in code you have to touch, the easier it is.</p>
 <p>The <a href="component.html">Component pattern</a> decouples different domains in your game from each other within a single entity that has aspects of all of them. <a href="event-queue.html">Event Queues</a> decouple two objects communicating with each other, both statically and <em>in time</em>. The <a href="service-locator.html">Service Locator pattern</a> lets code access an "ambient" facility without being bound to the code that provides it.</p>
@@ -70,8 +71,9 @@
 <li><a href="event-queue.html">Event Queue</a></li>
 <li><a href="service-locator.html">Service Locator</a></li>
 </ul>
-<p class="footer">&copy; 2009-2014 Bob Nystrom</p>
 </div>
+</div>
+<p class="footer">&copy; 2009-2014 Bob Nystrom</p>
 </body>
 <script src="jquery-1.10.1.min.js"></script>
 <script src="script.js"></script>
