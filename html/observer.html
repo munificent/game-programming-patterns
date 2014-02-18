@@ -99,7 +99,12 @@
 </pre></div>
 
 
-<p>All it does is say, "Uh, I don&#x2019;t know if anyone cares, but this thing just fell. Do with that as you will."</p>
+<p><span name="subtle">All</span> it does is say, "Uh, I don&#x2019;t know if anyone cares, but this thing just fell. Do with that as you will."</p>
+<aside name="subtle">
+
+<p>The physics engine does have to decide what notifications to send, so it isn&#x2019;t entirely decoupled. But in architecture, we&#x2019;re most often trying to make systems <em>better</em>, not <em>perfect</em>.</p>
+</aside>
+
 <p>The achievement system registers itself so that whenever the physics code sends a notification, the achievement receives it. It can then check to see if the falling body is our less-than-graceful hero, and if his perch prior to this new, unpleasant encounter with classical mechanics was a bridge. If so, it unlocks the proper achievement with associated fireworks and fanfare, and all of this with no involvement from the physics code.</p>
 <p><span name="tear">In fact</span>, you can change the set of achievements or tear out the entire achievement system without touching a line of the physics engine. It will still send out its notifications, oblivious to the fact that nothing is receiving them anymore.</p>
 <aside name="tear">
@@ -199,6 +204,7 @@ through it quickly.</p>
 <p>It&#x2019;s also important that the subject has a <em>list</em> of observers instead of a single one. It makes sure that observers aren&#x2019;t implicitly coupled to <em>each other</em>. For example, say the audio engine also observes the fall event so that it can play an appropriate sound. If the subject only supported one observer, when the audio engine registered itself, that would <em>un</em>register the achievements system.</p>
 <p>That means those two systems would be interfering with each other&thinsp;&mdash;&thinsp;and in a particularly nasty way, since one would effectively disable the other. Supporting a list of observers ensures that each observer is treated independently from the others. As far as they know, each is the only thing in the world with eyes on the subject.</p>
 <p>The other job of the subject is sending notifications:</p>
+<p><span name="concurrent"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">notify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numObservers_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
@@ -208,6 +214,11 @@ through it quickly.</p>
 <span class="p">}</span>
 </pre></div>
 
+
+<aside name="concurrent">
+
+<p>Note that this code assumes observers don&#x2019;t modify the list in their <code>onNotify</code> methods. A more robust implementation would either prevent or gracefully handle concurrent modification like that.</p>
+</aside>
 
 <h3><a href="#observable-physics" name="observable-physics">Observable physics</a></h3>
 <p>Now we just need to hook all of this into the physics engine so that it can send notifications and the achievement system can wire itself up to receive them. We&#x2019;ll stay close to the original <em>Design Patterns</em> recipe and <span name="event">inherit</span> <code>Subject</code>:</p>
@@ -249,7 +260,8 @@ through it quickly.</p>
 <h3><a href="#it&#x2019;s-too-*fast*" name="it&#x2019;s-too-*fast*">It&#x2019;s too <em>fast?</em></a></h3>
 <p>In fact, you have to be careful because the Observer pattern <em>is</em> synchronous. The subject invokes its observers directly, which means it does&#x2019;t resume its own work until all of the observers have returned from their notification methods. A slow observer can block a subject.</p>
 <p>This sounds scary, but in practice it&#x2019;s not the end of the world. It&#x2019;s just something you have to be aware of. UI programmers&thinsp;&mdash;&thinsp;who&#x2019;ve been doing event-based programming like this for ages&thinsp;&mdash;&thinsp;have an established motto for this: "stay off the UI thread".</p>
-<p>If you&#x2019;re responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn&#x2019;t lock up. When you have slow work to do, push it onto another thread or a work queue and you&#x2019;re good. It takes a little discipline, but it&#x2019;s not rocket science.</p>
+<p>If you&#x2019;re responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn&#x2019;t lock up. When you have slow work to do, push it onto another thread or a work queue.</p>
+<p>You do have to be careful mixing observers with threads and explicit locks, though. If an observer tries to grab a lock that the subject has, you can deadlock the game. In a highly threaded engine, you may be better off with asynchronous communication using an <a href="event-queue.html" class="pattern">Event Queue</a>.</p>
 <h2><a href="#"it-does-too-much-dynamic-allocation"" name=""it-does-too-much-dynamic-allocation"">"It Does Too Much Dynamic Allocation"</a></h2>
 <p>Whole tribes of the programmer clan&thinsp;&mdash;&thinsp;including many game developers&thinsp;&mdash;&thinsp;have moved
 onto garbage collected languages, and dynamic allocation isn&#x2019;t the boogie man
@@ -395,7 +407,7 @@ option and insert it at the front:</p>
 <p>Not to point fingers, but I&#x2019;ll note that <em>Design Patterns</em> doesn&#x2019;t mention this issue at all.</p>
 </aside>
 
-<p>Destroying the subject is easier since in most implementations the observer doesn&#x2019;t have any references to it. But even then, sending the subject&#x2019;s bits to the memory manager&#x2019;s recycle bin may cause some problems. Those observers may still be expecting to receive notifications in the future, and they don&#x2019;t know that that will never happen now. They aren&#x2019;t observers at all, really, they just think they are.</p>
+<p>Destroying the subject is easier since in most implementations, the observer doesn&#x2019;t have any references to it. But even then, sending the subject&#x2019;s bits to the memory manager&#x2019;s recycle bin may cause some problems. Those observers may still be expecting to receive notifications in the future, and they don&#x2019;t know that that will never happen now. They aren&#x2019;t observers at all, really, they just think they are.</p>
 <p>You can deal with this in a couple of different ways. The simplest is to do what I did and just punt on it. It&#x2019;s an observer&#x2019;s job to unregister itself from any subjects when it gets deleted. More often than not, the observer <em>does</em> know which subjects it&#x2019;s observing, so it&#x2019;s usually just a matter of <span name="destructor">adding</span> a <code>removeObserver()</code> call to its destructor.</p>
 <aside name="destructor">
 
@@ -412,10 +424,11 @@ option and insert it at the front:</p>
 <p>A safer answer is to make observers automatically unregister themselves from every subject when they get destroyed. If you implement the logic for that once in your base observer class, everyone using it doesn&#x2019;t have to remember to do it themselves. This does add some complexity, though. It means each <em>observer</em> will need a list of the <em>subjects</em> its observing. You end up with pointers going in both directions.</p>
 <h3><a href="#don&#x2019;t-worry,-i&#x2019;ve-got-a-gc" name="don&#x2019;t-worry,-i&#x2019;ve-got-a-gc">Don&#x2019;t worry, I&#x2019;ve got a GC</a></h3>
 <p>All you cool kids with your hip modern languages with garbage collectors are feeling pretty smug right now. Think you don&#x2019;t have to worry about this because you never explicitly delete anything? Think again!</p>
-<p>Imagine this: you&#x2019;ve got some UI screen that shows a bunch of stats about the player&#x2019;s character like their health and stuff. The player can bring up the screen and dismiss it whenever they want. You implement the screen as an observer where the subject is the main character.</p>
+<p>Imagine this: you&#x2019;ve got some UI screen that shows a bunch of stats about the player&#x2019;s character like their health and stuff. When the player brings up the screen, you instantiate a new object for it. When they close it, you just forget about the object and let the GC clean it up.</p>
 <p>Every time the character takes a punch to the face (or elsewhere, I suppose), it sends a notification. The UI screen observes that and updates the little health bar. Great. Now what happens when the player dismisses the screen, but you don&#x2019;t unregister the observer?</p>
-<p>The UI won&#x2019;t be visible anymore, but it will still be in memory. The entire time the player is playing the game, running around, getting in fights, the character will be sending notifications. Those will get sent to the UI screen, which will then reposition a bunch of UI elements and do other utterly pointless work.</p>
-<p>This is such a common issue in notification systems that it has a name: the <span name="lapsed"><em>lapsed listener problem</em></span>. Even though the user may not see anything fishy, you&#x2019;re wasting memory and CPU cycles on some zombie UI. The lesson here is that you have to be disciplined about unregistration.</p>
+<p>The UI isn&#x2019;t visible anymore, but won&#x2019;t get garbage collected since the character&#x2019;s observer list still has a reference to it. Every time the screen is loaded, we add a new instance of it to that increasingly long list.</p>
+<p>The entire time the player is playing the game, running around, getting in fights, the character is sending notifications that get received by <em>all</em> of those screens. They aren&#x2019;t on screen, but they receive notifications and waste CPU cycles updating invisible UI elements. If they do other things like play sounds, you&#x2019;ll get noticeably wrong behavior.</p>
+<p>This is such a common issue in notification systems that it has a name: the <span name="lapsed"><em>lapsed listener problem</em></span>. Since subjects retain references to their listeners, you can end up with zombie UI objects lingering in memory. The lesson here is to be disciplined about unregistration.</p>
 <aside name="lapsed">
 
 <p>An even surer sign of its significance: it has <a href="http://en.wikipedia.org/wiki/Lapsed_listener_problem">a Wikipedia article</a>.</p>
@@ -431,7 +444,7 @@ option and insert it at the front:</p>
 <p>The observer pattern is a great way to let those mostly unrelated lumps talk to each other without them merging into one big lump. It&#x2019;s less useful <em>within</em> a single lump of code dedicated to one feature or aspect.</p>
 <p>That&#x2019;s why it fit our example well: achievements and physics are almost entirely unrelated domains, likely implemented by different people. We want the bare minimum of communication between them so that working on either one doesn&#x2019;t require much knowledge of the other.</p>
 <h2><a href="#observers-today" name="observers-today">Observers Today</a></h2>
-<p>Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was <em>the</em> hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hiearchies.</p>
+<p>Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was <em>the</em> hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hierarchies.</p>
 <aside name="90s">
 
 <p>That same year, Ace of Base had not one but <em>three</em> hit singles, so that may tell you something about our taste and judgment back then.</p>
@@ -468,6 +481,10 @@ option and insert it at the front:</p>
 <p>Unlike more radical models, data binding doesn&#x2019;t try to entirely eliminate imperative code and doesn&#x2019;t try to architect your entire application around a giant declarative dataflow graph. What it does do is automate the busywork where you&#x2019;re tweaking a UI element or calculated property to reflect a change to some value.</p>
 <p>Like other declarative systems, data binding is probably a bit too slow and complex to fit inside the core of a game engine. But I would be surprised if I didn&#x2019;t see it start making in-roads into less critical areas of the game like UI.</p>
 <p>In the meantime, the good old Observer pattern will still be here waiting for us. Sure, it&#x2019;s not as exciting as some hot technique that manages to cram both "functional" and "reactive" in its name, but it&#x2019;s dead simple and it works. To me, those are often the two most important criteria for a solution.</p>
+<<<<<<< HEAD
+=======
+<p class="footer">&copy; 2009-2014 Bob Nystrom</p>
+>>>>>>> master
 </div>
 </div>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>

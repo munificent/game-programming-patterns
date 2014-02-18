@@ -333,26 +333,12 @@ A graphic here would help.
 <h3><a href="#stuck-in-the-middle" name="stuck-in-the-middle">Stuck in the middle</a></h3>
 <p>There&#x2019;s one issue we&#x2019;re left with, and that&#x2019;s residual lag. We update the game at a fixed time step, but we render at arbitrary points in time. This means that from the user&#x2019;s perspective, the game will often display at a point in time between two updates.</p>
 <p>Here&#x2019;s a timeline:</p>
-<div class="codehilite"><pre>  <span class="n">update</span>   <span class="n">update</span>   <span class="n">update</span>   <span class="n">update</span>   <span class="n">update</span>   <span class="n">update</span>
-     <span class="o">|</span>        <span class="o">|</span>        <span class="o">|</span>        <span class="o">|</span>        <span class="o">|</span>        <span class="o">|</span>
-<span class="o">--------------------------------------------------------&gt;</span>
-     <span class="o">|</span>                 <span class="o">|</span>             <span class="o">|</span>         <span class="o">|</span>
-   <span class="n">render</span>            <span class="n">render</span>        <span class="n">render</span>    <span class="n">render</span>
-</pre></div>
-
-
+<p><img src="images/game-loop-timeline.png" /></p>
 <p>As you can see, we update at a nice tight fixed interval. Meanwhile, we render
 whenever we can. It&#x2019;s less frequent than updating, and isn&#x2019;t steady either.
 Both of those are OK. The lame part is that we don&#x2019;t always render right at the
 point of updating. Look at the third render time. It&#x2019;s right between two updates:</p>
-<div class="codehilite"><pre>    <span class="n">update</span>   <span class="n">update</span>
-       <span class="o">|</span>        <span class="o">|</span>
-<span class="o">-</span> <span class="o">-</span> <span class="o">----------------</span>
-            <span class="o">|</span>
-          <span class="n">render</span>
-</pre></div>
-
-
+<p><img src="images/game-loop-timeline-close.png" /></p>
 <p>Imagine a bullet is flying across the screen. On the first update, it&#x2019;s on the left side. The second update moves it to the right side. The game is rendered at a point in time right between those two updates, so the user expects to see that bullet in the center of the screen. With our current implementation, it will still just be on the left side. This means motion looks jagged or stuttery.</p>
 <p>Conveniently, we actually know <em>exactly</em> how far between update frames we are when we render: it&#x2019;s stored in <code>lag</code>. We bail out of the update loop when it&#x2019;s less than the update time step, not when it&#x2019;s <em>zero</em>. That leftover amount? That&#x2019;s how far into the next frame we are.</p>
 <p>When we go to render, we&#x2019;ll pass that in:</p>
@@ -555,6 +541,10 @@ the most adaptable. It updates with a fixed time step, but can drop
 <p>Witters&#x2019; article on <a href="http://www.koonsolo.com/news/dewitters-gameloop/">game loops</a> is a close runner-up.</p>
 </li>
 </ul>
+<<<<<<< HEAD
+=======
+<p class="footer">&copy; 2009-2014 Bob Nystrom</p>
+>>>>>>> master
 </div>
 </div>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>

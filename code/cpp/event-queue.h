@@ -77,51 +77,6 @@ namespace EventQueue
   };
   //^play-message
 
-  namespace Deferred
-  {
-    //^pending
-    class Audio
-    {
-    public:
-      static void init()
-      {
-        hasPending_ = false;
-      }
-
-      static void playSound(SoundId id, int volume)
-      {
-        pending_.id = id;
-        pending_.volume = volume;
-        hasPending_ = true;
-      }
-
-      //^omit
-      static void update();
-      //^omit
-    private:
-      static PlayMessage pending_;
-      static bool hasPending_;
-    };
-    //^pending
-
-    //^defer-update
-    void Audio::update()
-    {
-      if (!hasPending_) return;
-
-      ResourceId resource = loadSound(pending_.id);
-      int channel = findOpenChannel();
-      if (channel == -1) return;
-      startSound(resource, channel, pending_.volume);
-
-      hasPending_ = false;
-    }
-    //^defer-update
-
-    PlayMessage Audio::pending_;
-    bool Audio::hasPending_;
-  }
-
   namespace DeferList
   {
     //^pending-array
@@ -150,7 +105,6 @@ namespace EventQueue
     {
       assert(numPending_ < MAX_PENDING);
 
-      // Add to the end of the list.
       pending_[numPending_].id = id;
       pending_[numPending_].volume = volume;
       numPending_++;
@@ -188,16 +142,21 @@ namespace EventQueue
         tail_ = 0;
       }
 
+      // Methods...
       //^omit
       static void playSound(SoundId id, int volume);
       static void update();
       //^omit
     private:
+      //^omit
       static const int MAX_PENDING = 16;
 
       static PlayMessage pending_[MAX_PENDING];
+      //^omit
       static int head_;
       static int tail_;
+
+      // Array...
     };
     //^head-tail
 
@@ -312,7 +271,7 @@ namespace EventQueue
     //^drop-dupe-play
     void Audio::playSound(SoundId id, int volume)
     {
-      // See if a duplicate request is pending.
+      // Walk the pending requests.
       for (int i = head_; i != tail_;
            i = (i + 1) % MAX_PENDING)
       {

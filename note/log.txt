@@ -1,35 +1,51 @@
-2013-02-01 - 811 words, finish first draft event queue, bunch of work on new design
-2013-01-31 - 961 words, first draft event queue
-2013-01-30 - 441 words, first draft event queue
-2013-01-29 - 378 words, first draft event queue
-2013-01-28 - 816 words, first draft event queue
-2013-01-27 - 186 words, ~100 lines of sample code
-2013-01-26 - 400 words, first draft event queue
-2013-01-25 - 535 words, first draft event queue
-2013-01-24 - 439 words, first draft event queue
-2013-01-23 - 537 words, first draft event queue
-2013-01-22 - 233 words, first draft event queue
-2013-01-21 - 854 words, first draft event queue
-2013-01-20 - 921 words, first draft event queue. fix #85, #88.
-2013-01-19 - 689 words, finish outline event queue
-2013-01-18 - 359 words outline
-2013-01-17 - 708 words outline event queue
-2013-01-16 - 305 words outline, start writing sample code
-2013-01-15 - fix/close #69, #76, #78, #79, #80, #81, #82, #83
-2013-01-14 - 767 words outline even queue
-2013-01-13 - 744 words outline event queue
-2013-01-12 - research and 718 words of notes for message queue
-2013-01-11 - research and apply for business license
-2013-01-10 - finish ape
-2013-01-09 - read half of ape
-2013-01-08 - fix or close #44, #58, #59, #63, #64, #65, #67, #68, #73. Merge #60, #66.
-2013-01-07 - publish chapter, tweet, r/gamedev, etc.
-2013-01-06 - photoshop six illustrations, finish observer
-2013-01-05 - revise section header and update prototype
-2013-01-04 - 4 illustrations for observer, 1 for object pool
-2013-01-03 - 1038 words, finish third draft observer
-2013-01-02 - 1064 words, third draft observer
-2013-01-01 - 1306 words, third draft observer
+2014-02-17 - fix #7, #61, #62, #71, #72, #95, #96, #97, #98. close #70, #92, #94
+2014-02-16 - 5 illustrations, decoupling section intro, mail, twitter, proggit
+2014-02-15 - 548 words, finish third draft event queue
+2014-02-14 - 1879 words (delete ~90), third draft event queue
+2014-02-13 - 1420 words (delete 120), third draft event queue
+2014-02-12 - 1108 words, third draft event queue
+2014-02-11 - 994 words (delete 246), third draft event queue
+2014-02-10 - photoshop illustrations for event queue
+2014-02-09 - 6 illustrations for event queue
+2014-02-08 - 479 words (delete 58), finish second draft event queue, email
+2014-02-07 - 985 words (delete 178), second draft event queue
+2014-02-06 - 1015 words (delete 110), second draft event queue
+2014-02-05 - 1166 words (delete 271), second draft event queue
+2014-02-04 - 952 words (delete 406), second draft event queue
+2014-02-03 - 532 words (delete 99), second draft event queue
+2014-02-02 - 1206 words (delete 282), second draft event queue
+2014-02-01 - 811 words, finish first draft event queue, bunch of work on new design
+2014-01-31 - 961 words, first draft event queue
+2014-01-30 - 441 words, first draft event queue
+2014-01-29 - 378 words, first draft event queue
+2014-01-28 - 816 words, first draft event queue
+2014-01-27 - 186 words, ~100 lines of sample code
+2014-01-26 - 400 words, first draft event queue
+2014-01-25 - 535 words, first draft event queue
+2014-01-24 - 439 words, first draft event queue
+2014-01-23 - 537 words, first draft event queue
+2014-01-22 - 233 words, first draft event queue
+2014-01-21 - 854 words, first draft event queue
+2014-01-20 - 921 words, first draft event queue. fix #85, #88.
+2014-01-19 - 689 words, finish outline event queue
+2014-01-18 - 359 words outline
+2014-01-17 - 708 words outline event queue
+2014-01-16 - 305 words outline, start writing sample code
+2014-01-15 - fix/close #69, #76, #78, #79, #80, #81, #82, #83
+2014-01-14 - 767 words outline even queue
+2014-01-13 - 744 words outline event queue
+2014-01-12 - research and 718 words of notes for message queue
+2014-01-11 - research and apply for business license
+2014-01-10 - finish ape
+2014-01-09 - read half of ape
+2014-01-08 - fix or close #44, #58, #59, #63, #64, #65, #67, #68, #73. Merge #60, #66.
+2014-01-07 - publish chapter, tweet, r/gamedev, etc.
+2014-01-06 - photoshop six illustrations, finish observer
+2014-01-05 - revise section header and update prototype
+2014-01-04 - 4 illustrations for observer, 1 for object pool
+2014-01-03 - 1038 words, finish third draft observer
+2014-01-02 - 1064 words, third draft observer
+2014-01-01 - 1306 words, third draft observer
 2013-12-31 - 293 words, third draft observer
 2013-12-30 - 1228 words, third draft observer
 2013-12-29 - reorganize chapters, write revised section intro

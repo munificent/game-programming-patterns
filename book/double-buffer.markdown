@@ -95,16 +95,19 @@ written, our circle starts to appear. But then it outpaces us and
 moves into pixels we haven't gotten to yet. The result is *tearing:* a
 hideous visual bug where you see half of something drawn on screen.
 
-<span name="tearing"></span><img src="images/double-buffer-tearing.gif" />
+<span name="tearing"></span>
+
+<img src="images/double-buffer-tearing.png" />
 
 <aside name="tearing">
 
-We start filling pixels in the circle just as the video driver starts
-reading from the framebuffer (Figure 1). The video driver eventually
-catches up to our renderer and then races past it to pixels we haven't
-written yet (Figure 2). We finish drawing (Figure 3), but the driver
-doesn't catch those new pixels. The result (Figure 4) is that the
-user sees half of a circle on screen.
+We start drawing pixels just as the video driver starts
+reading from the framebuffer (Fig. 1). The video driver eventually
+catches up to the renderer and then races past it to pixels we haven't
+written yet (Fig. 2). We finish drawing (Fig. 3), but the driver
+doesn't catch those new pixels.
+
+The result (Fig. 4) is that the user sees half of the drawing. The name "tearing" comes from the fact that it looks like the bottom half was torn off.
 
 </aside>
 
@@ -508,6 +511,7 @@ quickly as possible.
         the last frame.* Successive frames are drawn on alternating
         buffers, with no data copied between them, like so:
 
+            :::text
             Frame 1 drawn on buffer A
             Frame 2 drawn on buffer B
             Frame 3 drawn on buffer A

@@ -39,7 +39,13 @@ For example, you've got some physics code that handles gravity and tracks which 
 
 ^code physics-update
 
-All it does is say, "Uh, I don't know if anyone cares, but this thing just fell. Do with that as you will."
+<span name="subtle">All</span> it does is say, "Uh, I don't know if anyone cares, but this thing just fell. Do with that as you will."
+
+<aside name="subtle">
+
+The physics engine does have to decide what notifications to send, so it isn't entirely decoupled. But in architecture, we're most often trying to make systems *better*, not *perfect*.
+
+</aside>
 
 The achievement system registers itself so that whenever the physics code sends a notification, the achievement receives it. It can then check to see if the falling body is our less-than-graceful hero, and if his perch prior to this new, unpleasant encounter with classical mechanics was a bridge. If so, it unlocks the proper achievement with associated fireworks and fanfare, and all of this with no involvement from the physics code.
 
@@ -103,7 +109,15 @@ That means those two systems would be interfering with each other -- and in a pa
 
 The other job of the subject is sending notifications:
 
+<span name="concurrent"></span>
+
 ^code subject-notify
+
+<aside name="concurrent">
+
+Note that this code assumes observers don't modify the list in their `onNotify` methods. A more robust implementation would either prevent or gracefully handle concurrent modification like that.
+
+</aside>
 
 ### Observable physics
 
@@ -155,7 +169,9 @@ In fact, you have to be careful because the Observer pattern *is* synchronous. T
 
 This sounds scary, but in practice it's not the end of the world. It's just something you have to be aware of. UI programmers -- who've been doing event-based programming like this for ages -- have an established motto for this: "stay off the UI thread".
 
-If you're responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn't lock up. When you have slow work to do, push it onto another thread or a work queue and you're good. It takes a little discipline, but it's not rocket science.
+If you're responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn't lock up. When you have slow work to do, push it onto another thread or a work queue.
+
+You do have to be careful mixing observers with threads and explicit locks, though. If an observer tries to grab a lock that the subject has, you can deadlock the game. In a highly threaded engine, you may be better off with asynchronous communication using an <a href="event-queue.html" class="pattern">Event Queue</a>.
 
 ## "It Does Too Much Dynamic Allocation"
 
@@ -282,7 +298,7 @@ Not to point fingers, but I'll note that *Design Patterns* doesn't mention this 
 
 </aside>
 
-Destroying the subject is easier since in most implementations the observer doesn't have any references to it. But even then, sending the subject's bits to the memory manager's recycle bin may cause some problems. Those observers may still be expecting to receive notifications in the future, and they don't know that that will never happen now. They aren't observers at all, really, they just think they are.
+Destroying the subject is easier since in most implementations, the observer doesn't have any references to it. But even then, sending the subject's bits to the memory manager's recycle bin may cause some problems. Those observers may still be expecting to receive notifications in the future, and they don't know that that will never happen now. They aren't observers at all, really, they just think they are.
 
 You can deal with this in a couple of different ways. The simplest is to do what I did and just punt on it. It's an observer's job to unregister itself from any subjects when it gets deleted. More often than not, the observer *does* know which subjects it's observing, so it's usually just a matter of <span name="destructor">adding</span> a `removeObserver()` call to its destructor.
 
@@ -308,13 +324,15 @@ A safer answer is to make observers automatically unregister themselves from eve
 
 All you cool kids with your hip modern languages with garbage collectors are feeling pretty smug right now. Think you don't have to worry about this because you never explicitly delete anything? Think again!
 
-Imagine this: you've got some UI screen that shows a bunch of stats about the player's character like their health and stuff. The player can bring up the screen and dismiss it whenever they want. You implement the screen as an observer where the subject is the main character.
+Imagine this: you've got some UI screen that shows a bunch of stats about the player's character like their health and stuff. When the player brings up the screen, you instantiate a new object for it. When they close it, you just forget about the object and let the GC clean it up.
 
 Every time the character takes a punch to the face (or elsewhere, I suppose), it sends a notification. The UI screen observes that and updates the little health bar. Great. Now what happens when the player dismisses the screen, but you don't unregister the observer?
 
-The UI won't be visible anymore, but it will still be in memory. The entire time the player is playing the game, running around, getting in fights, the character will be sending notifications. Those will get sent to the UI screen, which will then reposition a bunch of UI elements and do other utterly pointless work.
+The UI isn't visible anymore, but won't get garbage collected since the character's observer list still has a reference to it. Every time the screen is loaded, we add a new instance of it to that increasingly long list.
 
-This is such a common issue in notification systems that it has a name: the <span name="lapsed">*lapsed listener problem*</span>. Even though the user may not see anything fishy, you're wasting memory and CPU cycles on some zombie UI. The lesson here is that you have to be disciplined about unregistration.
+The entire time the player is playing the game, running around, getting in fights, the character is sending notifications that get received by *all* of those screens. They aren't on screen, but they receive notifications and waste CPU cycles updating invisible UI elements. If they do other things like play sounds, you'll get noticeably wrong behavior.
+
+This is such a common issue in notification systems that it has a name: the <span name="lapsed">*lapsed listener problem*</span>. Since subjects retain references to their listeners, you can end up with zombie UI objects lingering in memory. The lesson here is to be disciplined about unregistration.
 
 <aside name="lapsed">
 
@@ -342,7 +360,7 @@ That's why it fit our example well: achievements and physics are almost entirely
 
 ## Observers Today
 
-Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was *the* hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hiearchies.
+Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was *the* hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hierarchies.
 
 <aside name="90s">
 

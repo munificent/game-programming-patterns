@@ -140,15 +140,16 @@ right as we&#x2019;re writing to it. As it scans across the pixels we&#x2019;ve
 written, our circle starts to appear. But then it outpaces us and
 moves into pixels we haven&#x2019;t gotten to yet. The result is <em>tearing:</em> a
 hideous visual bug where you see half of something drawn on screen.</p>
-<p><span name="tearing"></span><img src="images/double-buffer-tearing.gif" /></p>
+<p><span name="tearing"></span></p>
+<p><img src="images/double-buffer-tearing.png" /></p>
 <aside name="tearing">
 
-<p>We start filling pixels in the circle just as the video driver starts
-reading from the framebuffer (Figure 1). The video driver eventually
-catches up to our renderer and then races past it to pixels we haven&#x2019;t
-written yet (Figure 2). We finish drawing (Figure 3), but the driver
-doesn&#x2019;t catch those new pixels. The result (Figure 4) is that the
-user sees half of a circle on screen.</p>
+<p>We start drawing pixels just as the video driver starts
+reading from the framebuffer (Fig. 1). The video driver eventually
+catches up to the renderer and then races past it to pixels we haven&#x2019;t
+written yet (Fig. 2). We finish drawing (Fig. 3), but the driver
+doesn&#x2019;t catch those new pixels.</p>
+<p>The result (Fig. 4) is that the user sees half of the drawing. The name "tearing" comes from the fact that it looks like the bottom half was torn off.</p>
 </aside>
 
 <p>This is why we need this pattern. Our program renders the pixels one
@@ -700,10 +701,10 @@ this option.</p>
 <p><em>Existing data on the buffer will be from two frames ago, not
     the last frame.</em> Successive frames are drawn on alternating
     buffers, with no data copied between them, like so:</p>
-<div class="codehilite"><pre><span class="n">Frame</span> <span class="mi">1</span> <span class="n">drawn</span> <span class="n">on</span> <span class="n">buffer</span> <span class="n">A</span>
-<span class="n">Frame</span> <span class="mi">2</span> <span class="n">drawn</span> <span class="n">on</span> <span class="n">buffer</span> <span class="n">B</span>
-<span class="n">Frame</span> <span class="mi">3</span> <span class="n">drawn</span> <span class="n">on</span> <span class="n">buffer</span> <span class="n">A</span>
-<span class="o">&amp;</span><span class="n">hellip</span><span class="p">;</span>
+<div class="codehilite"><pre>Frame 1 drawn on buffer A
+Frame 2 drawn on buffer B
+Frame 3 drawn on buffer A
+...
 </pre></div>
 
 
@@ -823,6 +824,10 @@ will be swapped.</p>
     out there. OpenGL has <code>swapBuffers()</code>. Microsoft&#x2019;s XNA framework
     swaps the framebuffers within its <code>endDraw()</code> function.</p></li>
 </ul>
+<<<<<<< HEAD
+=======
+<p class="footer">&copy; 2009-2014 Bob Nystrom</p>
+>>>>>>> master
 </div>
 </div>
 <p class="footer">&copy; 2009-2013 Bob Nystrom</p>
