@@ -1,4 +1,5 @@
-2014-02-17 - fix #7, #61, #62, #71, #72, #95, #96, #97, #98. close #70, #92, #94
+2013-02-18 - fix 3 bugs, close 1
+2014-02-17 - fix 9 bugs, close 3
 2014-02-16 - 5 illustrations, decoupling section intro, mail, twitter, proggit
 2014-02-15 - 548 words, finish third draft event queue
 2014-02-14 - 1879 words (delete ~90), third draft event queue
