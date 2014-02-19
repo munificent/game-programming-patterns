@@ -197,11 +197,11 @@ Note that we added some <span name="memento">more state</span> to the class. Aft
 
 <aside name="memento">
 
-This "previous state of an object" is an obvious place to use the <a href="http://en.wikipedia.org/wiki/Memento_pattern" class="gof-pattern">Memento pattern</a>. Capture a memento before you perform the command, and restore from it to undo it.
+This is an obvious place to use the <a href="http://en.wikipedia.org/wiki/Memento_pattern" class="gof-pattern">Memento pattern</a>. Unfortunately, I've never found it to work well.
 
-If that works for you, great. In practice, I haven't used it. Commands tend to modify a small part of an object's state. Snapshotting the rest of the object's unchanged data is a waste of memory. It's cheaper to just manually store only the bits of data you change.
+Commands tend to modify a small part of an object's state. Snapshotting the rest of the object's unchanged data is a waste of memory. It's cheaper to just manually store only the bits of data you change.
 
-Another option is to use <a href="http://en.wikipedia.org/wiki/Persistent_data_structure">*persistent data structures*</a>. With these, every modification to an object actually returns a new one, leaving the old one unchanged. Through clever implementation, these new objects share data with the previous ones, so it's much cheaper than cloning the entire object.
+<a href="http://en.wikipedia.org/wiki/Persistent_data_structure">*Persistent data structures*</a> are another option. With these, every modification to an object returns a new one, leaving the original unchanged. Through clever implementation, these new objects share data with the previous ones, so it's much cheaper than cloning the entire object.
 
 Using this, each command stores a reference to the object before the command was performed, and undo just means switching back to the old object.
 
@@ -213,9 +213,17 @@ Supporting multiple levels of undo isn't much harder. Instead of remembering the
 
 <img src="images/command-undo.png" />
 
-When the player chooses "Undo", we undo the current command and move the current pointer back. When they redo, we advance the pointer and then execute that command. If they choose a new command after undoing some, everything in the list after the current command is discarded.
+When the player chooses "Undo", we undo the current command and move the current pointer back. When they <span name="replay">redo</span>, we advance the pointer and then execute that command. If they choose a new command after undoing some, everything in the list after the current command is discarded.
 
 Maybe I'm just easily impressed, but when I first implemented this in a level editor, I was as giddy as a schoolgirl at how straightforward it was and how well it worked. It takes discipline to make sure every data modification goes through a command, but once you do that, the rest is easy.
+
+<aside name="replay">
+
+Redo may not be common in games, but re-*play* is. A naïve implementation would record the entire game state at each frame so it can be replayed, but that would use too much memory.
+
+Instead, many games record the set of commands every entity performed each frame. To replay the game, the engine just runs the normal game simulation, executing the pre-recorded commands.
+
+</aside>
 
 ## Classy and Dysfunctional?
 

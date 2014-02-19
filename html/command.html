@@ -361,17 +361,23 @@
 <p>Note that we added some <span name="memento">more state</span> to the class. After we move a unit, it has no recollection of where it used to be. If we want to be able to undo that move, we have to remember its old position ourselves, which is what <code>xBefore_</code> and <code>yBefore_</code> in the command are.</p>
 <aside name="memento">
 
-<p>This "previous state of an object" is an obvious place to use the <a href="http://en.wikipedia.org/wiki/Memento_pattern" class="gof-pattern">Memento pattern</a>. Capture a memento before you perform the command, and restore from it to undo it.</p>
-<p>If that works for you, great. In practice, I haven&#x2019;t used it. Commands tend to modify a small part of an object&#x2019;s state. Snapshotting the rest of the object&#x2019;s unchanged data is a waste of memory. It&#x2019;s cheaper to just manually store only the bits of data you change.</p>
-<p>Another option is to use <a href="http://en.wikipedia.org/wiki/Persistent_data_structure"><em>persistent data structures</em></a>. With these, every modification to an object actually returns a new one, leaving the old one unchanged. Through clever implementation, these new objects share data with the previous ones, so it&#x2019;s much cheaper than cloning the entire object.</p>
+<p>This is an obvious place to use the <a href="http://en.wikipedia.org/wiki/Memento_pattern" class="gof-pattern">Memento pattern</a>. Unfortunately, I&#x2019;ve never found it to work well.</p>
+<p>Commands tend to modify a small part of an object&#x2019;s state. Snapshotting the rest of the object&#x2019;s unchanged data is a waste of memory. It&#x2019;s cheaper to just manually store only the bits of data you change.</p>
+<p><a href="http://en.wikipedia.org/wiki/Persistent_data_structure"><em>Persistent data structures</em></a> are another option. With these, every modification to an object returns a new one, leaving the original unchanged. Through clever implementation, these new objects share data with the previous ones, so it&#x2019;s much cheaper than cloning the entire object.</p>
 <p>Using this, each command stores a reference to the object before the command was performed, and undo just means switching back to the old object.</p>
 </aside>
 
 <p>To let the player undo a move, we keep around the last command they executed. When they bang on Control-Z, we call that command&#x2019;s <code>undo()</code> method. (If they&#x2019;ve already undone, then it becomes "redo" and we execute the command again.)</p>
 <p>Supporting multiple levels of undo isn&#x2019;t much harder. Instead of remembering the last command, we keep a list of commands and a reference to the "current" one. When the player executes a command, we append it to the list and point "current" at it.</p>
 <p><img src="images/command-undo.png" /></p>
-<p>When the player chooses "Undo", we undo the current command and move the current pointer back. When they redo, we advance the pointer and then execute that command. If they choose a new command after undoing some, everything in the list after the current command is discarded.</p>
+<p>When the player chooses "Undo", we undo the current command and move the current pointer back. When they <span name="replay">redo</span>, we advance the pointer and then execute that command. If they choose a new command after undoing some, everything in the list after the current command is discarded.</p>
 <p>Maybe I&#x2019;m just easily impressed, but when I first implemented this in a level editor, I was as giddy as a schoolgirl at how straightforward it was and how well it worked. It takes discipline to make sure every data modification goes through a command, but once you do that, the rest is easy.</p>
+<aside name="replay">
+
+<p>Redo may not be common in games, but re-<em>play</em> is. A na&iuml;ve implementation would record the entire game state at each frame so it can be replayed, but that would use too much memory.</p>
+<p>Instead, many games record the set of commands every entity performed each frame. To replay the game, the engine just runs the normal game simulation, executing the pre-recorded commands.</p>
+</aside>
+
 <h2><a href="#classy-and-dysfunctional" name="classy-and-dysfunctional">Classy and Dysfunctional?</a></h2>
 <p>Earlier, I said commands are similar to first class functions or closures, but every example I showed here used class definitions. If you&#x2019;re familiar with functional programming, you&#x2019;re probably wondering where the functions are.</p>
 <p>I wrote the examples this way because C++ has pretty limited support for first-class functions. Function pointers are stateless, functors are weird and still require defining a class, and the lambdas in C++11 are tricky to work with because of manual memory management.</p>
