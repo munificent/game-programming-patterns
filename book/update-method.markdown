@@ -39,7 +39,7 @@ Naturally, <a href="game-loop.html" class="pattern">Game Loop</a> is another pat
 
 ^code patrol-in-loop
 
-I did the before/after here to show you how the code gets more complex. Patrolling left and right used to be two simple `for` loops. It kept track of which direction the skeleton was moving implicitly by which loop was executing. Now that we have to yield to the outer game loop each frame and then resume where we left off, we have to track that explicitly using that `patrollingLeft` variable.
+I did the before/after here to show you how the code gets more complex. Patrolling left and right used to be two simple `for` loops. It kept track of which direction the skeleton was moving implicitly by which loop was executing. Now that we have to yield to the outer game loop each frame and then resume where we left off, we have to track the direction explicitly using that `patrollingLeft` variable.
 
 But this more or less works, so we keep going. A brainless bag of bones doesn't give yon Norse maiden too much of a challenge, so the next thing we add is a couple of enchanted statues. These will fire bolts of lightning at her every so often to keep her on her toes.
 
@@ -75,7 +75,7 @@ The **game world** maintains a **collection of objects**. Each object implements
 
 ## When to Use It
 
-If the Game Loop pattern is the best thing since sliced bread, then this pattern is its butter. A wide swath of games that have live entities that the player interacts with use this pattern in some form or other. If the game has space marines, dragons, martians, ghosts, or athletes, there's a good chance it uses this pattern.
+If the <a href="game-loop.html" class="pattern">Game Loop pattern</a> is the best thing since sliced bread, then this pattern is its butter. A wide swath of games featuring live entities that the player interacts with use this pattern in some form or other. If the game has space marines, dragons, martians, ghosts, or athletes, there's a good chance it uses this pattern.
 
 However, if the game is more abstract and the moving pieces are less like living actors and more like pieces on a chessboard, this pattern is often a poor fit. In a game like chess, you don't need to simulate all of the pieces concurrently, and you probably don't need to tell the <span name="pawn">pawns</span> to update themselves every frame.
 
@@ -123,7 +123,7 @@ The <a href="state.html" class="pattern">State pattern</a> can often help here. 
 
 ### Objects all simulate each frame but are not truly concurrent
 
-In this pattern, the game loops over a collection of objects and updates each one. Within an object's `update()` call, we can see the rest of the game world, including other objects that are being updated. This means that the *order* that the objects are updated is significant.
+In this pattern, the game loops over a collection of objects and updates each one. Inside the `update()` call, most objects are able to reach out and touch the rest of the game world, including other objects that are being updated. This means that the *order* that the objects are updated is significant.
 
 If A comes before B in the list of objects, then when A updates, it will see B's previous state. But when B updates, it will <span name="double-buffer">see</span> A's *new* state, since it's already updated this frame. Even though from the player's perspective everything is moving at the "same" time, the core of the game is still turn-based. It's just that a complete turn is only one frame long.
 
