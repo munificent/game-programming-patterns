@@ -253,7 +253,7 @@ will default to a null provider.
 Turning off audio is handy during development. It frees up some memory
 and CPU cycles. More importantly, when you break into a debugger just
 as a loud sound starts playing, it saves you from having your eardrums
-shredded. There's nothing like twenty seconds of a scream sound effect
+shredded. There's nothing like twenty milliseconds of a scream sound effect
 looping at full volume to get your blood flowing in the morning.
 
 </aside>
@@ -262,11 +262,10 @@ looping at full volume to get your blood flowing in the morning.
 
 Now that our system is pretty robust, let's discuss another refinement
 this pattern lets us do: decorated services. I'll explain with an
-example:
+example.
 
-It's helpful during development to have the game log when certain
-events occur. If you're working on AI, it's very useful to know when
-an entity is changing AI states. If you're the sound programmer, you
+During development, a little logging when interesting events occur can help you figure out what's going on under the hood of your game engine. If you're working on AI, you'd like to know when
+an entity changes AI states. If you're the sound programmer, you
 may want a record of every sound as it plays so you can check that
 they trigger in the right order.
 
