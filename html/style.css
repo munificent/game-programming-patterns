@@ -25,9 +25,9 @@ body {
     border-top: solid 1px #85a0ad;
     border-bottom: solid 1px #1f292e; }
   .nav .column {
-    max-width: 600px;
+    max-width: 560px;
     margin: 0 auto;
-    padding: 3px 300px 3px 40px; }
+    padding: 3px 340px 3px 40px; }
   .nav a {
     color: #99ddff; }
   .nav a:hover {
@@ -256,9 +256,10 @@ a.pdf:after {
 
 p.footer {
   text-align: center;
-  color: #777;
+  color: #aaa;
   font: 14px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
-  margin: 20px 0 50px 0; }
+  font-weight: 300;
+  margin-top: 40px; }
 
 .outline-note {
   margin-right: 240px;

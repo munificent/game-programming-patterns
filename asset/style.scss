@@ -46,10 +46,10 @@ body {
   }
 
   .column {
-    max-width: 600px;
+    max-width: 560px;
     margin: 0 auto;
 
-    padding: 3px 300px 3px 40px;
+    padding: 3px 340px 3px 40px;
     // TODO: Handle mobile and flex size.
   }
 
@@ -403,9 +403,10 @@ a.pdf:after {
 // Footer.
 p.footer {
   text-align: center;
-  color: #777;
+  color: #aaa;
   font: 14px $sans;
-  margin: 20px 0 50px 0;
+  font-weight: 300;
+  margin-top: 40px;
 }
 
 // Outline.
