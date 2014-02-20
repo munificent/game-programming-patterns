@@ -22,6 +22,92 @@ body {
   background-image: url("images/background.png");
 }
 
+.nav {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  z-index: 3;
+
+  height: 26px;
+  transition: height 0.3s ease;
+
+  background: hsl(200, 10%, 25%);
+  color: hsl(200, 10%, 55%);
+
+  border-top: solid 1px hsl(200, 20%, 30%);
+
+  box-shadow: 0 0 30px hsla(30, 40%, 20%, 0.3);
+
+  .bar {
+    background: hsl(200, 10%, 35%);
+    box-shadow: 0 5px 20px hsla(200, 50%, 20%, 0.3);
+    border-top: solid 1px hsl(200, 20%, 60%);
+    border-bottom: solid 1px hsl(200, 20%, 15%);
+  }
+
+  .column {
+    max-width: 600px;
+    margin: 0 auto;
+
+    padding: 3px 300px 3px 40px;
+    // TODO: Handle mobile and flex size.
+  }
+
+  a {
+    color: hsl(200, 100%, 80%);
+  }
+
+  a:hover {
+    color: hsl(200, 100%, 90%);
+    border-color: hsl(200, 30%, 50%);
+  }
+
+  h1 {
+    font: 14px $sans;
+    font-weight: 300;
+    color: hsl(200, 30%, 85%);
+    padding: 0;
+    margin: 0;
+    border: none;
+
+    a:hover {
+      border: none;
+    }
+  }
+
+  h2 {
+    font: 18px $sans;
+    font-weight: 300;
+    color: hsl(200, 20%, 50%);
+    padding: 10px 0;
+    margin: 0;
+    border: none;
+  }
+
+  table {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+  }
+
+  td {
+    vertical-align: top;
+  }
+
+  ul {
+    padding-left: 16px;
+  }
+
+  p, li {
+    font: 13px/20px $sans;
+    font-weight: 300;
+  }
+}
+
+.nav:hover {
+  height: 340px;
+}
+
 .page {
   background: hsl(40, 30%, 98%);
   max-width: 640px;
@@ -41,7 +127,7 @@ body {
   padding: 0 40px 40px 40px;
 
   background: white;
-  box-shadow: 0 0 20px hsla(30, 40%, 20%, 0.05);
+  box-shadow: 0 0 30px hsla(30, 40%, 20%, 0.05);
   z-index: 2;
 }
 
@@ -99,6 +185,7 @@ ul, ol {
 a {
   color: $primary;
   text-decoration: none;
+  outline: none;
 }
 
 img {
@@ -204,18 +291,42 @@ aside.sidebar {
   display: none;
 
   position: relative;
-  background: hsl(40, 100%, 95%);
-  padding: 6px 18px;
-  font: normal 15px/24px $sans;
+
+  background: hsl(40, 100%, 94%);
+  background: -moz-linear-gradient(top,
+    hsl(40, 100%, 94%) 0%,
+    hsl(40, 100%, 94%) 85%,
+    hsl(45, 100%, 97%) 100%);
+  background: -webkit-gradient(left top, left bottom,
+    color-stop(0%, hsl(40, 100%, 94%)),
+    color-stop(85%, hsl(40, 100%, 94%)),
+    color-stop(100%, hsl(45, 100%, 97%)));
+  background: -webkit-linear-gradient(top,
+    hsl(40, 100%, 94%) 0%,
+    hsl(40, 100%, 94%) 85%,
+    hsl(45, 100%, 97%) 100%);
+  background: -ms-linear-gradient(top,
+    hsl(40, 100%, 94%) 0%,
+    hsl(40, 100%, 94%) 85%,
+    hsl(45, 100%, 97%) 100%);
+  background: linear-gradient(to bottom,
+    hsl(40, 100%, 94%) 0%,
+    hsl(40, 100%, 94%) 85%,
+    hsl(45, 100%, 97%) 100%);
+
+  box-shadow: 0 5px 10px hsla(200, 50%, 20%, 0.05);
+
+  padding: 5px 15px;
+  font: normal 14px/22px $sans;
   color: hsl(35, 40%, 40%);
-  margin-bottom: 24px;
+  margin-bottom: -60px;
 
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 
-  border-left: solid 1px hsl(40, 80%, 90%);
-  border-right: solid 1px hsl(40, 80%, 90%);
-  border-bottom: solid 1px hsl(40, 80%, 80%);
+  border-left: solid 1px hsl(40, 80%, 92%);
+  border-right: solid 1px hsl(40, 80%, 92%);
+  border-bottom: solid 1px hsl(40, 80%, 88%);
 
   .dismiss {
     position: absolute;
@@ -227,6 +338,22 @@ aside.sidebar {
 
     // Hide it by default for users without JavaScript.
     display: none;
+  }
+
+  .dismiss:hover {
+    color: hsl(35, 100%, 40%);
+  }
+
+  p {
+    margin: 10px 0;
+  }
+
+  h2 {
+    font: normal 18px "Rock Salt", $sans;
+    color: hsl(35, 80%, 55%);
+    border: none;
+    margin: 10px 0;
+    padding: 0;
   }
 
   a {
@@ -244,29 +371,13 @@ aside.sidebar {
   }
 }
 
-// Notes to myself.
-p.note {
-  display: none;
-  /*
-  color: #d00;
-  font: normal 12px/20px $mono;
-  */
-}
-
-// ASCII art diagrams.
-pre.diagram {
-  background: #efe;
-  color: #080;
-  font: normal 12px/12px $mono;
-}
-
 // Pattern links.
 a.pattern,
 a.gof-pattern {
 }
 
 a:hover {
-  border-bottom: solid 1px #acf;
+  border-bottom: solid 1px hsl(200, 80%, 90%);
 }
 
 a.pattern:after,
@@ -294,7 +405,7 @@ p.footer {
   text-align: center;
   color: #777;
   font: 14px $sans;
-  margin: 24px 0 24px 0;
+  margin: 20px 0 50px 0;
 }
 
 // Outline.
@@ -345,7 +456,8 @@ a.outline:after {
 }
 
 #mc_embed_signup input {
-  border: 2px solid hsl(38, 80%, 88%);
+  border: 1px solid hsl(38, 80%, 88%);
+  border-radius: 4px;
   -webkit-appearance:none;
 }
 
@@ -358,13 +470,14 @@ a.outline:after {
 }
 
 #mc_embed_signup .button {
-  background-color: hsl(40, 90%, 55%);
-  border: 0 none;
+  background-color: hsl(35, 90%, 55%);
+  border: solid 1px hsl(35, 90%, 50%);
   border-radius: 4px;
+  border-bottom: solid 2px hsl(30, 90%, 45%);
   color: #fff;
   cursor: pointer;
   font-size: 13px;
-  height: 24px;
+  height: 26px;
   text-align: center;
   text-decoration: none;
   vertical-align: top;
@@ -377,7 +490,7 @@ a.outline:after {
 }
 
 #mc_embed_signup .button:hover {
-  background-color: hsl(40, 100%, 45%);
+  background-color: hsl(35, 100%, 60%);
 }
 
 #mc_embed_signup .small-meta {font-size: 11px;}

@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -21,11 +21,85 @@
 </script>
 </head>
 <body id="top">
+<div class="nav">
+  <div class="bar">
+    <div class="column">
+      <h1><a href="index.html">Game Programming Patterns</a></h1>
+    </div>
+  </div>
+  <div class="column">
+    <table>
+      <tr>
+        <td width="40%">
+          <h2>Spatial Partition</h2>
+          <ul><li>
+<a href="#intent">Intent</a></li><li>
+<a href="#motivation">Motivation</a></li><li>
+<a href="#the-pattern">The Pattern</a></li><li>
+<a href="#when-to-use-it">When to Use It</a></li><li>
+<a href="#keep-in-mind">Keep in Mind</a></li><li>
+<a href="#sample-code">Sample Code</a></li><li>
+<a href="#design-decisions">Design Decisions</a></li><li>
+<a href="#see-also">See Also</a></li></ul>
+</div>
+        </td>
+        <td width="60%">
+          <h2>Chapters</h2>
+<ul>
+  <li><a href="introduction.html">Introduction</a>
+    <ul>
+      <li>Architecture, Performance, and Games</li>
+    </ul>
+  </li>
+  <li><a href="design-patterns-revisited.html">Design Patterns Revisited</a>
+    <ul>
+      <li><a href="command.html">Command</a>,
+        <a href="flyweight.html">Flyweight</a>,
+        <a href="observer.html">Observer</a>,
+        <a href="prototype.html">Prototype</a>,
+        <a href="singleton.html">Singleton</a>,
+        <a href="state.html">State</a></li>
+    </ul>
+  </li>
+  <li><a href="sequencing-patterns.html">Sequencing Patterns</a>
+    <ul>
+      <li><a href="double-buffer.html">Double Buffer</a>,
+        <a href="game-loop.html">Game Loop</a>,
+        <a href="update-method.html">Update Method</a></li>
+    </ul>
+  </li>
+  <li>Behavioral Patterns
+    <ul>
+      <li>Bytecode, <a href="subclass-sandbox.html">Subclass Sandbox</a>,
+        <a href="type-object.html">Type Object</a></li>
+    </ul>
+  </li>
+  <li><a href="decoupling-patterns.html">Decoupling Patterns</a>
+    <ul>
+      <li><a href="component.html">Component</a>,
+        <a href="event-queue.html">Event Queue</a>,
+        <a href="service-locator.html">Service Locator</a></li>
+    </ul>
+  </li>
+  <li><a href="optimization-patterns.html">Optimization Patterns</a>
+    <ul>
+      <li><a href="data-locality.html">Data Locality</a>,
+      <a href="dirty-flag.html">Dirty Flag</a>,
+      <a href="object-pool.html">Object Pool</a>,
+      <a href="spatial-partition.html">Spatial Partition</a></li>
+    </ul>
+  </li>
+</ul>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
 <div class="page">
 <div class="content">
 <div class="in-progress">
   <span class="dismiss">&times;</span>
-  <p><strong>This book is a work in progress!</strong></p>
+  <h2>This book is a work in progress!</h2>
 
   <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/game-programming-patterns/issues" target="_blank">file a ticket</a>. To know when new chapters are up, join the mailing list:</p>
 
@@ -55,7 +129,7 @@
         <p>Thank you!</p>
       </td>
       <td width="50%">
-        <p class="signature">&mdash; Bob (<a href="https://twitter.com/intent/user?screen_name=munificentbob" target="_blank">@munificentbob</a>)</p>
+        <p class="signature">&mdash; Bob Nystrom (<a href="https://twitter.com/intent/user?screen_name=munificentbob" target="_blank">@munificentbob</a>)</p>
       </td>
     </tr>
   </table>
