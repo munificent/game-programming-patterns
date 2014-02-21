@@ -188,7 +188,6 @@ def navigationtohtml(chapter, headers):
         nav += '</li></ul>\n'
         currentdepth -= 1
 
-    nav += '</div>'
     return nav
 
 
