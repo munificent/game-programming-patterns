@@ -73,6 +73,9 @@ code {
   color: #444;
   font: normal 15px "Source Code Pro", Menlo, Consolas, Monaco, monospace; }
 
+a code {
+  color: #3366cc; }
+
 pre {
   color: #444;
   font: normal 13px/16px "Source Code Pro", Menlo, Consolas, Monaco, monospace;

@@ -346,6 +346,8 @@ The metric that should guide your approach here is how many inactive objects you
 
 * When you start caring about the cache performance of updating a bunch of entities or components in a loop each frame, the <a href="data-locality.html" class="pattern">Data Locality</a> pattern can help make that faster.
 
-* Microsoft's XNA platform uses this pattern both in the [`Game`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.update.aspx) and [`GameComponent`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gamecomponent.update.aspx) classes.
+* The [Unity](http://unity3d.com) framework uses this pattern in several classes, including [`MonoBehaviour`](http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.Update.html).
+
+* Microsoft's [XNA](http://creators.xna.com/en-US/) platform uses this pattern both in the [`Game`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.update.aspx) and [`GameComponent`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gamecomponent.update.aspx) classes.
 
 * The [Quintus](http://html5quintus.com/) JavaScript game engine uses this pattern on its main [`Sprite`](http://html5quintus.com/guide/sprites.md) class.

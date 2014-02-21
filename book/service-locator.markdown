@@ -606,7 +606,11 @@ be global.
     href="singleton.html">Singleton</a> in many ways, so it's worth
     looking at both to see which is most appropriate for your needs.
 
-*   Microsoft's <a  href="http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.services.aspx">XNA Framework</a> for game development has this pattern
+*   The [Unity](http://unity3d.com) framework uses this pattern in concert
+    with the <a href="component.html" class="pattern">Component pattern</a>
+    in its [`GetComponent()`](http://docs.unity3d.com/412/Documentation/ScriptReference/Component.GetComponent.html?from=index) method.
+
+*   Microsoft's <a  href="http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.services.aspx">XNA</a> framework for game development has this pattern
     built into its core `Game` class. Each instance has a
     `GameServices` object that can be used to register and locate
     services of any type.

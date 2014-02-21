@@ -472,3 +472,6 @@ on it. The PDP-1 was a 2 kHz machine with only 4,096 words of memory yet Steve R
     be the same without it.
 
 * Witters' article on [game loops](http://www.koonsolo.com/news/dewitters-gameloop/) is a close runner-up.
+
+* The [Unity](http://unity3d.com/) framework has a complex game loop, detailed in a wonderful illustration [here](http://www.richardfine.co.uk/2012/10/unity3d-monobehaviour-lifecycle/).
+

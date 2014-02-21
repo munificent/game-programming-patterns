@@ -686,18 +686,11 @@ communication paths if you need them.
 
 ## See Also
 
-*   This pattern goes hand in hand with the <a class="pattern"
-    href="data-locality.html">Data Locality</a> pattern.
-    Components split a monolithic object into separate smaller
-    objects for each domain being used. If you get all of the
-    components of the same type and put them in an array, now you've
-    got them laid out in memory in the most efficient way for your
-    CPU to read them.
+*   The [Unity](http://unity3d.com) framework's core
+    [`GameObject`](http://docs.unity3d.com/Documentation/Manual/GameObjects.html) class is designed entirely around
+    [components](http://docs.unity3d.com/Documentation/Manual/UsingComponents40.html).
 
-    This is a rare win-win in architecture: your code is both more
-    maintainable *and* faster.
-
-*   The open source <a href="http://www.delta3d.org/">Delta3D</a>
+*   The open source [Delta3D](http://www.delta3d.org)
     engine has a base `GameActor` class that implements this pattern
     with the appropriately named `ActorComponent` base class.
 

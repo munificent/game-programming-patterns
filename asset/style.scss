@@ -105,6 +105,10 @@ code {
   font: normal 15px $mono;
 }
 
+a code {
+  color: $primary;
+}
+
 pre {
   color: #444;
   font: normal 13px/16px $mono;
