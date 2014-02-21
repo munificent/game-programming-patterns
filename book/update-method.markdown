@@ -266,6 +266,24 @@ Now that those have been moved into the `Statue` class itself, you can create as
 
 This pattern lets us separate *populating* the game world from *implementing* it. This in turn gives us the flexibility to populate the world using something like a separate data file or level editor.
 
+### Passing time
+
+That's key pattern, but I'll just touch on a common refinement. So far, we've assumed every call to `update()` advances the state of the game world by the same fixed unit of time.
+
+I happen to prefer that, but many games use a <span name="variable">*variable time step*</span>. In those, each turn of the game loop may simulate a larger or smaller slice of time depending on how long it took to process and render the previous frame.
+
+<aside name="variable">
+
+The <a href="game-loop.html" class="pattern">Game Loop</a> chapter has a lot more on the advantages and disadvantages of fixed and variable time steps.
+
+</aside>
+
+That means that each `update()` call needs to know how far the hand of the virtual clock has swung, so you'll often see the elapsed time passed in. For example, we can make our patrolling skeleton handle a variable time step like so:
+
+^code variable
+
+Now, the distance the skeleton moves increases as the elapsed time grows. You can also see the additional complexity of dealing with a variable time step. The skeleton may overshoot the bounds of its patrol with a large time slice and we have to carefully handle that.
+
 ## Design Decisions
 
 With a simple pattern like this, there isn't too much variation, but there's still a couple of knobs you can turn.

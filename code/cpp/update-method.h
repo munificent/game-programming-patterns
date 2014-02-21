@@ -258,7 +258,7 @@ namespace UpdateMethod
     };
     //^statue
   }
-  
+
   namespace ForwardToDelegate
   {
     class Entity;
@@ -278,6 +278,41 @@ namespace UpdateMethod
     }
     //^forward
   }
+
+  namespace VariableTimeStep
+  {
+    class Skeleton
+    {
+    public:
+      float x;
+      bool patrollingLeft_;
+      void update(float elapsed);
+    };
+
+    //^variable
+    void Skeleton::update(float elapsed)
+    {
+      if (patrollingLeft_)
+      {
+        x -= elapsed;
+        if (x <= 0)
+        {
+          patrollingLeft_ = false;
+          x = -x;
+        }
+      }
+      else
+      {
+        x += elapsed;
+        if (x >= 100) {
+          patrollingLeft_ = true;
+          x = 100 - (x - 100);
+        }
+      }
+    }
+    //^variable
+  }
+
 }
 
 #endif

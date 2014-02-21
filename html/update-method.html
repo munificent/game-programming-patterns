@@ -415,6 +415,39 @@
 
 <p>Now that those have been moved into the <code>Statue</code> class itself, you can create as many as you want and each instance will have its own little timer. That&#x2019;s really the motivation behind this pattern: it&#x2019;s now much easier to add new entities to the game world because each one brings along everything it needs to take care of itself.</p>
 <p>This pattern lets us separate <em>populating</em> the game world from <em>implementing</em> it. This in turn gives us the flexibility to populate the world using something like a separate data file or level editor.</p>
+<h3><a href="#passing-time" name="passing-time">Passing time</a></h3>
+<p>That&#x2019;s key pattern, but I&#x2019;ll just touch on a common refinement. So far, we&#x2019;ve assumed every call to <code>update()</code> advances the state of the game world by the same fixed unit of time.</p>
+<p>I happen to prefer that, but many games use a <span name="variable"><em>variable time step</em></span>. In those, each turn of the game loop may simulate a larger or smaller slice of time depending on how long it took to process and render the previous frame.</p>
+<aside name="variable">
+
+<p>The <a href="game-loop.html" class="pattern">Game Loop</a> chapter has a lot more on the advantages and disadvantages of fixed and variable time steps.</p>
+</aside>
+
+<p>That means that each <code>update()</code> call needs to know how far the hand of the virtual clock has swung, so you&#x2019;ll often see the elapsed time passed in. For example, we can make our patrolling skeleton handle a variable time step like so:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Skeleton</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="kt">float</span> <span class="n">elapsed</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">patrollingLeft_</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">x</span> <span class="o">-=</span> <span class="n">elapsed</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="n">patrollingLeft_</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">else</span>
+  <span class="p">{</span>
+    <span class="n">x</span> <span class="o">+=</span> <span class="n">elapsed</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">100</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">patrollingLeft_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Now, the distance the skeleton moves increases as the elapsed time grows. You can also see the additional complexity of dealing with a variable time step. The skeleton may overshoot the bounds of its patrol with a large time slice and we have to carefully handle that.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>With a simple pattern like this, there isn&#x2019;t too much variation, but there&#x2019;s still a couple of knobs you can turn.</p>
 <h3><a href="#what-class-does-the-<code>update()</code>-method-live-on" name="what-class-does-the-<code>update()</code>-method-live-on">What class does the <code>update()</code> method live on?</a></h3>
