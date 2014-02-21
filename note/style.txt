@@ -13,6 +13,10 @@
   Ex: "Add a method to `Foo`."
 - Use normal font and lowercase when referring to objects of the class.
   Ex: "Create a new foo and pass it to `bar()`."
+- Capitalize when referring to pattern like proper noun, lowercase when
+  referring to object
+  implementing pattern.
+  Ex: "Object Pool is a great pattern. An object pool will save you memory."
 - Design Patterns and other book titles are *italicized*.
 - Q: Use parentheses when referring to methods/functions? `foo` or `foo()`?
 - Q: `true` or true?
