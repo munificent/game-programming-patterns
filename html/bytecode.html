@@ -61,7 +61,601 @@
     </tr>
   </table>
 </div>
-<p><em>Sorry, this chapter hasn&#x2019;t been written yet!</em></p>
+<h2><a href="#intent" name="intent">Intent</a></h2>
+<p><em>Increase flexibility by defining behavior as an encoded series of instructions in a higher-level virtual machine.</em></p>
+<h2><a href="#motivation" name="motivation">Motivation</a></h2>
+<ul>
+<li>game progs have hard job</li>
+<li>games hard to write</li>
+<li>fiendishly complex, large, high perf requirements, high stability requirements</li>
+<li>to cope, have tools designed for those</li>
+<li>languages we write game engines are complex, lots of features, and require low level expression of intent</li>
+<li>good fit for much of engine</li>
+<li>when things like cache coherency matters, need to express things in bytes</li>
+<li>
+<p>when have million line quickly changing codebase and bug means game doesn&#x2019;t ship, want complex type systems and ways to enforce invariants, modularity etc.</p>
+</li>
+<li>
+<p>but comes at cost</p>
+</li>
+<li>require right mindset and  years of dedicated training to be productive in language</li>
+<li>dev process often slow and painful: game takes long time to compile</li>
+<li>being able to express at low level is important, <em>having</em> to is often painful</li>
+<li>
+<p>when defining high level behavior, drag on productivity to have to worry about low level fiddly details</p>
+</li>
+<li>
+<p>dev in core engine language often slow and difficult, and rigid</p>
+</li>
+<li>
+<p>necessary evil for core of game that must be rock solid and efficient</p>
+</li>
+<li>
+<p>other parts of game have different constraints</p>
+</li>
+<li>much high level gameplay behavior isn&#x2019;t performance critical</li>
+<li>but does change often as designers explore game space</li>
+<li>as scale of games has grown, less common for single language to be best fit for all behavior in game</li>
+</ul>
+<h3><a href="#spell-fight" name="spell-fight">spell fight</a></h3>
+<ul>
+<li>say working on magic combat game</li>
+<li>wizards duel with hundreds of spells</li>
+<li>designers constantly adding new ones to game</li>
+<li>each spell relatively simple</li>
+<li>couple of concrete examples:</li>
+<li>healing potion raises hero health by 50% of max health, but doesn&#x2019;t go over max</li>
+<li>lightning bolt does 50-100 points of damage with chance of double damage</li>
+<li>
+<p>&hellip;</p>
+</li>
+<li>
+<p>could define these in code but</p>
+</li>
+<li>means engineer has to be involved every time new item or change</li>
+<li>when designer wants to tweak numbers to get feel for them, have to recompile
+  entire game</li>
+<li>adding new items after game has shipped means patching actual game executable</li>
+<li>bug in item behavior can take down entire engine</li>
+<li>want to eventually support modding and then really need to sandbox what items
+  can do</li>
+</ul>
+<h3><a href="#behavior-in-data" name="behavior-in-data">behavior in data</a></h3>
+<ul>
+<li>what does have flexibility we want? data</li>
+<li>can add new data files in patch without touching executable</li>
+<li>tweaking data just means reloading file, which can be done while game is still running</li>
+<li>
+<p>as long as code processing data file is solid, bad data can&#x2019;t take down game</p>
+</li>
+<li>
+<p>best of both worlds then is to define behavior in data</p>
+</li>
+<li>
+<p>sort of talking about programming language</p>
+</li>
+<li>but that brings lots of assumptions</li>
+<li>
+<p>what we end up with may not be like language</p>
+</li>
+<li>
+<p>important bit is just that behavior isn&#x2019;t in code, is data</p>
+</li>
+<li>but to bring data to life, do have to write code that reads data and does stuff</li>
+<li>lots of ways to do this</li>
+<li>gang of four covers one: interpreter</li>
+</ul>
+<h3><a href="#interpreter-pattern" name="interpreter-pattern">interpreter pattern</a></h3>
+<ul>
+<li>briefest possible intro</li>
+<li>basic idea is have some kind of language</li>
+<li>parse it to create abstract syntax tree</li>
+<li><strong>illustration</strong></li>
+<li>each node in tree is object</li>
+<li>different grammar entities are different classes</li>
+<li>classes implement "interpret" method</li>
+<li>data turns into behavior by calling that method</li>
+<li>for leaf classes like literals, just returns value</li>
+<li>other classes like exprs recursively call interpret on children</li>
+<li>in this way, can compose complex behavior out of small parts</li>
+<li>just like do when writing code</li>
+</ul>
+<h3><a href="#vm" name="vm">vm</a></h3>
+<ul>
+<li>interpreter pattern is neat</li>
+<li>easier to debug at runtime, since can see ast in memory</li>
+<li>but slower to execute, slower to load, trickier memory</li>
+<li>lots of little objects have to be created and wired up</li>
+<li>
+<p>calling tons of tiny virtual interpret methods is slow</p>
+</li>
+<li>
+<p>not how language of game engine works</p>
+</li>
+<li>game doesn&#x2019;t parse c++ and walk giant ast</li>
+<li>instead, have <em>compiler</em></li>
+<li>
+<p>compiler parses ast then translates it to machine code</p>
+</li>
+<li>
+<p>machine code has nice features</p>
+</li>
+<li>dense</li>
+<li>linear series of instructions, no nesting, just blob of data</li>
+<li>small set of low-level instructions</li>
+<li>
+<p>fast!</p>
+</li>
+<li>
+<p>original problem though is running compiler is slow and don&#x2019;t have access to</p>
+</li>
+<li>it at runtime</li>
+<li>not sandboxed either: machine code can crash game</li>
+<li>hardware specific</li>
+<li>many consoles don&#x2019;t allow running dynamically loaded or generated machine
+  code</li>
+<li>
+<p>[jit]</p>
+</li>
+<li>
+<p>instead of translating to actual machine code, what if defined <em>virtual</em>
+  machine</p>
+</li>
+<li>like real cpu, has set of low level instructions</li>
+<li>code is just linear series of instructions</li>
+<li>we write tiny emulator for machine in c++</li>
+<li>can then take blobs of code and execute them in vm</li>
+<li>
+<p>not quite as fast as machine code, but simpler, higher-level, platform-independent, and sandboxable</p>
+</li>
+<li>
+<p>how many real languages work: lua, ruby &gt;1.9, cpython</p>
+</li>
+<li>but seems daunting!</li>
+<li>goal of this chapter is to show that simple one can be approachable</li>
+</ul>
+<h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
+<ul>
+<li>virtual machine defined with custom instruction set</li>
+<li>behavior is defined as linear series of instructions, encoding in some compact binary form</li>
+<li>vm is implemented at application level</li>
+</ul>
+<h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
+<p>have lots of behavior to define
+underlying implementation language is wrong fit for behavior:
+- too low level
+- too rigid (either dev loop or after ship)
+- too unsafe</p>
+<ul>
+<li>behavior needs to be relatively constrained in terms of what it can express</li>
+<li>spells can do lots of things, but set of things is still pretty narrow when
+  consider scope of what you can do with entire engine</li>
+<li>every low level primitive behavior (changing a stat, moving entity) etc. has
+  to be made available to vm (like ffi)</li>
+<li>if lots of those, binding layer so large may nullify value of abstraction</li>
+</ul>
+<h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
+<ul>
+<li>complex, heavyweight pattern</li>
+<li>will be showing small, narrow example here to highlight that don&#x2019;t have to
+  go whole hog</li>
+<li>but this pattern often make architectural decision of engine</li>
+<li>hear lots of games talk about supporting scripting</li>
+</ul>
+<h3><a href="#debugging" name="debugging">debugging</a></h3>
+<ul>
+<li>defining behavior, i.e. programming is hard</li>
+<li>know what want machine to do, but often don&#x2019;t communicate intent to machine
+  correctly</li>
+<li>bugs</li>
+<li>to help fix those, programmers have very mature tools to help them understand
+  what code is doing, why, and how to fix it</li>
+<li>
+<p>debuggers, static analyzers, etc.</p>
+</li>
+<li>
+<p>if defining own bytecode, basically creating programming language</p>
+</li>
+<li>tools go out window</li>
+<li>if scale of behavior is small, can get by without them</li>
+<li>but as amount of behavior defined in this grows, users need more ability to
+  see what&#x2019;s going on</li>
+<li>especially important if aiming for non-technical users, which scripting often
+  does</li>
+<li>if creating vm, expect to invest time in tooling</li>
+</ul>
+<h3><a href="#front-end" name="front-end">front end</a></h3>
+<ul>
+<li>pattern about defiing behavior as chunk of low level instructions for vm</li>
+<li>users almost never hand-author those bytes</li>
+<li>
+<p>if c++ is too low level, making users effectively write in assembly isn&#x2019;t
+  improvement!</p>
+</li>
+<li>
+<p>will have to write tool that lets user define behavior and generates bytecode
+  for them</p>
+</li>
+<li>in other words, a compiler</li>
+<li>don&#x2019;t have to necessarily define behavior in text</li>
+<li>[hatsworth]</li>
+<li>can have ui to drag and drop bits of stuff</li>
+<li>but will need some kind of tool</li>
+<li>error handling very important!</li>
+</ul>
+<h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
+<ul>
+<li>building full-featured general purpose language vm is lots of work</li>
+<li>not doing that</li>
+<li>scoping it down</li>
+<li>just need to be able to define spells</li>
+</ul>
+<h3><a href="#magic-api" name="magic-api">magic api</a></h3>
+<ul>
+<li>first, need to think about instruction set</li>
+<li>instead of thinking about bytecode and vms, just think about api</li>
+<li>imagine designing api for spells</li>
+<li>provides basic operations</li>
+<li>
+<p>every spell implemented as fn that calls that api</p>
+</li>
+<li>
+<p>set of things here can grow over time, but can get lot of mileage out of
+  fairly small number, just above covers all sorts of damage, healing, and buff
+  spells</p>
+</li>
+<li>
+<p>then couple of things to jazz up gameplay experience</p>
+</li>
+<li>spawn vfx</li>
+<li>play sound</li>
+<li>
+<p>don&#x2019;t affect gameplay, but important</p>
+</li>
+<li>
+<p>to simplify, imagine api didn&#x2019;t even take params</p>
+</li>
+<li>literally just commands like "refill health" or "do damage" or "play bang"</li>
+<li>spell is just sequence of commands</li>
+</ul>
+<h3><a href="#magic-instruction-set" name="magic-instruction-set">magic instruction set</a></h3>
+<ul>
+<li>if wanted to implement that, easy</li>
+<li>
+<p>just need enum for instructions</p>
+<p>enum</p>
+</li>
+<li>
+<p>to breath life into data, just call into right api for each instruction</p>
+<p>switch</p>
+</li>
+<li>
+<p>like name "bytecode" implies, code is just series of bytes</p>
+</li>
+<li>each byte is one instruction</li>
+<li>[some vms have more complex isntructions]</li>
+<li>
+<p>byte value determines which instru</p>
+</li>
+<li>
+<p>can make little vm that interprets bytecode</p>
+</li>
+<li>takes array of instructions</li>
+<li>
+<p>runs them</p>
+<p>vm</p>
+</li>
+<li>
+<p>dead simple, just loop over switch</p>
+</li>
+<li>loop counter is "ip"</li>
+<li>there, have little bytecode vm</li>
+<li>
+<p>super simple</p>
+</li>
+<li>
+<p>but not very flexible</p>
+</li>
+<li>problem is that instructions too rigid</li>
+<li>can&#x2019;t take params</li>
+<li>have instruction for setting health, but only sets to one specific value</li>
+</ul>
+<h3><a href="#stack-machine" name="stack-machine">stack machine</a></h3>
+<ul>
+<li>want to have params for ins, be able to compose expressions</li>
+<li>like interpreter</li>
+<li>how do that without complexity of interpreter?</li>
+<li>
+<p>want to keep flat list of ins</p>
+</li>
+<li>
+<p>do it just like cpu does: with stack</p>
+<p>stack</p>
+</li>
+<li>
+<p>stack is just array of values</p>
+</li>
+<li>in our example, only data vm works with is numbers, so array of nums</li>
+<li>
+<p>every instruction implicitly modifies that stack</p>
+</li>
+<li>
+<p>all data flow is implicit, using single stack shared by all instructions</p>
+</li>
+<li>
+<p>[some langs work this way]</p>
+</li>
+<li>
+<p>each ins can push stuff onto stack or pop off</p>
+</li>
+<li>for example, set health ins needs to know what to set health too</li>
+<li>
+<p>gets it by popping off top of stack</p>
+<p>set health</p>
+</li>
+<li>
+<p>how does value get there?</p>
+</li>
+<li>need some inst for creating and working with nums</li>
+<li>first is literal: represents raw num</li>
+<li>literal ins pushes value onto stack</li>
+<li>where it get value?</li>
+<li>right from bytecode itself: stuff value as raw data right in bytecode after
+  ins</li>
+<li>
+<p>to interp, read value out of bytecode and push</p>
+<p>literal</p>
+</li>
+<li>
+<p>so if wanted to set health to 20, do:</p>
+<p>push 20
+set health</p>
+</li>
+<li>
+<p>if run this, load literal 20 onto stack then exec set health which consumes</p>
+</li>
+<li>
+<p>can do this for other ins that need params, can even pop multiple values</p>
+</li>
+<li>
+<p>(other ins&hellip;)</p>
+</li>
+<li>
+<p>much more expressive now</p>
+</li>
+<li>can create lots of spells that have basically different tuned constants</li>
+</ul>
+<h3><a href="#behavior-=-composition" name="behavior-=-composition">behavior = composition</a></h3>
+<ul>
+<li>still doesn&#x2019;t feel like behavior</li>
+<li>really just tweaking knobs</li>
+<li>
+<p>want to be able to <em>compose</em> stuff</p>
+</li>
+<li>
+<p>add more ins</p>
+</li>
+<li>want spells that modify stats</li>
+<li>add 10 to health</li>
+<li>
+<p>need ins to read stat</p>
+<p>read</p>
+</li>
+<li>
+<p>opposite of set: pulls attribute from game pushes onto stack</p>
+</li>
+<li>can now do stuff like read one stat and store it as other</li>
+<li>
+<p>could make weird things like spell that makes as strong as smart</p>
+</li>
+<li>
+<p>can still only copy values from one stat to other</p>
+</li>
+<li>want to do arith</li>
+<li>add some ins</li>
+<li>
+<p>plus pops two, adds, and pushes result</p>
+<p>plus</p>
+</li>
+<li>
+<p>ditto for other ops</p>
+</li>
+<li>
+<p>spells have chance, let&#x2019;s make random ins</p>
+</li>
+<li>pops min and max from stack, and pushes rand num in range</li>
+<li>
+<p>now can make spells that have varied effect</p>
+</li>
+<li>
+<p>with these, can now do really rich behavior</p>
+</li>
+<li>spell that increases health by 1/5 of stamina</li>
+<li>
+<p>spell that plays random sound</p>
+</li>
+<li>
+<p>not obvious, but can even eval complex, nested exprs</p>
+</li>
+<li>
+<p>consider (10 / 3) - (2 * 3))</p>
+</li>
+<li>start with ten, but put off to side for now</li>
+<li>because of parens, need to mult first</li>
+<li>then take 2 and 3 and multiply</li>
+<li>then get ten and result of mult and subtract</li>
+<li>
+<p>that&#x2019;s result</p>
+</li>
+<li>
+<p>translate to bytecode</p>
+<p>...</p>
+</li>
+<li>
+<p>almost exact same thing</p>
+</li>
+<li>note data flow implicit and right values get to right instructions from stack</li>
+</ul>
+<h3><a href="#vm" name="vm">vm</a></h3>
+<ul>
+<li>ta-da, now have tiny little vm that supports all kinds of open-ended behavior
+  for spells</li>
+<li>
+<p>seems really simple, but thanks to arithmetic and ability to compose
+  expressions using stack, sky is limit</p>
+</li>
+<li>
+<p>note that we have full control over how execute code</p>
+</li>
+<li>bytecode can&#x2019;t poke into disallowed places in game engine because only has
+  access to instructions we chose to implement</li>
+<li>can control how much memory it uses (just stack) and handle it overflowing</li>
+<li>
+<p>can even control code that runs for too long by stopping if execute too many
+  instructions</p>
+</li>
+<li>
+<p>just one problem&hellip; hand writing instructions even harder than writing c++!</p>
+</li>
+</ul>
+<h3><a href="#spellcasting-tools" name="spellcasting-tools">spellcasting tools</a></h3>
+<ul>
+<li>being able to look at chunk of code and hand-compile it to stack machine
+  bytecode is perhaps world&#x2019;s lamest party trick</li>
+<li>
+<p>not something most people want to do</p>
+</li>
+<li>
+<p>one of goals was <em>higher</em> level way to author behavior, not lower</p>
+</li>
+<li>need tool to let users express spell semantics in something friendlier</li>
+<li>then automatically translate to low level stack machine bytecode</li>
+<li>
+<p>compiler</p>
+</li>
+<li>
+<p>but! doesn&#x2019;t have to be textual</p>
+</li>
+<li>can be, but many non-tech people not text oriented</li>
+<li>prog langs unforgiving of syntax mistakes, really unpleasant for many users</li>
+<li>instead, can build gui for creating behavior</li>
+</ul>
+<p><strong>illustrate</strong></p>
+<ul>
+<li>nice thing is ui prevents user from creating invalid code</li>
+<li>don&#x2019;t have to write parser</li>
+<li>[writing parser not that hard. difficulty overstated. good error messages
+  are work though, and critical.]</li>
+<li>do still have to design and implement tool ui</li>
+<li>no escaping: you are creating system to let user define behavior</li>
+<li>have to make user experience</li>
+<li>text prog lang is ui too</li>
+</ul>
+<h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
+<ul>
+<li>while keep chapter simple, really about defining lang</li>
+<li>very open ended</li>
+<li>remember, trying to ship game, not design world&#x2019;s greatest lang</li>
+</ul>
+<h3><a href="#instructions" name="instructions">instructions?</a></h3>
+<ul>
+<li>have to decide what prim instructions</li>
+<li>have set of them that touch actual game engine in visible way: modify entities, graphics, etc. "side effects"</li>
+<li>these define limits of what code can and cannot do</li>
+<li>
+<p>if don&#x2019;t provide prim for moving camera, no amount of clever bytecode can fake it</p>
+</li>
+<li>
+<p>usually have basic arithmetic ones</p>
+</li>
+<li>couple stack juggling ones</li>
+<li>may add flow control ins. didn&#x2019;t cover here, but these pop value from stack
+  and, based on it, move the index used to walk through bytecode
+  (goto)</li>
+<li>
+<p>if then and even ?: and short-cirtuit &amp;&amp; || use this</p>
+</li>
+<li>
+<p>if users want to reuse chunks of bytecode, need something like function call
+  instr</p>
+</li>
+<li>basically instr that jumps to other point in bytecode</li>
+<li>have separate stack of return addresses</li>
+<li>when done with subroutine hit "end" instr</li>
+<li>pop return address off stack and set ip to that</li>
+</ul>
+<h3><a href="#instruction-encoding" name="instruction-encoding">instruction encoding</a></h3>
+<ul>
+<li>have to decide how inst are encoded in binary</li>
+<li>in example, just one byte each, simple enum mapping</li>
+<li>good enough for jvm</li>
+<li>other vm more complex</li>
+<li>some "register-based"</li>
+<li>bit if misnomer, not like regs in cpu</li>
+<li>instead of always getting args from top of stack, inst encodes offsets into
+  stack</li>
+<li>can try to pack more inst into fewer bytes</li>
+<li>perf game: denser code is faster [data locality]</li>
+<li>but takes more time to decode</li>
+<li>profile and tweak</li>
+</ul>
+<h3><a href="#value-rep" name="value-rep">value rep</a></h3>
+<ul>
+<li>what kind of runtime values vm handle?</li>
+<li>in example, just simple numbers</li>
+<li>may need multiple types: numbers, strings, etc.</li>
+<li>have to decide how represented and stored in stack</li>
+<li>typically have something like union or variant type</li>
+</ul>
+<h3><a href="#how-bytecode-generated" name="how-bytecode-generated">how bytecode generated</a></h3>
+<ul>
+<li>by far most important question</li>
+<li>
+<p>what kind of tool (or tools!) have to create bytecode</p>
+</li>
+<li>
+<p><strong>text based language</strong></p>
+<ul>
+<li>tried and true</li>
+<li>don&#x2019;t have to write editor: use text editor</li>
+<li>portable: not bound to ui system</li>
+<li>have to write parser: easy</li>
+<li>have to design syntax: hard!</li>
+<li>need good error messages</li>
+<li>non-progs not comfortable with text</li>
+</ul>
+</li>
+<li>
+<p><strong>ui</strong></p>
+<ul>
+<li>when done well, fun to use</li>
+<li>less error-handling since ui can prevent malformed code</li>
+<li>avoid syntax rathole</li>
+<li>have to do lots of ui programming</li>
+</ul>
+</li>
+</ul>
+<h2><a href="#see-also" name="see-also">See Also</a></h2>
+<ul>
+<li>
+<p>sister pattern is interpreter. often go hand-in-hand with this. when write
+  tool to generate bytecode, tool itself often parses or uses ui to build tree
+  then "interpret" pattern is used to emit bytecode</p>
+</li>
+<li>
+<p>similar to command pattern: can think of as dense encoding of series of
+  commands</p>
+</li>
+<li>
+<p>lua most well known bytecode vm in games</p>
+</li>
+<li>
+<p>jvm and clr well-known bytecode vms</p>
+</li>
+<li>
+<p>genre of "programming games" where player writes code. some early ones simple bytecode based like robowar</p>
+</li>
+</ul>
 <p class="footer">&copy; 2009-2014 Bob Nystrom</p>
 </div>
 </body>

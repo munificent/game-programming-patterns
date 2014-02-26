@@ -1,3 +1,9 @@
+2013-02-24 - 598 words, finish outline bytecode
+2013-02-23 - 1165 words, outline bytecode
+2013-02-22 - 1069 words, outline bytecode
+2013-02-21 - fix 3 (large) bugs
+2013-02-20 - fix 3 bugs, move todos to github issues, more design work
+2013-02-19 - nav bar on new design
 2013-02-18 - fix 3 bugs, close 1
 2014-02-17 - fix 9 bugs, close 3
 2014-02-16 - 5 illustrations, decoupling section intro, mail, twitter, proggit
