@@ -64,7 +64,7 @@
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Decouple when a message or event is sent from when it is processed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>Unless you live under one of the few rocks that still lacks Internet access, you&#x2019;ve probably already heard of an <span name="message">"event queue"</span>. If not, maybe "message queue", or "event loop", or "message pump" rings a bell. To refresh your memory, let&#x2019;s walk through a couple of common manifestations of the pattern.</p>
+<p>Unless you live under one of the few rocks that still lack Internet access, you&#x2019;ve probably already heard of an <span name="message">"event queue"</span>. If not, maybe "message queue", or "event loop", or "message pump" rings a bell. To refresh your memory, let&#x2019;s walk through a couple of common manifestations of the pattern.</p>
 <aside name="message">
 
 <p>For most of the chapter, I use "event" and "message" interchangeably. Where the distinction matters, I&#x2019;ll make it obvious.</p>
@@ -89,7 +89,7 @@
 <p>The call to <code>getNextEvent()</code> pulls a bit of unprocessed user input into your app. You route it to an event handler and, like magic, your application comes to life. The interesting part is that the application <em>pulls</em> in the event when <em>it</em> wants it. The operating system doesn&#x2019;t just immediately <span name="interrupt">jump</span> to some code in your app when the user pokes a peripheral.</p>
 <aside name="interrupt">
 
-<p>In constrast, <em>interrupts</em> from the operating system <em>do</em> work like that. When an interrupt happens, the OS stops whatever your app was doing and forces it to jump to an interrupt handler. This abruptness is why interrupts are so hard to work with.</p>
+<p>In contrast, <em>interrupts</em> from the operating system <em>do</em> work like that. When an interrupt happens, the OS stops whatever your app was doing and forces it to jump to an interrupt handler. This abruptness is why interrupts are so hard to work with.</p>
 </aside>
 
 <p>That means when user input comes in, it needs to go somewhere so that the operating system doesn&#x2019;t lose it between when the device driver reported the input and when your app gets around to calling <code>getNextEvent()</code>. That "somewhere" is a <em>queue</em>.</p>
