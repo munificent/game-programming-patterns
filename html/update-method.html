@@ -424,7 +424,7 @@
 </aside>
 
 <p>That means that each <code>update()</code> call needs to know how far the hand of the virtual clock has swung, so you&#x2019;ll often see the elapsed time passed in. For example, we can make our patrolling skeleton handle a variable time step like so:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Skeleton</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="kt">float</span> <span class="n">elapsed</span><span class="p">)</span>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Skeleton</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="kt">double</span> <span class="n">elapsed</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">patrollingLeft_</span><span class="p">)</span>
   <span class="p">{</span>

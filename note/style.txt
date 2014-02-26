@@ -39,4 +39,5 @@
 - Trailing underscore for fields. That way isFoo() doesn't collide with isFoo
   field.
 - Do use "virtual" for overridden methods.
+- Use "double" for floating point variables.
 - Q: How are empty constructors formatted? {} on next line?

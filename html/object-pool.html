@@ -643,7 +643,7 @@ inside the pool class or outside.</p>
   <span class="c1">// Multiple ways to initialize.</span>
   <span class="kt">void</span> <span class="n">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">);</span>
   <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">yVel</span><span class="p">);</span>
-  <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">float</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">float</span> <span class="n">speed</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">double</span> <span class="n">speed</span><span class="p">);</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">ParticlePool</span>
@@ -655,7 +655,7 @@ inside the pool class or outside.</p>
   <span class="kt">void</span> <span class="n">create</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">yVel</span><span class="p">)</span>
   <span class="p">{</span> <span class="cm">/* forward to Particle... */</span> <span class="p">}</span>
 
-  <span class="kt">void</span> <span class="n">create</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">float</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">float</span> <span class="n">speed</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="n">create</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">double</span> <span class="n">speed</span><span class="p">)</span>
   <span class="p">{</span> <span class="cm">/* forward to Particle... */</span> <span class="p">}</span>
 <span class="p">};</span>
 </pre></div>
@@ -677,7 +677,7 @@ inside the pool class or outside.</p>
   <span class="c1">// Multiple ways to initialize.</span>
   <span class="kt">void</span> <span class="n">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">);</span>
   <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">yVel</span><span class="p">);</span>
-  <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">float</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">float</span> <span class="n">speed</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">double</span> <span class="n">speed</span><span class="p">);</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">ParticlePool</span>

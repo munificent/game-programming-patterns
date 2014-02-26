@@ -223,7 +223,7 @@ namespace Temp4
     // Multiple ways to initialize.
     void init(int x, int y);
     void init(int x, int y, int xVel, int yVel);
-    void init(int x, int y, float direction, float speed);
+    void init(int x, int y, double direction, double speed);
   };
 
   class ParticlePool
@@ -235,7 +235,7 @@ namespace Temp4
     void create(int x, int y, int xVel, int yVel)
     { /* forward to Particle... */ }
 
-    void create(int x, int y, float direction, float speed)
+    void create(int x, int y, double direction, double speed)
     { /* forward to Particle... */ }
   };
   //^12
@@ -250,7 +250,7 @@ namespace Temp5
     // Multiple ways to initialize.
     void init(int x, int y);
     void init(int x, int y, int xVel, int yVel);
-    void init(int x, int y, float direction, float speed);
+    void init(int x, int y, double direction, double speed);
   };
 
   class ParticlePool

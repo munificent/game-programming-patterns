@@ -284,13 +284,13 @@ namespace UpdateMethod
     class Skeleton
     {
     public:
-      float x;
+      double x;
       bool patrollingLeft_;
-      void update(float elapsed);
+      void update(double elapsed);
     };
 
     //^variable
-    void Skeleton::update(float elapsed)
+    void Skeleton::update(double elapsed)
     {
       if (patrollingLeft_)
       {
