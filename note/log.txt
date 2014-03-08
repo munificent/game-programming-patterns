@@ -1,3 +1,9 @@
+2014-03-08 - 1197 words, finish first draft bytecode
+2014-03-07 - 758 words, work on design decisions
+2014-03-06 - 748 words, work on design decisions
+2014-03-05 - 708 words, finish sample code
+2014-03-04 - 678 words
+2014-03-03 - 583 words, first draft bytecode, work on sample code section
 2014-03-02 - 1373 words
 2014-03-01 - 639 words
 2014-02-28 - 615 words, finish motivation
