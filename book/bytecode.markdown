@@ -3,69 +3,59 @@
 
 ## Intent
 
-*Increase flexibility by defining behavior as an encoded series of instructions in a higher-level virtual machine.*
+*Define behavior in data as a series of low-level instructions executed by a virtual machine.*
 
 ## Motivation
 
-Not to moan about it, but game programmers have a pretty rough jobs. Despite what hordes of gamers might believe, games are actually fiendishly hard to program. Modern games have complex, sprawling codebases. A single bug can crash the program and prevent a console manufacturer or marketplace from approving the game.
+Making games may be fun, but it certainly ain't *easy*. Modern games require <span name="sprawling">enormous</span>, complex codebases. Console manufacturers and app marketplace gatekeepers have stringent quality requirements, and a single crash bug in any of that code can prevent your game from shipping.
 
-To cope with that complexity, we rely on big languages like C++ and Java with piles of modularity features and rich type systems to help us prevent or at least isolate bugs.
+<aside name="sprawling">
 
-At the same time, games are expected to squeeze every drop of performance out of the hardware which requires controlling down to the lowest possible level. Games are one of the last bastions of inline assembly in modern software. To make the best of CPU caching, we carefully control how every byte is laid out in memory.
+I worked on a game that had six million lines of C++ code. For comparison, the software controlling the Mars Curiosity rover is less than half that.
 
-Despite very mature tooling, all of this has a cost. It takes years of dedicated training to program in this way. Once you've levelled yourself up, you get to fight with the sheer scale of your codebase. Build times for large applications can vary somewhere between "go get a coffee" and "go roast your own beans, hand grind them, pull an espresso, foam some milk and practice your latte art in the froth".
+</aside>
 
-On top of all of these challenges, games have one more nasty constraint: *fun*, players expect games to offer a fresh experience that's precised balanced. That requires constant iteration on every feature and stat in the game. One overpowered move can throw off the entire game balance.
+At the same time, we're expected to squeeze every drop of performance out of the hardware. Games push hardware like nothing else, and we're expected to optimize relentlessly just to keep pace with the competition.
 
-If every tweak and change in the game requires bugging an engineer to muck around in piles of low-level code and then wait for a glacial recompile, you can kill your creative flow. That lost productivity adds up, and often the difference between a great game and a failure boils down to who managed to cram in more iterations of tuning.
+To handle these high stability and performance requirements, we reach for big, complex languages like C++ that have both low-level expressiveness to make the most of the hardware, and rich type systems to prevent or at least corral bugs.
 
-Some parts of a high performance game engine simply need to be expressed in the kind of language that lets control exactly what the CPU and RAM is doing. The core of you renderer, physics engine, and maybe AI will make up a large fraction of the game's execution time. Increasing performance by a few percent there can mean richer levels and more excitement on screen.
+We pride ourselves on our ability to do this, but it has its cost. Being a proficient programmer takes years of dedicated training. Once you've levelled yourself up, you get to fight with the sheer scale of your codebase. Build times for large applications can vary somewhere between "go get a coffee" and "go roast your own beans, hand-grind them, pull an espresso, foam some milk and practice your latte art in the froth".
 
-But much of a game's behavior isn't that performance critical. Things like level scripting and the behavior of items won't even show up in your profiler. And those are there exact places where the behavior is changing constantly as the designers hone the game experience.
-
-As codebases have grown, they've reached a point where one language, one way to express behavior, is rarely the best tool for the entire game. If you can trade off a bit of performance for more flexibility, ease of use, or a quicker iteration time, that can ultimately lead to a better game.
+On top of these challenges, games have one more nasty constraint: *fun*. Players demand a play experience that's both novel and yet carefully balanced. That requires constant iteration, but if every tweak requires bugging an engineer to muck around in piles of low-level code and then waiting for a glacial recompile, you've killed your creative flow.
 
 ### Spell fight!
 
-Let's say we're working on a magic-based fighting game. Pairs of wizars square off and try to best each other with an array of hundreds of spells. Designers are constantly iterating on the spells, adding new ones, tuning, and tweaking them.
+Let's say we're working on a magic-based fighting game. A pair of wizards square off and fling enchantments at each other until victor is pronounced. While each spell is relatively simple, there are piles of them and designers are constantly refining them.
 
-Each spell is relatively simple. It usually just modifies a few stats and does some sort of visual effect. A couple of examples:
+We could define them all in code, but that means an engineer has to be involved every time a spell is modified. When a designer wants to tweak a few numbers and get a feel for them, they have to recompile the entire game, reboot it, and get back into a fight.
 
-- Rejuvenate: Raises the wizard's health by 50%.
-- Lightning Bolt: Summons a bolt of lightning that strikes the opponent for 50-80 points of damage.
-- Stupefy: Lowers opponents wisdom by one.
+Now consider that our game is online. Like most games these days, we want to be able to update it after it ships, both to fix bugs and to add new content. If all of these spells are hard-coded, then updating them means patching the actual game executable.
 
-We could define all of these in code, but that would mean an engineer has to be involved every time a spell is modified. When a designer wants to tweak a few numbers and get a feel for them, they have to recompile the entire game, reboot it, and get back into a fight.
-
-Now consider that our game is online. Like most games these days, we want to be able to update it after it ships, both to fix bugs and to add new content. If all of these spells are hard-coded, then modifying them means patching the actual game executable.
-
-Let's take things a bit farther and say that we also want to support *modding*. We want *users* to be able to play around with adding new spells. If those are in code, that means every modder needs a full compiler toolchain to build the game, and we have to release the sources. Worse, if they have a bug in their spell, it could crash the game on some other player's machine.
+Let's take things a bit farther and say that we also want to support *modding*. We want *users* to be able to create their own spells. If those are in code, that means every modder needs a full compiler toolchain to build the game, and we have to release the sources. Worse, if they have a bug in their spell, it can crash the game on some other player's machine.
 
 ### Data &gt; code
 
-It's pretty clear that our engine's implementation language isn't the right fit for our needs here. We want to define spells in a way that's safely sandboxed from the main game executable. We want them to be easy to modify and reload, and physically separate from the rest of the game.
+It's pretty clear that our game's implementation language isn't the right fit for our needs here. We want to define spells in a way that's safely sandboxed from the core game engine. We want them to be easy to modify and reload, and physically separate from the rest of the game.
 
-I don't know about you, but to me that sounds a lot like *data*. If we defined our behavior in separate data files that the game engine loaded and "executed" in some way, we can achieve all of our goals here.
+I don't know about you, but to me that sounds a lot like *data*. If we could define our behavior in separate data files that the game engine loads and "executes" in some way, we can achieve all of our goals here.
 
-Now we just need to figure out what "execute" means for data. How do you define some bytes in a file that represent behavior? There are lots of ways to do this. I think it will help you get a picture of *this* pattern's strengths and weaknesses if we compare it to another one -- the Gang of Four's <a href="http://en.wikipedia.org/wiki/Interpreter_pattern" class="gof-pattern">Interpreter pattern</a>.
+Now we just need to figure out what "execute" means for data. How do you define some bytes in a file that represent behavior? There are a few different ways to do this. I think it will help you get a picture of *this* pattern's strengths and weaknesses if we compare it to another one -- the <a href="http://en.wikipedia.org/wiki/Interpreter_pattern" class="gof-pattern">Interpreter pattern</a>.
 
 ### The Interpreter pattern
 
-I could write a chapter just on this pattern, but I'm pretty sure four guys already did that for me. Instead, I'm going to cram the briefest of introductions in here. The basic idea is that you have some kind of language that you want to interpret.
-
-Say, for example, it supports arithmetic expressions like this:
+I could write a whole chapter just on this pattern, but some gang of four guys already covered that for me. Instead, I'll cram the briefest of introductions in here. It starts with a language -- think *programming* language -- that you want to execute. Say, for example, it supports arithmetic expressions like this:
 
     1 + 2 * (3 + 4)
 
-Then you take each piece of that expression -- each rule in the language's grammar -- and turn it into an *object*. The numbers will be objects:
+Then you take each piece of that expression -- each rule in the language's grammar -- and turn it into an *object*. The number literals will be objects:
 
 **TODO: illustrate**
 
-Basically just little boxes around the raw number. The operators will be objects too, and they'll have references to their operands. So, in the above, we're subtracting `4` from `3`, so we'd have this:
+Basically just little boxes around the raw value. The operators will be objects too, and they'll have references to their operands. So, in the above, we're subtracting `4` from `3`, so we'd have this:
 
 **TODO: illustrate**
 
-If you take into account the parentheses and rules of arithmetic precedence, that original expression <span name="magic">magically</span> turns into a little tree of objects like so:
+If you take into account the parentheses and the rules of arithmetic precedence, that expression <span name="magic">magically</span> turns into a little tree of objects like so:
 
 **TODO: illustration**
 
@@ -77,77 +67,91 @@ Whip up one of these and you've got yourself half of a compiler.
 
 </aside>
 
-The interpreter pattern isn't about *creating* that tree, it's about *executing* it. The way it works is pretty clever. Each those objects implements a base `Expression` interface:
+The interpreter pattern isn't about *creating* that tree, it's about *executing* it. The way it works is pretty clever. Each object in the tree is an expression, or a subexpression. In true object-oriented fashion, we'll let expressions evaluate themselves.
 
-    expression
+First, we define a base interface that all expressions will implement:
 
-There are different classes that implement that for each *kind* of expression in our language's grammar. For our example, that's numbers, addition and multiplication.
+^code expression
 
-Each class is responsible for evaluating itself and returning the result. For numbers, it's trivial:
+There we define classes that implement that for each kind of expression in our language's grammar. The simplest one is numbers:
 
-    number
+^code number
 
-A number expression's value is just the number. The two infix expressions are *compound* expressions -- they have subexpressions. So, before they can evaluate themselves, they need to recursively evaluate those first. Like so:
+A literal just evaluates to its value. Addition and multiplication are a bit more complex because they contain subexpressions. Before they can evaluate themselves, they need to recursively evaluate those first. Like so:
 
-    addition
+<span name="addition"></span>
 
-I'm sure you can figure out what the implementation of multiply looks like. Pretty neat right? Just a couple of simple classes and now we can represent and evaluate any possible arithmetic expression. We just need to create the right objects and wire them up correctly.
+^code addition
 
-In our example here, the expressions just evaluated numbers, but you could have "expressions" for things like "spawn particles" or "change an entity's health". There's nothing prevent `evaluate()` from reaching out and calling into other code.
+<aside name="addition">
 
-It's a great pattern. If you ever implement your own programming language, you'll probably write one in this style at some point. Ruby worked exactly like this all the way up to <span name="ruby">1.9</span>. But it's got it's problems.
-
-<aside name="ruby">
-
-In 1.9, they switched to a bytecode VM, which is what this chapter is about. It took something like 15 years for them to make the switch. Look how much time I'm saving you!
+I'm sure you can figure out what the implementation of multiply looks like.
 
 </aside>
 
-Look up at the illustration. What do you see? Lots of little objects, and lots of arrows between them. Code in this style is represented as a sprawling fractal tree of tiny objects. That's got some problems:
+Pretty neat right? Just a couple of simple classes and now we can represent and evaluate arbitrarily complex, nested arithmetic expressions. We just need to create the right objects and wire them up correctly.
 
-* Loading code from disk requires instantiating and wiring up tons of these small objects.
+In our example here, the expressions just evaluated numbers, but we could add expression classes for things like "spawn particles" or "change an entity's health". There's nothing preventing `evaluate()` from reaching out and calling into other code.
 
-* All of those objects take up memory. On a 32-bit machine that little arithmetic expression up there takes up at least 68 bytes, not including padding. (If you're playing along at home, don't forget to take into account the vtable pointers.)
+<aside name="ruby">
 
-* Traversing the pointers into subexpressions is murder on your data cache.
+Ruby was implemented like this for something like 15 years. At version 1.9, they switched to the kind of bytecode VM this chapter describes. Look how much time I'm saving you!
 
-* Meanwhile, calling all of those virtual methods wreaks carnage on your instruction cache.
+</aside>
 
-* Evaluating every single tiny subexpression involves the overhead of a virtual method call.
+It's a <span name="ruby">beautiful</span>, simple pattern, but is has some problems. Look up at the illustration. What do you see? Lots of little objects, and lots of arrows between them. Code is represented as a sprawling fractal tree of tiny objects. That has some unpleasant consequences:
 
-Add those up, and what do they spell? SLOW. There's a reason more languages in real use do *not* use the interpreter pattern. It's just too slow, and uses up too much memory.
+* Loading it from disk requires instantiating and wiring up tons of these small objects.
+
+* Those objects and the pointers between them use a lot of memory. On a 32-bit machine that little arithmetic expression up there takes up at least 68 bytes, not including padding. (If you're playing along at home, don't forget to take into account the vtable pointers.)
+
+* Traversing the pointers into subexpressions is murder on your <span name="cache">data cache</span>. Meanwhile, all of those virtual method calls wreak carnage on your instruction cache.
+
+<aside name="cache">
+
+See the chapter on <a href="data-locality.html" class="pattern">Data Locality</a> for more on what the cache is and how it affects your performance.
+
+</aside>
+
+Put those together, and what do they spell? S-L-O-W. There's a reason most programming languages in wide use aren't based on the interpreter pattern. It's just too slow, and uses up too much memory.
 
 ### Machine code, virtually
 
-Consider our game's executable. The computer doesn't run it by walking around these grammatical tree structures in memory. Instead, it executes machine code. What's machine code got going for it?
+Consider our game engine. When we execute that, the computer doesn't traverse a bunch of C++ grammar tree structures at runtime. Instead, we compile it ahead of time to machine code and the CPU runs that. What's machine code got going for it?
 
-* It's dense. A chunk of machine code is a solid, contiguous blob of binary data, and no bit goes to waste.
+* *It's dense.* A chunk of machine code is a solid, contiguous blob of binary data, and no bit goes to waste.
 
-* It's linear. Instructions are packed together and executed one right after another. No jumping around in memory (unless you're doing actual control flow, of course).
+* *It's linear.* Instructions are packed together and executed one right after another. No jumping around in memory (unless you're doing actual control flow, of course).
 
-* It's low-level. Each instruction does one relatively minimal thing, and interesting behavior comes from *composing* instructions.
+* *It's low-level.* Each instruction does one relatively minimal thing, and interesting behavior comes from *composing* instructions.
 
-* It's fast. As a consequence of all of these (well, and the fact that it's implemented directly in hardware), machine code runs like the wind.
+* *It's fast.* As a consequence of all of these (well, and the fact that it's implemented directly in hardware), machine code runs like the wind.
 
-Of course, we don't want machine code for our spells, or we'd be right back to the original problem. Few these days are crazy enough to write machine code by hand, so we'd be right back to need a full compiler toolchain and all of the problems that come with it.
+Of course, we don't want machine code for our spells, or we'd be right back to the original problem. Few people these days are crazy enough to write machine code by hand, so we'd be right back to needing a full compiler toolchain and all of the overhead that comes with it.
 
-Also, if we were to dynamically load machine code into our game and start executing it, that's a good way to make it completely insecure and likely to crash or steal the player's credit card number. For this reason, many game consoles and iOS don't allow programs to execute machine code loaded or generated at runtime.
+Also, if we dynamically load machine code into our game and start executing it, that's a good way to <span name="jit">breach its security</span> and break the game. Is there a middle ground?
 
-Is there a middle ground? What if instead of loading actual machine code and executing it directly, we defined our own *virtual* machine code? We'd then write a little emulator for it in our game. It would be similar to machine code -- dense, linear, relatively low-level -- but would also be handled entirely by our game so we can sandbox it and control it.
+What if instead of loading actual machine code and executing it directly, we defined our own *virtual* machine code? We'd then write a little emulator for it in our game. It would be similar to machine code -- dense, linear, relatively low-level -- but would also be handled entirely by our game so we could safely sandbox it.
+
+<aside name="jit">
+
+This is why many game consoles and iOS don't allow programs to execute machine code loaded or generated at runtime.
+
+That's a drag because the fastest programming language interpreters do exactly that. They contain a "just-in-time" compiler, or *JIT*, that translates the language to highly optimized machine code on the fly.
+
+</aside>
 
 We'd call our little emulator a *virtual machine*, and the synthetic binary machine code it runs *bytecode*. It's got the flexibility and ease of use of defining things in data, but better performance than higher-level representations like the interpreter pattern.
 
-This sounds pretty daunting, though. My goal for the rest of this chapter is to show you that if you can keep your feature list pared down, it's actually pretty approachable. At the worst, if you end up still not writing your own, you'll have a better appreciation for Lua and many other languages which are implemented as bytecode VMs.
+This sounds daunting, though. My goal for the rest of this chapter is to show you that if you keep your feature list pared down, it's actually pretty approachable. At the worst, if you end up still not writing your own, you'll have a better understanding of Lua and many other languages which are implemented as bytecode VMs.
 
 ## The Pattern
 
-A **set of instructions** defines the low-level operations that are can performed. These are encoded as an efficient **binary sequence of instructions**. A **virtual machine** executes these instructions one at a time. By combining instructions, complex high level behavior can be defined.
+An **instruction set** defines the low-level operations that can be performed. These are encoded as a **sequence of bytes**. A **virtual machine** executes these instructions one at a time, usually using a **stack for intermediate data**. By combining instructions, complex high-level behavior can be defined.
 
 ## When to Use It
 
-Even pared down, this is still a pretty big, complex pattern. It's not one you'll throw into your game lightly. At the very least, you'll have a lot of behavior that you need to implement. It would be pretty silly to use this in our example game if there were only a handful of spells.
-
-In addition, the underlying language your game is implemented isn't a good fit:
+This is one of the most complex patterns in this book, and not one you'll throw into your game lightly. Use it when you have a lot of behavior you need to define and your game's implementation language isn't a good fit because:
 
 * It's too low-level, making it tedious or error-prone to program in.
 
@@ -155,29 +159,25 @@ In addition, the underlying language your game is implemented isn't a good fit:
 
 * It has too much trust. If you want to ensure the behavior being defined can't break the game, you ened to be able to safely sandbox it from the rest of the codebase.
 
-The above list describes many parts of your game. Aside from the performance-critical core of the engine, most of the code you're writing is pretty high level. And who doesn't want a faster iteration loop or more safety? This helps explain why many games today do use an embedded scripting language like Lua to define much of the high level logic. But there's one other soft requirement to keep in mind.
+Of course, that list describes a bunch of your game. Who doesn't want a faster iteration loop or more safety? However, that doesn't come free. Bytecode is slower than native code, so it isn't a good fit for performance-critical parts of your engine.
 
-When you use <span name="other">this pattern</span>, there is an implicit separation between your game's codebase and the universe of stuff that's defined in bytecode. This separation is a good thing: that's how you get quick iteration, live reloading and sandboxing. But the behavior you're defining in bytecode doesn't exist in a vaccum. Ultimately, for it to do anything useful, it needs to communicate with your game.
+### The interop boundary
 
-<aside name="other">
+There's one last constraint to consider. This pattern separates the behavior defined in bytecode from the rest of your game's codebase. This barrier is a good thing -- that's how you get quick iteration and sandboxing -- but you have to cross that barrier if your bytecode is going to do anything useful.
 
-This is equally true of using a scripting language, or the interpreter pattern, or any other scheme where you aren't defining your entire game in a single language or framework.
+Our spells need to changes the stats of wizards and cause graphics to appear on screen. That means we have to provide hooks so the bytecode can call those parts of the game engine. This kind of layer where two languages or systems communicate is called "interop", or "binding", or a "foriegn function interface".
 
-</aside>
+Whatever you call it, you still have to *do* it. The more parts of the game that your bytecode needs to talk to, the wider that interop boundary is. If it gets too wide, you'll spend so much time adding bindings that it may cancel out the benefits of the pattern itself.
 
-Our spells are going to need to be able to tweak the stats of wizards and cause graphics to appear on screen. That means we'll have to explicitly provide hooks so that the bytecode can touch those parts of the game. This layer where two languages or systems communicate is called "interop", or "binding", or a "foriegn function interface".
-
-Whatever you call it, you still have to *do* it. The more parts of the game that your bytecode needs to talk to, the wider that interop boundary will be. If it gets too wide, you'll spend so much time adding bindings that it may cancel out the benefits of the pattern itself.
-
-This pattern works best when interface between bytecode and the game is pretty narrow. In our example, spells can really only do a few primitive things that touch the game itself: just change stats and a few graphical effects.
+This pattern works best when the interface between bytecode and the game is narrow. While spells may be behaviorally complex, ultimately, they can only do a few primitive things that touch the game itself: just change stats and a few graphical effects. That makes this pattern a good fit.
 
 ## Keep in Mind
 
-Like I said, this is one of the most complex, heavyweight patterns in this book. I'll be doing a minimal example here to show that you don't have to go whole hog on it. Even so, these things have a tendency to grow. Almost every time I've seen someone define a little templating language or a minimal scripting system, they say, "Don't worry, it will be tiny."
+There's something seductive about defining your own language or system-within-a-system. I'll be doing a minimal example here, but in the real world, these things have a tendency to grow. Every time I've seen someone define a little language or a scripting system, they say, "Don't worry, it will be tiny."
 
-Then, inevitably, they keep adding more and more little features until eventually it's Turing-complete and is pretty much a full-fledged language. Except, unlike many other existing languages, it's grown in an ad-hoc organic fashion and is riddled with cruft.
+Then, inevitably, they add more and more little features until eventually it's a full-fledged language. Except, unlike many other existing languages, it's grown in an ad-hoc organic fashion and is riddled with cruft.
 
-Of course, there's nothing wrong with being a full-fledged language. Just make sure you get there deliberately. Otherwise, be very careful to control the scope of what your little bytecode can express. Keep a short leash on it so it doesn't run away from you.
+Of course, there's nothing *wrong* with making a full-fledged language. Just make sure you do so deliberately. Otherwise, be very careful to control the scope of what your little bytecode can express. Put a short leash on it before it runs away from you.
 
 ### Bytecode is opaque
 

@@ -69,7 +69,7 @@ Since some stickler will call me on this, yes, they don't behave *truly concurre
 
 The game loop has a dynamic collection of objects, so adding and removing them from the level is easy: just add and remove them from the collection. Nothing is hardcoded anymore, and we can even populate the level using some kind of data file, which is exactly what our level designers want.
 
-## Pattern
+## The Pattern
 
 The **game world** maintains a **collection of objects**. Each object implements an **update method** that simulates one frame of the object's behavior. Each frame, the game updates every object in the collection.
 

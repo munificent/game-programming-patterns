@@ -3,6 +3,61 @@
 
 namespace Bytecode
 {
+  namespace Interpreter
+  {
+    //^expression
+    class Expression
+    {
+    public:
+      virtual ~Expression() {}
+      virtual double evaluate() = 0;
+    };
+    //^expression
+
+    //^number
+    class NumberExpression : public Expression
+    {
+    public:
+      NumberExpression(double value)
+      : value_(value)
+      {}
+
+      virtual double evaluate()
+      {
+        return value_;
+      }
+
+    private:
+      double value_;
+    };
+    //^number
+
+    //^addition
+    class AdditionExpression : public Expression
+    {
+    public:
+      AdditionExpression(Expression* left, Expression* right)
+      : left_(left),
+        right_(right)
+      {}
+
+      virtual double evaluate()
+      {
+        // Evaluate the operands.
+        double left = left_->evaluate();
+        double right = right_->evaluate();
+
+        // Add them.
+        return left + right;
+      }
+
+    private:
+      Expression* left_;
+      Expression* right_;
+    };
+    //^addition
+  }
+
   //^magic-api
   void setHealth(int wizard, int amount);
   void setWisdom(int wizard, int amount);

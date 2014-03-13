@@ -95,7 +95,7 @@ but I find *wide* inheritance trees to be easier to work with than *deep* ones.
 
 ## The Pattern
 
-The **base class** defines an abstract **sandbox method**, and several
+A **base class** defines an abstract **sandbox method** and several
 **provided operations**. Marking them protected makes it clear to a user that
 they are for use by derived classes. Each derived **sandboxed subclass**
 implements the sandbox method using the provided operations.

@@ -1,3 +1,7 @@
+2014-03-12 - 520 words, second draft bytecode
+2014-03-11 - 593 words, second draft bytecode
+2014-03-10 - 843 words second draft bytecode
+2014-03-09 - 286 words (delete 207), second draft
 2014-03-08 - 1197 words, finish first draft bytecode
 2014-03-07 - 758 words, work on design decisions
 2014-03-06 - 748 words, work on design decisions

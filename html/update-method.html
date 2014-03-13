@@ -172,7 +172,7 @@
 </aside>
 
 <p>The game loop has a dynamic collection of objects, so adding and removing them from the level is easy: just add and remove them from the collection. Nothing is hardcoded anymore, and we can even populate the level using some kind of data file, which is exactly what our level designers want.</p>
-<h2><a href="#pattern" name="pattern">Pattern</a></h2>
+<h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>The <strong>game world</strong> maintains a <strong>collection of objects</strong>. Each object implements an <strong>update method</strong> that simulates one frame of the object&#x2019;s behavior. Each frame, the game updates every object in the collection.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>If the <a href="game-loop.html" class="pattern">Game Loop pattern</a> is the best thing since sliced bread, then this pattern is its butter. A wide swath of games featuring live entities that the player interacts with use this pattern in some form or other. If the game has space marines, dragons, martians, ghosts, or athletes, there&#x2019;s a good chance it uses this pattern.</p>
