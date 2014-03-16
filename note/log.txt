@@ -1,4 +1,8 @@
-2014-03-12 - 520 words, second draft bytecode
+2014-03-16 - 1433 words (delete 33), second draft bytecode
+2014-03-15 - 651 words (delete 172), second draft bytecode
+2014-03-14 - 1151 words (delete ~150), second draft bytecode
+2014-03-13 - 736 words (delete ~50), second draft bytecode
+2014-03-12 - 520 words (delete ~100), second draft bytecode
 2014-03-11 - 593 words, second draft bytecode
 2014-03-10 - 843 words second draft bytecode
 2014-03-09 - 286 words (delete 207), second draft
@@ -37,7 +41,7 @@
 2014-02-04 - 952 words (delete 406), second draft event queue
 2014-02-03 - 532 words (delete 99), second draft event queue
 2014-02-02 - 1206 words (delete 282), second draft event queue
-2014-02-01 - 811 words, finish first draft event queue, bunch of work on new design
+2014-02-01 - 811 words, finish first draft event queue, work on new design
 2014-01-31 - 961 words, first draft event queue
 2014-01-30 - 441 words, first draft event queue
 2014-01-29 - 378 words, first draft event queue

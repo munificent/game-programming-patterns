@@ -75,7 +75,16 @@ namespace Bytecode
   void playSound(int soundId) {}
   void spawnParticles(int particleType) {}
   int getHealth(int wizard) { return 0; }
+  int getAgility(int wizard) { return 0; }
+  int getWisdom(int wizard) { return 0; }
 
+  void increaseHealth()
+  {
+    //^increase-health
+    setHealth(0, getHealth(0) +
+        (getAgility(0) + getWisdom(0)) / 2);
+    //^increase-health
+  }
 
   //^instruction-enum
   enum Instruction
