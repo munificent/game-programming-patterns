@@ -41,7 +41,7 @@
 <a href="#sample-code">Sample Code</a></li><li>
 <a href="#design-decisions">Design Decisions</a></li><li>
 <a href="#see-also">See Also</a></li></ul>
-</div>
+
         </td>
         <td width="70%">
           <h2>Chapters</h2>
@@ -156,10 +156,10 @@ long time without crashing or leaking memory and efficient compacting
 memory managers are rarely available. In this environment memory
 fragmentation is deadly.</p>
 <p>Fragmentation means the free space in our heap is <span name="park">broken</span> into smaller
-separate regions of memory instead of one large open block. The
-<em>total</em> memory available may be large, but the largest region of
-<em>contiguous</em> memory might be painfully small. Let&#x2019;s say we&#x2019;ve got a
-fourteen bytes free, but it&#x2019;s fragmented into two seven pieces with a
+pieces of memory instead of one large open block. The
+<em>total</em> memory available may be large, but the largest
+<em>contiguous</em> region might be painfully small. Say we&#x2019;ve got
+fourteen bytes free, but it&#x2019;s fragmented into two seven-byte pieces with a
 chunk of in-use memory between them. If we try to allocate a twelve-byte
 object, we&#x2019;ll fail. No more sparklies onscreen.</p>
 <aside name="park">
@@ -193,12 +193,12 @@ creeping fragmentation or memory leakage that brings the game down.</p>
 </aside>
 
 <h3><a href="#the-best-of-both-worlds" name="the-best-of-both-worlds">The best of both worlds</a></h3>
-<p>Because of this, and because allocation may be slow, games are very
+<p>Because of fragmentation, and because allocation may be slow, games are very
 careful about when and how they manage memory. A simple solution is
 often best: grab a big chunk of memory when the game starts and don&#x2019;t
 free it until the game ends. But this is a pain for systems where we
 need to create and destroy things while the game is running.</p>
-<p>An Object Pool gives us the best of both worlds: to the memory
+<p>An object pool gives us the best of both worlds: to the memory
 manager, we&#x2019;re just allocating one big hunk of memory up front and not
 freeing it while the game is playing. To the users of the pool, we
 can freely allocate and deallocate objects to our heart&#x2019;s content.</p>
@@ -218,7 +218,7 @@ resources.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>This pattern is used widely in games for obvious things like game
 entities and visual effects, but also for less visible data structures
-such as currently playing sounds. Use an Object Pool when:</p>
+such as currently playing sounds. Use Object Pool when:</p>
 <ul>
 <li>
 <p>You need to frequently create and destroy objects.</p>
@@ -237,7 +237,7 @@ such as currently playing sounds. Use an Object Pool when:</p>
 </ul>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <h3><a href="#the-pool-may-waste-memory-on-unneeded-objects" name="the-pool-may-waste-memory-on-unneeded-objects">The pool may waste memory on unneeded objects</a></h3>
-<p>The size of an Object Pool needs to be tuned for the game&#x2019;s needs.
+<p>The size of an object pool needs to be tuned for the game&#x2019;s needs.
 When tuning, it&#x2019;s usually obvious when the pool is too <em>small</em>
 (there&#x2019;s nothing like a crash to get your attention). But also take
 care that the pool isn&#x2019;t too <em>big</em>. A smaller pool frees up memory
@@ -299,7 +299,7 @@ right choice.</p>
 </li>
 </ol>
 <h3><a href="#memory-size-for-each-object-is-fixed" name="memory-size-for-each-object-is-fixed">Memory size for each object is fixed</a></h3>
-<p>Most Object Pool implementations store the objects in an array of in-
+<p>Most pool implementations store the objects in an array of in-
 place objects. If all of your objects are of the same type, this is
 fine. However, if you want to store objects of different types in the
 pool, or instances of subclasses that may add fields, you need to
@@ -328,7 +328,7 @@ pool of the appropriate size and allocates from that pool.</p>
 allocated or freed memory to some obvious magic value like
 <code>0xdeadbeef</code>. This helps you find painful bugs caused by uninitialized
 variables or using memory after it&#x2019;s freed.</p>
-<p>Since our Object Pool isn&#x2019;t going through the memory manager any more
+<p>Since our object pool isn&#x2019;t going through the memory manager any more
 when it reuses an object, we lose that safety net. Worse, the memory
 used for a &ldquo;new&rdquo; object previously held an object of the
 exact same type. This makes it nearly impossible to tell if you forgot
@@ -345,13 +345,13 @@ memory for an object slot when the object is reclaimed.</p>
 </aside>
 
 <h3><a href="#unused-objects-will-remain-in-memory" name="unused-objects-will-remain-in-memory">Unused objects will remain in memory</a></h3>
-<p>Object Pools are less common in systems that support garbage
+<p>Object pools are less common in systems that support garbage
 collection because the memory manager will usually deal
 with fragmentation for you. But pools are still useful there to avoid
 the cost of allocation and deallocation, especially on mobile
 devices with slower CPUs and simpler GC implementations.</p>
-<p>If you do use an Object Pool there, beware of a potential conflict. Since
-the pool doesn&#x2019;t actually deallocate objects when no longer
+<p>If you do use an object pool there, beware of a potential conflict. Since
+the pool doesn&#x2019;t actually deallocate objects when they&#x2019;re no longer
 in use, they remain in memory. If they contain references to <em>other</em>
 objects, it will prevent the collector from reclaiming those too.
 To avoid this, when a pooled object is no longer in use, clear any
@@ -484,7 +484,7 @@ the slots holding the unused objects.</p>
 <p>When a particle isn&#x2019;t in use, most of its state is irrelevant. Its
 position and velocity aren&#x2019;t being used. The only state it needs is
 the minimum required to tell if it&#x2019;s dead. For our example, that&#x2019;s the
-<code>_framesLeft</code> member. Everything else we can reuse. Here&#x2019;s a revised
+<code>_framesLeft</code> member. All those other bits, we can reuse. Here&#x2019;s a revised
 particle:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
@@ -604,17 +604,17 @@ list:</p>
 </pre></div>
 
 
-<p>There you go, a nice little Object Pool with constant-time creation
+<p>There you go, a nice little object pool with constant-time creation
 and deletion.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
-<p>As you&#x2019;ve seen, the simplest Object Pool implementation is almost
+<p>As you&#x2019;ve seen, the simplest object pool implementation is almost
 trivial: create an array of objects and reinitialize them as needed.
 Production code is rarely that minimal. There are several ways to
 expand on that to make the pool more generic, safer to use, or easier
 to maintain. As you implement pools in your games, you&#x2019;ll need to
 answer these questions:</p>
 <h3><a href="#are-objects-coupled-to-the-pool" name="are-objects-coupled-to-the-pool">Are objects coupled to the pool?</a></h3>
-<p>The first question you&#x2019;ll run into when writing an Object Pool is
+<p>The first question you&#x2019;ll run into when writing an object pool is
 whether the objects themselves know they are in a pool. Most of
 the time they will, but you won&#x2019;t have that luxury when writing a
 generic pool class that can hold arbitrary objects.</p>
@@ -718,7 +718,7 @@ inside the pool class or outside.</p>
   <span class="c1">// Multiple ways to initialize.</span>
   <span class="kt">void</span> <span class="n">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">);</span>
   <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">yVel</span><span class="p">);</span>
-  <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">float</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">float</span> <span class="n">speed</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">double</span> <span class="n">speed</span><span class="p">);</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">ParticlePool</span>
@@ -730,7 +730,7 @@ inside the pool class or outside.</p>
   <span class="kt">void</span> <span class="n">create</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">yVel</span><span class="p">)</span>
   <span class="p">{</span> <span class="cm">/* forward to Particle... */</span> <span class="p">}</span>
 
-  <span class="kt">void</span> <span class="n">create</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">float</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">float</span> <span class="n">speed</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="n">create</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">double</span> <span class="n">speed</span><span class="p">)</span>
   <span class="p">{</span> <span class="cm">/* forward to Particle... */</span> <span class="p">}</span>
 <span class="p">};</span>
 </pre></div>
@@ -752,7 +752,7 @@ inside the pool class or outside.</p>
   <span class="c1">// Multiple ways to initialize.</span>
   <span class="kt">void</span> <span class="n">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">);</span>
   <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">yVel</span><span class="p">);</span>
-  <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">float</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">float</span> <span class="n">speed</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">direction</span><span class="p">,</span> <span class="kt">double</span> <span class="n">speed</span><span class="p">);</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">ParticlePool</span>
@@ -806,8 +806,8 @@ duplicate memory usage by using the same object in multiple different
 contexts.</p>
 <p>Pooled objects are not intended to be used that way. The objects in a
 pool get reused, but only over time. &ldquo;Reuse&rdquo; in the
-context of an Object Pool means reclaiming the <em>memory</em> for an object
-<em>after</em> the original owner is done with it. With an Object Pool, there
+context of an object pool means reclaiming the <em>memory</em> for an object
+<em>after</em> the original owner is done with it. With an object pool, there
 isn&#x2019;t any expectation that an object will be shared within its
 lifetime.</p>
 <p class="footer">&copy; 2009-2014 Bob Nystrom</p>

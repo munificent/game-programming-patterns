@@ -41,7 +41,7 @@
 <a href="#sample-code">Sample Code</a></li><li>
 <a href="#design-decisions">Design Decisions</a></li><li>
 <a href="#see-also">See Also</a></li></ul>
-</div>
+
         </td>
         <td width="70%">
           <h2>Chapters</h2>
@@ -1084,18 +1084,12 @@ communication paths if you need them.</p>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
 <li>
-<p>This pattern goes hand in hand with the <a class="pattern"
-    href="data-locality.html">Data Locality</a> pattern.
-    Components split a monolithic object into separate smaller
-    objects for each domain being used. If you get all of the
-    components of the same type and put them in an array, now you&#x2019;ve
-    got them laid out in memory in the most efficient way for your
-    CPU to read them.</p>
-<p>This is a rare win-win in architecture: your code is both more
-maintainable <em>and</em> faster.</p>
+<p>The <a href="http://unity3d.com">Unity</a> framework&#x2019;s core
+    <a href="http://docs.unity3d.com/Documentation/Manual/GameObjects.html"><code>GameObject</code></a> class is designed entirely around
+    <a href="http://docs.unity3d.com/Documentation/Manual/UsingComponents40.html">components</a>.</p>
 </li>
 <li>
-<p>The open source <a href="http://www.delta3d.org/">Delta3D</a>
+<p>The open source <a href="http://www.delta3d.org">Delta3D</a>
     engine has a base <code>GameActor</code> class that implements this pattern
     with the appropriately named <code>ActorComponent</code> base class.</p>
 </li>

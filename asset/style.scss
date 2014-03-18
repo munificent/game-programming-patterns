@@ -215,6 +215,11 @@ blockquote p {
 code {
   color: hsl(200, 30%, 40%);
   font: normal 15px $mono;
+  white-space: nowrap;
+}
+
+a code {
+  color: $primary;
 }
 
 pre {
@@ -262,7 +267,6 @@ aside {
   code {
     color: #666;
     font: normal 13px $mono;
-    white-space: nowrap;
   }
 
   img {

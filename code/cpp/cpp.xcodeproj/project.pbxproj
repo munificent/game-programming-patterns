@@ -37,6 +37,7 @@
 		292AAF741888E6BF0059E300 /* event-queue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "event-queue.h"; sourceTree = SOURCE_ROOT; };
 		292FD0FD180392A6003CE36E /* command.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = command.h; sourceTree = SOURCE_ROOT; };
 		29360F5A177949FD0005D95F /* spatial-partition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "spatial-partition.h"; sourceTree = SOURCE_ROOT; };
+		29425F4B18BDB55000F1C528 /* bytecode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bytecode.h; sourceTree = SOURCE_ROOT; };
 		2947E82C17C32E3500257E9B /* introduction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = introduction.h; sourceTree = SOURCE_ROOT; };
 		294AEA8E16E792ED004E3BD0 /* game-loop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "game-loop.h"; sourceTree = SOURCE_ROOT; };
 		295A7BB9179246E100A8C792 /* state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = state.h; sourceTree = SOURCE_ROOT; };
@@ -102,6 +103,7 @@
 				29B14848183F37820006AABE /* data-locality.h */,
 				298A366118134C080009A9D6 /* observer.h */,
 				292AAF741888E6BF0059E300 /* event-queue.h */,
+				29425F4B18BDB55000F1C528 /* bytecode.h */,
 			);
 			name = cpp;
 			path = gpp;
@@ -227,6 +229,7 @@
 		29F2A2B016E63EBB005803DA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -234,6 +237,7 @@
 		29F2A2B116E63EBB005803DA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

@@ -1,4 +1,32 @@
-2014-02-17 - fix #7, #61, #62, #71, #72, #95, #96, #97, #98. close #70, #92, #94
+2014-03-17 - 733 words (delete ~70), second draft bytecode
+2014-03-16 - 1433 words (delete 33), second draft bytecode
+2014-03-15 - 651 words (delete 172), second draft bytecode
+2014-03-14 - 1151 words (delete ~150), second draft bytecode
+2014-03-13 - 736 words (delete ~50), second draft bytecode
+2014-03-12 - 520 words (delete ~100), second draft bytecode
+2014-03-11 - 593 words, second draft bytecode
+2014-03-10 - 843 words second draft bytecode
+2014-03-09 - 286 words (delete 207), second draft
+2014-03-08 - 1197 words, finish first draft bytecode
+2014-03-07 - 758 words, work on design decisions
+2014-03-06 - 748 words, work on design decisions
+2014-03-05 - 708 words, finish sample code
+2014-03-04 - 678 words
+2014-03-03 - 583 words, first draft bytecode, work on sample code section
+2014-03-02 - 1373 words
+2014-03-01 - 639 words
+2014-02-28 - 615 words, finish motivation
+2014-02-27 - 785 words, catch up on email
+2014-02-26 - 482 words, first draft bytecode
+2014-02-25 - resolve 2 bugs, start writing sample code for bytecode
+2014-02-24 - 598 words, finish outline bytecode
+2014-02-23 - 1165 words, outline bytecode
+2014-02-22 - 1069 words, outline bytecode
+2014-02-21 - fix 3 (large) bugs
+2014-02-20 - fix 3 bugs, move todos to github issues, more design work
+2014-02-19 - nav bar on new design
+2014-02-18 - fix 3 bugs, close 1
+2014-02-17 - fix 9 bugs, close 3
 2014-02-16 - 5 illustrations, decoupling section intro, mail, twitter, proggit
 2014-02-15 - 548 words, finish third draft event queue
 2014-02-14 - 1879 words (delete ~90), third draft event queue
@@ -14,7 +42,7 @@
 2014-02-04 - 952 words (delete 406), second draft event queue
 2014-02-03 - 532 words (delete 99), second draft event queue
 2014-02-02 - 1206 words (delete 282), second draft event queue
-2014-02-01 - 811 words, finish first draft event queue, bunch of work on new design
+2014-02-01 - 811 words, finish first draft event queue, work on new design
 2014-01-31 - 961 words, first draft event queue
 2014-01-30 - 441 words, first draft event queue
 2014-01-29 - 378 words, first draft event queue

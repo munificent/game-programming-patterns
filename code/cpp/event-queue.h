@@ -90,7 +90,6 @@ namespace EventQueue
 
       //^omit
       static void playSound(SoundId id, int volume);
-      static void update();
       //^omit
     private:
       static const int MAX_PENDING = 16;
@@ -111,19 +110,38 @@ namespace EventQueue
     }
     //^array-play
 
+    PlayMessage Audio::pending_[MAX_PENDING];
+    int Audio::numPending_;
+  }
+
+  namespace DeferList2
+  {
     //^array-update
-    void Audio::update()
+    class Audio
     {
-      for (int i = 0; i < numPending_; i++)
+    public:
+      static void update()
       {
-        ResourceId resource = loadSound(pending_[i].id);
-        int channel = findOpenChannel();
-        if (channel == -1) return;
-        startSound(resource, channel, pending_[i].volume);
+        for (int i = 0; i < numPending_; i++)
+        {
+          ResourceId resource = loadSound(pending_[i].id);
+          int channel = findOpenChannel();
+          if (channel == -1) return;
+          startSound(resource, channel, pending_[i].volume);
+        }
+
+        numPending_ = 0;
       }
 
-      numPending_ = 0;
-    }
+      // Other stuff...
+      //^omit
+    private:
+      static const int MAX_PENDING = 16;
+
+      static PlayMessage pending_[MAX_PENDING];
+      static int numPending_;
+      //^omit
+    };
     //^array-update
 
     PlayMessage Audio::pending_[MAX_PENDING];

@@ -19,13 +19,13 @@
 #include "prototype.h"
 #include "data-locality.h"
 #include "event-queue.h"
+#include "bytecode.h"
 
 int main (int argc, char * const argv[])
 {
-  /*
   UnbufferedSlapstick::testComedy();
   SpatialPartition::test();
   ObserverPattern::test();
-   */
+
   return 0;
 }

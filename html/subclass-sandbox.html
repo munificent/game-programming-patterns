@@ -41,7 +41,7 @@
 <a href="#sample-code">Sample Code</a></li><li>
 <a href="#design-decisions">Design Decisions</a></li><li>
 <a href="#see-also">See Also</a></li></ul>
-</div>
+
         </td>
         <td width="70%">
           <h2>Chapters</h2>
@@ -224,7 +224,7 @@ but I find <em>wide</em> inheritance trees to be easier to work with than <em>de
 </aside>
 
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
-<p>The <strong>base class</strong> defines an abstract <strong>sandbox method</strong>, and several
+<p>A <strong>base class</strong> defines an abstract <strong>sandbox method</strong> and several
 <strong>provided operations</strong>. Marking them protected makes it clear to a user that
 they are for use by derived classes. Each derived <strong>sandboxed subclass</strong>
 implements the sandbox method using the provided operations.</p>
@@ -278,12 +278,12 @@ not the complexity of its implementation.</p>
 <span class="nl">protected:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">activate</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-  <span class="kt">void</span> <span class="nf">move</span><span class="p">(</span><span class="kt">float</span> <span class="n">x</span><span class="p">,</span> <span class="kt">float</span> <span class="n">y</span><span class="p">,</span> <span class="kt">float</span> <span class="n">z</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="nf">move</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">z</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>
 
-  <span class="kt">void</span> <span class="nf">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">float</span> <span class="n">volume</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="nf">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">double</span> <span class="n">volume</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>
@@ -341,17 +341,17 @@ elaborate it a bit.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
 <span class="nl">protected:</span>
-  <span class="kt">float</span> <span class="n">getHeroX</span><span class="p">()</span>
+  <span class="kt">double</span> <span class="n">getHeroX</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>
 
-  <span class="kt">float</span> <span class="n">getHeroY</span><span class="p">()</span>
+  <span class="kt">double</span> <span class="n">getHeroY</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>
 
-  <span class="kt">float</span> <span class="n">getHeroZ</span><span class="p">()</span>
+  <span class="kt">double</span> <span class="n">getHeroZ</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>
@@ -459,7 +459,7 @@ up into provided operations in the more visible base class.</p>
 <p>However, even simple forwarding can still be useful: those methods often
 access state that the base class doesn&#x2019;t want to directly expose to
 subclasses. For example, let&#x2019;s say <code>Superpower</code> provided this:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">float</span> <span class="n">volume</span><span class="p">)</span>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">double</span> <span class="n">volume</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">soundEngine_</span><span class="p">.</span><span class="n">play</span><span class="p">(</span><span class="n">sound</span><span class="p">,</span> <span class="n">volume</span><span class="p">);</span>
 <span class="p">}</span>
@@ -481,7 +481,7 @@ base class then just return one of those objects.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
 <span class="nl">protected:</span>
-  <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">float</span> <span class="n">volume</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">double</span> <span class="n">volume</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>
@@ -506,7 +506,7 @@ avoid that. Instead, we create a <code>SoundPlayer</code> class that exposes tha
 functionality:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">SoundPlayer</span>
 <span class="p">{</span>
-  <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">float</span> <span class="n">volume</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">double</span> <span class="n">volume</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>

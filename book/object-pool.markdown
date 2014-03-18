@@ -28,10 +28,10 @@ memory managers are rarely available. In this environment memory
 fragmentation is deadly.
 
 Fragmentation means the free space in our heap is <span name="park">broken</span> into smaller
-separate regions of memory instead of one large open block. The
-*total* memory available may be large, but the largest region of
-*contiguous* memory might be painfully small. Let's say we've got a
-fourteen bytes free, but it's fragmented into two seven pieces with a
+pieces of memory instead of one large open block. The
+*total* memory available may be large, but the largest
+*contiguous* region might be painfully small. Say we've got
+fourteen bytes free, but it's fragmented into two seven-byte pieces with a
 chunk of in-use memory between them. If we try to allocate a twelve-byte
 object, we'll fail. No more sparklies onscreen.
 
@@ -73,13 +73,13 @@ creeping fragmentation or memory leakage that brings the game down.
 
 ### The best of both worlds
 
-Because of this, and because allocation may be slow, games are very
+Because of fragmentation, and because allocation may be slow, games are very
 careful about when and how they manage memory. A simple solution is
 often best: grab a big chunk of memory when the game starts and don't
 free it until the game ends. But this is a pain for systems where we
 need to create and destroy things while the game is running.
 
-An Object Pool gives us the best of both worlds: to the memory
+An object pool gives us the best of both worlds: to the memory
 manager, we're just allocating one big hunk of memory up front and not
 freeing it while the game is playing. To the users of the pool, we
 can freely allocate and deallocate objects to our heart's content.
@@ -104,7 +104,7 @@ resources.
 
 This pattern is used widely in games for obvious things like game
 entities and visual effects, but also for less visible data structures
-such as currently playing sounds. Use an Object Pool when:
+such as currently playing sounds. Use Object Pool when:
 
 *   You need to frequently create and destroy objects.
 
@@ -120,7 +120,7 @@ such as currently playing sounds. Use an Object Pool when:
 
 ### The pool may waste memory on unneeded objects
 
-The size of an Object Pool needs to be tuned for the game's needs.
+The size of an object pool needs to be tuned for the game's needs.
 When tuning, it's usually obvious when the pool is too *small*
 (there's nothing like a crash to get your attention). But also take
 care that the pool isn't too *big*. A smaller pool frees up memory
@@ -183,7 +183,7 @@ this.
 
 ### Memory size for each object is fixed
 
-Most Object Pool implementations store the objects in an array of in-
+Most pool implementations store the objects in an array of in-
 place objects. If all of your objects are of the same type, this is
 fine. However, if you want to store objects of different types in the
 pool, or instances of subclasses that may add fields, you need to
@@ -218,7 +218,7 @@ allocated or freed memory to some obvious magic value like
 `0xdeadbeef`. This helps you find painful bugs caused by uninitialized
 variables or using memory after it's freed.
 
-Since our Object Pool isn't going through the memory manager any more
+Since our object pool isn't going through the memory manager any more
 when it reuses an object, we lose that safety net. Worse, the memory
 used for a &ldquo;new&rdquo; object previously held an object of the
 exact same type. This makes it nearly impossible to tell if you forgot
@@ -239,14 +239,14 @@ I'd be honored if you clear it to `0x1deadb0b`.
 
 ### Unused objects will remain in memory
 
-Object Pools are less common in systems that support garbage
+Object pools are less common in systems that support garbage
 collection because the memory manager will usually deal
 with fragmentation for you. But pools are still useful there to avoid
 the cost of allocation and deallocation, especially on mobile
 devices with slower CPUs and simpler GC implementations.
 
-If you do use an Object Pool there, beware of a potential conflict. Since
-the pool doesn't actually deallocate objects when no longer
+If you do use an object pool there, beware of a potential conflict. Since
+the pool doesn't actually deallocate objects when they're no longer
 in use, they remain in memory. If they contain references to *other*
 objects, it will prevent the collector from reclaiming those too.
 To avoid this, when a pooled object is no longer in use, clear any
@@ -334,7 +334,7 @@ the slots holding the unused objects.
 When a particle isn't in use, most of its state is irrelevant. Its
 position and velocity aren't being used. The only state it needs is
 the minimum required to tell if it's dead. For our example, that's the
-`_framesLeft` member. Everything else we can reuse. Here's a revised
+`_framesLeft` member. All those other bits, we can reuse. Here's a revised
 particle:
 
 ^code 4
@@ -389,12 +389,12 @@ list:
 
 ^code 8
 
-There you go, a nice little Object Pool with constant-time creation
+There you go, a nice little object pool with constant-time creation
 and deletion.
 
 ## Design Decisions
 
-As you've seen, the simplest Object Pool implementation is almost
+As you've seen, the simplest object pool implementation is almost
 trivial: create an array of objects and reinitialize them as needed.
 Production code is rarely that minimal. There are several ways to
 expand on that to make the pool more generic, safer to use, or easier
@@ -403,7 +403,7 @@ answer these questions:
 
 ### Are objects coupled to the pool?
 
-The first question you'll run into when writing an Object Pool is
+The first question you'll run into when writing an object pool is
 whether the objects themselves know they are in a pool. Most of
 the time they will, but you won't have that luxury when writing a
 generic pool class that can hold arbitrary objects.
@@ -503,7 +503,7 @@ contexts.
 
 Pooled objects are not intended to be used that way. The objects in a
 pool get reused, but only over time. &ldquo;Reuse&rdquo; in the
-context of an Object Pool means reclaiming the *memory* for an object
-*after* the original owner is done with it. With an Object Pool, there
+context of an object pool means reclaiming the *memory* for an object
+*after* the original owner is done with it. With an object pool, there
 isn't any expectation that an object will be shared within its
 lifetime.

@@ -13,13 +13,18 @@
   Ex: "Add a method to `Foo`."
 - Use normal font and lowercase when referring to objects of the class.
   Ex: "Create a new foo and pass it to `bar()`."
+- Capitalize when referring to pattern like proper noun, lowercase when
+  referring to object
+  implementing pattern.
+  Ex: "Object Pool is a great pattern. An object pool will save you memory."
 - Design Patterns and other book titles are *italicized*.
+- Don't use ":" in sentence before illustration.
 - Q: Use parentheses when referring to methods/functions? `foo` or `foo()`?
 - Q: `true` or true?
 - Q: Are "enum", "struct", "int", etc. normal words or `code font`?
 - Q: Hide fields behind getters (better style) or allow public fields (less
      boilerplate)?
-- Don't use ":" in sentence before illustration.
+- Q: Can subheaders immediately follow headers?
 
 ## Terminology
 
@@ -34,3 +39,5 @@
 - Trailing underscore for fields. That way isFoo() doesn't collide with isFoo
   field.
 - Do use "virtual" for overridden methods.
+- Use "double" for floating point variables.
+- Q: How are empty constructors formatted? {} on next line?

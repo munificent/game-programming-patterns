@@ -37,7 +37,7 @@ the same way.
 Given that game design, we fire up our text editor and start coding.
 According to the design, a dragon <span name="isa">is a</span> kind of monster, a troll is
 another kind, and so on with the other breeds. Thinking
-object-oriented, that leads us to a Monster base class:
+object-oriented, that leads us to a `Monster` base class:
 
 <aside name="isa">
 
@@ -72,7 +72,7 @@ Exclamation points make everything more exciting!
 
 </aside>
 
-Each class derived from Monster passes in the starting health, and
+Each class derived from `Monster` passes in the starting health, and
 overrides `getAttack()` to return the attack string for that breed.
 Everything works as expected, and before long we've got our hero
 running around slaying a variety of beasties. We keep slinging code,
@@ -119,7 +119,7 @@ string.
 We decided to implement this concept using inheritance, since it lines
 up with our intuition of classes: A dragon is a monster, and each
 dragon in the game is an instance of this dragon &ldquo;class.&rdquo;
-Defining each breed as a subclass of an abstract base Monster class,
+Defining each breed as a subclass of an abstract base `Monster` class,
 and having each monster in the game be an instance of that derived
 breed class mirrors that. We end up with a class hierarchy like this:
 
@@ -139,8 +139,8 @@ adding new code, and each breed has to be compiled in as its own type.
 
 This works, but it isn't the only option. We could also architect our
 code so that each monster *has* a breed. Instead of subclassing
-Monster for each breed, we have a single Monster class and a single
-Breed class:
+`Monster` for each breed, we have a single `Monster` class and a single
+`Breed` class:
 
 <span name="references-arrow"></span>
 
@@ -154,22 +154,24 @@ Here, the <img src="images/arrow-references.png" class="arrow" /> means "is refe
 
 That's it. Two classes. Notice that there's no inheritance at all.
 With this system, each monster in the game is simply an instance of
-class Monster. The Breed class contains the information that's
-specific to a breed: starting health and the attack string.
+class `Monster`. The `Breed` class contains the information that's
+shared between all monsters of the same breed: starting health and the attack string.
 
-To associate monsters with breeds, we give each Monster instance a
-reference to a Breed object containing the information for that breed.
+To associate monsters with breeds, we give each `Monster` instance a
+reference to a `Breed` object containing the information for that breed.
 To get the attack string, a monster just calls a method on its breed.
-The Breed class essentially defines a monster's &ldquo;type.&rdquo;
-Each Breed instance is an *object* that represents a different
+The `Breed` class essentially defines a monster's &ldquo;type.&rdquo;
+Each breed instance is an *object* that represents a different
 conceptual *type*, hence the name of the pattern: Type Object.
 
 What's especially powerful about this pattern is that now we can
 define new *types* of things without complicating the codebase at all:
 we've essentially lifted a portion of the type system out of the
-hard-coded class hierarchy into data we can define at runtime. We can
+hard-coded class hierarchy into data we can define at runtime.
+
+We can
 create hundreds of different breeds just by instantiating more
-instances of Breed with different values. If we create Breeds by
+instances of `Breed` with different values. If we create breeds by
 initializing them from data read from some configuration file, we have
 the ability to define new types of monsters completely in data. So
 easy a designer could do it!
@@ -246,7 +248,7 @@ compiler.
 
 With subclassing, you can override a method and do whatever you want
 to: calculate values procedurally, call other code, etc. The sky is
-the limit. We could define a Monster subclass whose attack string
+the limit. We could define a monster subclass whose attack string
 changed based on the phase of the moon if we wanted to. (Handy for
 werewolves, I suppose.)
 
@@ -305,23 +307,21 @@ and more sense.
 
 ## Sample Code
 
-### A basic type object
-
 For our first pass at an implementation, let's start simple and build
 the basic system described in the &ldquo;Motivation&rdquo; section.
-We'll start with the Breed class we described:
+We'll start with the `Breed` class:
 
 ^code 3
 
 Very simple. It's basically just a container for two data fields: the
-starting health and the attack string. Let's see how Monster uses it:
+starting health and the attack string. Let's see how monsters use it:
 
 ^code 4
 
-When we construct a Monster, we give it a reference to a Breed object.
+When we construct a monster, we give it a reference to a breed object.
 This defines the monster's breed instead of the subclasses we were
-previously using. In the constructor, Monster uses the breed to
-determine its starting health. To get the attack string, Monster
+previously using. In the constructor, `Monster` uses the breed to
+determine its starting health. To get the attack string, the monster
 simply forwards the call to its breed.
 
 This very simple chunk of code is the core idea of the pattern.
@@ -358,15 +358,16 @@ And the class that uses them:
 
 ^code 6
 
-There are a couple of changes to note here. The most obvious one is
-the new `newMonster()` function in Breed. That's our
-&ldquo;constructor&rdquo; factory method. There are also two other
-minor changes: The real constructor in Monster is now private, and
-Breed is a friend class of Monster. These last two changes ensure that
-we can *only* create Monsters by going through `newMonster()`.
+The key <span name="friend">difference</span> is the `newMonster()` function in `Breed`. That's our
+&ldquo;constructor&rdquo; factory method. With our original implementation, creating a monster looked like:
 
-The result is a relatively minor change in how monsters are created.
-With our original implementation, creating a monster looked like:
+<aside name="friend">
+
+There's another minor difference here. Because the sample code is in C++, we can use a handy little feature: *friend classes.*
+
+We've made `Monster`'s constructor private which prevents anyone from calling it directly. Friend classes sidestep that restriction so `Breed` can still access it. This means the *only* way to create monsters by going through `newMonster()`.
+
+</aside>
 
 ^code 7
 
@@ -375,7 +376,7 @@ After our changes, it's like this:
 ^code 8
 
 So, why do this? There are two steps to creating an object: allocation
-and initialization. Monster's constructor lets us do all of the
+and initialization. `Monster`'s constructor lets us do all of the
 initialization we need. In our example, that's only storing the breed,
 but a full game would be loading graphics, initializing the monster's
 AI, and doing other set-up work.
@@ -387,12 +388,12 @@ creation too: we'll typically use things like custom allocators or the
 <a class="pattern" href="object-pool.html">Object Pool</a> pattern to
 control where in memory our objects end up.
 
-Defining a &ldquo;constructor&rdquo; function in Breed gives us a
+Defining a &ldquo;constructor&rdquo; function in `Breed` gives us a
 place to put that logic. Instead of simply calling `new`, the
-`newMonster` function in Breed can pull the memory from a pool or
-custom heap before passing control off to Monster for initialization.
-By putting this logic inside Breed, in the *only* function that has
-the ability to create Monsters, we ensure that all monsters go through
+`newMonster` function can pull the memory from a pool or
+custom heap before passing control off to `Monster` for initialization.
+By putting this logic inside `Breed`, in the *only* function that has
+the ability to create monsters, we ensure that all monsters go through
 the memory management scheme we want.
 
 ### Sharing data through inheritance

@@ -39,7 +39,7 @@ Naturally, <a href="game-loop.html" class="pattern">Game Loop</a> is another pat
 
 ^code patrol-in-loop
 
-I did the before/after here to show you how the code gets more complex. Patrolling left and right used to be two simple `for` loops. It kept track of which direction the skeleton was moving implicitly by which loop was executing. Now that we have to yield to the outer game loop each frame and then resume where we left off, we have to track that explicitly using that `patrollingLeft` variable.
+I did the before/after here to show you how the code gets more complex. Patrolling left and right used to be two simple `for` loops. It kept track of which direction the skeleton was moving implicitly by which loop was executing. Now that we have to yield to the outer game loop each frame and then resume where we left off, we have to track the direction explicitly using that `patrollingLeft` variable.
 
 But this more or less works, so we keep going. A brainless bag of bones doesn't give yon Norse maiden too much of a challenge, so the next thing we add is a couple of enchanted statues. These will fire bolts of lightning at her every so often to keep her on her toes.
 
@@ -69,13 +69,13 @@ Since some stickler will call me on this, yes, they don't behave *truly concurre
 
 The game loop has a dynamic collection of objects, so adding and removing them from the level is easy: just add and remove them from the collection. Nothing is hardcoded anymore, and we can even populate the level using some kind of data file, which is exactly what our level designers want.
 
-## Pattern
+## The Pattern
 
 The **game world** maintains a **collection of objects**. Each object implements an **update method** that simulates one frame of the object's behavior. Each frame, the game updates every object in the collection.
 
 ## When to Use It
 
-If the Game Loop pattern is the best thing since sliced bread, then this pattern is its butter. A wide swath of games that have live entities that the player interacts with use this pattern in some form or other. If the game has space marines, dragons, martians, ghosts, or athletes, there's a good chance it uses this pattern.
+If the <a href="game-loop.html" class="pattern">Game Loop pattern</a> is the best thing since sliced bread, then this pattern is its butter. A wide swath of games featuring live entities that the player interacts with use this pattern in some form or other. If the game has space marines, dragons, martians, ghosts, or athletes, there's a good chance it uses this pattern.
 
 However, if the game is more abstract and the moving pieces are less like living actors and more like pieces on a chessboard, this pattern is often a poor fit. In a game like chess, you don't need to simulate all of the pieces concurrently, and you probably don't need to tell the <span name="pawn">pawns</span> to update themselves every frame.
 
@@ -123,7 +123,7 @@ The <a href="state.html" class="pattern">State pattern</a> can often help here. 
 
 ### Objects all simulate each frame but are not truly concurrent
 
-In this pattern, the game loops over a collection of objects and updates each one. Within an object's `update()` call, we can see the rest of the game world, including other objects that are being updated. This means that the *order* that the objects are updated is significant.
+In this pattern, the game loops over a collection of objects and updates each one. Inside the `update()` call, most objects are able to reach out and touch the rest of the game world, including other objects that are being updated. This means that the *order* that the objects are updated is significant.
 
 If A comes before B in the list of objects, then when A updates, it will see B's previous state. But when B updates, it will <span name="double-buffer">see</span> A's *new* state, since it's already updated this frame. Even though from the player's perspective everything is moving at the "same" time, the core of the game is still turn-based. It's just that a complete turn is only one frame long.
 
@@ -266,6 +266,24 @@ Now that those have been moved into the `Statue` class itself, you can create as
 
 This pattern lets us separate *populating* the game world from *implementing* it. This in turn gives us the flexibility to populate the world using something like a separate data file or level editor.
 
+### Passing time
+
+That's key pattern, but I'll just touch on a common refinement. So far, we've assumed every call to `update()` advances the state of the game world by the same fixed unit of time.
+
+I happen to prefer that, but many games use a <span name="variable">*variable time step*</span>. In those, each turn of the game loop may simulate a larger or smaller slice of time depending on how long it took to process and render the previous frame.
+
+<aside name="variable">
+
+The <a href="game-loop.html" class="pattern">Game Loop</a> chapter has a lot more on the advantages and disadvantages of fixed and variable time steps.
+
+</aside>
+
+That means that each `update()` call needs to know how far the hand of the virtual clock has swung, so you'll often see the elapsed time passed in. For example, we can make our patrolling skeleton handle a variable time step like so:
+
+^code variable
+
+Now, the distance the skeleton moves increases as the elapsed time grows. You can also see the additional complexity of dealing with a variable time step. The skeleton may overshoot the bounds of its patrol with a large time slice and we have to carefully handle that.
+
 ## Design Decisions
 
 With a simple pattern like this, there isn't too much variation, but there's still a couple of knobs you can turn.
@@ -328,6 +346,8 @@ The metric that should guide your approach here is how many inactive objects you
 
 * When you start caring about the cache performance of updating a bunch of entities or components in a loop each frame, the <a href="data-locality.html" class="pattern">Data Locality</a> pattern can help make that faster.
 
-* Microsoft's XNA platform uses this pattern both in the [`Game`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.update.aspx) and [`GameComponent`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gamecomponent.update.aspx) classes.
+* The [Unity](http://unity3d.com) framework uses this pattern in several classes, including [`MonoBehaviour`](http://docs.unity3d.com/Documentation/ScriptReference/MonoBehaviour.Update.html).
+
+* Microsoft's [XNA](http://creators.xna.com/en-US/) platform uses this pattern both in the [`Game`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.update.aspx) and [`GameComponent`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gamecomponent.update.aspx) classes.
 
 * The [Quintus](http://html5quintus.com/) JavaScript game engine uses this pattern on its main [`Sprite`](http://html5quintus.com/guide/sprites.md) class.

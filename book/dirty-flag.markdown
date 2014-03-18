@@ -366,7 +366,7 @@ This pattern is fairly specific, so there are only a couple of knobs to twiddle:
         you want.
 
     * *You can do more redundant work.* If the primary state only changes a
-        tiny amount during the timer's run you can end up processing a large
+        tiny amount during the timer's run, you can end up processing a large
         chunk of mostly unchanged data.
 
     * *You need support for doing work asynchronously.*

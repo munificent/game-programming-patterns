@@ -282,7 +282,7 @@ namespace DataLocality
 
     private:
       Animation* animation_;
-      float      energy_;
+      double     energy_;
       Vector     goalPos_;
     };
     //^ai-component
@@ -301,7 +301,7 @@ namespace DataLocality
       LootType drop_;
       int      minDrops_;
       int      maxDrops_;
-      float    chanceOfDrop_;
+      double   chanceOfDrop_;
     };
     //^loot-drop
   }
@@ -317,7 +317,7 @@ namespace DataLocality
       // Methods...
     private:
       Animation*   animation_;
-      float        energy_;
+      double       energy_;
       Vector       goalPos_;
 
       LootDrop*    loot_;
@@ -329,7 +329,7 @@ namespace DataLocality
       LootType drop_;
       int minDrops_;
       int maxDrops_;
-      float chanceOfDrop_;
+      double chanceOfDrop_;
     };
     //^hot-cold
   }

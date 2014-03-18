@@ -32,7 +32,16 @@
       <tr>
         <td width="30%">
           <h2>Bytecode</h2>
-          </div>
+          <ul><li>
+<a href="#intent">Intent</a></li><li>
+<a href="#motivation">Motivation</a></li><li>
+<a href="#the-pattern">The Pattern</a></li><li>
+<a href="#when-to-use-it">When to Use It</a></li><li>
+<a href="#keep-in-mind">Keep in Mind</a></li><li>
+<a href="#sample-code">Sample Code</a></li><li>
+<a href="#design-decisions">Design Decisions</a></li><li>
+<a href="#see-also">See Also</a></li></ul>
+
         </td>
         <td width="70%">
           <h2>Chapters</h2>
@@ -127,7 +136,700 @@
 </div>
 <h1>Bytecode</h1>
 <h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="behavioral-patterns.html">Behavioral Patterns</a></h1>
-<p><em>Sorry, this chapter hasn&#x2019;t been written yet!</em></p>
+<h2><a href="#intent" name="intent">Intent</a></h2>
+<p><em>Define behavior in data as a series of low-level instructions executed by a virtual machine.</em></p>
+<h2><a href="#motivation" name="motivation">Motivation</a></h2>
+<p>Making games may be fun, but it certainly ain&#x2019;t <em>easy</em>. Modern games require <span name="sprawling">enormous</span>, complex codebases. Console manufacturers and app marketplace gatekeepers have stringent quality requirements, and a single crash bug in any of that code can prevent your game from shipping.</p>
+<aside name="sprawling">
+
+<p>I worked on a game that had six million lines of C++ code. For comparison, the software controlling the Mars Curiosity rover is less than half that.</p>
+</aside>
+
+<p>At the same time, we&#x2019;re expected to squeeze every drop of performance out of the hardware. Games push hardware like nothing else, and we&#x2019;re expected to optimize relentlessly just to keep pace with the competition.</p>
+<p>To handle these high stability and performance requirements, we reach for big, complex languages like C++ that have both low-level expressiveness to make the most of the hardware, and rich type systems to prevent or at least corral bugs.</p>
+<p>We pride ourselves on our ability to do this, but it has its cost. Being a proficient programmer takes years of dedicated training. Once you&#x2019;ve levelled yourself up, you get to fight with the sheer scale of your codebase. Build times for large applications can vary somewhere between "go get a coffee" and "go roast your own beans, hand-grind them, pull an espresso, foam some milk and practice your latte art in the froth".</p>
+<p>On top of these challenges, games have one more nasty constraint: <em>fun</em>. Players demand a play experience that&#x2019;s both novel and yet carefully balanced. That requires constant iteration, but if every tweak requires bugging an engineer to muck around in piles of low-level code and then waiting for a glacial recompile, you&#x2019;ve killed your creative flow.</p>
+<h3><a href="#spell-fight" name="spell-fight">Spell fight!</a></h3>
+<p>Let&#x2019;s say we&#x2019;re working on a magic-based fighting game. A pair of wizards square off and fling enchantments at each other until victor is pronounced. While each spell is relatively simple, there are piles of them and designers are constantly refining them.</p>
+<p>We could define them all in code, but that means an engineer has to be involved every time a spell is modified. When a designer wants to tweak a few numbers and get a feel for them, they have to recompile the entire game, reboot it, and get back into a fight.</p>
+<p>Now consider that our game is online. Like most games these days, we want to be able to update it after it ships, both to fix bugs and to add new content. If all of these spells are hard-coded, then updating them means patching the actual game executable.</p>
+<p>Let&#x2019;s take things a bit farther and say that we also want to support <em>modding</em>. We want <em>users</em> to be able to create their own spells. If those are in code, that means every modder needs a full compiler toolchain to build the game, and we have to release the sources. Worse, if they have a bug in their spell, it can crash the game on some other player&#x2019;s machine.</p>
+<h3><a href="#data-&gt;-code" name="data-&gt;-code">Data &gt; code</a></h3>
+<p>It&#x2019;s pretty clear that our game&#x2019;s implementation language isn&#x2019;t the right fit for our needs here. We want to define spells in a way that&#x2019;s safely sandboxed from the core game engine. We want them to be easy to modify and reload, and physically separate from the rest of the game.</p>
+<p>I don&#x2019;t know about you, but to me that sounds a lot like <em>data</em>. If we could define our behavior in separate data files that the game engine loads and "executes" in some way, we can achieve all of our goals here.</p>
+<p>Now we just need to figure out what "execute" means for data. How do you define some bytes in a file that represent behavior? There are a few different ways to do this. I think it will help you get a picture of <em>this</em> pattern&#x2019;s strengths and weaknesses if we compare it to another one&thinsp;&mdash;&thinsp;the <a href="http://en.wikipedia.org/wiki/Interpreter_pattern" class="gof-pattern">Interpreter pattern</a>.</p>
+<h3><a href="#the-interpreter-pattern" name="the-interpreter-pattern">The Interpreter pattern</a></h3>
+<p>I could write a whole chapter just on this pattern, but some gang of four guys already covered that for me. Instead, I&#x2019;ll cram the briefest of introductions in here. It starts with a language&thinsp;&mdash;&thinsp;think <em>programming</em> language&thinsp;&mdash;&thinsp;that you want to execute. Say, for example, it supports arithmetic expressions like this:</p>
+<div class="codehilite"><pre><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Then you take each piece of that expression&thinsp;&mdash;&thinsp;each rule in the language&#x2019;s grammar&thinsp;&mdash;&thinsp;and turn it into an <em>object</em>. The number literals will be objects:</p>
+<p><strong>TODO: illustrate</strong></p>
+<p>Basically just little boxes around the raw value. The operators will be objects too, and they&#x2019;ll have references to their operands. So, in the above, we&#x2019;re subtracting <code>4</code> from <code>3</code>, so we&#x2019;d have this:</p>
+<p><strong>TODO: illustrate</strong></p>
+<p>If you take into account the parentheses and the rules of arithmetic precedence, that expression <span name="magic">magically</span> turns into a little tree of objects like so:</p>
+<p><strong>TODO: illustration</strong></p>
+<aside name="magic">
+
+<p>What magic process is this? It&#x2019;s simple: <em>parsing</em>. A parser takes text&thinsp;&mdash;&thinsp;a stream of characters&thinsp;&mdash;&thinsp;and turns it into an <em>abstract syntax tree</em>, a tree-shaped graph of objects representing the grammatical structure of the text.</p>
+<p>Whip up one of these and you&#x2019;ve got yourself half of a compiler.</p>
+</aside>
+
+<p>The interpreter pattern isn&#x2019;t about <em>creating</em> that tree, it&#x2019;s about <em>executing</em> it. The way it works is pretty clever. Each object in the tree is an expression, or a subexpression. In true object-oriented fashion, we&#x2019;ll let expressions evaluate themselves.</p>
+<p>First, we define a base interface that all expressions will implement:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Expression</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">Expression</span><span class="p">()</span> <span class="p">{}</span>
+  <span class="k">virtual</span> <span class="kt">double</span> <span class="n">evaluate</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>There we define classes that implement that for each kind of expression in our language&#x2019;s grammar. The simplest one is numbers:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">NumberExpression</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Expression</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">NumberExpression</span><span class="p">(</span><span class="kt">double</span> <span class="n">value</span><span class="p">)</span>
+  <span class="o">:</span> <span class="n">value_</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="p">{}</span>
+
+  <span class="k">virtual</span> <span class="kt">double</span> <span class="n">evaluate</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">value_</span><span class="p">;</span>
+  <span class="p">}</span>
+
+<span class="nl">private:</span>
+  <span class="kt">double</span> <span class="n">value_</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>A literal just evaluates to its value. Addition and multiplication are a bit more complex because they contain subexpressions. Before they can evaluate themselves, they need to recursively evaluate those first. Like so:</p>
+<p><span name="addition"></span></p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">AdditionExpression</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Expression</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">AdditionExpression</span><span class="p">(</span><span class="n">Expression</span><span class="o">*</span> <span class="n">left</span><span class="p">,</span> <span class="n">Expression</span><span class="o">*</span> <span class="n">right</span><span class="p">)</span>
+  <span class="o">:</span> <span class="n">left_</span><span class="p">(</span><span class="n">left</span><span class="p">),</span>
+    <span class="n">right_</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+  <span class="p">{}</span>
+
+  <span class="k">virtual</span> <span class="kt">double</span> <span class="n">evaluate</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="c1">// Evaluate the operands.</span>
+    <span class="kt">double</span> <span class="n">left</span> <span class="o">=</span> <span class="n">left_</span><span class="o">-&gt;</span><span class="n">evaluate</span><span class="p">();</span>
+    <span class="kt">double</span> <span class="n">right</span> <span class="o">=</span> <span class="n">right_</span><span class="o">-&gt;</span><span class="n">evaluate</span><span class="p">();</span>
+
+    <span class="c1">// Add them.</span>
+    <span class="k">return</span> <span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">;</span>
+  <span class="p">}</span>
+
+<span class="nl">private:</span>
+  <span class="n">Expression</span><span class="o">*</span> <span class="n">left_</span><span class="p">;</span>
+  <span class="n">Expression</span><span class="o">*</span> <span class="n">right_</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<aside name="addition">
+
+<p>I&#x2019;m sure you can figure out what the implementation of multiply looks like.</p>
+</aside>
+
+<p>Pretty neat right? Just a couple of simple classes and now we can represent and evaluate arbitrarily complex, nested arithmetic expressions. We just need to create the right objects and wire them up correctly.</p>
+<p>In our example here, the expressions just evaluated numbers, but we could add expression classes for things like "spawn particles" or "change an entity&#x2019;s health". There&#x2019;s nothing preventing <code>evaluate()</code> from reaching out and calling into other code.</p>
+<aside name="ruby">
+
+<p>Ruby was implemented like this for something like 15 years. At version 1.9, they switched to the kind of bytecode VM this chapter describes. Look how much time I&#x2019;m saving you!</p>
+</aside>
+
+<p>It&#x2019;s a <span name="ruby">beautiful</span>, simple pattern, but is has some problems. Look up at the illustration. What do you see? Lots of little objects, and lots of arrows between them. Code is represented as a sprawling fractal tree of tiny objects. That has some unpleasant consequences:</p>
+<ul>
+<li>
+<p>Loading it from disk requires instantiating and wiring up tons of these small objects.</p>
+</li>
+<li>
+<p>Those objects and the pointers between them use a lot of memory. On a 32-bit machine that little arithmetic expression up there takes up at least 68 bytes, not including padding. (If you&#x2019;re playing along at home, don&#x2019;t forget to take into account the vtable pointers.)</p>
+</li>
+<li>
+<p>Traversing the pointers into subexpressions is murder on your <span name="cache">data cache</span>. Meanwhile, all of those virtual method calls wreak carnage on your instruction cache.</p>
+</li>
+</ul>
+<aside name="cache">
+
+<p>See the chapter on <a href="data-locality.html" class="pattern">Data Locality</a> for more on what the cache is and how it affects your performance.</p>
+</aside>
+
+<p>Put those together, and what do they spell? S-L-O-W. There&#x2019;s a reason most programming languages in wide use aren&#x2019;t based on the interpreter pattern. It&#x2019;s just too slow, and uses up too much memory.</p>
+<h3><a href="#machine-code,-virtually" name="machine-code,-virtually">Machine code, virtually</a></h3>
+<p>Consider our game engine. When we execute that, the computer doesn&#x2019;t traverse a bunch of C++ grammar tree structures at runtime. Instead, we compile it ahead of time to machine code and the CPU runs that. What&#x2019;s machine code got going for it?</p>
+<ul>
+<li>
+<p><em>It&#x2019;s dense.</em> A chunk of machine code is a solid, contiguous blob of binary data, and no bit goes to waste.</p>
+</li>
+<li>
+<p><em>It&#x2019;s linear.</em> Instructions are packed together and executed one right after another. No jumping around in memory (unless you&#x2019;re doing actual control flow, of course).</p>
+</li>
+<li>
+<p><em>It&#x2019;s low-level.</em> Each instruction does one relatively minimal thing, and interesting behavior comes from <em>composing</em> instructions.</p>
+</li>
+<li>
+<p><em>It&#x2019;s fast.</em> As a consequence of all of these (well, and the fact that it&#x2019;s implemented directly in hardware), machine code runs like the wind.</p>
+</li>
+</ul>
+<p>Of course, we don&#x2019;t want machine code for our spells, or we&#x2019;d be right back to the original problem. Few people these days are crazy enough to write machine code by hand, so we&#x2019;d be right back to needing a full compiler toolchain and all of the overhead that comes with it.</p>
+<p>Also, if we dynamically load machine code into our game and start executing it, that&#x2019;s a good way to <span name="jit">breach its security</span> and break the game. Is there a middle ground?</p>
+<p>What if instead of loading actual machine code and executing it directly, we defined our own <em>virtual</em> machine code? We&#x2019;d then write a little emulator for it in our game. It would be similar to machine code&thinsp;&mdash;&thinsp;dense, linear, relatively low-level&thinsp;&mdash;&thinsp;but would also be handled entirely by our game so we could safely sandbox it.</p>
+<aside name="jit">
+
+<p>This is why many game consoles and iOS don&#x2019;t allow programs to execute machine code loaded or generated at runtime.</p>
+<p>That&#x2019;s a drag because the fastest programming language interpreters do exactly that. They contain a "just-in-time" compiler, or <em>JIT</em>, that translates the language to highly optimized machine code on the fly.</p>
+</aside>
+
+<p>We&#x2019;d call our little emulator a <em>virtual machine</em>, and the synthetic binary machine code it runs <em>bytecode</em>. It&#x2019;s got the flexibility and ease of use of defining things in data, but better performance than higher-level representations like the interpreter pattern.</p>
+<p>This sounds daunting, though. My goal for the rest of this chapter is to show you that if you keep your feature list pared down, it&#x2019;s actually pretty approachable. At the worst, if you end up still not writing your own, you&#x2019;ll have a better understanding of Lua and many other languages which are implemented as bytecode VMs.</p>
+<h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
+<p>An <strong>instruction set</strong> defines the low-level operations that can be performed. These are encoded as a <strong>sequence of bytes</strong>. A <strong>virtual machine</strong> executes these instructions one at a time, usually using a <strong>stack for intermediate data</strong>. By combining instructions, complex high-level behavior can be defined.</p>
+<h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
+<p>This is one of the most complex patterns in this book, and not one you&#x2019;ll throw into your game lightly. Use it when you have a lot of behavior you need to define and your game&#x2019;s implementation language isn&#x2019;t a good fit because:</p>
+<ul>
+<li>
+<p>It&#x2019;s too low-level, making it tedious or error-prone to program in.</p>
+</li>
+<li>
+<p>Iterating on it takes too long due to slow compile times or other tooling issues.</p>
+</li>
+<li>
+<p>It has too much trust. If you want to ensure the behavior being defined can&#x2019;t break the game, you ened to be able to safely sandbox it from the rest of the codebase.</p>
+</li>
+</ul>
+<p>Of course, that list describes a bunch of your game. Who doesn&#x2019;t want a faster iteration loop or more safety? However, that doesn&#x2019;t come free. Bytecode is slower than native code, so it isn&#x2019;t a good fit for performance-critical parts of your engine.</p>
+<h3><a href="#the-interop-boundary" name="the-interop-boundary">The interop boundary</a></h3>
+<p>There&#x2019;s one last constraint to consider. This pattern separates the behavior defined in bytecode from the rest of your game&#x2019;s codebase. This barrier is a good thing&thinsp;&mdash;&thinsp;it&#x2019;s how you get quick iteration and sandboxing&thinsp;&mdash;&thinsp;but you have to cross that barrier if your bytecode is going to do anything useful.</p>
+<p>We want spells to change the stats of wizards and cause graphics to appear on screen, which means our VM needs hooks into those parts of the game engine. The more parts of the game that your bytecode needs to talk to, the wider this <span name="interop">interop</span> boundary is. If it gets too wide, you&#x2019;ll spend so much time maintaining that you may cancel out any benefit from the pattern.</p>
+<aside name="interop">
+
+<p>In addition to "interop", you sometimes hear this called "binding" or a "foreign function interface".</p>
+</aside>
+
+<p>This pattern works best when the interface between bytecode and the game is narrow. While spells may be complex, ultimately, they can only do a few things that touch the game itself: just change stats and a few graphical effects.</p>
+<h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
+<p>There&#x2019;s something <span name="seductive">seductive</span> about defining your own language or system-within-a-system. I&#x2019;ll be doing a minimal example here, but in the real world, these things have a tendency to grow. Every time I&#x2019;ve seen someone define a little language or a scripting system, they say, "Don&#x2019;t worry, it will be tiny."</p>
+<aside name="seductive">
+
+<p>For me, game development is seductive in the same way. In both cases, I&#x2019;m striving to create a virtual space for others to play and be creative in.</p>
+</aside>
+
+<p>Then, inevitably, they add more and more little features until eventually it&#x2019;s a full-fledged <span name="template">language</span>. Except, unlike many other existing languages, it&#x2019;s grown in an ad-hoc organic fashion and has all of the architectural elegance of a shanty town.</p>
+<aside name="template">
+
+<p>For example, see every templating language ever.</p>
+</aside>
+
+<p>Of course, there&#x2019;s nothing <em>wrong</em> with making a full-fledged language. Just make sure you do so deliberately. Otherwise, be very careful to control the scope of what your little bytecode can express. Put a short leash on it before it runs away from you.</p>
+<h3><a href="#you&#x2019;ll-miss-your-debugger" name="you&#x2019;ll-miss-your-debugger">You&#x2019;ll miss your debugger</a></h3>
+<p>Programming is hard. We know what we want the machine to do, but we don&#x2019;t always communicate that correctly&thinsp;&mdash;&thinsp;we write bugs. To help find and fix those, we&#x2019;ve amassed a pile of tools to understand what our code is doing wrong, and how to right it.</p>
+<p>We have debuggers, static analyzers, decompilers, etc. All of those tools are designed to work with some existing language: either machine code or a higher level language.</p>
+<p>When we define our own bytecode VM, we leave those tools behind. Sure, you can step through the VM in your debugger, but that tells you what the VM <em>itself</em> is doing, and not what the bytecode it&#x2019;s interpreting is up to. It certainly doesn&#x2019;t help you map that bytecode back to the high-level form is was compiled from.</p>
+<p>If the behavior you&#x2019;re defining is simple, you can scrape by without too much tooling to help you debug it. But as the scale of your bytecode grows, plan to invest real time into features that help you see what the VM is doing. Those features might not <span name="debugger">ship</span> in your game, but they&#x2019;ll be critical to ensure that you actually <em>can</em> ship your game.</p>
+<aside name="debugger">
+
+<p>Of course, if you want your game to be moddable, then you <em>will</em> ship those features, and they&#x2019;ll be even more important.</p>
+</aside>
+
+<h3><a href="#you&#x2019;ll-need-a-front-end" name="you&#x2019;ll-need-a-front-end">You&#x2019;ll need a front-end</a></h3>
+<p>Low-level bytecode instructions are great for performance, but a binary bytecode format is <em>not</em> what your users are going to author. One reason we&#x2019;re even moving behavior out of code is so that we can express it at a <em>higher</em> level. If C++ is too low level, making your users effectively write in <span name="assembly">assembly language</span>&thinsp;&mdash;&thinsp;even one of your own design&thinsp;&mdash;&thinsp;isn&#x2019;t an improvement!</p>
+<aside name="assembly">
+
+<p>Challenging that assertion is the venerable game <a href="http://en.wikipedia.org/wiki/RoboWar">RoboWar</a>. In that game, <em>players</em> write little programs to control a robot in a language very similar to assembly and the kind of instruction sets we&#x2019;ll be discussing here.</p>
+<p>It was my first introduction to assembly-like languages.</p>
+</aside>
+
+<p>Much like the Gang of Four&#x2019;s Interpreter pattern, it&#x2019;s assumed that you also have some way to <em>generate</em> the bytecode. Usually, users author their behavior in some higher level format and a tool translates that to the bytecode that our VM understands. In other words, a compiler.</p>
+<p>I know, that sounds scary. That&#x2019;s why I&#x2019;m mentioning it here. If you don&#x2019;t have the resources to build an authoring tool, then bytecode probably isn&#x2019;t a good solution. But it may not be as bad as you think. We&#x2019;ll talk more about this later. First, let&#x2019;s write some code!</p>
+<h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
+<p>After the previous couple of sections, you might be surprised how straightforward the implementation is. First, we need to craft an instruction set for our VM. Before we start thinking about bytecode and stuff, let&#x2019;s just think about it like an API.</p>
+<h3><a href="#a-magical-api" name="a-magical-api">A magical API</a></h3>
+<p>Imagine we were going to define spells in straight C++ code. What kind of API would be need that code to be able to call into? What are the basic operations in the game engine that spells are defined in terms of?</p>
+<p>Most spells ultimately change one of the stats of a wizard, so we&#x2019;ll start with a couple for that:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">setHealth</span><span class="p">(</span><span class="kt">int</span> <span class="n">wizard</span><span class="p">,</span> <span class="kt">int</span> <span class="n">amount</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">setWisdom</span><span class="p">(</span><span class="kt">int</span> <span class="n">wizard</span><span class="p">,</span> <span class="kt">int</span> <span class="n">amount</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">setAgility</span><span class="p">(</span><span class="kt">int</span> <span class="n">wizard</span><span class="p">,</span> <span class="kt">int</span> <span class="n">amount</span><span class="p">);</span>
+</pre></div>
+
+
+<p>The first parameter identifies which wizard is affected, say <code>0</code> for the player&#x2019;s and <code>1</code> for their opponent. This way, healing spells can affect your own wizard, while damaging attacks harm your nemesis. These three little methods cover a surprisingly wide variety of magical effects.</p>
+<p>If the spells just silently tweaked stats, the game logic would be fine, but playing it would bore players to tears. Let&#x2019;s fix that:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">playSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundId</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">spawnParticles</span><span class="p">(</span><span class="kt">int</span> <span class="n">particleType</span><span class="p">);</span>
+</pre></div>
+
+
+<p>These don&#x2019;t affect gameplay, but they crank up the intensity of the gameplay <em>experience</em>. We could probably add some more here for camera shake, animation, etc., but this is enough to get us started.</p>
+<h3><a href="#a-magical-instruction-set" name="a-magical-instruction-set">A magical instruction set</a></h3>
+<p>Now let&#x2019;s see how we&#x2019;d turn this <em>programmatic</em> API into something that can be controlled from data. We&#x2019;ll build our way up to the full thing, so let&#x2019;s strip a few things out at first. We&#x2019;ll ditch all of the parameters to these methods. We&#x2019;ll say the <code>set___()</code> methods always affect your own wizard and always max out the stat. Likewise, the FX operations always play a single hard-coded sound and particle effect.</p>
+<p>Given that, a spell is just a sequence of instructions. Each instruction identifies which primitive operation you want to perform. We can list them out and assign a number to each. In other words, an enum:</p>
+<div class="codehilite"><pre><span class="k">enum</span> <span class="n">Instruction</span>
+<span class="p">{</span>
+  <span class="n">INST_SET_HEALTH</span><span class="p">,</span>
+  <span class="n">INST_SET_WISDOM</span><span class="p">,</span>
+  <span class="n">INST_SET_AGILITY</span><span class="p">,</span>
+  <span class="n">INST_PLAY_SOUND</span><span class="p">,</span>
+  <span class="n">INST_SPAWN_PARTICLES</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>To encode a spell in data, we just store an array of enum values. We&#x2019;ve only got a few different primitives, so the range of enum values easily fits into a byte. This means a spell is just a list of <span name="byte">bytes</span>&thinsp;&mdash;&thinsp;ergo "bytecode".</p>
+<aside name="byte">
+
+<p>Some bytecode VMs use more than a single byte for each instruction and have more complicated rules for how they are decoded. Actual machine code on common chips like x86 is a good bit more complex.</p>
+<p>But a single byte is good enough for the <a href="http://en.wikipedia.org/wiki/Java_virtual_machine">Java Virtual Machine</a> and Microsoft&#x2019;s <a href="http://en.wikipedia.org/wiki/Common_Language_Runtime">Common Language Runtime</a> which forms the backbone of the .NET platform, and it&#x2019;s good enough for us.</p>
+</aside>
+
+<p>To execute a single instruction, we just see which primitive it is and call the right API method:</p>
+<div class="codehilite"><pre><span class="k">switch</span> <span class="p">(</span><span class="n">instruction</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="n">INST_SET_HEALTH</span>:
+    <span class="n">setHealth</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+
+  <span class="k">case</span> <span class="n">INST_SET_WISDOM</span>:
+    <span class="n">setWisdom</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+
+  <span class="k">case</span> <span class="n">INST_SET_AGILITY</span>:
+    <span class="n">setAgility</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+
+  <span class="k">case</span> <span class="n">INST_PLAY_SOUND</span>:
+    <span class="n">playSound</span><span class="p">(</span><span class="n">SOUND_BANG</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+
+  <span class="k">case</span> <span class="n">INST_SPAWN_PARTICLES</span>:
+    <span class="n">spawnParticles</span><span class="p">(</span><span class="n">PARTICLE_FLAME</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>We can call into the game engine because our interpreter is defined in the language of the game itself. It forms the bridge between code world and data world. A spell is then a sequence of these instructions. We can create a little VM that executes an entire spell like so:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">VM</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="kt">void</span> <span class="n">interpret</span><span class="p">(</span><span class="kt">char</span> <span class="n">bytecode</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">size</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="kt">char</span> <span class="n">instruction</span> <span class="o">=</span> <span class="n">bytecode</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+      <span class="k">switch</span> <span class="p">(</span><span class="n">instruction</span><span class="p">)</span>
+      <span class="p">{</span>
+        <span class="c1">// Cases for each instruction...</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>It wraps the instruction dispatch in a loop and stops when it reaches the end. There, type that in and you&#x2019;ll have written your first virtual machine. Pat yourself on the back!</p>
+<p>OK, self-congratulation time is over. We have a VM now, but it&#x2019;s not very flexible. The problem is that our instructions are too rigid. We can&#x2019;t define a spell that touches your opponent, or lowers a stat. We can only play one sound!</p>
+<p>To get something that starts to have the expressive feel of an actual language, we need to get parameters in here.</p>
+<h3><a href="#a-virtual-stack-machine" name="a-virtual-stack-machine">A virtual stack machine</a></h3>
+<p>The interpreter pattern handles parameters and subexpressions by explicitly wiring them together as a tree of nested objects, but we want the speed of a flat list of instructions. We&#x2019;ll do that by making the data flow from parameter to call <em>implicit</em> the same way your CPU does: <span name="stack-machine">with a stack</span>.</p>
+<aside name="stack-machine">
+
+<p>This architecture is unimaginatively called a <a href="http://en.wikipedia.org/wiki/Stack_machine"><em>stack machine</em></a>. Programming languages like <a href="http://en.wikipedia.org/wiki/Forth_(programming_language)">Forth</a>, <a href="http://en.wikipedia.org/wiki/PostScript">PostScript</a> and <a href="http://en.wikipedia.org/wiki/Factor_(programming_language)">Factor</a> expose this model directly to the user.</p>
+</aside>
+
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">VM</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">VM</span><span class="p">()</span>
+  <span class="o">:</span> <span class="n">stackSize_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  <span class="p">{}</span>
+
+  <span class="c1">// Other stuff...</span>
+
+<span class="nl">private:</span>
+  <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">MAX_STACK</span> <span class="o">=</span> <span class="mi">128</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">stackSize_</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">stack_</span><span class="p">[</span><span class="n">MAX_STACK</span><span class="p">];</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>The VM maintains an internal stack of values. In our example, the only kinds of values our instructions work with are numbers, so we can just use a simple array of ints. Any bit of data that needs to work its way from one instruction to another gets there by going through the stack.</p>
+<p>Like the name implies, values can be pushed onto or popped off of the stack, so let&#x2019;s add a couple of methods for that:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">VM</span>
+<span class="p">{</span>
+<span class="nl">private:</span>
+  <span class="kt">void</span> <span class="n">push</span><span class="p">(</span><span class="kt">int</span> <span class="n">value</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="c1">// Check for stack overflow.</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">stackSize_</span> <span class="o">&lt;</span> <span class="n">MAX_STACK</span><span class="p">);</span>
+    <span class="n">stack_</span><span class="p">[</span><span class="n">stackSize_</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kt">int</span> <span class="n">pop</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="c1">// Make sure the stack isn&#39;t empty.</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">stackSize_</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">stack_</span><span class="p">[</span><span class="o">--</span><span class="n">stackSize_</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Other stuff...</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>When an instruction needs to receive parameters, it pops them off the stack, like so:</p>
+<div class="codehilite"><pre><span class="k">switch</span> <span class="p">(</span><span class="n">instruction</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">case</span> <span class="n">INST_SET_HEALTH</span>:
+  <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">amount</span> <span class="o">=</span> <span class="n">pop</span><span class="p">();</span>
+    <span class="kt">int</span> <span class="n">wizard</span> <span class="o">=</span> <span class="n">pop</span><span class="p">();</span>
+    <span class="n">setHealth</span><span class="p">(</span><span class="n">wizard</span><span class="p">,</span> <span class="n">amount</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">case</span> <span class="n">INST_SET_WISDOM</span>:
+  <span class="k">case</span> <span class="n">INST_SET_AGILITY</span>:
+    <span class="c1">// Same as above...</span>
+
+  <span class="k">case</span> <span class="n">INST_PLAY_SOUND</span>:
+    <span class="n">playSound</span><span class="p">(</span><span class="n">pop</span><span class="p">());</span>
+    <span class="k">break</span><span class="p">;</span>
+
+  <span class="k">case</span> <span class="n">INST_SPAWN_PARTICLES</span>:
+    <span class="n">spawnParticles</span><span class="p">(</span><span class="n">pop</span><span class="p">());</span>
+    <span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>To get some values onto that stack, we need one more instruction: a literal. It represents a raw integer value. Of course, that instruction can&#x2019;t get its value by popping it off the stack! How do we avoid some turtles-all-the-way-down infinite regress here?</p>
+<p>The trick is to take advantage of the fact that our instruction stream is just a sequence of bytes: we can stuff the number directly in the bytecode. We define another instruction type for a number literal like so:</p>
+<div class="codehilite"><pre><span class="k">case</span> <span class="n">INST_LITERAL</span>:
+<span class="p">{</span>
+  <span class="c1">// Read the next byte from the bytecode.</span>
+  <span class="kt">int</span> <span class="n">value</span> <span class="o">=</span> <span class="n">bytecode</span><span class="p">[</span><span class="o">++</span><span class="n">i</span><span class="p">];</span>
+  <span class="n">push</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+  <span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<aside name="byte">
+
+<p>Here, I&#x2019;m just reading a single byte for the value to avoid to avoid the fiddly code required to decode a multiple-byte integer, but in a real implementation, you&#x2019;d want to be able to have literals that cover your full numeric range.</p>
+</aside>
+
+<p>It reads the next <span name="byte">byte</span> in the bytecode stream <em>as a number</em>, pushes it onto the stack, and then advances past it. Now we can stitch a few of these instructions together. Here&#x2019;s each line is one instruction in a chunk of bytecode:</p>
+<div class="codehilite"><pre><span class="n">LITERAL</span> <span class="mi">0</span>
+<span class="n">LITERAL</span> <span class="mi">10</span>
+<span class="n">SET_HEALTH</span>
+</pre></div>
+
+
+<p>Let&#x2019;s see how the interpreter executes it to get a feel for how the stack works.</p>
+<ol>
+<li>It executes the first <code>INST_LITERAL</code>. That reads the next byte from the bytecode (<code>0</code>) and pushes it onto the stack.</li>
+<li>It executes the second <code>INST_LITERAL</code>. That reads the <code>10</code> and pushes it. So now our stack, from bottom to top, is <code>[0, 10]</code>.</li>
+<li>Finally, it executes <code>INST_SET_HEALTH</code>. That pops <code>10</code> and stores it in <code>amount</code>, then pops <code>0</code> and stores it in <code>wizard</code>. Then it calls <code>setHealth()</code> with those parameters.</li>
+</ol>
+<p>Ta-da! We&#x2019;ve got a spell that sets your wizard&#x2019;s health to ten points. Now we&#x2019;ve got enough flexibility to define spells that set either wizard&#x2019;s stats to whatever amounts we want. We can also play different sounds and spawn particles.</p>
+<p>But&hellip; this still just feels like a <em>data</em> format. We can&#x2019;t, for example, raise a wizard&#x2019;s health by half of their wisdom. Our designers want to be able to express <em>rules</em> for spells, not just <em>values</em>.</p>
+<h3><a href="#behavior-=-composition" name="behavior-=-composition">Behavior = composition</a></h3>
+<p>If we think of our little VM like a programming language, all it supports now is a couple of built-in functions and constant parameters to them. To get bytecode to feel like <em>behavior</em>, what we&#x2019;re missing is <em>composition</em>.</p>
+<p>Our designers need to be able to create expressions that combine different values in interesting ways. For a simple example, they want spells that modify a stat <em>by</em> a certain amount instead of <em>to</em> a certain amount.</p>
+<p>That requires taking into account a stat&#x2019;s current value. We have instructions for <em>writing</em> a stat, we just need to add a couple to <em>read</em> stats:</p>
+<div class="codehilite"><pre><span class="k">case</span> <span class="n">INST_GET_HEALTH</span>:
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">wizard</span> <span class="o">=</span> <span class="n">pop</span><span class="p">();</span>
+  <span class="n">push</span><span class="p">(</span><span class="n">getHealth</span><span class="p">(</span><span class="n">wizard</span><span class="p">));</span>
+  <span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">case</span> <span class="n">INST_GET_WISDOM</span>:
+<span class="k">case</span> <span class="n">INST_GET_AGILITY</span>:
+  <span class="c1">// You get the idea...</span>
+</pre></div>
+
+
+<p>As you can see, it works with the stack in both directions. It pops a parameter to determine which wizard to get the stat for, then it looks up the stat&#x2019;s value and pushes that back onto the stack.</p>
+<p>This lets us write spells that copy stats around. We could create a spell that set a wizard&#x2019;s agility to their wisdom, or a strange incantation that set one wizard&#x2019;s health to mirror his opponent&#x2019;s.</p>
+<p>Better, but still quite limited. Next we need arithmetic. It&#x2019;s time our baby VM learned how to add 1 + 1. We&#x2019;ll add a few more instructions. By now, you&#x2019;ve probably got the hang of it and can guess how they look. I&#x2019;ll just do addition:</p>
+<div class="codehilite"><pre><span class="k">case</span> <span class="n">INST_ADD</span>:
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">pop</span><span class="p">();</span>
+  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="n">pop</span><span class="p">();</span>
+  <span class="n">push</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">);</span>
+  <span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Like our other instructions, it pops a couple of values, does a bit of work, and then pushes the result back. Up until now, every new instruction gave us an incremental improvement in expressiveness, but we just made a big leap. It isn&#x2019;t obvious, but we can now handle all sorts of complicated, deeply nested arithmetic expressions.</p>
+<p>Let&#x2019;s walk through a slightly more complex example. Say we want a spell that increases your wizard&#x2019;s health by the average of their agility and wisdom. In code, that&#x2019;s:</p>
+<div class="codehilite"><pre><span class="n">setHealth</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">getHealth</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
+    <span class="p">(</span><span class="n">getAgility</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">getWisdom</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
+</pre></div>
+
+
+<p>You might think we&#x2019;d need instructions to handle the explicit grouping that parentheses give you in the expression here, but the stack supports that implicitly. First, here&#x2019;s how you could evaluate this by hand:</p>
+<ol>
+<li>Get our wizard&#x2019;s current health and remember it.</li>
+<li>Get our wizard&#x2019;s agility and remember it.</li>
+<li>Do the same for their wisdom.</li>
+<li>Get those last two and add them, and remember the result.</li>
+<li>Divide that by two and remember the result.</li>
+<li>Recall the wizard&#x2019;s health and add it to that result.</li>
+<li>Take that result and set the wizard&#x2019;s health to that value.</li>
+</ol>
+<p>Do you see all of those "remembers" and "recalls"? Each "remember" corresponds to a push, and the "recalls" are pops. That means we can translate this to bytecode pretty easily. For example, the first line to get the wizard&#x2019;s current health is:</p>
+<div class="codehilite"><pre><span class="n">LITERAL</span> <span class="mi">0</span>
+<span class="n">GET_HEALTH</span>
+</pre></div>
+
+
+<p>This bit of bytecode pushes our wizard&#x2019;s health onto the stack. If we mechanically translate each line like that, we end up with a chunk of bytecode that evaluates our original expression. To give you a feel for how the instructions compose, I&#x2019;ve done that below.</p>
+<p>To show how the stack changes over time, we&#x2019;ll walk through a sample execution where the wizard&#x2019;s current stats are 45 health, 7 agility, and 11 wisdom. Next to each instruction is what the stack looks like after executing it and then a little comment explaining the instruction&#x2019;s purpose.</p>
+<div class="codehilite"><pre><span class="n">LITERAL</span> <span class="mi">0</span>    <span class="p">[</span><span class="mi">0</span><span class="p">]</span>            <span class="err">#</span> <span class="n">Wizard</span> <span class="n">index</span>
+<span class="n">GET_HEALTH</span>   <span class="p">[</span><span class="mi">45</span><span class="p">]</span>           <span class="err">#</span> <span class="n">getHealth</span><span class="p">()</span>
+<span class="n">LITERAL</span> <span class="mi">0</span>    <span class="p">[</span><span class="mi">45</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>        <span class="err">#</span> <span class="n">Wizard</span> <span class="n">index</span>
+<span class="n">GET_AGILITY</span>  <span class="p">[</span><span class="mi">45</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>        <span class="err">#</span> <span class="n">getAgility</span><span class="p">()</span>
+<span class="n">LITERAL</span> <span class="mi">0</span>    <span class="p">[</span><span class="mi">45</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>     <span class="err">#</span> <span class="n">Wizard</span> <span class="n">index</span>
+<span class="n">GET_WISDOM</span>   <span class="p">[</span><span class="mi">45</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">11</span><span class="p">]</span>    <span class="err">#</span> <span class="n">getWisdom</span><span class="p">()</span>
+<span class="n">ADD</span>          <span class="p">[</span><span class="mi">45</span><span class="p">,</span> <span class="mi">18</span><span class="p">]</span>       <span class="err">#</span> <span class="n">Add</span> <span class="n">agility</span> <span class="n">and</span> <span class="n">wisdom</span>
+<span class="n">LITERAL</span> <span class="mi">2</span>    <span class="p">[</span><span class="mi">45</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>    <span class="err">#</span> <span class="n">Divisor</span>
+<span class="n">DIVIDE</span>       <span class="p">[</span><span class="mi">45</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>        <span class="err">#</span> <span class="n">Average</span> <span class="n">agility</span> <span class="n">and</span> <span class="n">wisdom</span>
+<span class="n">ADD</span>          <span class="p">[</span><span class="mi">54</span><span class="p">]</span>           <span class="err">#</span> <span class="n">Add</span> <span class="n">average</span> <span class="n">to</span> <span class="n">current</span> <span class="n">health</span>
+<span class="n">SET_HEALTH</span>   <span class="p">[]</span>             <span class="err">#</span> <span class="n">Set</span> <span class="n">health</span> <span class="n">to</span> <span class="n">result</span>
+</pre></div>
+
+
+<p>If you watch the stack at each step, you can see how data flows through it almost like <span name="threshold">magic</span>. We push the wizard&#x2019;s current health at the beginning and it just hangs around at the bottom of the stack until we finally need it for last addition at the end.</p>
+<aside name="threshold">
+
+<p>Maybe my threshold for "magic" is a little too low here.</p>
+</aside>
+
+<h3><a href="#a-virtual-machine" name="a-virtual-machine">A virtual machine</a></h3>
+<p>I could keep going, adding more and more instructions, but this is a good place to stop. As it is, we&#x2019;ve got a nice little VM that lets us define fairly open-ended behavior using a simple, compact data format. While "bytecode" and "virtual machines" sound intimidating, you can see they&#x2019;re often as simple a stack, a loop, and a switch statement.</p>
+<p>Remember our original goal to have behavior be nicely sandboxed? Now that you&#x2019;ve seen exactly how the VM is implemented, it&#x2019;s obvious that we&#x2019;ve accomplished that. The bytecode can&#x2019;t do anything malicious or reach out into weird parts of the game engine because we&#x2019;ve only defined a few instructions that touch the rest of the game.</p>
+<p>We control how much memory it uses by how big of a stack we create, and we&#x2019;re careful to make sure it can&#x2019;t overflow that. We can even <span name="looping">control how much <em>time</em></span> it uses. In our instruction loop, we can track how many we&#x2019;ve executed and bail out if it goes over some limit.</p>
+<aside name="looping">
+
+<p>Controlling execution time isn&#x2019;t necessary in our sample because we don&#x2019;t have any instructions for looping. We could limit execution time just by limiting the total size of the bytecode. This also means our bytecode isn&#x2019;t Turing-complete.</p>
+</aside>
+
+<p>There&#x2019;s just one problem left: actually creating the bytecode. So far, we&#x2019;ve taken bits of pseudocode and compiled them to bytecode by hand. Unless you&#x2019;ve got a <em>lot</em> of free time, that&#x2019;s not going to work in practice.</p>
+<h3><a href="#spellcasting-tools" name="spellcasting-tools">Spellcasting tools</a></h3>
+<p>One of our initial goals was to have a <em>higher</em>-level way to author behavior, but we&#x2019;ve gone and created something <em>lower</em>-level than C++. It has the runtime performance and safety we want, but absolutely none of the designer-friendly usability.</p>
+<p>To fill that gap, we need some tooling. We need a program that lets users define the high-level behavior of a spell and then takes that and generates the apppropriate low-level stack machine bytecode. In other words, a compiler.</p>
+<p>I know, that probably sounds like even more work than making the VM. Many programmers were dragged through a compilers class in college and took away from it nothing but PTSD triggered by the sight of a <span name="dragon">book</span> with a dragon on the cover or the words "<a href="http://en.wikipedia.org/wiki/Lex_(software)">lex</a>" and "<a href="http://en.wikipedia.org/wiki/Yacc">yacc</a>".</p>
+<aside name="dragon">
+
+<p>I&#x2019;m referring, of course, to the classic text <a href="http://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools"><em>Compilers: Principles, Techniques, and Tools</em></a>.</p>
+</aside>
+
+<p>In truth, compiling a text-based language isn&#x2019;t that bad, though it&#x2019;s a <em>bit</em> too broad of a topic to cram in here. However, you don&#x2019;t have to do that. What I said we need was a <em>tool</em>, it doesn&#x2019;t have to be a compiler whose input format is a text file.</p>
+<p>On the contrary, I encourage you to consider building a <span name="text">graphical interface</span> to let users define their behavior, especially if the people using it won&#x2019;t be highly technical. Writing text that&#x2019;s free of syntax errors is surprisingly hard for people that haven&#x2019;t spent years getting used to a compiler yelling at them.</p>
+<aside name="text">
+
+<p>The scripting system I wrote for <a href="http://en.wikipedia.org/wiki/Henry_Hatsworth_in_the_Puzzling_Adventure">Henry Hatsworth and the Puzzling Adventure</a> worked like this.</p>
+</aside>
+
+<p>Instead, you can build an app that lets users build and compose by clicking and dragging little boxes or pulling down menu items, or whatever else makes sense for the kind of behavior you want them to create.</p>
+<p>The nice thing about this is that your UI can make it impossible for users to create <span name="errors">"invalid"</span> programs. Instead of yelling error messages at them, you can just proactively disable buttons or automatically fill in defaults to ensure that the thing they&#x2019;ve created is valid at all points in time.</p>
+<aside name="errors">
+
+<p>I want to stress how important error-handling is. As programmers, we tend to view human error as a shameful personality flaw that we strive to eliminate in ourselves.</p>
+<p>To make a system that users enjoy, you have to embrace their humanity, <em>including their fallibility</em>. Making mistakes is what people do, and is a fundamental part of the creative process. Handling them gracefully with features like undo helps your users be more creative and create better work.</p>
+</aside>
+
+<p><strong>TODO: Illustrate</strong></p>
+<p>This spares you from designing a grammar and writing a <span name="parser">parser</span> for a little language. But, I know, some of you find UI programming equally unpleasant. Well, in that case, I don&#x2019;t have any good news for you.</p>
+<aside name="parser">
+
+<p>Parsers aren&#x2019;t anywhere near as bad as the reputation that precedes them. Just like physics, graphics, or any other programming domain, it&#x2019;s got a couple of typical patterns and techniques. Once you&#x2019;ve got those down, you can whip up a parser in a day or two.</p>
+</aside>
+
+<p>Ultimately, this pattern is about expressing behavior in a user-friendly, high-level format. You have to design the user experience for that format, and to execute it efficiently, you need to translate it into a lower-level form. It is real work, but if you&#x2019;re up to the challenge, it can pay off in spades.</p>
+<h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
+<p>I <span name="failed">tried</span> to keep this chapter as simple as I could, but at the heart of this pattern, what we&#x2019;re really doing is creating a language. As you can imagine, that&#x2019;s a pretty open-ended design space. Exploring this space can be tons of fun, so make sure you don&#x2019;t forget to finish your game.</p>
+<aside name="failed">
+
+<p>Given that this is the longest chapter in the book, I probably failed in that task.</p>
+</aside>
+
+<h3><a href="#what&#x2019;s-the-intruction-set" name="what&#x2019;s-the-intruction-set">What&#x2019;s the intruction set?</a></h3>
+<p>Your instruction set defines the boundaries of what can and cannot be expressed in bytecode, and also has a big impact on the performance of your VM. Here&#x2019;s a laundry list of the different kinds of instructions you may want:</p>
+<ul>
+<li>
+<p><strong>External primitives.</strong> These are the ones that reach out of the VM into the rest of the game engine and do stuff that the user can see. They control what kinds of real behavior can be expressed in bytecode. Without these, your VM can&#x2019;t do anything more than burn CPU cycles.</p>
+</li>
+<li>
+<p><strong>Internal primitives.</strong> These manipulate values inside the VM&thinsp;&mdash;&thinsp;things like literals, arithmetic, comparison operators and instructions that juggle the stack around.</p>
+</li>
+<li>
+<p><strong>Control flow.</strong> Our example didn&#x2019;t cover these, but when you want behavior that&#x2019;s imperative and conditionally executes instructions or loops and executes instructions more than once, you need control flow. In the low-level language of bytecode, they&#x2019;re surprisingly simple: jumps.</p>
+<p>In our instruction loop, we had an index to track where we are in the bytecode. All a jump instruction does is modify that variable and change where we&#x2019;re currently executing. In other words, it&#x2019;s a <code>goto</code>. Your tool can then build higher-level control flow in terms of that.</p>
+</li>
+<li>
+<p><strong>Abstraction.</strong> If your users start defining a <em>lot</em> of stuff in data, eventually they&#x2019;ll want to start reusing bits of bytecode instead of having to copy and paste it. You may want something like callable procedures.</p>
+<p>In its simplest form these aren&#x2019;t much more complex than a jump. The only difference is that the VM maintains a second <em>return</em> stack. When you do a "call" instruction, you push the current instruction index onto that stack before jumping to the bytecode being called. When you hit a "return", you pop that index and jump back to it.</p>
+</li>
+</ul>
+<h3><a href="#how-are-the-instructions-encoded" name="how-are-the-instructions-encoded">How are the instructions encoded?</a></h3>
+<p>Your bytecode is conceptually a list of instructions, some of which (like literals in our example) may have arguments embedded in them or following right after. You&#x2019;ll have to decide how to map that data to raw bits.</p>
+<p>Bytecode VMs come in two main flavors: stack-based and register-based.</p>
+<ul>
+<li>
+<p><strong>With a stack-based VM:</strong></p>
+<p>In a stack-based VM, instructions always work from the top of the stack, like our sample code. For example, <code>INST_ADD</code> pops two values, adds them, and pushes the result.</p>
+<ul>
+<li>
+<p><em>Instructions are small.</em> Since each instruction implicitly finds its arguments on top of the stack, you don&#x2019;t need to encode any data for that. This means each instruction can be pretty small, usually a single byte.</p>
+</li>
+<li>
+<p><em>Code generation is simpler.</em> When you get around to writing the compiler or tool that outputs bytecode, you&#x2019;ll find it simpler to generate stack-based bytecode. Since each instruction implicitly works from the top of the stack, you just need to output instructions in the right order to pass parameters between them.</p>
+</li>
+<li>
+<p><em>You have more instructions.</em> Each instruction only sees the very top of the stack. This means that to generate code for something like <code>a = b + c</code>, you need separate instructions to move <code>a</code> and <code>b</code> to the top of the stack, perform the operation, then move the result <code>c</code>.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>With a register-based VM:</strong></p>
+<p>This style of bytecode is growing in popularity since Lua started using it several years ago and noted a performance improvement. The name is a bit confusing because these VMs still have a stack. The difference is that instructions can read their inputs from anywhere in it.</p>
+<p>Instead of "add" always popping the top two items, it will have two arguments stored with the bytecode that identify where in the stack the two values being added can be found. This means you don&#x2019;t need separate instructions to bring those values up from the bottom of the stack before you can use them.</p>
+<ul>
+<li><em>Instructions are larger.</em> Since instructions need arguments for stack offsets, a single instruction needs more bits. For example, an instruction in <span name="lua">Lua</span>&thinsp;&mdash;&thinsp;probably the most well-known register-based VM&thinsp;&mdash;&thinsp;is a full 32-bits. It uses 6 bits for the instruction itself, and the rest are arguments.</li>
+</ul>
+<aside name="lua">
+
+<p>Lua doesn&#x2019;t specify their bytecode format and it changes from version to version. What I&#x2019;m describing here is true as of Lua 5.1. For an absolutely amazing deep dive into Lua&#x2019;s internals, read <a href="http://luaforge.net/docman/83/98/ANoFrillsIntroToLua51VMInstructions.pdf">this</a>.</p>
+</aside>
+
+<ul>
+<li><em>You have fewer instructions.</em> Since each instruction can do more work, you don&#x2019;t need as many of them. Some say you get a performance improvement since you don&#x2019;t have to move values around in the stack as much.</li>
+</ul>
+</li>
+</ul>
+<p>So which should you do? My recommendation is to stick with a stack-based VM. They&#x2019;re simpler to implement, and much simpler to generate code for. Register-based VMs have a reputation for being a bit faster, but that depends <em>deeply</em> on your actual instruction set and lots of other details of your VM.</p>
+<hr />
+<h3><a href="#how-our-values-represented" name="how-our-values-represented">How our values represented?</a></h3>
+<p>Our sample VM only works with one kind of value: integers. That makes it easy: the stack is just a stack of ints. A more full-featured VM might support different data types: numbers, strings, objects, lists, etc.</p>
+<p>You&#x2019;ll have to decide how those are stored and identified internally.</p>
+<ul>
+<li>
+<p><strong>A single datatype:</strong></p>
+<ul>
+<li>
+<p><em>It&#x2019;s simple.</em> You don&#x2019;t have to worry about tagging, conversions, or type-checking.</p>
+</li>
+<li>
+<p><em>You can&#x2019;t work with different data types.</em> The obvious downside. Only supporting a single data type either limits you or forces you to do ugly hacks like treating 0 and 1 as booleans.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>A tagged variant:</strong></p>
+<p>This is the common representation for dynamically-typed languages. Every value is two chunks of bits. The first is a type tag&thinsp;&mdash;&thinsp;an enum&thinsp;&mdash;&thinsp;that identifies what data is being stored. The rest of the bits are then interpreted appropriately according to that type.</p>
+<p>For example, if the type is an int, the other bits are the int value. If it&#x2019;s a string, they&#x2019;ll be a pointer to the string data on the heap.</p>
+<ul>
+<li>
+<p><em>You can determine the type of a value at runtime.</em> The nice thing about this representation is that values know their type. You can check it at runtime, which is important for dynamic dispatch and ensuring you don&#x2019;t try to perform operations on types that don&#x2019;t support it.</p>
+</li>
+<li>
+<p><em>It takes more memory.</em> Every value has to carry around a few extra bits with it to identify its type. With something as low-level as a VM, a few bits here and there can add up quickly.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>An untagged union:</strong></p>
+<p>This uses a union like the previous form, but does <em>not</em> have a type tag that goes along with it. It&#x2019;s like a raw union in C or C++. You have a little blob of bits that could represent more than one type, and it&#x2019;s up to you to ensure you don&#x2019;t misinterpret them.</p>
+<p>This is how <span name="untyped">statically-typed</span> languages represent things in memory. Since the type system ensures that you don&#x2019;t misinterpret values at compile time, you don&#x2019;t validate it at runtime.</p>
+<aside name="untyped">
+
+<p>This is also how <em>untyped</em> languages like assembly and Forth store values.
+Those languages leave it to the <em>user</em> to make sure they don&#x2019;t write code that misinterprets a value&#x2019;s type. Not for the feint of heart!</p>
+</aside>
+
+<ul>
+<li>
+<p><em>It&#x2019;s compact.</em> You can&#x2019;t get any more efficient than storing just the absolute bits you need for the value itself.</p>
+</li>
+<li>
+<p><em>It&#x2019;s fast.</em> Not having type tags implies you&#x2019;re not spending cycles checking them at runtime either. This is one of the reasons statically-typed languages tend to be faster than dynamic ones.</p>
+</li>
+<li>
+<p><em>It&#x2019;s unsafe.</em> <span name="unsafe">This</span> is the real cost, of course. A bad chunk of bytecode that causes you misinterpret a value and treat a number like a pointer or vice versa can violate the security of your game or crash.</p>
+</li>
+</ul>
+<aside name="unsafe">
+
+<p>If you&#x2019;re bytecode was compiled from a statically-typed language, you might think you&#x2019;re safe here because the compiler won&#x2019;t generate unsafe bytecode. That may be true, but remember malicious users may have hand-crafted evil bytecode without going through your compiler.</p>
+<p>That&#x2019;s why, for example, the Java Virtual Machine has to do <em>bytecode verification</em> when it loads a program.</p>
+</aside>
+
+</li>
+</ul>
+<h3><a href="#how-is-the-bytecode-generated" name="how-is-the-bytecode-generated">How is the bytecode generated?</a></h3>
+<p>I saved the most important question for last. I&#x2019;ve walked you through the code to <em>consume</em> and <em>interpret</em> bytecode, but it&#x2019;s up to you to build something to <em>produce</em> it. The typical answer here is to write a compiler, but it&#x2019;s not the only option.</p>
+<ul>
+<li>
+<p><strong>If you define a text-based language:</strong></p>
+<ul>
+<li>
+<p><em>You have to define a syntax.</em> Both amateur and professional language designers categorically underestimate how difficult this is to do. Making a grammar that can be parsed by a machine is easy. Making one that can be easily parsed by a human is <em>hard</em>.</p>
+<p>Syntax design is user interface design, and that process doesn&#x2019;t get easier when you slap the constraint of being confined to a linear stream of characters onto it.</p>
+</li>
+<li>
+<p><em>You have to implement a parser.</em> In contrast, this part is fairly simple. Despite their reputation, parsers are pretty easy. Either user a parser generator like ANTLR or Bison, or&thinsp;&mdash;&thinsp;like I do&thinsp;&mdash;&thinsp;hand-roll a little recursive descent and you&#x2019;re good to go.</p>
+</li>
+<li>
+<p><em>You have to handle syntax errors.</em> This is one of the most important and most difficult parts of the process. When users make syntax and semantic errors&thinsp;&mdash;&thinsp;which they will, constantly&thinsp;&mdash;&thinsp;it&#x2019;s your job to guide them back onto the path of success. Giving appropriate, helpful feedback isn&#x2019;t easy when often all you know is that your parser is sitting on some random unexpected punctuation.</p>
+</li>
+<li>
+<p><em>It will likely turn off non-technical users.</em> We programmers like text files. Combined with a powerful command-line, we think of them as the LEGO blocks of computing: simple but easily composible in a million ways.</p>
+<p>Most non-programmers don&#x2019;t think of text like that. To them, it feels like filling in tax forms for a robotic auditor that yells at them if they forget a single semicolon.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>If you define a graphical authoring tool:</strong></p>
+<ul>
+<li>
+<p><em>You have to implement a user interface.</em> Buttons, clicks, drags, stuff like that. Some programmers cringe at the thought of this, but I personally love it. If you go down this route, it&#x2019;s important to treat designing the user interface as a core part of doing your job well, and not just an unpleasant task to be muddled through.</p>
+<p>Every little bit of extra work you do here will make your tool easier and more pleasant to use and that directly leads to better content in your game. If you look behind many of the games you love, you&#x2019;ll often find the secret was powerful, enjoyable authoring tools.</p>
+</li>
+<li>
+<p><em>You have fewer error cases.</em> Because the user will be building content incrementally one step at a time, your application can guide them away from mistakes as soon as they happen.</p>
+<p>With a text-based language, the tool doesn&#x2019;t see <em>any</em> of the user&#x2019;s content until they throw an entire file at it. That makes it much harder to prevent and handle errors.</p>
+</li>
+<li>
+<p><em>Portability is harder.</em> The nice thing about text compilers is that text files are universal. A simple compiler just reads in one file and writes one out. Porting that across operating systems is trivial.</p>
+<p>When you&#x2019;re building a UI, you have to choose which framework to use, and many of those are specific to one operating system. There are cross-platform UI toolkits too, but those often sacrifice familiarity ubquity: they work on many platforms by feeling equally weird and non-standard on all of them.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2><a href="#see-also" name="see-also">See Also</a></h2>
+<ul>
+<li>
+<p>This pattern&#x2019;s close sister is the Gang of Four&#x2019;s <a href="http://en.wikipedia.org/wiki/Interpreter_pattern" class="gof-pattern">Interpreter pattern</a>. Both give you a way to express composable behavior in terms of data.</p>
+<p>In fact, you&#x2019;ll often end up using <em>both</em> patterns. The tool you use to generate bytecode will internally have some tree of objects that represent the code. This is exactly what the interpreter pattern gives you.</p>
+<p>In order to compile that to bytecode, you&#x2019;ll recursively walk the tree, just like you do to <em>interpret</em> it with the interpreter pattern. The <em>only</em> difference is that instead of executing a primitive piece of behavior immediately, you&#x2019;ll generate the bytecode instruction to perform it later.</p>
+</li>
+<li>
+<p>The <a href="http://www.lua.org/">Lua</a> programming language is the most widely-used scripting language in games. It&#x2019;s implemented internally as a very compact register-based bytecode VM.</p>
+</li>
+</ul>
 <p class="footer">&copy; 2009-2014 Bob Nystrom</p>
 </div>
 </div>

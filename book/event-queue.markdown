@@ -89,7 +89,7 @@ While I almost always shy away from the <a href="singleton.html" class="gof-patt
 
 ^code sync-api
 
-It's responsible for loading the appropriate sound resource, finding an available channel to play it on, and starting it up. This chapter isn't about some platform's real audio API, so I'll conjure up an imaginary one. Using it, we write our method like so:
+It's responsible for loading the appropriate sound resource, finding an available channel to play it on, and starting it up. This chapter isn't about some platform's real audio API, so I'll conjure one up that we can presume is implemented elsewhere. Using it, we write our method like so:
 
 ^code sync-impl
 
@@ -105,7 +105,7 @@ Our `playSound()` method is *synchronous* -- it doesn't return back to the calle
 
 Ignoring that for now, we move on. In the AI code, we add a call to let out a wail of anguish when an enemy takes damage from the player. Nothing warms a gamer's heart like inflicting simulated pain on a virtual living being.
 
-It works, but sometimes when the hero does a mighty attack, it hits two enemies in the exact same frame. That causes the game to play the wail sound twice simultaneously. <span name="hatsworth">If</span> you know anything about audio, you know mixing multiple sounds together sums their waveforms. When those are the *same* waveform, it's the same as *one* sound played *twice as loud*. Its jarringly loud.
+It works, but sometimes when the hero does a mighty attack, it hits two enemies in the exact same frame. That causes the game to play the wail sound twice simultaneously. <span name="hatsworth">If</span> you know anything about audio, you know mixing multiple sounds together sums their waveforms. When those are the *same* waveform, it's the same as *one* sound played *twice as loud*. It's jarringly loud.
 
 <aside name="hatsworth">
 
@@ -121,7 +121,7 @@ To handle these issues, we need to look at the entire *set* of sound calls to ag
 
 These problems seem like mere annoyances compared to the next issue that falls in our lap. By now, we've strewn `playSound()` calls throughout the codebase in lots of different game systems. But our game engine is running on modern multi-core hardware. To take advantage of those cores, we distribute those systems on different threads -- rendering on one, AI on another, etc.
 
-Since our API is synchronous, it runs on the *caller's* thread. When we call it from different game systems, we're hitting our API concurrently from multiple threads. Look at that sample code. See any thread synchronization? Me either.
+Since our API is synchronous, it runs on the *caller's* thread. When we call it from different game systems, we're hitting our API concurrently from multiple threads. Look at that sample code. See any thread synchronization? Me neither.
 
 This is particularly egregious because we intended to have a *separate* thread for audio. It's just sitting there totally idle while these other threads are busy stepping all over each other and breaking things.
 
@@ -167,7 +167,7 @@ Meanwhile, the experience system wants to track the heroine's bodycount and rewa
 
 That requires various pieces of state in the world. We need the entity that died to see how tough it was. We may want to inspect its surroundings to see what other obstacles or minions were nearby. But if the event isn't received until later, that stuff may be gone. The entity may have been deallocated, and other nearby foes may have wandered off.
 
-When you receive an event, you have to be careful not to assume the *current* state of the world reflects how the world was *when the event was raised*. This means queued events tend to be more data heavy than in synchronous systems. With the latter, the notification can just say " something happened" and the receiver can look around for the details. With a queue, those ephemeral details must be captured when the event is sent so they can be used later.
+When you receive an event, you have to be careful not to assume the *current* state of the world reflects how the world was *when the event was raised*. This means queued events tend to be more data heavy than in synchronous systems. With the latter, the notification can just say "something happened" and the receiver can look around for the details. With a queue, those ephemeral details must be captured when the event is sent so they can be used later.
 
 ### You can get stuck in feedback loops
 
@@ -364,7 +364,7 @@ I've used "event" and "message" interchangeably so far because it mostly doesn't
 
 * **If you queue events:**
 
-    You're basically doing an asynchronous <a href="observer.html" class="gof-pattern">Observer pattern</a>. The queue holds *events* or *notifications*: actions that were already performed. We enqueue them so that we can *respond* to them later.
+    An "event" or "notification" describes something that *already* happened, like "monster died". You queue it so that other objects can *respond* to the event, sort of like an asynchronous <a href="observer.html" class="gof-pattern">Observer pattern</a>.
 
     * *You are likely to allow multiple listeners.* Since the queue contains things that already happened, the sender probably doesn't care who receives it. From its perspective, the event is in the past and is already forgotten.
 
@@ -372,11 +372,11 @@ I've used "event" and "message" interchangeably so far because it mostly doesn't
 
 * **When you queue messages:**
 
-    You can think of this as an asynchronous <span name="command">API</span> to a service, like our audio example. We have some outside code that wants an action to happen and often knows *who* should do that action. It just doesn't control *when* the action will be done.
+    A <span name="command">"message"</href="observer.html"> or "request" describes an action that we *want* to happen *in the future*, like "play sound". You can think of this as an asynchronous API to a service.
 
     <aside name="command">
 
-    Another word for "action" is "command", as in the <a href="command.html" class="gof-pattern">Command pattern</a>, and queues can be used there too.
+    Another word for "request" is "command", as in the <a href="command.html" class="gof-pattern">Command pattern</a>, and queues can be used there too.
 
     </aside>
 
@@ -390,11 +390,11 @@ I've used "event" and "message" interchangeably so far because it mostly doesn't
 
 ### Who can read from the queue?
 
-In our example, the queue was internal to the audio system and only it read from it. In a user interface's event system, you can register listeners to your heart's content. You sometimes hear the terms "single-cast" and "broadcast" to distinguish these, and both styles are useful.
+In our example, the queue is encapsulated and only the `Audio` class can read from it. In a user interface's event system, you can register listeners to your heart's content. You sometimes hear the terms "single-cast" and "broadcast" to distinguish these, and both styles are useful.
 
 * **A single-cast queue:**
 
-    This is the natural fit when a queue is part of a class's API. Like in our audio example, from the caller's perspective, they just see a `playsound()`method they can call.
+    This is the natural fit when a queue is part of a class's API. Like in our audio example, from the caller's perspective, they just see a `playSound()`method they can call.
 
     * *The queue becomes an implementation detail of the reader.* All the sender knows is that it sent a message.
 
@@ -489,7 +489,7 @@ If you're using a garbage collected language, you don't need to worry about this
 
 * Like many patterns, event queues go by a number of aliases. One established term is "message queue". It's usually referring to a higher level manifestation. Where our event queues are *within* an application, message queues are usually used for communicating *between* them.
 
-    Another term is "publish/subscribe", sometimes abbreviated to "pubsub". Like "message queue", it usuallys refer to larger distributed systems and less the humble coding pattern we're focused on.
+    Another term is "publish/subscribe", sometimes abbreviated to "pubsub". Like "message queue", it usually refers to larger distributed systems and less the humble coding pattern we're focused on.
 
 * A [finite state machine](http://en.wikipedia.org/wiki/Finite-state_machine), similar to the Gang of Four's <a href="state.html" class="gof-pattern">State pattern</a>, requires a stream of inputs. If you want it to respond to those asynchronously, it makes sense to queue them.
 

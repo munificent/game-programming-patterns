@@ -18,12 +18,12 @@ namespace SimpleExample
   protected:
     virtual void activate() = 0;
     
-    void move(float x, float y, float z)
+    void move(double x, double y, double z)
     {
       // Code here...
     }
     
-    void playSound(SoundId sound, float volume)
+    void playSound(SoundId sound, double volume)
     {
       // Code here...
     }
@@ -58,11 +58,11 @@ namespace Elaborated
   protected:
     //^omit
     virtual void activate() = 0;
-    void move(float x, float y, float z) {}
-    void playSound(SoundId sound, float volume) {}
+    void move(double x, double y, double z) {}
+    void playSound(SoundId sound, double volume) {}
     void spawnParticles(ParticleType type, int count) {}
     //^omit
-    float getHeroX()
+    double getHeroX()
     {
       // Code here...
       //^omit
@@ -70,7 +70,7 @@ namespace Elaborated
       //^omit
     }
     
-    float getHeroY()
+    double getHeroY()
     {
       // Code here...
       //^omit
@@ -78,7 +78,7 @@ namespace Elaborated
       //^omit
     }
     
-    float getHeroZ()
+    double getHeroZ()
     {
       // Code here...
       //^omit
@@ -125,13 +125,13 @@ namespace Forwarding
 {
   struct SoundEngine
   {
-    void play(SoundId sound, float volume) {}
+    void play(SoundId sound, double volume) {}
   };
   
   SoundEngine soundEngine_;
   
   //^5
-  void playSound(SoundId sound, float volume)
+  void playSound(SoundId sound, double volume)
   {
     soundEngine_.play(sound, volume);
   }
@@ -144,7 +144,7 @@ namespace HelperClassBefore
   class Superpower
   {
   protected:
-    void playSound(SoundId sound, float volume)
+    void playSound(SoundId sound, double volume)
     {
       // Code here...
     }
@@ -169,7 +169,7 @@ namespace HelperClassAfter
   //^7
   class SoundPlayer
   {
-    void playSound(SoundId sound, float volume)
+    void playSound(SoundId sound, double volume)
     {
       // Code here...
     }
