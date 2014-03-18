@@ -103,6 +103,7 @@ blockquote p {
 code {
   color: #444;
   font: normal 15px $mono;
+  white-space: nowrap;
 }
 
 a code {
@@ -147,7 +148,6 @@ aside {
   code {
     color: #666;
     font: normal 13px $mono;
-    white-space: nowrap;
   }
 
   img {

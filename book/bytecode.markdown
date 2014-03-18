@@ -384,7 +384,13 @@ To show how the stack changes over time, we'll walk through a sample execution w
     ADD          [54]           # Add average to current health
     SET_HEALTH   []             # Set health to result
 
-If you watch the stack at each step, you can see how data flows through it almost like magic. We push the wizard's current health at the beginning and it just hangs around at the bottom of the stack until we finally need it for last addition at the end.
+If you watch the stack at each step, you can see how data flows through it almost like <span name="threshold">magic</span>. We push the wizard's current health at the beginning and it just hangs around at the bottom of the stack until we finally need it for last addition at the end.
+
+<aside name="threshold">
+
+Maybe my threshold for "magic" is a little too low here.
+
+</aside>
 
 ### A virtual machine
 
@@ -416,9 +422,9 @@ I'm referring, of course, to the classic text [*Compilers: Principles, Technique
 
 </aside>
 
-In truth, compiling a text-based language isn't that bad, though it's a bit too broad of a topic to cram in here. However, you don't have to do that. What I said we need was a *tool*, it doesn't have to be a compiler whose input format is a text file.
+In truth, compiling a text-based language isn't that bad, though it's a *bit* too broad of a topic to cram in here. However, you don't have to do that. What I said we need was a *tool*, it doesn't have to be a compiler whose input format is a text file.
 
-On the contrary, I encourage you to consider building a <span name="text">graphical interface</span> to let users define their behavior, especially if the people using it won't be highly technical. Writing text that's free of syntax errors is surprisingly hard for people that haven't had several years of training to get used to a compiler yelling at them.
+On the contrary, I encourage you to consider building a <span name="text">graphical interface</span> to let users define their behavior, especially if the people using it won't be highly technical. Writing text that's free of syntax errors is surprisingly hard for people that haven't spent years getting used to a compiler yelling at them.
 
 <aside name="text">
 
@@ -464,43 +470,41 @@ Given that this is the longest chapter in the book, I probably failed in that ta
 
 Your instruction set defines the boundaries of what can and cannot be expressed in bytecode, and also has a big impact on the performance of your VM. Here's a laundry list of the different kinds of instructions you may want:
 
----
-
 * **External primitives.** These are the ones that reach out of the VM into the rest of the game engine and do stuff that the user can see. They control what kinds of real behavior can be expressed in bytecode. Without these, your VM can't do anything more than burn CPU cycles.
 
-* **Internal primitives.** These work with values that are already in the VM. Things like the literals and arithmetic operations we implemented. This covers comparison operators and stuff like instructions that juggle the stack around to duplicate or discard items from it.
+* **Internal primitives.** These manipulate values inside the VM -- things like literals, arithmetic, comparison operators and instructions that juggle the stack around.
 
-* **Control flow.** Our example didn't cover these, but when you want behavior that's imperative and conditionally executes instructions or loops and executes instructions more than once, you'll need control flow. In the low-level language of bytecode, they're surprisingly simple: jumps.
+* **Control flow.** Our example didn't cover these, but when you want behavior that's imperative and conditionally executes instructions or loops and executes instructions more than once, you need control flow. In the low-level language of bytecode, they're surprisingly simple: jumps.
 
-    When we were executing the code, we looped over the instructions and stored the current instruction index in a local variable. All a jump instruction does is assign to that variable and dictate where in the bytecode stream we will continue to execute. In other words, it's a `goto`. Your tool can then build higher-level control flow in terms of that.
+    In our instruction loop, we had an index to track where we are in the bytecode. All a jump instruction does is modify that variable and change where we're currently executing. In other words, it's a `goto`. Your tool can then build higher-level control flow in terms of that.
 
 * **Abstraction.** If your users start defining a *lot* of stuff in data, eventually they'll want to start reusing bits of bytecode instead of having to copy and paste it. You may want something like callable procedures.
 
-    In its simplest form these aren't much more complex than a jump. The only difference is that the VM maintains a second *return* stack. Every time you do a "call" instruction, you jump to another place in the bytecode, but you push the old instruction index onto that stack. When you hit a "return", you pop that index and jump back to it.
+    In its simplest form these aren't much more complex than a jump. The only difference is that the VM maintains a second *return* stack. When you do a "call" instruction, you push the current instruction index onto that stack before jumping to the bytecode being called. When you hit a "return", you pop that index and jump back to it.
 
 ### How are the instructions encoded?
 
 Your bytecode is conceptually a list of instructions, some of which (like literals in our example) may have arguments embedded in them or following right after. You'll have to decide how to map that data to raw bits.
 
-Bytecode VMs come in two main flavors: stack-based and register-based. Ours was a stack-based one.
+Bytecode VMs come in two main flavors: stack-based and register-based.
 
 * **With a stack-based VM:**
 
-    In a stack-based VM, instructions that consume and produce values always do so from the top of the stack. This is how our sample VM works. For example: the `INST_ADD` instruction pops two values, adds them, and pushes the result.
+    In a stack-based VM, instructions always work from the top of the stack, like our sample code. For example, `INST_ADD` pops two values, adds them, and pushes the result.
 
     * *Instructions are small.* Since each instruction implicitly finds its arguments on top of the stack, you don't need to encode any data for that. This means each instruction can be pretty small, usually a single byte.
 
-    * *Code generation is simpler.* When you get around to write the compiler or tool that outputs bytecode, you'll find it a simpler task to generate stack-based bytecode. Since each instruction implicitly works from the top of the stack, you just need to output instructions in the right order to pass parameters between them.
+    * *Code generation is simpler.* When you get around to writing the compiler or tool that outputs bytecode, you'll find it simpler to generate stack-based bytecode. Since each instruction implicitly works from the top of the stack, you just need to output instructions in the right order to pass parameters between them.
 
-    * *You have more instructions.* Each instruction only sees the very top of the stack. This means that generate code for something like `a = b + c`, you'll need separate instructions to move the variables you need to the top of the stack, perform the operation, then move the result back into the proper variable.
+    * *You have more instructions.* Each instruction only sees the very top of the stack. This means that to generate code for something like `a = b + c`, you need separate instructions to move `a` and `b` to the top of the stack, perform the operation, then move the result `c`.
 
 * **With a register-based VM:**
 
-    This style of bytecode is growing in popularity since Lua started using it several years ago and reported a performance improvement. The name is a bit confusing because these VMs still have a stack.
+    This style of bytecode is growing in popularity since Lua started using it several years ago and noted a performance improvement. The name is a bit confusing because these VMs still have a stack. The difference is that instructions can read their inputs from anywhere in it.
 
-    The difference is that the instructions can read their inputs from anywhere in that stack. Instead of "add" always popping the top two items, an "add" instruction in a register-based VM will have two arguments stored with the bytecode that identify which two stack indices contain the values to be added. This means you don't need separate instructions to bring those values up from the bottom of the stack before "add" can get to them.
+    Instead of "add" always popping the top two items, it will have two arguments stored with the bytecode that identify where in the stack the two values being added can be found. This means you don't need separate instructions to bring those values up from the bottom of the stack before you can use them.
 
-    * *Instructions are larger.* Of course storing those arguments in the bytecode takes up room, so register-based VMs have larger instructions. For example, an instruction in <span name="lua">Lua</span> -- probably the most well-known register-based VM -- is a full 32-bits. It uses 6 bits for the opcode (i.e. the thing you switch on), and the rest are arguments for things like identifying registers.
+    * *Instructions are larger.* Since instructions need arguments for stack offsets, a single instruction needs more bits. For example, an instruction in <span name="lua">Lua</span> -- probably the most well-known register-based VM -- is a full 32-bits. It uses 6 bits for the instruction itself, and the rest are arguments.
 
     <aside name="lua">
 
@@ -508,9 +512,11 @@ Bytecode VMs come in two main flavors: stack-based and register-based. Ours was 
 
     </aside>
 
-    * *You have fewer instructions.* Since each instruction can do more work, you don't need as many of them. Some say you get a performance improvement too, since you don't have to copy values around in the stack as much.
+    * *You have fewer instructions.* Since each instruction can do more work, you don't need as many of them. Some say you get a performance improvement since you don't have to move values around in the stack as much.
 
-So which should you do? My recommendation is to stick with a stack-based VM. They're simpler to implement, and much simpler to write generate code for. Register-based VMs have a reputation for being a bit faster, but that depends *deeply* on your actual instruction set and lots of other details of your VM.
+So which should you do? My recommendation is to stick with a stack-based VM. They're simpler to implement, and much simpler to generate code for. Register-based VMs have a reputation for being a bit faster, but that depends *deeply* on your actual instruction set and lots of other details of your VM.
+
+---
 
 ### How our values represented?
 

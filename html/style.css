@@ -71,7 +71,8 @@ blockquote p {
 
 code {
   color: #444;
-  font: normal 15px "Source Code Pro", Menlo, Consolas, Monaco, monospace; }
+  font: normal 15px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+  white-space: nowrap; }
 
 a code {
   color: #3366cc; }
@@ -98,8 +99,7 @@ aside {
     padding: 0 0 0 18px; }
   aside code {
     color: #666;
-    font: normal 13px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
-    white-space: nowrap; }
+    font: normal 13px "Source Code Pro", Menlo, Consolas, Monaco, monospace; }
   aside img {
     padding: 0; }
 

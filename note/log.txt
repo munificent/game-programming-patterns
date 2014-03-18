@@ -1,3 +1,4 @@
+2014-03-17 - 733 words (delete ~70), second draft bytecode
 2014-03-16 - 1433 words (delete 33), second draft bytecode
 2014-03-15 - 651 words (delete 172), second draft bytecode
 2014-03-14 - 1151 words (delete ~150), second draft bytecode
