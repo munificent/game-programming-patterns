@@ -1,6 +1,8 @@
 #ifndef cpp_bytecode_h
 #define cpp_bytecode_h
 
+#include "common.h"
+
 namespace Bytecode
 {
   namespace Interpreter
@@ -286,6 +288,73 @@ namespace Bytecode
         }
       }
     }
+  }
+
+  namespace TaggedValue
+  {
+    //^tagged-value
+    enum ValueType
+    {
+      TYPE_INT,
+      TYPE_DOUBLE,
+      TYPE_STRING
+    };
+
+    struct Value
+    {
+      ValueType type;
+      union
+      {
+        int    intValue;
+        double doubleValue;
+        char*  stringValue;
+      };
+    };
+    //^tagged-value
+  }
+
+  namespace ValueOop
+  {
+    enum ValueType
+    {
+      TYPE_INT,
+      TYPE_DOUBLE,
+      TYPE_STRING
+    };
+
+    //^value-interface
+    class Value
+    {
+    public:
+      virtual ~Value() {}
+
+      virtual ValueType type() = 0;
+
+      virtual int asInt() {
+        // Can only call this on ints.
+        assert(false);
+        return 0;
+      }
+
+      // Other conversion methods...
+    };
+    //^value-interface
+
+    //^int-value
+    class IntValue : public Value
+    {
+    public:
+      IntValue(int value)
+      : value_(value)
+      {}
+
+      virtual ValueType type() { return TYPE_INT; }
+      virtual int asInt() { return value_; }
+
+    private:
+      int value_;
+    };
+    //^int-value
   }
 }
 

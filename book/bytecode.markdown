@@ -466,6 +466,34 @@ Given that this is the longest chapter in the book, I probably failed in that ta
 
 </aside>
 
+### How do instructions access the stack?
+
+Bytecode VMs come in two main flavors: stack-based and register-based. In a stack-based VM, instructions always work on the top of the stack, like our sample code. For example, `INST_ADD` pops two values, adds them, and pushes the result.
+
+Register-based VMs still have a stack. The difference is that instructions can read their inputs from deeper in it. Instead of "add" always popping the top two items, it has two arguments stored in the bytecode that identify where in the stack the two values being added can be found. This means you don't need separate instructions to bring those values up from the bottom of the stack before you can use them.
+
+* **With a stack-based VM:**
+
+    * *Instructions are small.* Since each instruction implicitly finds its arguments on top of the stack, you don't need to encode any data for that. This means each instruction can be pretty small, usually a single byte.
+
+    * *Code generation is simpler.* When you get around to writing the compiler or tool that outputs bytecode, you'll find it simpler to generate stack-based bytecode. Since each instruction implicitly works from the top of the stack, you just need to output instructions in the right order to pass parameters between them.
+
+    * *You have more instructions.* Each instruction only sees the very top of the stack. This means that to generate code for something like `a = b + c`, you need separate instructions to move `a` and `b` to the top of the stack, perform the operation, then move the result `c`.
+
+* **With a register-based VM:**
+
+    * *Instructions are larger.* Since instructions need arguments for stack offsets, a single instruction needs more bits. For example, an instruction in <span name="lua">Lua</span> -- probably the most well-known register-based VM -- is a full 32-bits. It uses 6 bits for the instruction itself, and the rest are arguments.
+
+    <aside name="lua">
+
+    Lua doesn't specify their bytecode format and it changes from version to version. What I'm describing here is true as of Lua 5.1. For an absolutely amazing deep dive into Lua's internals, read [this](http://luaforge.net/docman/83/98/ANoFrillsIntroToLua51VMInstructions.pdf).
+
+    </aside>
+
+    * *You have fewer instructions.* Since each instruction can do more work, you don't need as many of them. Some say you get a performance improvement since you don't have to move values around in the stack as much.
+
+So which should you do? My recommendation is to stick with a stack-based VM. They're simpler to implement, and much simpler to generate code for. Register-based VMs have a reputation for being a bit faster since Lua converted to that style, but it depends *deeply* on your actual instruction set and lots of other details of your VM.
+
 ### What's the intruction set?
 
 Your instruction set defines the boundaries of what can and cannot be expressed in bytecode, and also has a big impact on the performance of your VM. Here's a laundry list of the different kinds of instructions you may want:
@@ -482,59 +510,21 @@ Your instruction set defines the boundaries of what can and cannot be expressed 
 
     In its simplest form these aren't much more complex than a jump. The only difference is that the VM maintains a second *return* stack. When you do a "call" instruction, you push the current instruction index onto that stack before jumping to the bytecode being called. When you hit a "return", you pop that index and jump back to it.
 
-### How are the instructions encoded?
-
-Your bytecode is conceptually a list of instructions, some of which (like literals in our example) may have arguments embedded in them or following right after. You'll have to decide how to map that data to raw bits.
-
-Bytecode VMs come in two main flavors: stack-based and register-based.
-
-* **With a stack-based VM:**
-
-    In a stack-based VM, instructions always work from the top of the stack, like our sample code. For example, `INST_ADD` pops two values, adds them, and pushes the result.
-
-    * *Instructions are small.* Since each instruction implicitly finds its arguments on top of the stack, you don't need to encode any data for that. This means each instruction can be pretty small, usually a single byte.
-
-    * *Code generation is simpler.* When you get around to writing the compiler or tool that outputs bytecode, you'll find it simpler to generate stack-based bytecode. Since each instruction implicitly works from the top of the stack, you just need to output instructions in the right order to pass parameters between them.
-
-    * *You have more instructions.* Each instruction only sees the very top of the stack. This means that to generate code for something like `a = b + c`, you need separate instructions to move `a` and `b` to the top of the stack, perform the operation, then move the result `c`.
-
-* **With a register-based VM:**
-
-    This style of bytecode is growing in popularity since Lua started using it several years ago and noted a performance improvement. The name is a bit confusing because these VMs still have a stack. The difference is that instructions can read their inputs from anywhere in it.
-
-    Instead of "add" always popping the top two items, it will have two arguments stored with the bytecode that identify where in the stack the two values being added can be found. This means you don't need separate instructions to bring those values up from the bottom of the stack before you can use them.
-
-    * *Instructions are larger.* Since instructions need arguments for stack offsets, a single instruction needs more bits. For example, an instruction in <span name="lua">Lua</span> -- probably the most well-known register-based VM -- is a full 32-bits. It uses 6 bits for the instruction itself, and the rest are arguments.
-
-    <aside name="lua">
-
-    Lua doesn't specify their bytecode format and it changes from version to version. What I'm describing here is true as of Lua 5.1. For an absolutely amazing deep dive into Lua's internals, read [this](http://luaforge.net/docman/83/98/ANoFrillsIntroToLua51VMInstructions.pdf).
-
-    </aside>
-
-    * *You have fewer instructions.* Since each instruction can do more work, you don't need as many of them. Some say you get a performance improvement since you don't have to move values around in the stack as much.
-
-So which should you do? My recommendation is to stick with a stack-based VM. They're simpler to implement, and much simpler to generate code for. Register-based VMs have a reputation for being a bit faster, but that depends *deeply* on your actual instruction set and lots of other details of your VM.
-
----
-
 ### How our values represented?
 
-Our sample VM only works with one kind of value: integers. That makes it easy: the stack is just a stack of ints. A more full-featured VM might support different data types: numbers, strings, objects, lists, etc.
-
-You'll have to decide how those are stored and identified internally.
+Our sample VM only works with one kind of value: integers. That makes it easy: the stack is just a stack of ints. A more full-featured VM will support different data types: numbers, strings, objects, lists, etc. You'll have to decide how those are stored internally.
 
 * **A single datatype:**
 
     * *It's simple.* You don't have to worry about tagging, conversions, or type-checking.
 
-    * *You can't work with different data types.* The obvious downside. Only supporting a single data type either limits you or forces you to do ugly hacks like treating 0 and 1 as booleans.
+    * *You can't work with different data types.* The obvious downside. Cramming different types into a single representation -- think storing numbers as strings -- is asking for pain.
 
 * **A tagged variant:**
 
-    This is the common representation for dynamically-typed languages. Every value is two chunks of bits. The first is a type tag -- an enum -- that identifies what data is being stored. The rest of the bits are then interpreted appropriately according to that type.
+    This is the common representation for dynamically-typed languages. Every value has two parts. The first is a type tag -- an enum -- that identifies what data type is being stored. The rest of the bits are then interpreted appropriately according to that type, like:
 
-    For example, if the type is an int, the other bits are the int value. If it's a string, they'll be a pointer to the string data on the heap.
+    ^code tagged-value
 
     * *You can determine the type of a value at runtime.* The nice thing about this representation is that values know their type. You can check it at runtime, which is important for dynamic dispatch and ensuring you don't try to perform operations on types that don't support it.
 
@@ -542,18 +532,18 @@ You'll have to decide how those are stored and identified internally.
 
 * **An untagged union:**
 
-    This uses a union like the previous form, but does *not* have a type tag that goes along with it. It's like a raw union in C or C++. You have a little blob of bits that could represent more than one type, and it's up to you to ensure you don't misinterpret them.
+    This uses a union like the previous form, but does *not* have a type tag that goes along with it. You have a little blob of bits that could represent more than one type, and it's up to you to ensure you don't misinterpret them.
 
-    This is how <span name="untyped">statically-typed</span> languages represent things in memory. Since the type system ensures that you don't misinterpret values at compile time, you don't validate it at runtime.
+    This is how <span name="untyped">statically-typed</span> languages represent things in memory. Since the type system ensures that you don't misinterpret values at compile time, you don't need to validate it at runtime.
 
     <aside name="untyped">
 
     This is also how *untyped* languages like assembly and Forth store values.
-    Those languages leave it to the *user* to make sure they don't write code that misinterprets a value's type. Not for the feint of heart!
+    Those languages leave it to the *user* to make sure they don't write code that misinterprets a value's type. Not for the faint of heart!
 
     </aside>
 
-    * *It's compact.* You can't get any more efficient than storing just the absolute bits you need for the value itself.
+    * *It's compact.* You can't get any more efficient than storing just the bits you need for the value itself.
 
     * *It's fast.* Not having type tags implies you're not spending cycles checking them at runtime either. This is one of the reasons statically-typed languages tend to be faster than dynamic ones.
 
@@ -561,27 +551,49 @@ You'll have to decide how those are stored and identified internally.
 
     <aside name="unsafe">
 
-    If you're bytecode was compiled from a statically-typed language, you might think you're safe here because the compiler won't generate unsafe bytecode. That may be true, but remember malicious users may have hand-crafted evil bytecode without going through your compiler.
+    If your bytecode was compiled from a statically-typed language, you might think you're safe here because the compiler won't generate unsafe bytecode. That may be true, but remember malicious users may hand-craft evil bytecode without going through your compiler.
 
     That's why, for example, the Java Virtual Machine has to do *bytecode verification* when it loads a program.
 
     </aside>
 
+* **An interface:**
+
+    The object-oriented solution for a value that maybe be one of several different types is a pointer to an interface. That interface provides virtual methods for the various type tests and conversions, along the lines of:
+
+    ^code value-interface
+
+    Then you have concrete classes for each specific data type, like:
+
+    ^code int-value
+
+    * *It's open-ended.* You can define new value types outside of the core VM as long as they implement the base interface.
+
+    * *It's object-oriented.* If you adhere OOP principles, this does things the "right" way and uses polymorphic dispatch for type-specific behavior instead of something like switching on the type tag.
+
+    * *It's verbose.* You have to define a separate class with all of the associated ceremonial verbiage for each data type. Note that in the above examples, we showed the entire definition of *all* of the value types. Here we only covered one!
+
+    * *It's inefficient.* To get polymorphism, you have to go through a pointer, which means even tiny values like booleans and numbers have to get wrapped in objects that are allocated on the heap. Every time you touch a value, you have to do a virtual method call.
+
+        In something like the core of a virtual machine, small performance hits like this quickly add up. I like OOP and I find this style appealing, but in practice it's rarely used because it's just too heavyweight.
+
+My recommendation: if you can stick with a single data type, do that. Otherwise, do a tagged union. That's what virtually every language interpreter in the world does.
+
 ### How is the bytecode generated?
 
-I saved the most important question for last. I've walked you through the code to *consume* and *interpret* bytecode, but it's up to you to build something to *produce* it. The typical answer here is to write a compiler, but it's not the only option.
+I saved the most important question for last. I've walked you through the code to *consume* and *interpret* bytecode, but it's up to you to build something to *produce* it. The typical solution here is to write a compiler, but it's not the only option.
 
 * **If you define a text-based language:**
 
-    * *You have to define a syntax.* Both amateur and professional language designers categorically underestimate how difficult this is to do. Making a grammar that can be parsed by a machine is easy. Making one that can be easily parsed by a human is *hard*.
+    * *You have to define a syntax.* Both amateur and professional language designers categorically underestimate how difficult this is to do. Defining a grammar that makes your parser happy is easy. Defining one that makes your *users* happy is *hard*.
 
-        Syntax design is user interface design, and that process doesn't get easier when you slap the constraint of being confined to a linear stream of characters onto it.
+        Syntax design is user interface design, and that process doesn't get easier when you constrain the user interface a linear sequence of characters.
 
     * *You have to implement a parser.* In contrast, this part is fairly simple. Despite their reputation, parsers are pretty easy. Either user a parser generator like ANTLR or Bison, or -- like I do -- hand-roll a little recursive descent and you're good to go.
 
-    * *You have to handle syntax errors.* This is one of the most important and most difficult parts of the process. When users make syntax and semantic errors -- which they will, constantly -- it's your job to guide them back onto the path of success. Giving appropriate, helpful feedback isn't easy when often all you know is that your parser is sitting on some random unexpected punctuation.
+    * *You have to handle syntax errors.* This is one of the most important and most difficult parts of the process. When users make syntax and semantic errors -- which they will, constantly -- it's your job to guide them back onto the path of success. Giving helpful feedback isn't easy when all you know is that your parser is sitting on some unexpected punctuation.
 
-    * *It will likely turn off non-technical users.* We programmers like text files. Combined with a powerful command-line, we think of them as the LEGO blocks of computing: simple but easily composible in a million ways.
+    * *It will likely turn off non-technical users.* We programmers like text files. Combined with powerful command-line tools, we think of them as the LEGO blocks of computing: simple but easily composible in a million ways.
 
         Most non-programmers don't think of text like that. To them, it feels like filling in tax forms for a robotic auditor that yells at them if they forget a single semicolon.
 
@@ -591,13 +603,13 @@ I saved the most important question for last. I've walked you through the code t
 
         Every little bit of extra work you do here will make your tool easier and more pleasant to use and that directly leads to better content in your game. If you look behind many of the games you love, you'll often find the secret was powerful, enjoyable authoring tools.
 
-    * *You have fewer error cases.* Because the user will be building content incrementally one step at a time, your application can guide them away from mistakes as soon as they happen.
+    * *You have fewer error cases.* Because the user is building behavior interactively one step at a time, your application can guide them away from mistakes as soon as they happen.
 
         With a text-based language, the tool doesn't see *any* of the user's content until they throw an entire file at it. That makes it much harder to prevent and handle errors.
 
     * *Portability is harder.* The nice thing about text compilers is that text files are universal. A simple compiler just reads in one file and writes one out. Porting that across operating systems is trivial.
 
-        When you're building a UI, you have to choose which framework to use, and many of those are specific to one operating system. There are cross-platform UI toolkits too, but those often sacrifice familiarity ubquity: they work on many platforms by feeling equally weird and non-standard on all of them.
+        When you're building a UI, you have to choose which framework to use, and many of those are specific to one operating system. There are cross-platform UI toolkits too, but those often sacrifice familiarity for ubquity: they work on many platforms by feeling equally foreign on all of them.
 
 ## See Also
 
@@ -605,6 +617,8 @@ I saved the most important question for last. I've walked you through the code t
 
     In fact, you'll often end up using *both* patterns. The tool you use to generate bytecode will internally have some tree of objects that represent the code. This is exactly what the interpreter pattern gives you.
 
-    In order to compile that to bytecode, you'll recursively walk the tree, just like you do to *interpret* it with the interpreter pattern. The *only* difference is that instead of executing a primitive piece of behavior immediately, you'll generate the bytecode instruction to perform it later.
+    In order to compile that to bytecode, you'll recursively walk the tree, just like you do to *interpret* it with the interpreter pattern. The *only* difference is that instead of executing a primitive piece of behavior immediately, you'll output the bytecode instruction to perform that later.
 
 * The [Lua](http://www.lua.org/) programming language is the most widely-used scripting language in games. It's implemented internally as a very compact register-based bytecode VM.
+
+* My own little scripting language [Wren](https://github.com/munificent/wren) is a simple stack-based bytecode interpreter.
