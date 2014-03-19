@@ -143,17 +143,12 @@ blockquote p {
   color: #777; }
 
 code {
-<<<<<<< HEAD
   color: #477085;
-  font: normal 15px "Source Code Pro", Menlo, Consolas, Monaco, monospace; }
-=======
-  color: #444;
   font: normal 15px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
   white-space: nowrap; }
 
 a code {
-  color: #3366cc; }
->>>>>>> master
+  color: #1481b8; }
 
 pre {
   color: #444;
