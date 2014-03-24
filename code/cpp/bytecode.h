@@ -91,11 +91,11 @@ namespace Bytecode
   //^instruction-enum
   enum Instruction
   {
-    INST_SET_HEALTH,
-    INST_SET_WISDOM,
-    INST_SET_AGILITY,
-    INST_PLAY_SOUND,
-    INST_SPAWN_PARTICLES
+    INST_SET_HEALTH      = 0x00,
+    INST_SET_WISDOM      = 0x01,
+    INST_SET_AGILITY     = 0x02,
+    INST_PLAY_SOUND      = 0x03,
+    INST_SPAWN_PARTICLES = 0x04
     //^omit
     ,INST_LITERAL,
     INST_GET_HEALTH,
@@ -286,6 +286,7 @@ namespace Bytecode
           push(a + b);
           break;
         }
+        //^add
       }
     }
   }
