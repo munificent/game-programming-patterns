@@ -291,7 +291,7 @@ The trick is to take advantage of the fact that our instruction stream is just a
 
 <aside name="single">
 
-Here, I'm just reading a single byte for the value to avoid to avoid the fiddly code required to decode a multiple-byte integer, but in a real implementation, you'd want to be able to have literals that cover your full numeric range.
+Here, I'm just reading a single byte for the value to avoid the fiddly code required to decode a multiple-byte integer, but in a real implementation, you'd want to be able to have literals that cover your full numeric range.
 
 </aside>
 
