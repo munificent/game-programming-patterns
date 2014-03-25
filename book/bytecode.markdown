@@ -442,21 +442,20 @@ Ultimately, this pattern is about expressing behavior in a user-friendly, high-l
 
 ## Design Decisions
 
-I <span name="failed">tried</span> to keep this chapter as simple as I could, but at the heart of this pattern, what we're really doing is creating a language. That's a pretty open-ended design space. Exploring this space can be tons of fun, so make sure you don't forget to finish your game.
+I <span name="failed">tried</span> to keep this chapter as simple as I could, but what we're really doing is creating a language. That's a pretty open-ended design space. Exploring it can be tons of fun, so make sure you don't forget to finish your game.
 
 <aside name="failed">
 
-Given that this is the longest chapter in the book, I probably failed in that task.
+Since this is the longest chapter in the book, it seems I failed that task.
 
 </aside>
 
----
 
 ### How do instructions access the stack?
 
-Bytecode VMs come in two main flavors: stack-based and register-based. In a stack-based VM, instructions always work on the top of the stack, like our sample code. For example, `INST_ADD` pops two values, adds them, and pushes the result.
+Bytecode VMs come in two main flavors: stack-based and register-based. In a stack-based VM, instructions always work from the top of the stack, like our sample code. For example, `INST_ADD` pops two values, adds them, and pushes the result.
 
-Register-based VMs still have a stack. The difference is that instructions can read their inputs from deeper in it. Instead of "add" always popping the top two items, it has two arguments stored in the bytecode that identify where in the stack the two values being added can be found. This means you don't need separate instructions to bring those values up from the bottom of the stack before you can use them.
+Register-based VMs still have a stack. The only difference is that instructions can read their inputs from deeper in it. Instead of `INST_ADD` always *popping* its operands, it has two indexes stored in the bytecode that identify where in the stack the to read the operands from.
 
 * **With a stack-based VM:**
 
@@ -464,11 +463,11 @@ Register-based VMs still have a stack. The difference is that instructions can r
 
     * *Code generation is simpler.* When you get around to writing the compiler or tool that outputs bytecode, you'll find it simpler to generate stack-based bytecode. Since each instruction implicitly works from the top of the stack, you just need to output instructions in the right order to pass parameters between them.
 
-    * *You have more instructions.* Each instruction only sees the very top of the stack. This means that to generate code for something like `a = b + c`, you need separate instructions to move `a` and `b` to the top of the stack, perform the operation, then move the result `c`.
+    * *You have more instructions.* Each instruction only sees the very top of the stack. This means that to generate code for something like `a = b + c`, you need separate instructions to move `a` and `b` to the top of the stack, perform the operation, then move the result into `c`.
 
 * **With a register-based VM:**
 
-    * *Instructions are larger.* Since instructions need arguments for stack offsets, a single instruction needs more bits. For example, an instruction in <span name="lua">Lua</span> -- probably the most well-known register-based VM -- is a full 32-bits. It uses 6 bits for the instruction itself, and the rest are arguments.
+    * *Instructions are larger.* Since instructions need arguments for stack offsets, a single instruction needs more bits. For example, an instruction in <span name="lua">Lua</span> -- probably the most well-known register-based VM -- is a full 32-bits. It uses 6 bits for the instruction type, and the rest are arguments.
 
     <aside name="lua">
 
@@ -476,11 +475,11 @@ Register-based VMs still have a stack. The difference is that instructions can r
 
     </aside>
 
-    * *You have fewer instructions.* Since each instruction can do more work, you don't need as many of them. Some say you get a performance improvement since you don't have to move values around in the stack as much.
+    * *You have fewer instructions.* Since each instruction can do more work, you don't need as many of them. Some say you get a performance improvement since you don't have to shuffle values around in the stack as much.
 
-So which should you do? My recommendation is to stick with a stack-based VM. They're simpler to implement, and much simpler to generate code for. Register-based VMs have a reputation for being a bit faster since Lua converted to that style, but it depends *deeply* on your actual instruction set and lots of other details of your VM.
+So which should you do? My recommendation is to stick with a stack-based VM. They're simpler to implement, and much simpler to generate code for. Register-based VMs got a reputation for being a bit faster after Lua converted to that style, but it depends *deeply* on your actual instructions and lots of other details of your VM.
 
-### What's the intruction set?
+### What intructions do you have?
 
 Your instruction set defines the boundaries of what can and cannot be expressed in bytecode, and also has a big impact on the performance of your VM. Here's a laundry list of the different kinds of instructions you may want:
 
@@ -490,7 +489,7 @@ Your instruction set defines the boundaries of what can and cannot be expressed 
 
 * **Control flow.** Our example didn't cover these, but when you want behavior that's imperative and conditionally executes instructions or loops and executes instructions more than once, you need control flow. In the low-level language of bytecode, they're surprisingly simple: jumps.
 
-    In our instruction loop, we had an index to track where we are in the bytecode. All a jump instruction does is modify that variable and change where we're currently executing. In other words, it's a `goto`. Your tool can then build higher-level control flow in terms of that.
+    In our instruction loop, we had an index to track where we were in the bytecode. All a jump instruction does is modify that variable and change where we're currently executing. In other words, it's a `goto`. You can build all kinds of higher-level control flow using that.
 
 * **Abstraction.** If your users start defining a *lot* of stuff in data, eventually they'll want to start reusing bits of bytecode instead of having to copy and paste it. You may want something like callable procedures.
 
@@ -498,7 +497,7 @@ Your instruction set defines the boundaries of what can and cannot be expressed 
 
 ### How our values represented?
 
-Our sample VM only works with one kind of value: integers. That makes it easy: the stack is just a stack of ints. A more full-featured VM will support different data types: numbers, strings, objects, lists, etc. You'll have to decide how those are stored internally.
+Our sample VM only works with one kind of value, integers. That makes it easy: the stack is just a stack of ints. A more full-featured VM will support different data types: strings, objects, lists, etc. You'll have to decide how those are stored internally.
 
 * **A single datatype:**
 
@@ -508,19 +507,19 @@ Our sample VM only works with one kind of value: integers. That makes it easy: t
 
 * **A tagged variant:**
 
-    This is the common representation for dynamically-typed languages. Every value has two parts. The first is a type tag -- an enum -- that identifies what data type is being stored. The rest of the bits are then interpreted appropriately according to that type, like:
+    This is the common representation for dynamically-typed languages. Every value has two pieces. The first is a type tag -- an enum -- that identifies what data type is being stored. The rest of the bits are then interpreted appropriately according to that type, like:
 
     ^code tagged-value
 
-    * *You can determine the type of a value at runtime.* The nice thing about this representation is that values know their type. You can check it at runtime, which is important for dynamic dispatch and ensuring you don't try to perform operations on types that don't support it.
+    * *Values know their type.* The nice thing about this representation is that you can check the type of a value at runtime. That's important for dynamic dispatch and ensuring you don't try to perform operations on types that don't support it.
 
-    * *It takes more memory.* Every value has to carry around a few extra bits with it to identify its type. With something as low-level as a VM, a few bits here and there can add up quickly.
+    * *It takes more memory.* Every value has to carry around a few extra bits with it to identify its type. In something as low-level as a VM, a few bits here and there add up quickly.
 
 * **An untagged union:**
 
     This uses a union like the previous form, but does *not* have a type tag that goes along with it. You have a little blob of bits that could represent more than one type, and it's up to you to ensure you don't misinterpret them.
 
-    This is how <span name="untyped">statically-typed</span> languages represent things in memory. Since the type system ensures that you don't misinterpret values at compile time, you don't need to validate it at runtime.
+    This is how <span name="untyped">statically-typed</span> languages represent things in memory. Since the type system ensures at compile time that you aren't misinterpreting values, you don't need to validate it at runtime.
 
     <aside name="untyped">
 
@@ -545,7 +544,7 @@ Our sample VM only works with one kind of value: integers. That makes it easy: t
 
 * **An interface:**
 
-    The object-oriented solution for a value that maybe be one of several different types is a pointer to an interface. That interface provides virtual methods for the various type tests and conversions, along the lines of:
+    The object-oriented solution for a value that maybe be one of several different types is through polymorphism. An interface provides virtual methods for the various type tests and conversions, along the lines of:
 
     ^code value-interface
 
@@ -553,19 +552,17 @@ Our sample VM only works with one kind of value: integers. That makes it easy: t
 
     ^code int-value
 
-    **TODO: mention many of same problems as interpreter pattern which trying to avoid.**
-
     * *It's open-ended.* You can define new value types outside of the core VM as long as they implement the base interface.
 
-    * *It's object-oriented.* If you adhere OOP principles, this does things the "right" way and uses polymorphic dispatch for type-specific behavior instead of something like switching on the type tag.
+    * *It's object-oriented.* If you adhere to OOP principles, this does things the "right" way and uses polymorphic dispatch for type-specific behavior instead of something like switching on a type tag.
 
     * *It's verbose.* You have to define a separate class with all of the associated ceremonial verbiage for each data type. Note that in the above examples, we showed the entire definition of *all* of the value types. Here we only covered one!
 
-    * *It's inefficient.* To get polymorphism, you have to go through a pointer, which means even tiny values like booleans and numbers have to get wrapped in objects that are allocated on the heap. Every time you touch a value, you have to do a virtual method call.
+    * *It's inefficient.* To get polymorphism, you have to go through a pointer, which means even tiny values like booleans and numbers get wrapped in objects that are allocated on the heap. Every time you touch a value, you have to do a virtual method call.
 
-        In something like the core of a virtual machine, small performance hits like this quickly add up. I like OOP and I find this style appealing, but in practice it's rarely used because it's just too heavyweight.
+        In something like the core of a virtual machine, small performance hits like this quickly add up. In fact, this suffers from many of the problems that caused us to avoid the Interpreter pattern, except now the problem is in our *values* instead of our *code*.
 
-My recommendation: if you can stick with a single data type, do that. Otherwise, do a tagged union. That's what virtually every language interpreter in the world does.
+My recommendation: If you can stick with a single data type, do that. Otherwise, do a tagged union. That's what almost every language interpreter in the world does.
 
 ### How is the bytecode generated?
 
@@ -573,13 +570,13 @@ I saved the most important question for last. I've walked you through the code t
 
 * **If you define a text-based language:**
 
-    * *You have to define a syntax.* Both amateur and professional language designers categorically underestimate how difficult this is to do. Defining a grammar that makes your parser happy is easy. Defining one that makes your *users* happy is *hard*.
+    * *You have to define a syntax.* Both amateur and professional language designers categorically underestimate how difficult this is to do. Defining a grammar that makes parsers happy is easy. Defining one that makes *users* happy is *hard*.
 
-        Syntax design is user interface design, and that process doesn't get easier when you constrain the user interface a linear sequence of characters.
+        Syntax design is user interface design, and that process doesn't get easier when you constrain the user interface to a string of characters.
 
-    * *You have to implement a parser.* In contrast, this part is fairly simple. Despite their reputation, parsers are pretty easy. Either user a parser generator like ANTLR or Bison, or -- like I do -- hand-roll a little recursive descent and you're good to go.
+    * *You have to implement a parser.* Despite their reputation, this part is pretty easy. Either user a parser generator like ANTLR or Bison, or -- like I do -- hand-roll a little recursive descent one and you're good to go.
 
-    * *You have to handle syntax errors.* This is one of the most important and most difficult parts of the process. When users make syntax and semantic errors -- which they will, constantly -- it's your job to guide them back onto the path of success. Giving helpful feedback isn't easy when all you know is that your parser is sitting on some unexpected punctuation.
+    * *You have to handle syntax errors.* This is one of the most important and most difficult parts of the process. When users make syntax and semantic errors -- which they will, constantly -- it's your job to guide them back onto the right path. Giving helpful feedback isn't easy when all you know is that your parser is sitting on some unexpected punctuation.
 
     * *It will likely turn off non-technical users.* We programmers like text files. Combined with powerful command-line tools, we think of them as the LEGO blocks of computing: simple but easily composible in a million ways.
 
@@ -587,25 +584,31 @@ I saved the most important question for last. I've walked you through the code t
 
 * **If you define a graphical authoring tool:**
 
-    * *You have to implement a user interface.* Buttons, clicks, drags, stuff like that. Some programmers cringe at the thought of this, but I personally love it. If you go down this route, it's important to treat designing the user interface as a core part of doing your job well, and not just an unpleasant task to be muddled through.
+    * *You have to implement a user interface.* Buttons, clicks, drags, stuff like that. Some cringe at the idea of this, but I personally love it. If you go down this route, it's important to treat designing the user interface as a core part of doing your job well, and not just an unpleasant task to be muddled through.
 
-        Every little bit of extra work you do here will make your tool easier and more pleasant to use and that directly leads to better content in your game. If you look behind many of the games you love, you'll often find the secret was powerful, enjoyable authoring tools.
+        Every little bit of extra work you do here will make your tool easier and more pleasant to use and that directly leads to better content in your game. If you look behind many of the games you love, you'll often find the secret was fun authoring tools.
 
     * *You have fewer error cases.* Because the user is building behavior interactively one step at a time, your application can guide them away from mistakes as soon as they happen.
 
-        With a text-based language, the tool doesn't see *any* of the user's content until they throw an entire file at it. That makes it much harder to prevent and handle errors.
+        With a text-based language, the tool doesn't see *any* of the user's content until they throw an entire file at it. That makes it harder to prevent and handle errors.
 
-    * *Portability is harder.* The nice thing about text compilers is that text files are universal. A simple compiler just reads in one file and writes one out. Porting that across operating systems is trivial.
+    * *Portability is harder.* The nice thing about text compilers is that text files are <span name="lines">universal</span>. A simple compiler just reads in one file and writes one out. Porting that across operating systems is trivial.
 
-        When you're building a UI, you have to choose which framework to use, and many of those are specific to one operating system. There are cross-platform UI toolkits too, but those often sacrifice familiarity for ubquity: they work on many platforms by feeling equally foreign on all of them.
+        <aside name="lines">
+
+        Except for line endings. *Sigh...*
+
+        </aside>
+
+        When you're building a UI, you have to choose which framework to use, and many of those are specific to one OS. There are cross-platform UI toolkits too, but those often get ubiquity at the expense of familiarity: they feel equally weird on all of platforms.
 
 ## See Also
 
 * This pattern's close sister is the Gang of Four's <a href="http://en.wikipedia.org/wiki/Interpreter_pattern" class="gof-pattern">Interpreter pattern</a>. Both give you a way to express composable behavior in terms of data.
 
-    In fact, you'll often end up using *both* patterns. The tool you use to generate bytecode will internally have some tree of objects that represent the code. This is exactly what the interpreter pattern gives you.
+    In fact, you'll often end up using *both* patterns. The tool you use to generate bytecode will internally have a tree of objects that represents the code. This is exactly what the Interpreter pattern expects.
 
-    In order to compile that to bytecode, you'll recursively walk the tree, just like you do to *interpret* it with the interpreter pattern. The *only* difference is that instead of executing a primitive piece of behavior immediately, you'll output the bytecode instruction to perform that later.
+    In order to compile that to bytecode, you'll recursively walk the tree, just like you do to interpret it with the Interpreter pattern. The *only* difference is that instead of executing a primitive piece of behavior immediately, you output the bytecode instruction to perform that later.
 
 * The [Lua](http://www.lua.org/) programming language is the most widely-used scripting language in games. It's implemented internally as a very compact register-based bytecode VM.
 
