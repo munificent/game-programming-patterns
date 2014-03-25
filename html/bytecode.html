@@ -440,7 +440,7 @@
 
 <aside name="single">
 
-<p>Here, I&#x2019;m just reading a single byte for the value to avoid to avoid the fiddly code required to decode a multiple-byte integer, but in a real implementation, you&#x2019;d want to be able to have literals that cover your full numeric range.</p>
+<p>Here, I&#x2019;m just reading a single byte for the value to avoid the fiddly code required to decode a multiple-byte integer, but in a real implementation, you&#x2019;d want to be able to have literals that cover your full numeric range.</p>
 </aside>
 
 <p><img src="images/bytecode-literal.png" /></p>
@@ -626,7 +626,7 @@
 <p>In its simplest form these aren&#x2019;t much more complex than a jump. The only difference is that the VM maintains a second <em>return</em> stack. When you do a "call" instruction, you push the current instruction index onto that stack before jumping to the bytecode being called. When you hit a "return", you pop that index and jump back to it.</p>
 </li>
 </ul>
-<h3><a href="#how-our-values-represented" name="how-our-values-represented">How our values represented?</a></h3>
+<h3><a href="#how-are-values-represented" name="how-are-values-represented">How are values represented?</a></h3>
 <p>Our sample VM only works with one kind of value, integers. That makes it easy: the stack is just a stack of ints. A more full-featured VM will support different data types: strings, objects, lists, etc. You&#x2019;ll have to decide how those are stored internally.</p>
 <ul>
 <li>
@@ -767,7 +767,7 @@ Those languages leave it to the <em>user</em> to make sure they don&#x2019;t wri
 <p>Syntax design is user interface design, and that process doesn&#x2019;t get easier when you constrain the user interface to a string of characters.</p>
 </li>
 <li>
-<p><em>You have to implement a parser.</em> Despite their reputation, this part is pretty easy. Either user a parser generator like ANTLR or Bison, or&thinsp;&mdash;&thinsp;like I do&thinsp;&mdash;&thinsp;hand-roll a little recursive descent one and you&#x2019;re good to go.</p>
+<p><em>You have to implement a parser.</em> Despite their reputation, this part is pretty easy. Either use a parser generator like ANTLR or Bison, or&thinsp;&mdash;&thinsp;like I do&thinsp;&mdash;&thinsp;hand-roll a little recursive descent one and you&#x2019;re good to go.</p>
 </li>
 <li>
 <p><em>You have to handle syntax errors.</em> This is one of the most important and most difficult parts of the process. When users make syntax and semantic errors&thinsp;&mdash;&thinsp;which they will, constantly&thinsp;&mdash;&thinsp;it&#x2019;s your job to guide them back onto the right path. Giving helpful feedback isn&#x2019;t easy when all you know is that your parser is sitting on some unexpected punctuation.</p>

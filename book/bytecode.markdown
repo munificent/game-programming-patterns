@@ -291,7 +291,7 @@ The trick is to take advantage of the fact that our instruction stream is just a
 
 <aside name="single">
 
-Here, I'm just reading a single byte for the value to avoid to avoid the fiddly code required to decode a multiple-byte integer, but in a real implementation, you'd want to be able to have literals that cover your full numeric range.
+Here, I'm just reading a single byte for the value to avoid the fiddly code required to decode a multiple-byte integer, but in a real implementation, you'd want to be able to have literals that cover your full numeric range.
 
 </aside>
 
@@ -495,7 +495,7 @@ Your instruction set defines the boundaries of what can and cannot be expressed 
 
     In its simplest form these aren't much more complex than a jump. The only difference is that the VM maintains a second *return* stack. When you do a "call" instruction, you push the current instruction index onto that stack before jumping to the bytecode being called. When you hit a "return", you pop that index and jump back to it.
 
-### How our values represented?
+### How are values represented?
 
 Our sample VM only works with one kind of value, integers. That makes it easy: the stack is just a stack of ints. A more full-featured VM will support different data types: strings, objects, lists, etc. You'll have to decide how those are stored internally.
 
@@ -574,7 +574,7 @@ I saved the most important question for last. I've walked you through the code t
 
         Syntax design is user interface design, and that process doesn't get easier when you constrain the user interface to a string of characters.
 
-    * *You have to implement a parser.* Despite their reputation, this part is pretty easy. Either user a parser generator like ANTLR or Bison, or -- like I do -- hand-roll a little recursive descent one and you're good to go.
+    * *You have to implement a parser.* Despite their reputation, this part is pretty easy. Either use a parser generator like ANTLR or Bison, or -- like I do -- hand-roll a little recursive descent one and you're good to go.
 
     * *You have to handle syntax errors.* This is one of the most important and most difficult parts of the process. When users make syntax and semantic errors -- which they will, constantly -- it's your job to guide them back onto the right path. Giving helpful feedback isn't easy when all you know is that your parser is sitting on some unexpected punctuation.
 
