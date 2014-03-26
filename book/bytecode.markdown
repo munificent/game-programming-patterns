@@ -455,7 +455,7 @@ Since this is the longest chapter in the book, it seems I failed that task.
 
 Bytecode VMs come in two main flavors: stack-based and register-based. In a stack-based VM, instructions always work from the top of the stack, like our sample code. For example, `INST_ADD` pops two values, adds them, and pushes the result.
 
-Register-based VMs still have a stack. The only difference is that instructions can read their inputs from deeper in it. Instead of `INST_ADD` always *popping* its operands, it has two indexes stored in the bytecode that identify where in the stack the to read the operands from.
+Register-based VMs still have a stack. The only difference is that instructions can read their inputs from deeper in it. Instead of `INST_ADD` always *popping* its operands, it has two indexes stored in the bytecode that identify where in the stack to read the operands from.
 
 * **With a stack-based VM:**
 
