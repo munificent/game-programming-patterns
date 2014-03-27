@@ -240,8 +240,6 @@ during modification.
 
 ## Sample Code
 
-### A simple graphics system
-
 Now that we've got the theory, let's see how it works in practice.
 We'll write a very bare-bones graphics system that lets us draw pixels
 on a frame buffer. In most consoles and PCs, this low-level part of
@@ -318,10 +316,9 @@ There is another equally common cause, though: when the code *doing
 the modification* is accessing the same state that it's modifying.
 This can manifest in a variety of places, especially physics and AI
 where you have entities interacting with each other. Double-buffering
-is often necessary here too. To see how, let's go through an AI
-example.
+is often necessary here too.
 
-#### Artificial unintelligence
+### Artificial unintelligence
 
 Let's say we're building the behavioral system for, of all things, a
 game based on slapstick comedy. The game has a stage containing a
@@ -367,8 +364,6 @@ gets slapped -- by anyone -- he responds by slapping the
 actor he faces.
 
 ^code 7
-
-#### Roll the film
 
 Now lets throw some comedians on a stage and see what happens. We'll
 set up three comedians, each facing the next. The last one will face
@@ -442,7 +437,7 @@ violates our requirement that actors need to appear to run in
 parallel: the order that they update within a single frame shouldn't
 matter.
 
-#### Buffered slaps
+### Buffered slaps
 
 Fortunately, our Double Buffer pattern can help. This time, instead of
 having two copies of a monolithic "buffer" object, we'll be buffering
