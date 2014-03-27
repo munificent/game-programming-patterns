@@ -361,18 +361,19 @@ This bit of bytecode pushes our wizard's health onto the stack. If we mechanical
 To show how the stack changes over time, we'll walk through a sample execution where the wizard's current stats are 45 health, 7 agility, and 11 wisdom. Next to each instruction is what the stack looks like after executing it and then a little comment explaining the instruction's purpose.
 
     LITERAL 0    [0]            # Wizard index
-    GET_HEALTH   [45]           # getHealth()
-    LITERAL 0    [45, 0]        # Wizard index
-    GET_AGILITY  [45, 7]        # getAgility()
-    LITERAL 0    [45, 7, 0]     # Wizard index
-    GET_WISDOM   [45, 7, 11]    # getWisdom()
-    ADD          [45, 18]       # Add agility and wisdom
-    LITERAL 2    [45, 18, 2]    # Divisor
-    DIVIDE       [45, 9]        # Average agility and wisdom
-    ADD          [54]           # Add average to current health
+    LITERAL 0    [0, 0]         # Wizard index
+    GET_HEALTH   [0, 45]        # getHealth()
+    LITERAL 0    [0, 45, 0]     # Wizard index
+    GET_AGILITY  [0, 45, 7]     # getAgility()
+    LITERAL 0    [0, 45, 7, 0]  # Wizard index
+    GET_WISDOM   [0, 45, 7, 11] # getWisdom()
+    ADD          [0, 45, 18]    # Add agility and wisdom
+    LITERAL 2    [0, 45, 18, 2] # Divisor
+    DIVIDE       [0, 45, 9]     # Average agility and wisdom
+    ADD          [0, 54]        # Add average to current health
     SET_HEALTH   []             # Set health to result
 
-If you watch the stack at each step, you can see how data flows through it almost like <span name="threshold">magic</span>. We push the wizard's current health at the beginning and it just hangs around at the bottom of the stack until we finally need it for the last addition at the end.
+If you watch the stack at each step, you can see how data flows through it almost like <span name="threshold">magic</span>. We push a `0` for the wizard index at the beginning and it just hangs around at the bottom of the stack until we finally need it for the last `SET_HEALTH` at the end.
 
 <aside name="threshold">
 
