@@ -135,7 +135,7 @@ through it quickly.</p>
 <p>Any concrete class that implements this becomes an observer. In our example, that&#x2019;s the achievement system, so we&#x2019;d have something like so:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Achievements</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Observer</span>
 <span class="p">{</span>
-<span class="nl">protected:</span>
+<span class="nl">public:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">onNotify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">switch</span> <span class="p">(</span><span class="n">event</span><span class="p">)</span>
@@ -204,13 +204,19 @@ through it quickly.</p>
 <p>That means those two systems would be interfering with each other&thinsp;&mdash;&thinsp;and in a particularly nasty way, since one would effectively disable the other. Supporting a list of observers ensures that each observer is treated independently from the others. As far as they know, each is the only thing in the world with eyes on the subject.</p>
 <p>The other job of the subject is sending notifications:</p>
 <p><span name="concurrent"></span></p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">notify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Subject</span>
 <span class="p">{</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numObservers_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="nl">protected:</span>
+  <span class="kt">void</span> <span class="n">notify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="n">observers_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">onNotify</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">event</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numObservers_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="n">observers_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">onNotify</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">event</span><span class="p">);</span>
+    <span class="p">}</span>
   <span class="p">}</span>
-<span class="p">}</span>
+
+  <span class="c1">// Other stuff...</span>
+<span class="p">};</span>
 </pre></div>
 
 
