@@ -464,7 +464,7 @@ Register-based VMs still have a stack. The only difference is that instructions 
 
     * *Code generation is simpler.* When you get around to writing the compiler or tool that outputs bytecode, you'll find it simpler to generate stack-based bytecode. Since each instruction implicitly works from the top of the stack, you just need to output instructions in the right order to pass parameters between them.
 
-    * *You have more instructions.* Each instruction only sees the very top of the stack. This means that to generate code for something like `a = b + c`, you need separate instructions to move `a` and `b` to the top of the stack, perform the operation, then move the result into `c`.
+    * *You have more instructions.* Each instruction only sees the very top of the stack. This means that to generate code for something like `a = b + c`, you need separate instructions to move `b` and `c` to the top of the stack, perform the operation, then move the result into `a`.
 
 * **With a register-based VM:**
 
