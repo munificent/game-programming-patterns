@@ -145,11 +145,15 @@
 
 
 <p>We check that in, create a few sound files, and start sprinkling <code>playSound()</code> calls through our codebase like some magical audio fairy. For example, in our UI code, when the selected menu item changes, we play a little bloop:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Menu</span><span class="o">::</span><span class="n">onSelect</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Menu</span>
 <span class="p">{</span>
-  <span class="n">Audio</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">SOUND_BLOOP</span><span class="p">,</span> <span class="n">VOL_MAX</span><span class="p">);</span>
-  <span class="c1">// Other stuff...</span>
-<span class="p">}</span>
+<span class="nl">public:</span>
+  <span class="kt">void</span> <span class="n">onSelect</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">Audio</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">SOUND_BLOOP</span><span class="p">,</span> <span class="n">VOL_MAX</span><span class="p">);</span>
+    <span class="c1">// Other stuff...</span>
+  <span class="p">}</span>
+<span class="p">};</span>
 </pre></div>
 
 
@@ -250,6 +254,7 @@
     <span class="n">numPending_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="p">}</span>
 
+  <span class="c1">// Other stuff...</span>
 <span class="nl">private:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">MAX_PENDING</span> <span class="o">=</span> <span class="mi">16</span><span class="p">;</span>
 
