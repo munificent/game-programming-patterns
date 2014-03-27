@@ -577,7 +577,7 @@
 
 <h3><a href="#how-do-instructions-access-the-stack" name="how-do-instructions-access-the-stack">How do instructions access the stack?</a></h3>
 <p>Bytecode VMs come in two main flavors: stack-based and register-based. In a stack-based VM, instructions always work from the top of the stack, like our sample code. For example, <code>INST_ADD</code> pops two values, adds them, and pushes the result.</p>
-<p>Register-based VMs still have a stack. The only difference is that instructions can read their inputs from deeper in it. Instead of <code>INST_ADD</code> always <em>popping</em> its operands, it has two indexes stored in the bytecode that identify where in the stack the to read the operands from.</p>
+<p>Register-based VMs still have a stack. The only difference is that instructions can read their inputs from deeper in it. Instead of <code>INST_ADD</code> always <em>popping</em> its operands, it has two indexes stored in the bytecode that identify where in the stack to read the operands from.</p>
 <ul>
 <li>
 <p><strong>With a stack-based VM:</strong></p>
@@ -589,7 +589,7 @@
 <p><em>Code generation is simpler.</em> When you get around to writing the compiler or tool that outputs bytecode, you&#x2019;ll find it simpler to generate stack-based bytecode. Since each instruction implicitly works from the top of the stack, you just need to output instructions in the right order to pass parameters between them.</p>
 </li>
 <li>
-<p><em>You have more instructions.</em> Each instruction only sees the very top of the stack. This means that to generate code for something like <code>a = b + c</code>, you need separate instructions to move <code>a</code> and <code>b</code> to the top of the stack, perform the operation, then move the result into <code>c</code>.</p>
+<p><em>You have more instructions.</em> Each instruction only sees the very top of the stack. This means that to generate code for something like <code>a = b + c</code>, you need separate instructions to move <code>b</code> and <code>c</code> to the top of the stack, perform the operation, then move the result into <code>a</code>.</p>
 </li>
 </ul>
 </li>

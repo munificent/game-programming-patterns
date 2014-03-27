@@ -1,3 +1,5 @@
+2014-03-26 - fix #103 #109 #110 #111 #115, merge #108 #114 #118, close #106
+2014-03-25 - post new chapter, mailing list, twitter, proggit, g+
 2014-03-24 - 2136 words, finish bytecode
 2014-03-23 - 2448 words (delete ~100), third draft bytecode
 2014-03-22 - 808 words, third draft bytecode
