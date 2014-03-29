@@ -288,7 +288,7 @@ Now, that's a different question. Like all design patterns, the Observer pattern
 
 Two challenges remain, one technical and one at something more like the maintainability level. We'll do the technical one first because those are always easiest.
 
-## Destroying subjects and observers
+### Destroying subjects and observers
 
 The sample code we walked through is solid, but it <span name="destruct">side-steps</span> an important issue: what happens when you delete a subject or an observer? If you just wantonly call `delete` on some observer, a subject may still have a pointer to it. That's now a dangling pointer into deallocated memory. When that subject tries to send a notification, well... things like that are why people end up hating C++.
 
@@ -340,7 +340,7 @@ An even surer sign of its significance: it has [a Wikipedia article](http://en.w
 
 </aside>
 
-## What's going on?
+### What's going on?
 
 The other, deeper issue with the Observer pattern is a direct consequence of its intended purpose. We use it because it helps us loosen the coupling between two pieces of code. It lets a subject indirectly communicate with some observer without being statically bound to it.
 

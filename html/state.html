@@ -24,13 +24,14 @@
 <div class="nav">
   <div class="bar">
     <div class="column">
-      <h1><a href="index.html">Game Programming Patterns</a></h1>
+      <h1 class="thread">&larr; <a href="singleton.html">Singleton</a> | <a href="singleton.html">Sequencing Patterns</a> &rarr;
+      <h1>&equiv; <a href="index.html">Game Programming Patterns</a></h1>
     </div>
   </div>
   <div class="column">
     <table>
       <tr>
-        <td width="30%">
+        <td width="30%" class="section-nav">
           <h2>State</h2>
           <ul><li>
 <a href="#we&#x2019;ve-all-been-there">We&#x2019;ve All Been There</a></li><li>
@@ -51,7 +52,7 @@
 <ul>
   <li><a href="introduction.html">Introduction</a>
     <ul>
-      <li>Architecture, Performance, and Games</li>
+      <li><a href="architecture-performance-and-games.html">Architecture, Performance, and Games</a></li>
     </ul>
   </li>
   <li><a href="design-patterns-revisited.html">Design Patterns Revisited</a>
@@ -71,10 +72,11 @@
         <a href="update-method.html">Update Method</a></li>
     </ul>
   </li>
-  <li>Behavioral Patterns
+  <li><a href="behavioral-patterns.html">Behavioral Patterns</a>
     <ul>
-      <li>Bytecode, <a href="subclass-sandbox.html">Subclass Sandbox</a>,
-        <a href="type-object.html">Type Object</a></li>
+      <li><a href="bytecode.html">Bytecode</a>,
+      <a href="subclass-sandbox.html">Subclass Sandbox</a>,
+      <a href="type-object.html">Type Object</a></li>
     </ul>
   </li>
   <li><a href="decoupling-patterns.html">Decoupling Patterns</a>
@@ -98,7 +100,7 @@
     </table>
   </div>
 </div>
-<div class="page">
+<div class="page sidebar">
 <div class="content">
 <div class="in-progress">
   <span class="dismiss">&times;</span>
@@ -138,7 +140,7 @@
   </table>
 </div>
 <h1>State</h1>
-<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="design-patterns-revisited.html">Design Patterns Revisited</a></h1>
+<h1 class="book"><a href="index.html">Game Programming Patterns</a><span class="section"><a href="design-patterns-revisited.html">Design Patterns Revisited</a></span></h1>
 <p>Confession time: I went a little overboard and packed way too much into this chapter. It&#x2019;s ostensibly about the <a href="http://en.wikipedia.org/wiki/State_pattern" class="gof-pattern">State design pattern</a>. But I can&#x2019;t talk about that and games without going into the more fundamental concept of <em>finite state machines</em> (or "FSMs"). But then once I went there, I figured I might as well introduce <em>hierarchical state machines</em> and <em>pushdown automata</em>.</p>
 <p>That&#x2019;s a lot to cover, so to keep things as short as possible, the code samples here leave out a few details that you&#x2019;ll have to fill in on your own. I hope they&#x2019;re still clear enough for you to get the big picture.</p>
 <p>Don&#x2019;t feel sad if you&#x2019;ve never heard of a state machine. While well known to <span name="two-camps">AI and compiler</span> hackers, they aren&#x2019;t that familiar to other programming circles. I think they should be more widely known, so I&#x2019;m going to throw them at a different kind of problem here.</p>

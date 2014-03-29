@@ -24,13 +24,14 @@
 <div class="nav">
   <div class="bar">
     <div class="column">
-      <h1><a href="index.html">Game Programming Patterns</a></h1>
+      <h1 class="thread">&larr; <a href="observer.html">Observer</a> | <a href="observer.html">Singleton</a> &rarr;
+      <h1>&equiv; <a href="index.html">Game Programming Patterns</a></h1>
     </div>
   </div>
   <div class="column">
     <table>
       <tr>
-        <td width="30%">
+        <td width="30%" class="section-nav">
           <h2>Prototype</h2>
           <ul><li>
 <a href="#the-prototype-design-pattern">The Prototype Design Pattern</a></li><li>
@@ -43,7 +44,7 @@
 <ul>
   <li><a href="introduction.html">Introduction</a>
     <ul>
-      <li>Architecture, Performance, and Games</li>
+      <li><a href="architecture-performance-and-games.html">Architecture, Performance, and Games</a></li>
     </ul>
   </li>
   <li><a href="design-patterns-revisited.html">Design Patterns Revisited</a>
@@ -63,10 +64,11 @@
         <a href="update-method.html">Update Method</a></li>
     </ul>
   </li>
-  <li>Behavioral Patterns
+  <li><a href="behavioral-patterns.html">Behavioral Patterns</a>
     <ul>
-      <li>Bytecode, <a href="subclass-sandbox.html">Subclass Sandbox</a>,
-        <a href="type-object.html">Type Object</a></li>
+      <li><a href="bytecode.html">Bytecode</a>,
+      <a href="subclass-sandbox.html">Subclass Sandbox</a>,
+      <a href="type-object.html">Type Object</a></li>
     </ul>
   </li>
   <li><a href="decoupling-patterns.html">Decoupling Patterns</a>
@@ -90,7 +92,7 @@
     </table>
   </div>
 </div>
-<div class="page">
+<div class="page sidebar">
 <div class="content">
 <div class="in-progress">
   <span class="dismiss">&times;</span>
@@ -130,16 +132,16 @@
   </table>
 </div>
 <h1>Prototype</h1>
-<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="design-patterns-revisited.html">Design Patterns Revisited</a></h1>
+<h1 class="book"><a href="index.html">Game Programming Patterns</a><span class="section"><a href="design-patterns-revisited.html">Design Patterns Revisited</a></span></h1>
 <p>The first time I heard the word "prototype" was in <em>Design Patterns</em>. Today, it seems like everyone is saying it, but it turns out they aren&#x2019;t talking about the <a href="http://en.wikipedia.org/wiki/Prototype_pattern" class="gof-pattern">design pattern</a>.</p>
 <p>We&#x2019;ll cover that here, but I&#x2019;ll also show you other, more interesting places where the term "prototype" and the concepts behind it have popped up. But first, let&#x2019;s revisit the <span name="original">original</span> pattern.</p>
-<h2><a href="#the-prototype-design-pattern" name="the-prototype-design-pattern">The Prototype Design Pattern</a></h2>
 <aside name="original">
 
 <p>I don&#x2019;t say "original" lightly here. <em>Design Patterns</em> cites Ivan Sutherland&#x2019;s legendary <a href="http://en.wikipedia.org/wiki/Sketchpad">Sketchpad</a> project in <em>1963</em> as one of the first examples of this pattern in the wild. While everyone else was listening to Dylan and the Beatles, Sutherland was busy just, you know, inventing the basic concepts of CAD, interactive graphics, and object-oriented programming.</p>
 <p>Watch <a href="http://www.youtube.com/watch?v=USyoT_Ha_bA">the demo</a> and prepare to be blown away.</p>
 </aside>
 
+<h2><a href="#the-prototype-design-pattern" name="the-prototype-design-pattern">The Prototype Design Pattern</a></h2>
 <p>Pretend we&#x2019;re making a game in the style of Gauntlet. We&#x2019;ve got creatures and fiends swarming around the hero, vying for their share of his flesh. These unsavory dinner companions enter the arena by way of "spawners", and there is a different spawner for each kind of enemy.</p>
 <p>For the sake of this example, let&#x2019;s say we have different types for each kind of monster in the game. We&#x2019;ll have actual C++ classes for <code>Ghost</code>, <code>Demon</code>, <code>Sorcerer</code>, etc., like:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>

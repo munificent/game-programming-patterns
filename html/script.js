@@ -16,6 +16,10 @@ $(document).ready(function() {
     refreshAsides();
   });
 
+  $(".nav").click(function() {
+    $(".nav").toggleClass("expanded");
+  });
+
   if (document.cookie.indexOf("hideinprogress") == -1) {
     $(".in-progress").show();
   }
@@ -42,8 +46,7 @@ $(document).ready(function() {
 });
 
 function refreshAsides() {
-  // TODO(bob): What should the cutoff be?
-  if ($(document).width() > 640) {
+  if ($(document).width() > 700) {
     sidebarAsides();
   } else {
     inlineAsides();
@@ -53,12 +56,14 @@ function refreshAsides() {
 // Moves the asides into the main content column.
 function inlineAsides() {
   $(".page").removeClass("sidebar");
+  $(".nav").removeClass("sidebar");
   $("aside").removeClass("sidebar");
 }
 
 // Moves the asides to a second column on the right.
 function sidebarAsides() {
   $(".page").addClass("sidebar");
+  $(".nav").addClass("sidebar");
   $("aside").each(function() {
     var aside = $(this);
 

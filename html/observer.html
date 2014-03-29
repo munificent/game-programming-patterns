@@ -24,13 +24,14 @@
 <div class="nav">
   <div class="bar">
     <div class="column">
-      <h1><a href="index.html">Game Programming Patterns</a></h1>
+      <h1 class="thread">&larr; <a href="flyweight.html">Flyweight</a> | <a href="flyweight.html">Prototype</a> &rarr;
+      <h1>&equiv; <a href="index.html">Game Programming Patterns</a></h1>
     </div>
   </div>
   <div class="column">
     <table>
       <tr>
-        <td width="30%">
+        <td width="30%" class="section-nav">
           <h2>Observer</h2>
           <ul><li>
 <a href="#achievement-unlocked">Achievement Unlocked</a></li><li>
@@ -38,8 +39,6 @@
 <a href="#"it&#x2019;s-too-slow"">"It&#x2019;s Too Slow"</a></li><li>
 <a href="#"it-does-too-much-dynamic-allocation"">"It Does Too Much Dynamic Allocation"</a></li><li>
 <a href="#remaining-problems">Remaining Problems</a></li><li>
-<a href="#destroying-subjects-and-observers">Destroying subjects and observers</a></li><li>
-<a href="#what&#x2019;s-going-on">What&#x2019;s going on?</a></li><li>
 <a href="#observers-today">Observers Today</a></li><li>
 <a href="#observers-tomorrow">Observers Tomorrow</a></li></ul>
 
@@ -49,7 +48,7 @@
 <ul>
   <li><a href="introduction.html">Introduction</a>
     <ul>
-      <li>Architecture, Performance, and Games</li>
+      <li><a href="architecture-performance-and-games.html">Architecture, Performance, and Games</a></li>
     </ul>
   </li>
   <li><a href="design-patterns-revisited.html">Design Patterns Revisited</a>
@@ -69,10 +68,11 @@
         <a href="update-method.html">Update Method</a></li>
     </ul>
   </li>
-  <li>Behavioral Patterns
+  <li><a href="behavioral-patterns.html">Behavioral Patterns</a>
     <ul>
-      <li>Bytecode, <a href="subclass-sandbox.html">Subclass Sandbox</a>,
-        <a href="type-object.html">Type Object</a></li>
+      <li><a href="bytecode.html">Bytecode</a>,
+      <a href="subclass-sandbox.html">Subclass Sandbox</a>,
+      <a href="type-object.html">Type Object</a></li>
     </ul>
   </li>
   <li><a href="decoupling-patterns.html">Decoupling Patterns</a>
@@ -96,7 +96,7 @@
     </table>
   </div>
 </div>
-<div class="page">
+<div class="page sidebar">
 <div class="content">
 <div class="in-progress">
   <span class="dismiss">&times;</span>
@@ -136,7 +136,7 @@
   </table>
 </div>
 <h1>Observer</h1>
-<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="design-patterns-revisited.html">Design Patterns Revisited</a></h1>
+<h1 class="book"><a href="index.html">Game Programming Patterns</a><span class="section"><a href="design-patterns-revisited.html">Design Patterns Revisited</a></span></h1>
 <p>You can&#x2019;t throw a rock at a hard drive without hitting an application built using the <span name="devised"><a href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">Model-View-Controller</a></span> architecture, and underlying that is the Observer pattern. Observer is so pervasive that Java put it in its core library (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Observer.html"><code>java.util.Observer</code></a>) and C# baked it right into the <em>language</em> (the <a href="http://msdn.microsoft.com/en-us/library/8627sbea.aspx"><code>event</code></a> keyword).</p>
 <aside name="devised">
 
@@ -481,7 +481,7 @@ option and insert it at the front:</p>
 <p>I think we&#x2019;ve banished the two main boogie men used to scare people off this pattern. As we&#x2019;ve seen, it&#x2019;s simple, fast, and can be made to play nice with memory management. But does that mean that you should observers all the time?</p>
 <p>Now, that&#x2019;s a different question. Like all design patterns, the Observer pattern isn&#x2019;t a cure-all. Even when implemented correctly and efficiently, it may not be the right solution. The reason design patterns get a bad rap is because people apply good patterns to the wrong problem and end up making things worse.</p>
 <p>Two challenges remain, one technical and one at something more like the maintainability level. We&#x2019;ll do the technical one first because those are always easiest.</p>
-<h2><a href="#destroying-subjects-and-observers" name="destroying-subjects-and-observers">Destroying subjects and observers</a></h2>
+<h3><a href="#destroying-subjects-and-observers" name="destroying-subjects-and-observers">Destroying subjects and observers</a></h3>
 <p>The sample code we walked through is solid, but it <span name="destruct">side-steps</span> an important issue: what happens when you delete a subject or an observer? If you just wantonly call <code>delete</code> on some observer, a subject may still have a pointer to it. That&#x2019;s now a dangling pointer into deallocated memory. When that subject tries to send a notification, well&hellip; things like that are why people end up hating C++.</p>
 <aside name="destruct">
 
@@ -515,7 +515,7 @@ option and insert it at the front:</p>
 <p>An even surer sign of its significance: it has <a href="http://en.wikipedia.org/wiki/Lapsed_listener_problem">a Wikipedia article</a>.</p>
 </aside>
 
-<h2><a href="#what&#x2019;s-going-on" name="what&#x2019;s-going-on">What&#x2019;s going on?</a></h2>
+<h3><a href="#what&#x2019;s-going-on" name="what&#x2019;s-going-on">What&#x2019;s going on?</a></h3>
 <p>The other, deeper issue with the Observer pattern is a direct consequence of its intended purpose. We use it because it helps us loosen the coupling between two pieces of code. It lets a subject indirectly communicate with some observer without being statically bound to it.</p>
 <p>This is a real win when you&#x2019;re trying to reason about the subject&#x2019;s behavior, and any hangers-on would be an annoying distraction. If you&#x2019;re poking at the physics engine, you really don&#x2019;t want your editor&thinsp;&mdash;&thinsp;or your mind&thinsp;&mdash;&thinsp;cluttered up with a bunch of stuff about achievements.</p>
 <p>On the other hand, if your program isn&#x2019;t working and the bug spans some chain of observers, reasoning about that communication flow is much more difficult. With an explicit coupling, it&#x2019;s as easy as looking up the method being called. Child&#x2019;s play for your average IDE, since the coupling is static.</p>

@@ -5,8 +5,6 @@ The first time I heard the word "prototype" was in *Design Patterns*. Today, it 
 
 We'll cover that here, but I'll also show you other, more interesting places where the term "prototype" and the concepts behind it have popped up. But first, let's revisit the <span name="original">original</span> pattern.
 
-## The Prototype Design Pattern
-
 <aside name="original">
 
 I don't say "original" lightly here. *Design Patterns* cites Ivan Sutherland's legendary [Sketchpad](http://en.wikipedia.org/wiki/Sketchpad) project in *1963* as one of the first examples of this pattern in the wild. While everyone else was listening to Dylan and the Beatles, Sutherland was busy just, you know, inventing the basic concepts of CAD, interactive graphics, and object-oriented programming.
@@ -14,6 +12,8 @@ I don't say "original" lightly here. *Design Patterns* cites Ivan Sutherland's l
 Watch [the demo](http://www.youtube.com/watch?v=USyoT_Ha_bA) and prepare to be blown away.
 
 </aside>
+
+## The Prototype Design Pattern
 
 Pretend we're making a game in the style of Gauntlet. We've got creatures and fiends swarming around the hero, vying for their share of his flesh. These unsavory dinner companions enter the arena by way of "spawners", and there is a different spawner for each kind of enemy.
 

@@ -39,6 +39,7 @@ body {
   box-shadow: 0 0 30px hsla(30, 40%, 20%, 0.3);
 
   .bar {
+    cursor: pointer;
     background: hsl(200, 10%, 35%);
     box-shadow: 0 5px 20px hsla(200, 50%, 20%, 0.3);
     border-top: solid 1px hsl(200, 20%, 60%);
@@ -49,8 +50,11 @@ body {
     max-width: 560px;
     margin: 0 auto;
 
-    padding: 3px 340px 3px 40px;
-    // TODO: Handle mobile and flex size.
+    padding: 3px 40px;
+  }
+
+  .thread {
+    float: right;
   }
 
   a {
@@ -65,7 +69,6 @@ body {
   h1 {
     font: 14px $sans;
     font-weight: 300;
-    color: hsl(200, 30%, 85%);
     padding: 0;
     margin: 0;
     border: none;
@@ -104,7 +107,7 @@ body {
   }
 }
 
-.nav:hover {
+.nav.expanded {
   height: 340px;
 }
 
@@ -135,6 +138,10 @@ body {
   padding-right: 300px;
 }
 
+.nav.sidebar .column {
+  padding-right: 340px;
+}
+
 // Note: We use explicit line heights here so that the positions of the
 // elements don't change after the fonts are loaded asynchronously. That way,
 // when we position the asides procedurally, they are in the right place.
@@ -150,6 +157,10 @@ h1.book {
   font: normal 16px/20px $header;
   padding: 6px 0 30px 0;
   border: none;
+}
+
+.section:before {
+  content: " / ";
 }
 
 h2 {
@@ -239,17 +250,17 @@ pre {
 // Asides.
 
 aside {
-  color: #666;
+  color: hsl(40, 5%, 50%);
 
   // These are only used when the asides are inline with the text.
   padding: 10px 10px;
-  background: hsl(40, 30%, 98%);
-  border: solid 1px hsl(40, 40%, 96%);
-  border-bottom: solid 1px hsl(40, 50%, 90%);
+  background: hsl(40, 30%, 97%);
+  border: solid 1px hsl(40, 40%, 95%);
+  border-bottom: solid 1px hsl(40, 40%, 90%);
   border-radius: 3px;
 
   p, li {
-    font: 13px/20px $sans;
+    font: 15px/22px $sans;
   }
 
   >p:first-child {
@@ -287,6 +298,10 @@ aside.sidebar {
   padding-left: 22px;
   border-radius: 0;
   border-left: solid 8px hsl(40, 35%, 93%);
+
+  p, li {
+    font: 14px/20px $sans;
+  }
 }
 
 // In-progress banner.
@@ -339,9 +354,6 @@ aside.sidebar {
     font: bold 24px $sans;
     padding: 4px;
     cursor: pointer;
-
-    // Hide it by default for users without JavaScript.
-    display: none;
   }
 
   .dismiss:hover {
@@ -512,35 +524,67 @@ a.outline:after {
 #mc_embed_signup #mce-success-response {color:#529214; display:none;}
 #mc_embed_signup label.error {display:block; float:none; width:auto; margin-left:1.05em; text-align:left; padding:.5em 0;}
 
+// If the column is too narrow for the chapter lists in the navigation, kill
+// the section column so the chapters don't wrap and get too tall.
+@media only screen and (max-width: 900px) {
+  .thread {
+    display: none;
+  }
+
+  .section-nav {
+    display: none;
+  }
+}
+
+// On phone-size screens, shrink all of the text a bit.
 @media only screen and (max-width: 479px) {
   .content {
     padding: 0 20px 20px 20px;
   }
 
+  .nav {
+    .column {
+      padding: 3px 20px;
+
+      p, li {
+        line-height: 19px;
+      }
+    }
+  }
+
   h1 {
     font-size: 50px;
+    padding-top: 70px;
+  }
+
+  h1.book {
+    padding-bottom: 20px;
+  }
+
+  .section {
+    display: block;
+  }
+
+  .section:before {
+    content: "";
   }
 
   h2 {
-    font: bold 24px $header;
-    margin: 20px 0 5px 0;
+    font-size: 25px;
+    margin-left: -18px;
+    padding-left: 10px;
+    border-left: solid 6px hsl(200, 50%, 90%);
   }
 
   h3 {
-    font: bold 18px $header;
-    margin: 20px 0 5px 0;
-  }
-
-  p {
-    margin: 10px 0;
+    font-size: 18px;
+    margin-left: -18px;
+    padding-left: 10px;
+    border-left: solid 6px hsl(200, 50%, 90%);
   }
 
   p, li {
     font: normal 14px/20px $serif;
-  }
-
-  blockquote {
-    padding: 0 10px;
   }
 
   blockquote p {
@@ -562,17 +606,40 @@ a.outline:after {
     padding: 0 0 0 20px;
   }
 
-  .in-progress {
-    padding: 4px 12px;
-    font: normal 13px/20px $sans;
-    margin-bottom: 18px;
+  p.footer {
+    font-weight: 400;
+  }
 
-    p {
-      font: normal 13px/20px $sans;
+  // In-progress banner.
+  .in-progress {
+    box-shadow: 0 5px 10px hsla(200, 50%, 20%, 0.05);
+
+    padding: 5px 10px;
+    font: normal 14px/22px $sans;
+    color: hsl(35, 40%, 40%);
+    margin-bottom: -50px;
+
+    .dismiss {
+      position: absolute;
+      right: 8px;
+      top: 0;
+      font: bold 36px $sans;
+      padding: 4px;
     }
 
-    .signature {
-      font: italic 12px $sans;
+    h2 {
+      line-height: 22px;
+      margin: 6px 0;
     }
   }
 }
+
+// On very short screens (phones in landscape), don't show the nav bar. It's
+// too tall when expanded and fills the screen. Even the collapsed bar takes up
+// too much room, so just kill the nav entirely.
+@media only screen and (max-height: 400px) {
+  .nav {
+    display: none;
+  }
+}
+

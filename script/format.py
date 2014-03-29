@@ -19,6 +19,36 @@ DEFAULT = '\033[0m'
 PINK = '\033[91m'
 YELLOW = '\033[33m'
 
+CHAPTERS = [
+    # Index?
+    "Introduction",
+    "Architecture, Performance, and Games",
+    "Design Patterns Revisited",
+    "Command",
+    "Flyweight",
+    "Observer",
+    "Prototype",
+    "Singleton",
+    "State",
+    "Sequencing Patterns",
+    "Double Buffer",
+    "Game Loop",
+    "Update Method",
+    "Behavioral Patterns",
+    "Bytecode",
+    "Subclass Sandbox",
+    "Type Object",
+    "Decoupling Patterns",
+    "Component",
+    "Event Queue",
+    "Service Locator",
+    "Optimization Patterns",
+    "Data Locality",
+    "Dirty Flag",
+    "Object Pool",
+    "Spatial Partition"
+]
+
 num_chapters = 0
 empty_chapters = 0
 total_words = 0
@@ -120,7 +150,7 @@ def formatfile(path, nav, skip_up_to_date):
         if section != "":
             title_text = section + " / " + title
             section_href = section.lower().replace(" ", "-")
-            section_header = ' / <a href="{}.html">{}</a>'.format(
+            section_header = '<span class="section"><a href="{}.html">{}</a></span>'.format(
                 section_href, section)
 
         contents = contents.replace('<aside', '<aside markdown="1"')
@@ -134,6 +164,7 @@ def formatfile(path, nav, skip_up_to_date):
         html = html.replace("{{section_header}}", section_header)
         html = html.replace("{{header}}", title)
         html = html.replace("{{body}}", body)
+        html = html.replace("{{thread}}", make_thread(title))
         html = html.replace("{{navigation}}",
             navigationtohtml(title, navigation))
 
@@ -161,6 +192,42 @@ def formatfile(path, nav, skip_up_to_date):
         # Section header chapters aren't counted like regular chapters.
         print "{}•{} {} ({} words)".format(
             GREEN, DEFAULT, basename, word_count)
+
+
+def title_to_file(title):
+    """Given a title like "Event Queue", converts it to the corresponding file
+    name like "event-queue"."""
+
+    return (title.lower()
+        .replace(" ", "-")
+        .replace(",", ""))
+
+
+def make_thread(title):
+    """Generate the links that thread through the chapters."""
+
+    # TODO: Real links.
+    chapter_index = CHAPTERS.index(title)
+    prev_link = None
+    next_link = None
+    if chapter_index > 0:
+        prev_href = title_to_file(CHAPTERS[chapter_index - 1])
+        prev_link = '&larr; <a href="{}.html">{}</a>'.format(
+            prev_href, CHAPTERS[chapter_index - 1])
+
+    if chapter_index < len(CHAPTERS) - 1:
+        next_href = title_to_file(CHAPTERS[chapter_index - 1])
+        next_link = '<a href="{}.html">{}</a> &rarr;'.format(
+            next_href, CHAPTERS[chapter_index + 1])
+
+    if prev_link and next_link:
+        thread = '{} | {}'.format(prev_link, next_link)
+    elif prev_link:
+        thread = prev_link
+    else:
+        thread = next_link
+
+    return thread
 
 
 def navigationtohtml(chapter, headers):

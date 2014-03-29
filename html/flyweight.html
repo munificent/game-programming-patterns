@@ -24,13 +24,14 @@
 <div class="nav">
   <div class="bar">
     <div class="column">
-      <h1><a href="index.html">Game Programming Patterns</a></h1>
+      <h1 class="thread">&larr; <a href="command.html">Command</a> | <a href="command.html">Observer</a> &rarr;
+      <h1>&equiv; <a href="index.html">Game Programming Patterns</a></h1>
     </div>
   </div>
   <div class="column">
     <table>
       <tr>
-        <td width="30%">
+        <td width="30%" class="section-nav">
           <h2>Flyweight</h2>
           <ul><li>
 <a href="#forest-for-the-trees">Forest for the Trees</a></li><li>
@@ -46,7 +47,7 @@
 <ul>
   <li><a href="introduction.html">Introduction</a>
     <ul>
-      <li>Architecture, Performance, and Games</li>
+      <li><a href="architecture-performance-and-games.html">Architecture, Performance, and Games</a></li>
     </ul>
   </li>
   <li><a href="design-patterns-revisited.html">Design Patterns Revisited</a>
@@ -66,10 +67,11 @@
         <a href="update-method.html">Update Method</a></li>
     </ul>
   </li>
-  <li>Behavioral Patterns
+  <li><a href="behavioral-patterns.html">Behavioral Patterns</a>
     <ul>
-      <li>Bytecode, <a href="subclass-sandbox.html">Subclass Sandbox</a>,
-        <a href="type-object.html">Type Object</a></li>
+      <li><a href="bytecode.html">Bytecode</a>,
+      <a href="subclass-sandbox.html">Subclass Sandbox</a>,
+      <a href="type-object.html">Type Object</a></li>
     </ul>
   </li>
   <li><a href="decoupling-patterns.html">Decoupling Patterns</a>
@@ -93,7 +95,7 @@
     </table>
   </div>
 </div>
-<div class="page">
+<div class="page sidebar">
 <div class="content">
 <div class="in-progress">
   <span class="dismiss">&times;</span>
@@ -133,7 +135,7 @@
   </table>
 </div>
 <h1>Flyweight</h1>
-<h1 class="book"><a href="index.html">Game Programming Patterns</a> / <a href="design-patterns-revisited.html">Design Patterns Revisited</a></h1>
+<h1 class="book"><a href="index.html">Game Programming Patterns</a><span class="section"><a href="design-patterns-revisited.html">Design Patterns Revisited</a></span></h1>
 <p>The fog lifts, revealing a majestic old growth forest. Ancient hemlocks, countless in number, tower over you forming a cathedral of greenery. The stained glass canopy of leaves fragments the sunlight into golden shafts of mist. Between giant trunks, you can make out the massive forest receding into the distance.</p>
 <p>This is the kind of otherworldly setting we dream of as game developers, and scenes like these are often enabled by a pattern whose name couldn&#x2019;t possibly be more modest: the humble Flyweight.</p>
 <h2><a href="#forest-for-the-trees" name="forest-for-the-trees">Forest for the Trees</a></h2>
