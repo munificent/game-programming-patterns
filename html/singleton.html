@@ -137,14 +137,14 @@
 you how to use a design pattern. This chapter shows you how <em>not</em> to use
 one.</p>
 <p>Despite noble intentions, the <a class="gof-pattern"
-href="http://c2.com/cgi/wiki?SingletonPattern">Singleton</a> pattern
+href="http://c2.com/cgi/wiki?SingletonPattern">Singleton pattern</a>
 described by the Gang of Four usually does more harm than good. While
 they stress that the pattern should be used sparingly, that message
 was often lost in translation to the <span name="instance">game industry</span>.</p>
 <p>Like any pattern,
 though, using it where it doesn&#x2019;t belong is about as helpful as
 treating a bullet wound with a splint. Since it&#x2019;s so overused, most
-of this chapter will be about <em>avoiding</em> Singletons, but first, let&#x2019;s
+of this chapter will be about <em>avoiding</em> singletons, but first, let&#x2019;s
 go over the pattern itself.</p>
 <aside name="instance">
 
@@ -176,7 +176,7 @@ don&#x2019;t interfere with each other.</p>
 <p>To do this, a call into our wrapper needs to have access to every
 previous operation. If users could freely create instances of our
 class, one instance has no way of knowing about operations that other
-instances started. Enter the Singleton. It provides a way for a class
+instances started. Enter the singleton. It provides a way for a class
 to ensure at compile time that there is only a single instance of the
 class.</p>
 <h3><a href="#providing-a-global-point-of-access" name="providing-a-global-point-of-access">Providing a global point of access</a></h3>
@@ -247,14 +247,14 @@ nice features too:</p>
 <ul>
 <li>
 <p><strong>It doesn&#x2019;t create the instance if no one uses it.</strong> Saving
-    memory and CPU cycles is always good. Since the Singleton is
+    memory and CPU cycles is always good. Since the singleton is
     initialized only when it&#x2019;s first accessed, it won&#x2019;t be
     instantiated at all if the game never asks for it.</p>
 </li>
 <li>
 <p><strong>It&#x2019;s initialized at runtime.</strong> A common alternative to Singleton
     is a class with static member variables. I like simple solutions,
-    so I use static classes instead of Singletons when possible, but
+    so I use static classes instead of singletons when possible, but
     there&#x2019;s one limitation static members have: automatic
     initialization. The compiler initializes statics before <code>main()</code>
     is called. This means they can&#x2019;t use information known only once
@@ -262,14 +262,14 @@ nice features too:</p>
     information loaded from a file). It also means they can&#x2019;t reliably
     depend on each other&thinsp;&mdash;&thinsp;the compiler does not guarantee the
     order in which statics are initialized relative to each other.</p>
-<p>Lazy initialization solves both of those problems. The Singleton
+<p>Lazy initialization solves both of those problems. The singleton
 will be initialized as late as possible, so by that time any
 information it needs should be available. As long as they don&#x2019;t
-have circular dependencies, one Singleton can even refer to
+have circular dependencies, one singleton can even refer to
 another when initializing itself.</p>
 </li>
 <li>
-<p><strong>You can subclass the Singleton.</strong> This is a powerful but often
+<p><strong>You can subclass the singleton.</strong> This is a powerful but often
     overlooked capability. Let&#x2019;s say we need our file system wrapper
     to be cross-platform. To make this work, we want it to be an
     abstract interface for a file system, with subclasses that
@@ -313,7 +313,7 @@ another when initializing itself.</p>
 </pre></div>
 
 
-<p>Now we turn <code>FileSystem</code> into a Singleton:</p>
+<p>Now we turn <code>FileSystem</code> into a singleton:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">FileSystem</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -358,7 +358,7 @@ It&#x2019;s time to check in the code and celebrate with a tasty beverage.</p>
 <h2><a href="#why-we-regret-using-it" name="why-we-regret-using-it">Why We Regret Using It</a></h2>
 <p>In the short-term, the Singleton pattern is relatively benign. Like
 many design choices, we pay the cost in the long-term. Once we&#x2019;ve cast
-a few unnecessary Singletons into cold hard code, here&#x2019;s the trouble
+a few unnecessary singletons into cold hard code, here&#x2019;s the trouble
 we&#x2019;ve bought ourselves:</p>
 <h3><a href="#it&#x2019;s-a-global-variable" name="it&#x2019;s-a-global-variable">It&#x2019;s a global variable</a></h3>
 <p>When games were still written by a couple of guys in a garage, pushing
@@ -439,7 +439,7 @@ sound, right? And it lets us design software the way we have been
 doing for years.</p>
 <p>Unfortunately, it&#x2019;s more placebo than cure. If you scan the list of
 problems that globals cause, you&#x2019;ll notice that the Singleton pattern
-doesn&#x2019;t solve any of them. That&#x2019;s because a Singleton <em>is</em> global
+doesn&#x2019;t solve any of them. That&#x2019;s because a singleton <em>is</em> global
 state, just encapsulated in a class.</p>
 <h3><a href="#it-solves-two-problems-even-when-you-just-have-one" name="it-solves-two-problems-even-when-you-just-have-one">It solves two problems even when you just have one</a></h3>
 <p>The word &ldquo;and&rdquo; in the Gang of Four&#x2019;s description of
@@ -454,7 +454,7 @@ modules in the game can benefit from being able to log diagnostic
 information. However, passing an instance of our <code>Log</code> class to every
 single function clutters the method signature and distracts from the
 intent of the code.</p>
-<p>The obvious fix is to make our Log class a Singleton. Every function
+<p>The obvious fix is to make our Log class a singleton. Every function
 can then go straight to the class itself to get an instance. But when
 we do that, we inadvertently acquire a strange little restriction. All
 of the sudden, we can no longer create more than one logger.</p>
@@ -523,12 +523,12 @@ this:</p>
 
 
 <p>That solves the lazy initialization problem, but at the expense of
-discarding several Singleton features that <em>do</em> make it better than
+discarding several singleton features that <em>do</em> make it better than
 a raw global variable. With a static instance, we can no longer use
 polymorphism, and the class must be constructible at static
 initialization time. Nor can we free the memory that the instance is
 using when not needed.</p>
-<p>Instead of creating a Singleton, what we really have here is a simple
+<p>Instead of creating a singleton, what we really have here is a simple
 static class. That isn&#x2019;t necessarily a bad thing, but if a static
 class is all you need, <span name="static">why not</span> get rid of the <code>instance()</code> method
 entirely and use static functions instead? Calling <code>Foo::bar()</code> is
@@ -536,14 +536,14 @@ simpler than <code>Foo::instance().bar()</code>, and also makes it clear that yo
 really are dealing with static memory.</p>
 <aside name="static">
 
-<p>The usual argument for choosing Singletons over static classes is
+<p>The usual argument for choosing singletons over static classes is
 that if you decide to change the static class into a non-static one
 later, you&#x2019;ll need to fix every call site. In theory, you don&#x2019;t have
-to do that with Singletons, because you could be passing the instance
+to do that with singletons, because you could be passing the instance
 around and calling it like a normal instance method.</p>
 <p>In practice, I don&#x2019;t think I&#x2019;ve ever seen that happen. Everyone just
 does <code>Foo::instance().bar()</code> in one line. So, if we changed Foo to not
-be a Singleton, we&#x2019;d still have to touch every call site. Given that,
+be a singleton, we&#x2019;d still have to touch every call site. Given that,
 I&#x2019;d rather have a simpler class, and a simpler syntax to call into it.</p>
 </aside>
 
@@ -554,7 +554,7 @@ But you still have a problem that needs solving. What tool <em>should</em>
 you pull out? Depending on what you&#x2019;re trying to do, I have a few
 options for you to consider, but first&hellip;</p>
 <h3><a href="#see-if-you-need-the-class-at-all" name="see-if-you-need-the-class-at-all">See if you need the class at all</a></h3>
-<p>Most of the Singleton classes I see in games are "managers": those
+<p>Most of the singleton classes I see in games are "managers": those
 nebulous classes that exist just to babysit other objects. I&#x2019;ve seen
 codebases where it seems like <em>every</em> class has a manager: Monster,
 MonsterManager, Particle, ParticleManager, Sound, SoundManager,
@@ -606,7 +606,7 @@ unfamiliarity with OOP. Consider these two contrived classes:</p>
 <p>Maybe this example is a bit dumb, but I&#x2019;ve seen plenty of code that
 reveals a design just like this after you scrape away the crusty
 details. If you look at this code, it&#x2019;s natural to think that
-BulletManager should be a Singleton. After all, anything that has a
+BulletManager should be a singleton. After all, anything that has a
 Bullet will need the manager too, and how many instances of
 BulletManager do you need?</p>
 <p>The answer here is <em>zero</em>, actually. Here&#x2019;s how we solve the
@@ -630,7 +630,7 @@ BulletManager do you need?</p>
 </pre></div>
 
 
-<p>There we go. No manager, no problem. Poorly-designed Singletons are
+<p>There we go. No manager, no problem. Poorly-designed singletons are
 often "helpers" that add functionality to another class. If you can,
 just move all of that behavior into the class it helps. After all, OOP is about letting objects take care of themselves.</p>
 <p>Outside of managers, though, there are other problems where we&#x2019;d
@@ -679,7 +679,7 @@ multiple instantiation is only done at <em>runtime</em>. The Singleton
 pattern, in contrast, guarantees a single instance at compile time, by
 the very nature of the class&#x2019;s structure.</p>
 <h3><a href="#to-provide-convenient-access-to-an-instance" name="to-provide-convenient-access-to-an-instance">To provide convenient access to an instance</a></h3>
-<p>Convenient access is the main reason we reach for Singletons --
+<p>Convenient access is the main reason we reach for singletons --
 they make it easy to get our hands on an object we need to use in a
 lot of different places. That ease comes at a cost, though: it becomes
 equally easy to get our hands on the object in places where we <em>don&#x2019;t</em>
@@ -687,13 +687,14 @@ want it being used.</p>
 <p>The general rule is that we want variables to be as narrowly scoped as
 possible while still getting the job done. The smaller the scope an
 object has, the fewer places we need to keep in our head while we&#x2019;re
-working with it. Before we take the shotgun approach of a Singleton
+working with it. Before we take the shotgun approach of a singleton
 object with <em>global</em> scope, let&#x2019;s consider other ways our codebase can
 get access to an object.</p>
-<h4><a href="#pass-it-in" name="pass-it-in">Pass it in</a></h4>
-<p>The simplest solution, and often the best, is to simply pass the
-object you need as an argument to the functions that need it. It&#x2019;s worth
-considering before we discard it as too cumbersome.</p>
+<ul>
+<li>
+<p><strong>Pass it in.</strong> The simplest solution, and often the best, is to simply pass the
+    object you need as an argument to the functions that need it. It&#x2019;s worth
+    considering before we discard it as too cumbersome.</p>
 <p>Consider a function for rendering objects. In order to render, it
 needs access to an object that represents the graphics device and maintains the render state. It&#x2019;s very common to just pass that in to all of the rendering functions, usually as a parameter named something like <code>context</code>.</p>
 <p>On the other hand, some objects don&#x2019;t belong in the signature of a
@@ -708,14 +709,15 @@ is a "cross-cutting concern". Handling cross-cutting concerns gracefully is a co
 these concerns.</p>
 </aside>
 
-<h4><a href="#get-it-from-the-base-class" name="get-it-from-the-base-class">Get it from the base class</a></h4>
-<p>Many game architectures have shallow but wide inheritance hierarchies,
-often only one level deep. For example, you may have a base
-<code>GameObject</code> class, with derived classes for each enemy or object in
-the game. With architectures like this, a large portion of the game
-code will live in these "leaf" derived classes. This means that all
-these classes already has access to the same thing: their <code>GameObject</code>
-base class. We can use that to our advantage:</p>
+</li>
+<li>
+<p><strong>Get it from the base class.</strong> Many game architectures have shallow but wide inheritance hierarchies,
+    often only one level deep. For example, you may have a base
+    <code>GameObject</code> class, with derived classes for each enemy or object in
+    the game. With architectures like this, a large portion of the game
+    code will live in these "leaf" derived classes. This means that all
+    these classes already has access to the same thing: their <code>GameObject</code>
+    base class. We can use that to our advantage:</p>
 <p><span name="gameobject"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">GameObject</span>
 <span class="p">{</span>
@@ -755,13 +757,14 @@ the <a class="pattern" href="service-locator.html">Service Locator</a>
 pattern goes into this in depth.</p>
 </aside>
 
-<h4><a href="#get-it-from-something-already-global" name="get-it-from-something-already-global">Get it from something already global</a></h4>
-<p>The goal of removing <em>all</em> global state is admirable, but rarely
-practical. Most codebases will still have a couple of globally
-available objects, for example a single <code>Game</code> or <code>World</code> object
-representing the entire game state.</p>
+</li>
+<li>
+<p><strong>Get it from something already global.</strong> The goal of removing <em>all</em> global state is admirable, but rarely
+    practical. Most codebases will still have a couple of globally
+    available objects, for example a single <code>Game</code> or <code>World</code> object
+    representing the entire game state.</p>
 <p>You can use this to your advantage and reduce the number of global
-classes by piggybacking on existing ones. Instead of making Singletons
+classes by piggybacking on existing ones. Instead of making singletons
 out of <code>Log</code>, <code>FileSystem</code>, and <code>AudioPlayer</code>, do this:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">World</span>
 <span class="p">{</span>
@@ -793,7 +796,7 @@ the other systems <span name="demeter">through</span> it:</p>
 <aside name="demeter">
 
 <p>Purists will claim this violates the Law of Demeter. I claim that&#x2019;s
-still better than a giant pile of Singletons.</p>
+still better than a giant pile of singletons.</p>
 </aside>
 
 <p>If, later, the architecture is changed to support multiple <code>World</code>
@@ -807,12 +810,15 @@ to get to the audio player.</p>
 World can simply access <code>AudioPlayer</code> directly from it. For code that
 doesn&#x2019;t, we provide access to <code>AudioPlayer</code> using one of the other
 options described here.</p>
-<h4><a href="#get-it-from-a-service-locator" name="get-it-from-a-service-locator">Get it from a Service Locator</a></h4>
-<p>So far, we&#x2019;re assuming the global class is some regular concrete class
-like World. Another option is to define a class whose sole reason for
-being is to give global access to objects. This common pattern is
-called a <a class="pattern" href="service-locator.html">Service
-Locator</a> and gets its own chapter.</p>
+</li>
+<li>
+<p><strong>Get it from a Service Locator.</strong> So far, we&#x2019;re assuming the global class is some regular concrete class
+    like World. Another option is to define a class whose sole reason for
+    being is to give global access to objects. This common pattern is
+    called a <a class="pattern" href="service-locator.html">Service
+    Locator</a> and gets its own chapter.</p>
+</li>
+</ul>
 <h2><a href="#what&#x2019;s-left-for-singleton" name="what&#x2019;s-left-for-singleton">What&#x2019;s Left for Singleton</a></h2>
 <p>The question remains, where <em>should</em> we use the real Singleton
 pattern? Honestly, I&#x2019;ve never used the full Gang of Four

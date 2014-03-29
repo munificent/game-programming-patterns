@@ -83,7 +83,7 @@ Strangely enough, this is similar to how CPUs in modern computers work. In case 
 
 If I were writing this chapter thirty years ago, the analogy would stop there. But as chips got faster and RAM, well, *didn't*, hardware engineers started looking for solutions. What they came up with was *CPU caching*.
 
-Modern computers have a <span name="caches">little chunk</span> of memory right inside the chip. It's small because it has to fit in the chip. The CPU can pull data from this much faster than it can from main memory, in large part because it's physically closer to the registers. The electrons have a shorter distance to travel.
+Modern computers have a <span name="caches">little chunk</span> of memory right inside the chip. The CPU can pull data from this much faster than it can from main memory. It's small because it has to fit in the chip and because the faster type of memory it uses (static RAM or "SRAM") is way more expensive.
 
 <aside name="caches">
 

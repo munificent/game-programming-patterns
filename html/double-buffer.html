@@ -338,7 +338,6 @@ can be a heavy price to pay. If you can&#x2019;t afford two buffers, you may
 have to look into other ways to ensure your state isn&#x2019;t being accessed
 during modification.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
-<h3><a href="#a-simple-graphics-system" name="a-simple-graphics-system">A simple graphics system</a></h3>
 <p>Now that we&#x2019;ve got the theory, let&#x2019;s see how it works in practice.
 We&#x2019;ll write a very bare-bones graphics system that lets us draw pixels
 on a frame buffer. In most consoles and PCs, this low-level part of
@@ -495,9 +494,8 @@ accessed from code on another thread or interrupt.</p>
 the modification</em> is accessing the same state that it&#x2019;s modifying.
 This can manifest in a variety of places, especially physics and AI
 where you have entities interacting with each other. Double-buffering
-is often necessary here too. To see how, let&#x2019;s go through an AI
-example.</p>
-<h4><a href="#artificial-unintelligence" name="artificial-unintelligence">Artificial unintelligence</a></h4>
+is often necessary here too.</p>
+<h3><a href="#artificial-unintelligence" name="artificial-unintelligence">Artificial unintelligence</a></h3>
 <p>Let&#x2019;s say we&#x2019;re building the behavioral system for, of all things, a
 game based on slapstick comedy. The game has a stage containing a
 bunch of actors that run around and get up to various hijinks and
@@ -584,7 +582,6 @@ actor he faces.</p>
 </pre></div>
 
 
-<h4><a href="#roll-the-film" name="roll-the-film">Roll the film</a></h4>
 <p>Now lets throw some comedians on a stage and see what happens. We&#x2019;ll
 set up three comedians, each facing the next. The last one will face
 the first, in a big circle:</p>
@@ -671,7 +668,7 @@ entirely on how the two actors happen to be ordered on the stage. This
 violates our requirement that actors need to appear to run in
 parallel: the order that they update within a single frame shouldn&#x2019;t
 matter.</p>
-<h4><a href="#buffered-slaps" name="buffered-slaps">Buffered slaps</a></h4>
+<h3><a href="#buffered-slaps" name="buffered-slaps">Buffered slaps</a></h3>
 <p>Fortunately, our Double Buffer pattern can help. This time, instead of
 having two copies of a monolithic "buffer" object, we&#x2019;ll be buffering
 at a much finer granularity: each actor&#x2019;s "slapped" state:</p>

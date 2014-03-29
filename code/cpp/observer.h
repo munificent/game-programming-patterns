@@ -71,7 +71,7 @@ namespace ObserverPattern
     //^achievement-observer
     class Achievements : public Observer
     {
-    protected:
+    public:
       virtual void onNotify(const Entity& entity, Event event)
       {
         switch (event)
@@ -101,9 +101,11 @@ namespace ObserverPattern
 
     //^subject-list
     //^subject-register
+    //^subject-notify
     class Subject
     {
       //^omit subject-list
+      //^omit subject-notify
     public:
       void addObserver(Observer* observer)
       {
@@ -137,27 +139,29 @@ namespace ObserverPattern
       }
 
       // Other stuff...
+      //^omit subject-notify
       //^omit subject-register
     protected:
-      void notify(const Entity& entity, Event event);
+      void notify(const Entity& entity, Event event)
+      {
+        for (int i = 0; i < numObservers_; i++)
+        {
+          observers_[i]->onNotify(entity, event);
+        }
+      }
+
+      // Other stuff...
+      //^omit subject-notify
 
       //^omit subject-list
     private:
       Observer* observers_[MAX_OBSERVERS];
       int numObservers_;
       //^omit subject-register
+      //^omit subject-notify
     };
     //^subject-list
     //^subject-register
-
-    //^subject-notify
-    void Subject::notify(const Entity& entity, Event event)
-    {
-      for (int i = 0; i < numObservers_; i++)
-      {
-        observers_[i]->onNotify(entity, event);
-      }
-    }
     //^subject-notify
 
     //^physics-inherit

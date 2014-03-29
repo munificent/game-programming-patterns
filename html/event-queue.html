@@ -139,7 +139,7 @@
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Decouple when a message or event is sent from when it is processed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>Unless you live under one of the few rocks that still lacks Internet access, you&#x2019;ve probably already heard of an <span name="message">"event queue"</span>. If not, maybe "message queue", or "event loop", or "message pump" rings a bell. To refresh your memory, let&#x2019;s walk through a couple of common manifestations of the pattern.</p>
+<p>Unless you live under one of the few rocks that still lack Internet access, you&#x2019;ve probably already heard of an <span name="message">"event queue"</span>. If not, maybe "message queue", or "event loop", or "message pump" rings a bell. To refresh your memory, let&#x2019;s walk through a couple of common manifestations of the pattern.</p>
 <aside name="message">
 
 <p>For most of the chapter, I use "event" and "message" interchangeably. Where the distinction matters, I&#x2019;ll make it obvious.</p>
@@ -164,7 +164,7 @@
 <p>The call to <code>getNextEvent()</code> pulls a bit of unprocessed user input into your app. You route it to an event handler and, like magic, your application comes to life. The interesting part is that the application <em>pulls</em> in the event when <em>it</em> wants it. The operating system doesn&#x2019;t just immediately <span name="interrupt">jump</span> to some code in your app when the user pokes a peripheral.</p>
 <aside name="interrupt">
 
-<p>In constrast, <em>interrupts</em> from the operating system <em>do</em> work like that. When an interrupt happens, the OS stops whatever your app was doing and forces it to jump to an interrupt handler. This abruptness is why interrupts are so hard to work with.</p>
+<p>In contrast, <em>interrupts</em> from the operating system <em>do</em> work like that. When an interrupt happens, the OS stops whatever your app was doing and forces it to jump to an interrupt handler. This abruptness is why interrupts are so hard to work with.</p>
 </aside>
 
 <p>That means when user input comes in, it needs to go somewhere so that the operating system doesn&#x2019;t lose it between when the device driver reported the input and when your app gets around to calling <code>getNextEvent()</code>. That "somewhere" is a <em>queue</em>.</p>
@@ -220,11 +220,15 @@
 
 
 <p>We check that in, create a few sound files, and start sprinkling <code>playSound()</code> calls through our codebase like some magical audio fairy. For example, in our UI code, when the selected menu item changes, we play a little bloop:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Menu</span><span class="o">::</span><span class="n">onSelect</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Menu</span>
 <span class="p">{</span>
-  <span class="n">Audio</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">SOUND_BLOOP</span><span class="p">,</span> <span class="n">VOL_MAX</span><span class="p">);</span>
-  <span class="c1">// Other stuff...</span>
-<span class="p">}</span>
+<span class="nl">public:</span>
+  <span class="kt">void</span> <span class="n">onSelect</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">Audio</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">SOUND_BLOOP</span><span class="p">,</span> <span class="n">VOL_MAX</span><span class="p">);</span>
+    <span class="c1">// Other stuff...</span>
+  <span class="p">}</span>
+<span class="p">};</span>
 </pre></div>
 
 
@@ -325,6 +329,7 @@
     <span class="n">numPending_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="p">}</span>
 
+  <span class="c1">// Other stuff...</span>
 <span class="nl">private:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">MAX_PENDING</span> <span class="o">=</span> <span class="mi">16</span><span class="p">;</span>
 

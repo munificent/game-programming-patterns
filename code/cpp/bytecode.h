@@ -1,6 +1,8 @@
 #ifndef cpp_bytecode_h
 #define cpp_bytecode_h
 
+#include "common.h"
+
 namespace Bytecode
 {
   namespace Interpreter
@@ -89,11 +91,11 @@ namespace Bytecode
   //^instruction-enum
   enum Instruction
   {
-    INST_SET_HEALTH,
-    INST_SET_WISDOM,
-    INST_SET_AGILITY,
-    INST_PLAY_SOUND,
-    INST_SPAWN_PARTICLES
+    INST_SET_HEALTH      = 0x00,
+    INST_SET_WISDOM      = 0x01,
+    INST_SET_AGILITY     = 0x02,
+    INST_PLAY_SOUND      = 0x03,
+    INST_SPAWN_PARTICLES = 0x04
     //^omit
     ,INST_LITERAL,
     INST_GET_HEALTH,
@@ -284,8 +286,76 @@ namespace Bytecode
           push(a + b);
           break;
         }
+        //^add
       }
     }
+  }
+
+  namespace TaggedValue
+  {
+    //^tagged-value
+    enum ValueType
+    {
+      TYPE_INT,
+      TYPE_DOUBLE,
+      TYPE_STRING
+    };
+
+    struct Value
+    {
+      ValueType type;
+      union
+      {
+        int    intValue;
+        double doubleValue;
+        char*  stringValue;
+      };
+    };
+    //^tagged-value
+  }
+
+  namespace ValueOop
+  {
+    enum ValueType
+    {
+      TYPE_INT,
+      TYPE_DOUBLE,
+      TYPE_STRING
+    };
+
+    //^value-interface
+    class Value
+    {
+    public:
+      virtual ~Value() {}
+
+      virtual ValueType type() = 0;
+
+      virtual int asInt() {
+        // Can only call this on ints.
+        assert(false);
+        return 0;
+      }
+
+      // Other conversion methods...
+    };
+    //^value-interface
+
+    //^int-value
+    class IntValue : public Value
+    {
+    public:
+      IntValue(int value)
+      : value_(value)
+      {}
+
+      virtual ValueType type() { return TYPE_INT; }
+      virtual int asInt() { return value_; }
+
+    private:
+      int value_;
+    };
+    //^int-value
   }
 }
 

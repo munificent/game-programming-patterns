@@ -7,7 +7,7 @@
 
 ## Motivation
 
-Unless you live under one of the few rocks that still lacks Internet access, you've probably already heard of an <span name="message">"event queue"</span>. If not, maybe "message queue", or "event loop", or "message pump" rings a bell. To refresh your memory, let's walk through a couple of common manifestations of the pattern.
+Unless you live under one of the few rocks that still lack Internet access, you've probably already heard of an <span name="message">"event queue"</span>. If not, maybe "message queue", or "event loop", or "message pump" rings a bell. To refresh your memory, let's walk through a couple of common manifestations of the pattern.
 
 <aside name="message">
 
@@ -33,7 +33,7 @@ The call to `getNextEvent()` pulls a bit of unprocessed user input into your app
 
 <aside name="interrupt">
 
-In constrast, *interrupts* from the operating system *do* work like that. When an interrupt happens, the OS stops whatever your app was doing and forces it to jump to an interrupt handler. This abruptness is why interrupts are so hard to work with.
+In contrast, *interrupts* from the operating system *do* work like that. When an interrupt happens, the OS stops whatever your app was doing and forces it to jump to an interrupt handler. This abruptness is why interrupts are so hard to work with.
 
 </aside>
 

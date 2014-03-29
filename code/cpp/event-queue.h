@@ -54,18 +54,16 @@ namespace EventQueue
     }
     //^sync-impl
 
+    //^menu-bloop
     class Menu
     {
     public:
-      void onSelect(int index);
+      void onSelect(int index)
+      {
+        Audio::playSound(SOUND_BLOOP, VOL_MAX);
+        // Other stuff...
+      }
     };
-
-    //^menu-bloop
-    void Menu::onSelect(int index)
-    {
-      Audio::playSound(SOUND_BLOOP, VOL_MAX);
-      // Other stuff...
-    }
     //^menu-bloop
   }
 
@@ -88,6 +86,7 @@ namespace EventQueue
         numPending_ = 0;
       }
 
+      // Other stuff...
       //^omit
       static void playSound(SoundId id, int volume);
       //^omit
