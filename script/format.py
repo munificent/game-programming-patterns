@@ -20,7 +20,6 @@ PINK = '\033[91m'
 YELLOW = '\033[33m'
 
 CHAPTERS = [
-    # Index?
     "Introduction",
     "Architecture, Performance, and Games",
     "Design Patterns Revisited",
@@ -216,7 +215,7 @@ def make_thread(title):
             prev_href, CHAPTERS[chapter_index - 1])
 
     if chapter_index < len(CHAPTERS) - 1:
-        next_href = title_to_file(CHAPTERS[chapter_index - 1])
+        next_href = title_to_file(CHAPTERS[chapter_index + 1])
         next_link = '<a href="{}.html">{}</a> &rarr;'.format(
             next_href, CHAPTERS[chapter_index + 1])
 
