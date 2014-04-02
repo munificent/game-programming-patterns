@@ -98,43 +98,6 @@
 </div>
 <div class="page sidebar">
 <div class="content">
-<div class="in-progress">
-  <span class="dismiss">&times;</span>
-  <h2>This book is a work in progress!</h2>
-
-  <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/game-programming-patterns/issues" target="_blank">file a ticket</a>. To know when new chapters are up, join the mailing list:</p>
-
-  <!-- Begin MailChimp Signup Form -->
-  <div id="mc_embed_signup">
-  <form action="http://gameprogrammingpatterns.us7.list-manage.com/subscribe/post?u=0952ca43ed2536d6717766b88&amp;id=0c27329244" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <table>
-      <tr>
-        <td width="100%">
-          <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
-        </td>
-        <td>
-          <div class="spacer"></div>
-        </td>
-        <td>
-          <input type="submit" value="Join" name="subscribe" id="mc-embedded-subscribe" class="button">
-        </td>
-      </tr>
-    </table>
-  </form>
-  </div>
-  <!--End mc_embed_signup-->
-
-  <table width="100%">
-    <tr>
-      <td width="50%">
-        <p>Thank you!</p>
-      </td>
-      <td width="50%">
-        <p class="signature">&mdash; Bob Nystrom (<a href="https://twitter.com/intent/user?screen_name=munificentbob" target="_blank">@munificentbob</a>)</p>
-      </td>
-    </tr>
-  </table>
-</div>
 <h1>Observer</h1>
 <h1 class="book"><a href="index.html">Game Programming Patterns</a><span class="section"><a href="design-patterns-revisited.html">Design Patterns Revisited</a></span></h1>
 <p>You can&#x2019;t throw a rock at a hard drive without hitting an application built using the <span name="devised"><a href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">Model-View-Controller</a></span> architecture, and underlying that is the Observer pattern. Observer is so pervasive that Java put it in its core library (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Observer.html"><code>java.util.Observer</code></a>) and C# baked it right into the <em>language</em> (the <a href="http://msdn.microsoft.com/en-us/library/8627sbea.aspx"><code>event</code></a> keyword).</p>
@@ -562,7 +525,7 @@ option and insert it at the front:</p>
 <p>Unlike more radical models, data binding doesn&#x2019;t try to entirely eliminate imperative code and doesn&#x2019;t try to architect your entire application around a giant declarative dataflow graph. What it does do is automate the busywork where you&#x2019;re tweaking a UI element or calculated property to reflect a change to some value.</p>
 <p>Like other declarative systems, data binding is probably a bit too slow and complex to fit inside the core of a game engine. But I would be surprised if I didn&#x2019;t see it start making in-roads into less critical areas of the game like UI.</p>
 <p>In the meantime, the good old Observer pattern will still be here waiting for us. Sure, it&#x2019;s not as exciting as some hot technique that manages to cram both "functional" and "reactive" in its name, but it&#x2019;s dead simple and it works. To me, those are often the two most important criteria for a solution.</p>
-<p class="footer">&copy; 2009-2014 Bob Nystrom</p>
+<p class="footer">&copy; 2009-2014 Robert Nystrom</p>
 </div>
 </div>
 </body>

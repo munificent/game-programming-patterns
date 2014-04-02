@@ -29,7 +29,8 @@ body {
   z-index: 3;
 
   height: 26px;
-  transition: height 0.3s ease;
+  transition: height 0.3s ease,
+              box-shadow 0.3s ease;
 
   background: hsl(200, 10%, 25%);
   color: hsl(200, 10%, 55%);
@@ -40,7 +41,7 @@ body {
 
   .bar {
     cursor: pointer;
-    background: hsl(200, 10%, 35%);
+    background: hsl(200, 10%, 30%);
     box-shadow: 0 5px 20px hsla(200, 50%, 20%, 0.3);
     border-top: solid 1px hsl(200, 20%, 60%);
     border-bottom: solid 1px hsl(200, 20%, 15%);
@@ -58,7 +59,7 @@ body {
   }
 
   a {
-    color: hsl(200, 100%, 80%);
+    color: hsl(200, 70%, 60%);
   }
 
   a:hover {
@@ -93,10 +94,6 @@ body {
     border-collapse: collapse;
   }
 
-  td {
-    vertical-align: top;
-  }
-
   ul {
     padding-left: 16px;
   }
@@ -109,6 +106,7 @@ body {
 
 .nav.expanded {
   height: 340px;
+  box-shadow: 0 0 40px hsla(30, 40%, 20%, 0.5);
 }
 
 .page {
@@ -166,7 +164,7 @@ h1.book {
 h2 {
   color: $primary;
   font: 300 35px $header;
-  margin: 20px 0 0 -38px;
+  margin: 20px 0 15px -38px;
   padding: 0 0 2px 30px;
   border-left: solid 8px hsl(200, 50%, 90%);
 }
@@ -177,12 +175,6 @@ h3 {
   margin: 20px 0 0 -38px;
   padding-left: 30px;
   border-left: solid 8px hsl(200, 50%, 90%);
-}
-
-h4 {
-  color: #777;
-  font: 16px $header;
-  margin: 20px 0 0 0;
 }
 
 p {
@@ -197,6 +189,11 @@ a {
   color: $primary;
   text-decoration: none;
   outline: none;
+
+  border-bottom: solid 1px hsla(200, 80%, 90%, 0);
+
+  transition: color 0.2s ease,
+              border-color 0.2s ease;
 }
 
 img {
@@ -212,6 +209,18 @@ img.arrow {
   margin-top: -2px;
   width: 30px;
   height: 20px;
+}
+
+img.profile {
+  width: 150px;
+  float: right;
+  margin: 0 0 0 15px;
+  padding: 10px;
+
+  background: hsl(40, 35%, 93%);
+  border: solid 1px hsl(40, 40%, 90%);
+  border-bottom: solid 1px hsl(40, 40%, 85%);
+  border-radius: 3px;
 }
 
 blockquote {
@@ -247,6 +256,10 @@ pre {
   overflow: auto;
 }
 
+td {
+  vertical-align: top;
+}
+
 // Asides.
 
 aside {
@@ -259,8 +272,20 @@ aside {
   border-bottom: solid 1px hsl(40, 40%, 90%);
   border-radius: 3px;
 
+  h2 {
+    color: hsl(40, 5%, 60%);
+    font-size: 24px;
+    border: none;
+    margin: 20px 0 10px 0;
+    padding: 0;
+  }
+
   p, li {
     font: 15px/22px $sans;
+  }
+
+  li {
+    line-height: 20px;
   }
 
   >p:first-child {
@@ -304,87 +329,173 @@ aside.sidebar {
   }
 }
 
-// In-progress banner.
-.in-progress {
-  // It will be shown by JavaScript if the cookie isn't set.
-  display: none;
+// The front page gets a bit of special styling.
+.index {
+  h1 {
+    border: none;
+  }
 
-  position: relative;
+  aside {
+    display: none;
+  }
 
-  background: hsl(40, 100%, 94%);
-  background: -moz-linear-gradient(top,
-    hsl(40, 100%, 94%) 0%,
-    hsl(40, 100%, 94%) 85%,
-    hsl(45, 100%, 97%) 100%);
-  background: -webkit-gradient(left top, left bottom,
-    color-stop(0%, hsl(40, 100%, 94%)),
-    color-stop(85%, hsl(40, 100%, 94%)),
-    color-stop(100%, hsl(45, 100%, 97%)));
-  background: -webkit-linear-gradient(top,
-    hsl(40, 100%, 94%) 0%,
-    hsl(40, 100%, 94%) 85%,
-    hsl(45, 100%, 97%) 100%);
-  background: -ms-linear-gradient(top,
-    hsl(40, 100%, 94%) 0%,
-    hsl(40, 100%, 94%) 85%,
-    hsl(45, 100%, 97%) 100%);
-  background: linear-gradient(to bottom,
-    hsl(40, 100%, 94%) 0%,
-    hsl(40, 100%, 94%) 85%,
-    hsl(45, 100%, 97%) 100%);
+  // Don't highlight the aside.
+  aside.sidebar {
+    display: block;
+    border-left: none;
+  }
 
-  box-shadow: 0 5px 10px hsla(200, 50%, 20%, 0.05);
+  // No little tab boxes next to the headers.
+  h2, h3 {
+    border-left: none;
+    margin-left: 0;
+    padding-left: 0;
+  }
+}
 
+.rhetorical {
+  font: 16px $sans;
+  font-weight: 400;
+
+  background: hsl(200, 80%, 95%);
+  color: hsl(200, 30%, 40%);
+  border-radius: 4px;
+  margin-top: 20px;
+  padding: 20px;
+
+  border: solid 1px hsl(200, 85%, 90%);
+  border-bottom: solid 1px hsl(200, 85%, 85%);
+
+  h2 {
+    font: normal 19px/30px "Rock Salt", $sans;
+    color: hsl(200, 80%, 50%);
+    margin: 0 0 10px 0;
+    padding: 0;
+  }
+
+  li + li {
+    margin-top: 10px;
+  }
+}
+
+a.start-reading {
+  display: block;
+  width: 40%;
+  margin: 20px auto;
+  padding: 8px 0;
+  border-radius: 4px;
+  background: hsl(200, 80%, 45%);
+  border: solid 1px hsl(200, 85%, 35%);
+  border-bottom: solid 3px hsl(200, 85%, 35%);
+  box-shadow: 0 0 0 hsl(200, 100%, 70%);
+  color: white;
+  font: 300 18px $header;
+  font-weight: 400;
+  text-align: center;
+
+  transition: background-color 0.2s ease,
+              border-color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+a.start-reading:hover {
+  background-color: hsl(200, 85%, 55%);
+  border-color: hsl(200, 85%, 40%);
+  border-bottom: solid 3px hsl(200, 85%, 40%);
+  box-shadow: 0 0 10px hsl(200, 100%, 80%);
+}
+
+// Sign-up box on front page.
+.sign-up {
+  background: hsl(40, 90%, 98%);
+
+  margin: 0;
   padding: 5px 15px;
-  font: normal 14px/22px $sans;
-  color: hsl(35, 40%, 40%);
-  margin-bottom: -60px;
+  font: normal 16px $sans;
+  color: hsl(40, 50%, 50%);
 
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 
-  border-left: solid 1px hsl(40, 80%, 92%);
-  border-right: solid 1px hsl(40, 80%, 92%);
-  border-bottom: solid 1px hsl(40, 80%, 88%);
-
-  .dismiss {
-    position: absolute;
-    right: 8px;
-    top: 0;
-    font: bold 24px $sans;
-    padding: 4px;
-    cursor: pointer;
-  }
-
-  .dismiss:hover {
-    color: hsl(35, 100%, 40%);
-  }
+  border-left: solid 1px hsl(40, 80%, 90%);
+  border-right: solid 1px hsl(40, 80%, 90%);
+  border-bottom: solid 1px hsl(40, 80%, 80%);
 
   p {
-    margin: 10px 0;
+    margin: 5px 0;
   }
 
   h2 {
-    font: normal 18px "Rock Salt", $sans;
-    color: hsl(35, 80%, 55%);
+    font: normal 19px/30px "Rock Salt", $sans;
+    color: hsl(40, 80%, 55%);
     border: none;
     margin: 10px 0;
     padding: 0;
   }
 
-  a {
-    color: hsl(35, 100%, 40%);
+  small {
+    color: hsl(40, 50%, 70%);
+    line-height: 14px;
   }
 
-  a:hover {
-    color: hsl(30, 100%, 30%);
-    border: none;
+  // Based on MailChimp Form Embed Code - Slim - 08/17/2011
+  #mc_embed_signup input {
+    border: 1px solid hsl(40, 50%, 75%);
+    border-radius: 4px;
+    outline: none;
+    font-size: 13px;
+    -webkit-appearance:none;
   }
 
-  .signature {
-    text-align: right;
-    font: italic 13px $sans;
+  #mc_embed_signup input:focus {
+    border-color: hsl(40, 100%, 40%);
   }
+
+  #mc_embed_signup label {
+    white-space: nowrap;
+  }
+
+  #mc_embed_signup .button {
+    background-color: hsl(40, 100%, 55%);
+    border: solid 1px hsl(40, 100%, 45%);
+    border-radius: 4px;
+    border-bottom: solid 3px hsl(40, 100%, 45%);
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: top;
+    width: 100%;
+    padding: 4px 16px;
+
+    box-shadow: 0 0 0 hsl(40, 100%, 65%);
+
+    transition: background-color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+  }
+
+  #mc_embed_signup .button:hover {
+    background-color: hsl(40, 100%, 65%);
+    border-color: hsl(40, 100%, 50%);
+    box-shadow: 0 0 10px hsl(40, 100%, 65%);
+  }
+
+  #mc_embed_signup .small-meta {font-size: 11px;}
+
+  #mc_embed_signup input.email {
+    padding: 5px 0;
+    text-indent: 5px;
+    width: 100%;
+  }
+
+  // Generic Mailchimp stuff.
+  #mc_embed_signup div#mce-responses {float:left; top:-1.4em; padding:0em .5em 0em .5em; overflow:hidden; width:90%;margin: 0 5%; clear: both;}
+  #mc_embed_signup div.response {margin:1em 0; padding:1em .5em .5em 0; font-weight:bold; float:left; top:-1.5em; z-index:1; width:80%;}
+  #mc_embed_signup #mce-error-response {display:none;}
+  #mc_embed_signup #mce-success-response {color:#529214; display:none;}
+  #mc_embed_signup label.error {display:block; float:none; width:auto; margin-left:1.05em; text-align:left; padding:.5em 0;}
 }
 
 // Pattern links.
@@ -421,36 +532,23 @@ p.footer {
   text-align: center;
   color: #aaa;
   font: 14px $sans;
-  font-weight: 300;
   margin-top: 40px;
 }
 
-// Outline.
-.outline-note {
-  margin-right: 240px;
-  background: #fdf;
-  padding: 23px 24px 1px 24px;
-  margin-bottom: 24px;
+.narrow-sign-up {
+  border-radius: 4px;
+  border-top: solid 1px hsl(40, 80%, 85%);
 }
 
-.outline-note p,
-.outline h2,
-.outline h3,
-.outline a,
-a.outline {
-  color: #a0a;
-}
+// Normally, show the chapter list in the sidebar, so don't show it here.
+.page.sidebar {
+  .narrow-toc {
+    display: none;
+  }
 
-a.outline {
-  font-style: italic;
-}
-
-a.outline:before {
-  content: "("
-}
-
-a.outline:after {
-  content: ")"
+  .narrow-sign-up {
+    display: none;
+  }
 }
 
 // Syntax highlighting.
@@ -466,63 +564,6 @@ a.outline:after {
 .codehilite .cp { color: #594; }     // preprocessor
 .codehilite .nl { color: $primary; } // keyword label (private: etc.)
 .codehilite .nt { color: $primary; } // json key
-
-// Based on MailChimp Form Embed Code - Slim - 08/17/2011
-#mc_embed_signup table {
-  border-spacing: 0px;
-}
-
-#mc_embed_signup input {
-  border: 1px solid hsl(38, 80%, 88%);
-  border-radius: 4px;
-  -webkit-appearance:none;
-}
-
-#mc_embed_signup input:focus {
-  border-color: hsl(38, 100%, 75%);
-}
-
-#mc_embed_signup label {
-  white-space: nowrap;
-}
-
-#mc_embed_signup .button {
-  background-color: hsl(35, 90%, 55%);
-  border: solid 1px hsl(35, 90%, 50%);
-  border-radius: 4px;
-  border-bottom: solid 2px hsl(30, 90%, 45%);
-  color: #fff;
-  cursor: pointer;
-  font-size: 13px;
-  height: 26px;
-  text-align: center;
-  text-decoration: none;
-  vertical-align: top;
-  width: 100%;
-  padding: 0 16px;
-}
-
-#mc_embed_signup .spacer {
-  width: 8px;
-}
-
-#mc_embed_signup .button:hover {
-  background-color: hsl(35, 100%, 60%);
-}
-
-#mc_embed_signup .small-meta {font-size: 11px;}
-
-#mc_embed_signup input.email {
-  padding: 5px 0;
-  text-indent: 5px;
-  width: 100%;
-}
-
-#mc_embed_signup div#mce-responses {float:left; top:-1.4em; padding:0em .5em 0em .5em; overflow:hidden; width:90%;margin: 0 5%; clear: both;}
-#mc_embed_signup div.response {margin:1em 0; padding:1em .5em .5em 0; font-weight:bold; float:left; top:-1.5em; z-index:1; width:80%;}
-#mc_embed_signup #mce-error-response {display:none;}
-#mc_embed_signup #mce-success-response {color:#529214; display:none;}
-#mc_embed_signup label.error {display:block; float:none; width:auto; margin-left:1.05em; text-align:left; padding:.5em 0;}
 
 // If the column is too narrow for the chapter lists in the navigation, kill
 // the section column so the chapters don't wrap and get too tall.
@@ -604,33 +645,6 @@ a.outline:after {
 
   ul, ol {
     padding: 0 0 0 20px;
-  }
-
-  p.footer {
-    font-weight: 400;
-  }
-
-  // In-progress banner.
-  .in-progress {
-    box-shadow: 0 5px 10px hsla(200, 50%, 20%, 0.05);
-
-    padding: 5px 10px;
-    font: normal 14px/22px $sans;
-    color: hsl(35, 40%, 40%);
-    margin-bottom: -50px;
-
-    .dismiss {
-      position: absolute;
-      right: 8px;
-      top: 0;
-      font: bold 36px $sans;
-      padding: 4px;
-    }
-
-    h2 {
-      line-height: 22px;
-      margin: 6px 0;
-    }
   }
 }
 

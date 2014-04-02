@@ -8,51 +8,27 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 <link href="http://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:200,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 </head>
-<body>
+<body class="index">
 <div class="page">
 <div class="content">
-<div class="in-progress">
-  <span class="dismiss">&times;</span>
-  <h2>This book is a work in progress!</h2>
+<aside class="index">
 
-  <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/game-programming-patterns/issues" target="_blank">file a ticket</a>. To know when new chapters are up, join the mailing list:</p>
+<div class="sign-up">
+  <h2>Want to read it on paper/eBook?</h2>
+  <p>I'm working on those now! Join the mailing list and I'll tell you when they're ready:</p>
 
   <!-- Begin MailChimp Signup Form -->
   <div id="mc_embed_signup">
   <form action="http://gameprogrammingpatterns.us7.list-manage.com/subscribe/post?u=0952ca43ed2536d6717766b88&amp;id=0c27329244" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <table>
-      <tr>
-        <td width="100%">
-          <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
-        </td>
-        <td>
-          <div class="spacer"></div>
-        </td>
-        <td>
-          <input type="submit" value="Join" name="subscribe" id="mc-embedded-subscribe" class="button">
-        </td>
-      </tr>
-    </table>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <input type="submit" value="Sign me up!" name="subscribe" id="mc-embedded-subscribe" class="button">
   </form>
   </div>
   <!--End mc_embed_signup-->
-
-  <table width="100%">
-    <tr>
-      <td width="50%">
-        <p>Thank you!</p>
-      </td>
-      <td width="50%">
-        <p class="signature">&mdash; Bob Nystrom (<a href="https://twitter.com/intent/user?screen_name=munificentbob" target="_blank">@munificentbob</a>)</p>
-      </td>
-    </tr>
-  </table>
+  <p><small>(I post less than once a month. Don't worry, I won't spam you.)</small></p>
 </div>
-<h1>Game Programming Patterns</h1>
 
-<p>Welcome to <em>Game Programming Patterns</em>, a book on architectural patterns in game code. If you ever struggle with the complexity of your game's codebase, this book will help. The complete text is available online for free, and will always be. Follow the table of contents below to start your journey!</p>
-<p>To stay updated on the progress of the book, join <a href="http://eepurl.com/C0p89">the mailing list</a>. (Don't worry, it's very low traffic.) You can get in touch with me directly by emailing <tt>bob</tt> at this site. If you want to read more of my writing on other subjects, check out <a href="http://journal.stuffwithstuff.com/">my blog</a> or <a href="https://twitter.com/munificentbob">follow me on twitter</a>.</p>
-<h2>Chapters</h2>
+<h2>Table of Contents</h2>
 <ul>
   <li><a href="introduction.html">Introduction</a>
     <ul>
@@ -92,14 +68,124 @@
   </li>
   <li><a href="optimization-patterns.html">Optimization Patterns</a>
     <ul>
-      <li><a href="data-locality.html">Data Locality</li>
+      <li><a href="data-locality.html">Data Locality</a></li>
       <li><a href="dirty-flag.html">Dirty Flag</a></li>
       <li><a href="object-pool.html">Object Pool</a></li>
       <li><a href="spatial-partition.html">Spatial Partition</a></li>
     </ul>
   </li>
 </ul>
-<p class="footer">&copy; 2009-2014 Bob Nystrom</p>
+</aside>
+
+<h1>Game Programming Patterns</h1>
+
+<div class="rhetorical">
+<h2>Hey, Game Developer!</h2>
+<ul>
+  <li>Do you struggle to make your code hang together into a cohesive whole?</li>
+  <li>Find it harder to make changes as your codebase grows?</li>
+  <li>Feel like your game is a giant hairball where everything is intertwined with everything else?</li>
+  <li>Wonder if and how design patterns apply to games?</li>
+  <li>Hear things like "cache coherency" and "object pools", but don't know how to use them to make your game faster?</li>
+</ul>
+</div>
+
+<p>I'm here to help! I wrote this book, <em>Game Programming Patterns</em>, to address just those questions. It's a collection of patterns I found in games to make code cleaner, easier to understand, and faster.</p>
+
+<h2>It's Free and Online!</h2>
+
+<p>This is the book I wish I had when I started making games, and I want you to have it now!</p>
+
+<div class="narrow-sign-up sign-up">
+  <h2>Want to read it on paper/eBook?</h2>
+  <p>I'm working on those now! Join the mailing list and I'll tell you when they're ready:</p>
+
+  <!-- Begin MailChimp Signup Form -->
+  <div id="mc_embed_signup">
+  <form action="http://gameprogrammingpatterns.us7.list-manage.com/subscribe/post?u=0952ca43ed2536d6717766b88&amp;id=0c27329244" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <input type="submit" value="Sign me up!" name="subscribe" id="mc-embedded-subscribe" class="button">
+  </form>
+  </div>
+  <!--End mc_embed_signup-->
+  <p><small>(I post less than once a month. Don't worry, I won't spam you.)</small></p>
+</div>
+
+<a class="start-reading" href="introduction.html">Start Reading!</a>
+
+<div class="narrow-toc">
+<h2>Table of Contents</h2>
+<table>
+<tr>
+<td width="50%">
+<ul>
+  <li><a href="introduction.html">Introduction</a>
+    <ul>
+      <li><a href="architecture-performance-and-games.html">Architecture, Performance, and Games</a></li>
+    </ul>
+  </li>
+  <li><a href="design-patterns-revisited.html">Design Patterns Revisited</a>
+    <ul>
+      <li><a href="command.html">Command</a></li>
+      <li><a href="flyweight.html">Flyweight</a></li>
+      <li><a href="observer.html">Observer</a></li>
+      <li><a href="prototype.html">Prototype</a></li>
+      <li><a href="singleton.html">Singleton</a></li>
+      <li><a href="state.html">State</a></li>
+    </ul>
+  </li>
+  <li><a href="sequencing-patterns.html">Sequencing Patterns</a>
+    <ul>
+      <li><a href="double-buffer.html">Double Buffer</a></li>
+      <li><a href="game-loop.html">Game Loop</a></li>
+      <li><a href="update-method.html">Update Method</a></li>
+    </ul>
+  </li>
+</ul>
+</td>
+<td width="50%">
+<ul>
+  <li><a href="behavioral-patterns.html">Behavioral Patterns</a>
+    <ul>
+      <li><a href="bytecode.html">Bytecode</a></em></li>
+      <li><a href="subclass-sandbox.html">Subclass Sandbox</a></li>
+      <li><a href="type-object.html">Type Object</a></li>
+    </ul>
+  </li>
+  <li><a href="decoupling-patterns.html">Decoupling Patterns</a>
+    <ul>
+      <li><a href="component.html">Component</a></li>
+      <li><a href="event-queue.html">Event Queue</a></li>
+      <li><a href="service-locator.html">Service Locator</a></li>
+    </ul>
+  </li>
+  <li><a href="optimization-patterns.html">Optimization Patterns</a>
+    <ul>
+      <li><a href="data-locality.html">Data Locality</a></li>
+      <li><a href="dirty-flag.html">Dirty Flag</a></li>
+      <li><a href="object-pool.html">Object Pool</a></li>
+      <li><a href="spatial-partition.html">Spatial Partition</a></li>
+    </ul>
+  </li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+
+<h2>Who Am I?</h2>
+
+<img src="images/dogshot.jpg" class="profile" />
+
+<p>I'm Bob Nystrom. I started writing this book while working at Electronic Arts. In my eight years there, I saw a lot of beautiful code, and a lot of really horrendous code. My hope was that I could take what I learned from the beautiful stuff, write it down here, and then show it to the people writing the awful stuff to get them to stop.</p>
+
+<p>If you want to get in touch with me, you can email <tt>bob</tt> at this site or just ask me (<a href="https://twitter.com/intent/user?screen_name=munificentbob"><tt>@munificentbob</tt></a>) on twitter.
+
+<h2>Have Feedback?</h2>
+
+<p>Part of the magic of writing a book online is that it's easy to change. If you find mistakes or have suggestions, please don't hesitate to <a href="https://github.com/munificent/game-programming-patterns/issues">file a bug</a> or send me a pull request.</p>
+
+<p class="footer">&copy; 2009-2014 Robert Nystrom</p>
 </div>
 </div>
 </body>

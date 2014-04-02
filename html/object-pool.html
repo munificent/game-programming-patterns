@@ -99,43 +99,6 @@
 </div>
 <div class="page sidebar">
 <div class="content">
-<div class="in-progress">
-  <span class="dismiss">&times;</span>
-  <h2>This book is a work in progress!</h2>
-
-  <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/game-programming-patterns/issues" target="_blank">file a ticket</a>. To know when new chapters are up, join the mailing list:</p>
-
-  <!-- Begin MailChimp Signup Form -->
-  <div id="mc_embed_signup">
-  <form action="http://gameprogrammingpatterns.us7.list-manage.com/subscribe/post?u=0952ca43ed2536d6717766b88&amp;id=0c27329244" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <table>
-      <tr>
-        <td width="100%">
-          <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
-        </td>
-        <td>
-          <div class="spacer"></div>
-        </td>
-        <td>
-          <input type="submit" value="Join" name="subscribe" id="mc-embedded-subscribe" class="button">
-        </td>
-      </tr>
-    </table>
-  </form>
-  </div>
-  <!--End mc_embed_signup-->
-
-  <table width="100%">
-    <tr>
-      <td width="50%">
-        <p>Thank you!</p>
-      </td>
-      <td width="50%">
-        <p class="signature">&mdash; Bob Nystrom (<a href="https://twitter.com/intent/user?screen_name=munificentbob" target="_blank">@munificentbob</a>)</p>
-      </td>
-    </tr>
-  </table>
-</div>
 <h1>Object Pool</h1>
 <h1 class="book"><a href="index.html">Game Programming Patterns</a><span class="section"><a href="optimization-patterns.html">Optimization Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
@@ -797,22 +760,25 @@ the object exposes.</p>
 </li>
 </ul>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
-<h3><a href="#flyweight-(gof)" name="flyweight-(gof)">Flyweight (GoF)</a></h3>
-<p>On the surface, this looks a lot like the <a class="gof-pattern"
-href="http://c2.com/cgi/wiki?FlyweightPattern">Flyweight</a> pattern.
-Both maintain a collection of small objects so that they can be
-reused. The difference is what is meant by &ldquo;reuse.&rdquo;
-Flyweight objects are reused by sharing the same instance between
-multiple owners <em>simultaneously</em>. Flyweight is about avoiding
-duplicate memory usage by using the same object in multiple different
-contexts.</p>
-<p>Pooled objects are not intended to be used that way. The objects in a
-pool get reused, but only over time. &ldquo;Reuse&rdquo; in the
-context of an object pool means reclaiming the <em>memory</em> for an object
+<ul>
+<li>
+<p>This looks a lot like the <a class="gof-pattern"
+    href="flyweight.html">Flyweight pattern</a>.
+    Both maintain a collection of reusable objects. The difference is what &ldquo;reuse&rdquo; means. Flyweight objects are reused by sharing the same instance between
+    multiple owners <em>simultaneously</em>. It avoids
+    <em>duplicate</em> memory usage by using the same object in multiple
+    contexts.</p>
+<p>The objects in a pool get reused too, but only over time. &ldquo;Reuse&rdquo; in the
+context of an object pool means reclaiming the memory for an object
 <em>after</em> the original owner is done with it. With an object pool, there
 isn&#x2019;t any expectation that an object will be shared within its
 lifetime.</p>
-<p class="footer">&copy; 2009-2014 Bob Nystrom</p>
+</li>
+<li>
+<p>Packing a bunch of objects of the same type together in memory increases helps keep your CPU cache full as you iterate over those objects. The <a class="pattern" href="data-locality.html">Data Locality pattern</a> is all about that.</p>
+</li>
+</ul>
+<p class="footer">&copy; 2009-2014 Robert Nystrom</p>
 </div>
 </div>
 </body>

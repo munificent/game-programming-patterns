@@ -1,3 +1,7 @@
+2014-04-01 - finish mobile index
+2014-03-31 - work on mobile version of index
+2014-03-30 - redo front page
+2014-03-29 - finish new design
 2014-03-28 - work on new design
 2014-03-27 - email email email
 2014-03-26 - fix #103 #109 #110 #111 #115, merge #108 #114 #118, close #106

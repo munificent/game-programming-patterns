@@ -490,20 +490,17 @@ inside the pool class or outside.
 
 ## See Also
 
-### Flyweight (GoF)
+*   This looks a lot like the <a class="gof-pattern"
+    href="flyweight.html">Flyweight pattern</a>.
+    Both maintain a collection of reusable objects. The difference is what &ldquo;reuse&rdquo; means. Flyweight objects are reused by sharing the same instance between
+    multiple owners *simultaneously*. It avoids
+    *duplicate* memory usage by using the same object in multiple
+    contexts.
 
-On the surface, this looks a lot like the <a class="gof-pattern"
-href="http://c2.com/cgi/wiki?FlyweightPattern">Flyweight</a> pattern.
-Both maintain a collection of small objects so that they can be
-reused. The difference is what is meant by &ldquo;reuse.&rdquo;
-Flyweight objects are reused by sharing the same instance between
-multiple owners *simultaneously*. Flyweight is about avoiding
-duplicate memory usage by using the same object in multiple different
-contexts.
+    The objects in a pool get reused too, but only over time. &ldquo;Reuse&rdquo; in the
+    context of an object pool means reclaiming the memory for an object
+    *after* the original owner is done with it. With an object pool, there
+    isn't any expectation that an object will be shared within its
+    lifetime.
 
-Pooled objects are not intended to be used that way. The objects in a
-pool get reused, but only over time. &ldquo;Reuse&rdquo; in the
-context of an object pool means reclaiming the *memory* for an object
-*after* the original owner is done with it. With an object pool, there
-isn't any expectation that an object will be shared within its
-lifetime.
+*   Packing a bunch of objects of the same type together in memory increases helps keep your CPU cache full as you iterate over those objects. The <a class="pattern" href="data-locality.html">Data Locality pattern</a> is all about that.
