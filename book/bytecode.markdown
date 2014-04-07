@@ -613,4 +613,6 @@ I saved the most important question for last. I've walked you through the code t
 
 * The [Lua](http://www.lua.org/) programming language is the most widely-used scripting language in games. It's implemented internally as a very compact register-based bytecode VM.
 
+* [Kismet](http://en.wikipedia.org/wiki/UnrealEd#Kismet) is a graphical scripting tool built into UnrealEd, the editor for the Unreal engine.
+
 * My own little scripting language [Wren](https://github.com/munificent/wren) is a simple stack-based bytecode interpreter.

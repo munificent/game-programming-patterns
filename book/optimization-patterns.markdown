@@ -1,6 +1,6 @@
 ^title Optimization Patterns
 
-While the rising tide of faster and faster hardware has lifted most software above worrying about performance, games are one of the few remaining exceptions. Players always want richer, more realistic and exciting experiences. Screens are crowded with games vying for a player's attention -- and cash! -- and the game that squeezes the most out of the hardware often wins.
+While the rising tide of faster and faster hardware has lifted most software above worrying about performance, games are one of the few remaining exceptions. Players always want richer, more realistic and exciting experiences. Screens are crowded with games vying for a player's attention -- and cash! -- and the game that pushes the hardware the farthest often wins.
 
 Optimizing for performance is a deep art that touches all aspects of software. Low-level coders master the myriad idiosyncracies of hardware architectures. Meanwhile, algorithms researchers compete to prove mathematically whose procedure is the most efficient.
 
