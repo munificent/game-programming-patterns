@@ -34,7 +34,7 @@
         <td width="30%" class="section-nav">
           <h2>Architecture, Performance, and Games</h2>
           <ul><li>
-<a href="#what-is-arch-and-design">what is arch and design</a></li><li>
+<a href="#what-is-software-architecture">What is Software Architecture?</a></li><li>
 <a href="#at-what-cost">at what cost?</a></li><li>
 <a href="#dev-perf-vs-runtime-perf">dev perf vs runtime perf</a></li><li>
 <a href="#deliberate-bad-code">deliberate bad code</a></li><li>
@@ -99,65 +99,46 @@
 <div class="content">
 <h1>Architecture, Performance, and Games</h1>
 <h1 class="book"><a href="index.html">Game Programming Patterns</a><span class="section"><a href="introduction.html">Introduction</a></span></h1>
+<p>This chapter frames the rest of the book. I thought it might be helpful to give you some larger context about how I think about software architecture and how it applies to games. It may help you understand the rest of this book better. When you find yourself dragged into an argument about whether design patterns and software architecture suck or are awesome, it will give you some <span name="ammo">ammo</span>.</p>
+<aside name="ammo">
+
+<p>Note that I didn&#x2019;t presume which side you&#x2019;re on in that fight. Like any arms dealer, I&#x2019;ve got weapons for all combatants here.</p>
+</aside>
+
+<p>However, like all frames, this chapter isn&#x2019;t the painting itself. If you just want some concrete information you can apply immediately to become a better programmer, I won&#x2019;t be offended if you skip this. Well, not much.</p>
+<h2><a href="#what-is-software-architecture" name="what-is-software-architecture">What is Software Architecture?</a></h2>
+<p><span name="won&#x2019;t">If</span> you read this book cover to cover, you won&#x2019;t come away knowing the linear algebra behind 3D graphics, or the calculus behind game physics. It won&#x2019;t show you how to alpha-beta prune your AI&#x2019;s search tree or simulate a room&#x2019;s reverberation in your audio playback.</p>
+<aside name="won&#x2019;t">
+
+<p>Wow, this paragraph would make a terrible ad for the book.</p>
+</aside>
+
+<p>Instead, it&#x2019;s about the code <em>between</em> all of that. It&#x2019;s less about writing code than it is about <em>organizing</em> code. We&#x2019;ve got a bunch of terms to talk about. "Software architecture" and "design" are the big ones but "abstraction", "modularity", and a slew of others some more tied to fad methodologies than others all gravitate around the same idea.</p>
+<p>Every program has <em>some</em> organization, even if it&#x2019;s just "jam the whole thing into <code>main()</code> and see what happens", so it&#x2019;s a lot more interesting to talk about what makes <em>good</em> architecture. How do we tell a good design from a bad one?</p>
+<p>I&#x2019;ve been mulling this question over pretty much the entire time I&#x2019;ve been writing this book. Of course, we all have a solid intuition about good design. Everyone has had experiences dealing with <em>bad</em> design. We&#x2019;ve all suffered through codebases so bad the best you can do for them is take them out back and put them out of their misery. Most us created quite a few of those as we learned to program.</p>
+<p>A lucky few have had the opposite experience, a chance to work with beautifully designed code. The kind of codebase that feels like a perfectly appointed luxury hotel just waiting for you to take off your shoes and settle in.</p>
+<p>What&#x2019;s the <span name="brace">difference</span> between the two?</p>
+<aside name="brace">
+
+<p>We all know the most important property is "does the program use the indentation style I happen to prefer?"</p>
+</aside>
+
+<p>For me, good design means that when I make a change, it&#x2019;s as if the entire program was crafted in anticipation of that change. I barely have to write a line of code and it slots in perfectly, solving my task while leaving not the slightest ripple on the placid surface of the code.</p>
+<p>That sounds pretty, but it&#x2019;s not exactly actionable. "Just write your code so that changes don&#x2019;t disturb its placid surface." Right. Let me try to break that down a bit more. The first key piece is that <em>design is all about change</em>.</p>
+<p>Someone has to be modifying the codebase. If <span name="zen">no one</span> is touching the code --whether because it&#x2019;s perfect and complete, or so wretched no one will touch it&thinsp;&mdash;&thinsp;its design doesn&#x2019;t matter. If no one is cracking open the source, its design is irrelevant.</p>
+<aside name="zen">
+
+<p>There&#x2019;s some Zen koan in here somewhere. "If a program falls in the woods and no one reads the source, does it make a sound?"</p>
+</aside>
+
+<p>Before you can change the code to add a new feature, or fix a bug, or whatever reason caused you to fire up your editor, you have to understand what the existing code is doing. You don&#x2019;t have to know the whole program, of course, but you need to <aside name="ocr">load</aside> all of the pieces of it that are relevant to your problem into your primate brain.</p>
+<aside name="ocr">
+
+<p>It&#x2019;s weird to think that that is literally an OCR process.</p>
+</aside>
+
+<p>We tend to gloss over this part, but it&#x2019;s often the most time-consuming part of programming. If you think paging some data from RAM into disk is slow, try paging it into a simian cerebrum over a pair of optical nerves.</p>
 <ul>
-<li>chapter frames book</li>
-<li>if want to know how i think about design, read on</li>
-<li>if want context for how to apply book as a whole, read</li>
-<li>if want response to people who argue for or against design patterns, read</li>
-<li>if just want to learn to write better code, can skip</li>
-</ul>
-<h2><a href="#what-is-arch-and-design" name="what-is-arch-and-design">what is arch and design</a></h2>
-<ul>
-<li>book is mainly about software architecture, design</li>
-<li>cover some algorithms, some perf</li>
-<li>but not about 3d graphics, ai, physics, etc.</li>
-<li>no features</li>
-<li>about code between features</li>
-<li>about how features organized</li>
-<li>all program has some org, but could just be giant blob all stuck together</li>
-<li>
-<p>better question is what makes good arch, good design</p>
-</li>
-<li>
-<p>spent lot of time thinking about</p>
-</li>
-<li>all have intuition about good versus bad</li>
-<li>have had experience with awful messy codebase</li>
-<li>if lucky, had experience with beatiful one</li>
-<li>
-<p>difference?</p>
-</li>
-<li>
-<p>for me: good means when i went to make a change, as it entire program oriented to have that change slot right in</p>
-</li>
-<li>
-<p>like it was made for what i wanted to do</p>
-</li>
-<li>
-<p>pretty nebulous "just feels good, man" not very actionable</p>
-</li>
-<li>
-<p>break it down</p>
-</li>
-<li>
-<ol>
-<li>all about change</li>
-</ol>
-</li>
-<li>someone has to be making program do something new or different</li>
-<li>
-<p>if prog is totally done, no reason to even crack open the source, doesn&#x2019;t matter how good it is</p>
-</li>
-<li>
-<ol>
-<li>to make change, need to understand existing code</li>
-</ol>
-</li>
-<li>have to figure out how change integrates with rest of code</li>
-<li>read read read</li>
-<li>
-<p>have to load chunk of program into head</p>
-</li>
 <li>
 <ol>
 <li>have to make the change</li>

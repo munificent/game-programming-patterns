@@ -1,43 +1,63 @@
 ^title Architecture, Performance, and Games
 ^section Introduction
 
-- chapter frames book
-- if want to know how i think about design, read on
-- if want context for how to apply book as a whole, read
-- if want response to people who argue for or against design patterns, read
-- if just want to learn to write better code, can skip
+This chapter frames the rest of the book. I thought it might be helpful to give you some larger context about how I think about software architecture and how it applies to games. It may help you understand the rest of this book better. When you find yourself dragged into an argument about whether design patterns and software architecture suck or are awesome, it will give you some <span name="ammo">ammo</span>.
 
-## what is arch and design
+<aside name="ammo">
 
-- book is mainly about software architecture, design
-- cover some algorithms, some perf
-- but not about 3d graphics, ai, physics, etc.
-- no features
-- about code between features
-- about how features organized
-- all program has some org, but could just be giant blob all stuck together
-- better question is what makes good arch, good design
+Note that I didn't presume which side you're on in that fight. Like any arms dealer, I've got weapons for all combatants here.
 
-- spent lot of time thinking about
-- all have intuition about good versus bad
-- have had experience with awful messy codebase
-- if lucky, had experience with beatiful one
-- difference?
+</aside>
 
-- for me: good means when i went to make a change, as it entire program oriented to have that change slot right in
-- like it was made for what i wanted to do
+However, like all frames, this chapter isn't the painting itself. If you just want some concrete information you can apply immediately to become a better programmer, I won't be offended if you skip this. Well, not much.
 
-- pretty nebulous "just feels good, man" not very actionable
-- break it down
+## What is Software Architecture?
 
-- 1. all about change
-- someone has to be making program do something new or different
-- if prog is totally done, no reason to even crack open the source, doesn't matter how good it is
+<span name="won't">If</span> you read this book cover to cover, you won't come away knowing the linear algebra behind 3D graphics, or the calculus behind game physics. It won't show you how to alpha-beta prune your AI's search tree or simulate a room's reverberation in your audio playback.
 
-- 2. to make change, need to understand existing code
-- have to figure out how change integrates with rest of code
-- read read read
-- have to load chunk of program into head
+<aside name="won't">
+
+Wow, this paragraph would make a terrible ad for the book.
+
+</aside>
+
+Instead, it's about the code *between* all of that. It's less about writing code than it is about *organizing* code. We've got a bunch of terms to talk about. "Software architecture" and "design" are the big ones but "abstraction", "modularity", and a slew of others some more tied to fad methodologies than others all gravitate around the same idea.
+
+Every program has *some* organization, even if it's just "jam the whole thing into `main()` and see what happens", so it's a lot more interesting to talk about what makes *good* architecture. How do we tell a good design from a bad one?
+
+I've been mulling this question over pretty much the entire time I've been writing this book. Of course, we all have a solid intuition about good design. Everyone has had experiences dealing with *bad* design. We've all suffered through codebases so bad the best you can do for them is take them out back and put them out of their misery. Most us created quite a few of those as we learned to program.
+
+A lucky few have had the opposite experience, a chance to work with beautifully designed code. The kind of codebase that feels like a perfectly appointed luxury hotel just waiting for you to take off your shoes and settle in.
+
+What's the <span name="brace">difference</span> between the two?
+
+<aside name="brace">
+
+We all know the most important property is "does the program use the indentation style I happen to prefer?"
+
+</aside>
+
+For me, good design means that when I make a change, it's as if the entire program was crafted in anticipation of that change. I barely have to write a line of code and it slots in perfectly, solving my task while leaving not the slightest ripple on the placid surface of the code.
+
+That sounds pretty, but it's not exactly actionable. "Just write your code so that changes don't disturb its placid surface." Right. Let me try to break that down a bit more. The first key piece is that *design is all about change*.
+
+Someone has to be modifying the codebase. If <span name="zen">no one</span> is touching the code --whether because it's perfect and complete, or so wretched no one will touch it -- its design doesn't matter. If no one is cracking open the source, its design is irrelevant.
+
+<aside name="zen">
+
+There's some Zen koan in here somewhere. "If a program falls in the woods and no one reads the source, does it make a sound?"
+
+</aside>
+
+Before you can change the code to add a new feature, or fix a bug, or whatever reason caused you to fire up your editor, you have to understand what the existing code is doing. You don't have to know the whole program, of course, but you need to <aside name="ocr">load</aside> all of the pieces of it that are relevant to your problem into your primate brain.
+
+<aside name="ocr">
+
+It's weird to think that that is literally an OCR process.
+
+</aside>
+
+We tend to gloss over this part, but it's often the most time-consuming part of programming. If you think paging some data from RAM into disk is slow, try paging it into a simian cerebrum over a pair of optical nerves.
 
 - 3. have to make the change
 
