@@ -147,7 +147,7 @@ def formatfile(path, nav, skip_up_to_date):
         section_header = ""
 
         if section != "":
-            title_text = section + " / " + title
+            title_text = title + " &middot; " + section
             section_href = section.lower().replace(" ", "-")
             section_header = '<span class="section"><a href="{}.html">{}</a></span>'.format(
                 section_href, section)

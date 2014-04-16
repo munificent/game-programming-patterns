@@ -274,7 +274,7 @@ in the larger pattern ecosystem.
 ## How the Book is Formatted
 
 Each <span name="aside">pattern</span> has a set of parts -- the ingredients in its recipe.
-Every implementation will include these parts, so its important to
+Every implementation will include these parts, so it's important to
 note them all. The first time one is mentioned, it will be in **bold
 face**.
 

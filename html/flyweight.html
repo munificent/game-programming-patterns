@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 
-<title>Game Programming Patterns / Design Patterns Revisited / Flyweight</title>
+<title>Flyweight &middot; Design Patterns Revisited &middot; Game Programming Patterns</title>
 
 <!-- Tell mobile browsers we're optimized for them and they don't need to crop
      the viewport. -->
@@ -177,7 +177,7 @@
 
 <p>This is all well and good for storing stuff in main memory, but that doesn&#x2019;t help rendering. Before the forest gets on screen, it has to work its way over to the GPU&#x2019;s memory. We need to express this resource sharing in a way that the graphics card understands.</p>
 <h2><a href="#a-thousand-instances" name="a-thousand-instances">A Thousand Instances</a></h2>
-<p>To minimize the amount of data we have to push to the GPU, we want to be able to send the shared data&thinsp;&mdash;&thinsp;the <code>TreeModel</code>&thinsp;&mdash;&thinsp;just <em>once</em>. Then, separately, we push over every tree instance&#x2019;s unique data&thinsp;&mdash;&thinsp;its position, color, and scale. Then we tell the GPU, "use that one model to render each of these instances".</p>
+<p>To minimize the amount of data we have to push to the GPU, we want to be able to send the shared data&thinsp;&mdash;&thinsp;the <code>TreeModel</code>&thinsp;&mdash;&thinsp;just <em>once</em>. Then, separately, we push over every tree instance&#x2019;s unique data&thinsp;&mdash;&thinsp;its position, color, and scale. Then we tell the GPU, "use that one model to render each of these instances."</p>
 <p>Fortunately, today&#x2019;s graphics APIs and <span name="hardware">cards</span> support exactly that. The details are fiddly, and out of the scope of this book, but both Direct3D and OpenGL have support for <a href="http://en.wikipedia.org/wiki/Geometry_instancing"><em>instanced rendering</em></a>.</p>
 <p>In both APIs, you provide two streams of data. The first is the blob of common data that will be rendered multiple times&thinsp;&mdash;&thinsp;the mesh and textures in our arboreal example. The second is the list of instances and their parameters that will be used to vary that first chunk of data each time it&#x2019;s drawn. With a single draw call, an entire forest appears.</p>
 <aside name="hardware">

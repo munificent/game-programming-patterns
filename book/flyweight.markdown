@@ -66,7 +66,7 @@ This is all well and good for storing stuff in main memory, but that doesn't hel
 
 ## A Thousand Instances
 
-To minimize the amount of data we have to push to the GPU, we want to be able to send the shared data -- the `TreeModel` -- just *once*. Then, separately, we push over every tree instance's unique data -- its position, color, and scale. Then we tell the GPU, "use that one model to render each of these instances".
+To minimize the amount of data we have to push to the GPU, we want to be able to send the shared data -- the `TreeModel` -- just *once*. Then, separately, we push over every tree instance's unique data -- its position, color, and scale. Then we tell the GPU, "use that one model to render each of these instances."
 
 Fortunately, today's graphics APIs and <span name="hardware">cards</span> support exactly that. The details are fiddly, and out of the scope of this book, but both Direct3D and OpenGL have support for [*instanced rendering*](http://en.wikipedia.org/wiki/Geometry_instancing).
 
