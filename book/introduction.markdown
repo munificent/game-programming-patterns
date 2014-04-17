@@ -226,7 +226,7 @@ primary force is that game objects *must* interact: bullets must
 collide with enemies, the hero must be able to play heroic sounds. The
 opposing force is that decoupling and isolating code makes it easier
 to understand, modify, and test. The patterns in this theme let
-modules communicate with each other, but in proscribed ways that
+modules communicate with each other, but in prescribed ways that
 control the coupling.
 
 Each pattern within these themes is described using a consistent
