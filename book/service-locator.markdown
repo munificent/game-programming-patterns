@@ -280,7 +280,7 @@ Ideally, we would be able to selectively enable logging for just the
 stuff we care about, and in the final game build, there'd be no
 logging at all. If the different systems we want to conditionally log
 are exposed as services, then we can solve this using the <a
-class="gof-pattern" href="decorator.html">Decorator</a> pattern. Let's
+class="gof-pattern" href="http://www.c2.com/cgi/wiki?DecoratorPattern">Decorator</a> pattern. Let's
 define another audio service provider implementation like this:
 
 ^code 12
