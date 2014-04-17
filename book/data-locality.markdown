@@ -181,7 +181,7 @@ In C++, using interfaces implies accessing objects through <span name="virtual">
 
 <aside name="virtual">
 
-The other half of interfaces is *virtual method calls*. Those require the CPU to look up an object's vtable, and then find the pointer to the actual method to call there. So, again, you're chasing a pointer and often causing a cache miss, though this time it's an *instruction* cache miss, since you're reading *code* from RAM.
+The other half of interfaces is *virtual method calls*. Those require the CPU to look up an object's vtable, and then find the pointer to the actual method to call there. So, again, you're chasing pointers which can cause cache misses.
 
 </aside>
 
@@ -415,7 +415,7 @@ One way to keep much of the flexibility of polymorphism without using subclassin
 
   * *It's safe and easy.* You know exactly what class you're dealing with and all objects are obviously the same size.
 
-  * *It's faster.* Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. That can be an instruction cache miss. While the cost of this varies widely across different hardware, there is <span name="cpp">*some*</span> cost to dynamic dispatch.
+  * *It's faster.* Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. While the cost of this varies widely across different hardware, there is <span name="cpp">*some*</span> cost to dynamic dispatch.
 
 <aside name="cpp">
 

@@ -229,7 +229,7 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 <p>In C++, using interfaces implies accessing objects through <span name="virtual">pointers or references</span>. But going through a pointer means hopping across memory, which leads to the cache misses this pattern works to avoid.</p>
 <aside name="virtual">
 
-<p>The other half of interfaces is <em>virtual method calls</em>. Those require the CPU to look up an object&#x2019;s vtable, and then find the pointer to the actual method to call there. So, again, you&#x2019;re chasing a pointer and often causing a cache miss, though this time it&#x2019;s an <em>instruction</em> cache miss, since you&#x2019;re reading <em>code</em> from RAM.</p>
+<p>The other half of interfaces is <em>virtual method calls</em>. Those require the CPU to look up an object&#x2019;s vtable, and then find the pointer to the actual method to call there. So, again, you&#x2019;re chasing pointers which can cause cache misses.</p>
 </aside>
 
 <p>In order to please this pattern, you will have to sacrifice some of your precious abstractions. The more you design your program around data locality, the more you will have to give up inheritance and interfaces, and the benefits those tools can provide. There&#x2019;s no silver bullet here, just challenging trade-offs. That&#x2019;s what makes it fun!</p>
@@ -618,7 +618,7 @@ some more boxes that are next to it. He doesn&#x2019;t know if you want those (a
 <p><em>It&#x2019;s safe and easy.</em> You know exactly what class you&#x2019;re dealing with and all objects are obviously the same size.</p>
 </li>
 <li>
-<p><em>It&#x2019;s faster.</em> Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. That can be an instruction cache miss. While the cost of this varies widely across different hardware, there is <span name="cpp"><em>some</em></span> cost to dynamic dispatch.</p>
+<p><em>It&#x2019;s faster.</em> Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. While the cost of this varies widely across different hardware, there is <span name="cpp"><em>some</em></span> cost to dynamic dispatch.</p>
 </li>
 </ul>
 <aside name="cpp">

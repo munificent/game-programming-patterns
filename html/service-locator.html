@@ -418,7 +418,7 @@ other&#x2019;s messages.</p>
 stuff we care about, and in the final game build, there&#x2019;d be no
 logging at all. If the different systems we want to conditionally log
 are exposed as services, then we can solve this using the <a
-class="gof-pattern" href="decorator.html">Decorator</a> pattern. Let&#x2019;s
+class="gof-pattern" href="http://www.c2.com/cgi/wiki?DecoratorPattern">Decorator</a> pattern. Let&#x2019;s
 define another audio service provider implementation like this:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">LoggedAudio</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Audio</span>
 <span class="p">{</span>
