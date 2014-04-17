@@ -131,13 +131,17 @@ What if instead of loading actual machine code and executing it directly, we def
 
 <aside name="jit">
 
-This is why many game consoles and iOS don't allow programs to execute machine code loaded or generated at runtime.
-
-That's a drag because the fastest programming language interpreters do exactly that. They contain a "just-in-time" compiler, or *JIT*, that translates the language to highly optimized machine code on the fly.
+This is why many game consoles and iOS don't allow programs to execute machine code loaded or generated at runtime. That's a drag because the fastest programming language implementations do exactly that. They contain a "just-in-time" compiler, or *JIT*, that translates the language to optimized machine code on the fly.
 
 </aside>
 
-We'd call our little emulator a *virtual machine*, and the synthetic binary machine code it runs *bytecode*. It's got the flexibility and ease of use of defining things in data, but better performance than higher-level representations like the Interpreter pattern.
+We'd call our little emulator a <span name="virtual">*virtual machine*</span>, and the synthetic binary machine code it runs *bytecode*. It's got the flexibility and ease of use of defining things in data, but better performance than higher-level representations like the Interpreter pattern.
+
+<aside name="virtual">
+
+In programming language circles, "virtual machine" and "interpreter" are synonymous, and I use them interchangeably here. When I refer to the Gang of Four's Interpreter pattern, I'll use "pattern" to make it clear.
+
+</aside>
 
 This sounds daunting, though. My goal for the rest of this chapter is to show you that if you keep your feature list pared down, it's actually pretty approachable. Even if you end up not using this pattern yourself, you'll at least have a better understanding of Lua and many other languages which are implemented using it.
 
@@ -263,7 +267,9 @@ To get something that starts to have the expressive feel of an actual language, 
 
 ### A stack machine
 
-The Interpreter pattern handles parameters and subexpressions by explicitly wiring them together as a tree of nested objects, but we want the speed of a flat list of instructions. To do that, we need to make the data flow that brings parameters to the callsite that needs them implicit in the structure of the code. We'll do it the same way your CPU does: <span name="stack-machine">with a stack</span>.
+To execute a complex nested expression, you start with the innermost subexpressions. You calculate those and the results flow outward as arguments to the expressions that contain them until eventually the whole expression has been evaluated.
+
+The Interpreter pattern models this explicitly as a tree of nested objects, but we want the speed of a flat list of instructions. We still need to ensure results from subexpressions flow to the right surrounding expressions. But, since our data is flattened, we'll have to use the *order* of the instructions to control that. We'll do it the same way your CPU does: <span name="stack-machine">with a stack</span>.
 
 <aside name="stack-machine">
 
@@ -439,7 +445,7 @@ To make a system that users enjoy, you have to embrace their humanity, *includin
 
 This spares you from designing a grammar and writing a parser for a little language. But, I know, some of you find UI programming equally unpleasant. Well, in that case, I don't have any good news for you.
 
-Ultimately, this pattern is about expressing behavior in a user-friendly, high-level format. You have to design the user experience for that format, and to execute it efficiently, you need to translate it into a lower-level form. It is real work, but if you're up to the challenge, it can pay off in spades.
+Ultimately, this pattern is about expressing behavior in a user-friendly, high-level way. You have to craft the user experience. To execute the behavior efficiently, you then need to translate that into a lower-level form. It is real work, but if you're up to the challenge, it can pay off.
 
 ## Design Decisions
 
@@ -494,7 +500,7 @@ Your instruction set defines the boundaries of what can and cannot be expressed 
 
 * **Abstraction.** If your users start defining a *lot* of stuff in data, eventually they'll want to start reusing bits of bytecode instead of having to copy and paste it. You may want something like callable procedures.
 
-    In its simplest form these aren't much more complex than a jump. The only difference is that the VM maintains a second *return* stack. When you do a "call" instruction, you push the current instruction index onto that stack before jumping to the bytecode being called. When you hit a "return", you pop that index and jump back to it.
+    In its simplest form these aren't much more complex than a jump. The only difference is that the VM maintains a second *return* stack. When it executes a "call" instruction, it pushes the current instruction index onto the return stack then jumps to the called bytecode. When it hits a "return", the VM pops the index from the return stack and jumps back to it.
 
 ### How are values represented?
 
@@ -579,7 +585,7 @@ I saved the most important question for last. I've walked you through the code t
 
     * *You have to handle syntax errors.* This is one of the most important and most difficult parts of the process. When users make syntax and semantic errors -- which they will, constantly -- it's your job to guide them back onto the right path. Giving helpful feedback isn't easy when all you know is that your parser is sitting on some unexpected punctuation.
 
-    * *It will likely turn off non-technical users.* We programmers like text files. Combined with powerful command-line tools, we think of them as the LEGO blocks of computing: simple but easily composible in a million ways.
+    * *It will likely turn off non-technical users.* We programmers like text files. Combined with powerful command-line tools, we think of them as the LEGO blocks of computing: simple but easily composable in a million ways.
 
         Most non-programmers don't think of text like that. To them, it feels like filling in tax forms for a robotic auditor that yells at them if they forget a single semicolon.
 
@@ -615,4 +621,4 @@ I saved the most important question for last. I've walked you through the code t
 
 * [Kismet](http://en.wikipedia.org/wiki/UnrealEd#Kismet) is a graphical scripting tool built into UnrealEd, the editor for the Unreal engine.
 
-* My own little scripting language [Wren](https://github.com/munificent/wren) is a simple stack-based bytecode interpreter.
+* My own little scripting language, [Wren](https://github.com/munificent/wren), is a simple stack-based bytecode interpreter.
