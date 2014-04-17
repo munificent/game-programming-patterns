@@ -384,7 +384,7 @@ that it can vary, based on differing answers to a few core questions:
     a class with a given name, find its constructor, and then invoke it to
     create an instance.
 
-    Dynamically-typed languages like Lisp, SmallTalk, and Python get this
+    Dynamically-typed languages like Lisp, Smalltalk, and Python get this
     by their very nature, but newer static languages like C# and Java also
     support it.
 
