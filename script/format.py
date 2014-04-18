@@ -4,12 +4,14 @@
 # Converts from the source markup format to HTML for the web version.
 
 import glob
-import markdown
 import os
 import subprocess
 import sys
 import time
 from datetime import datetime
+
+import markdown
+import smartypants
 
 # Assumes cwd is root project dir.
 
@@ -62,16 +64,13 @@ def cpppath(pattern):
 
 
 def pretty(text):
-  # Use nicer HTML entities and special characters.
-  return (text.replace("'", "&#x2019;")
-        .replace("...", "&hellip;")
-        # Hack: Don't replace ... in double buffer pre-formatted.
-        .replace("    &hellip;", "    ...")
-        .replace(" -- ", "&thinsp;&mdash;&thinsp;")
-        .replace("à", "&agrave;")
-        .replace("ï", "&iuml;")
-        .replace("ø", "&oslash;")
-        .replace("æ", "&aelig;"))
+  '''Use nicer HTML entities and special characters.'''
+  text = text.replace(" -- ", "&thinsp;&mdash;&thinsp;")
+  text = text.replace("à", "&agrave;")
+  text = text.replace("ï", "&iuml;")
+  text = text.replace("ø", "&oslash;")
+  text = text.replace("æ", "&aelig;")
+  return text
 
 
 def formatfile(path, nav, skip_up_to_date):
@@ -161,6 +160,8 @@ def formatfile(path, nav, skip_up_to_date):
     body = markdown.markdown(contents,
             extensions=['extra', 'def_list', 'codehilite'])
     body = body.replace('<aside markdown="1"', '<aside')
+
+    body = smartypants.smartypants(body)
 
     html = template
     html = html.replace("{{title}}", title_text)

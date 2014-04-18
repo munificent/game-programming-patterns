@@ -105,14 +105,14 @@
 <p><em>Improve performance and memory use by reusing objects from a fixed
 pool instead of allocating and freeing them individually.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>We&#x2019;re working on the visual effects for our game. When the hero casts
+<p>We&#8217;re working on the visual effects for our game. When the hero casts
 a spell, we want a shimmer of sparkles to burst across the screen.
 This calls for a <em>particle system</em>: an engine that spawns little
 sparkly graphics and animates them until they wink out of existence.</p>
 <p>Since a single wave of the wand could cause hundreds of particles to
 be spawned, our system needs to be able to create them very quickly.
 More importantly, we need to make sure that creating and destroying
-these particles doesn&#x2019;t cause <em>memory fragmentation</em>.</p>
+these particles doesn&#8217;t cause <em>memory fragmentation</em>.</p>
 <h3><a href="#the-curse-of-fragmentation" name="the-curse-of-fragmentation">The curse of fragmentation</a></h3>
 <p>Programming for a game console like the XBox 360 is closer to embedded
 programming than conventional PC programming in many ways. Like
@@ -123,25 +123,25 @@ fragmentation is deadly.</p>
 <p>Fragmentation means the free space in our heap is <span name="park">broken</span> into smaller
 pieces of memory instead of one large open block. The
 <em>total</em> memory available may be large, but the largest
-<em>contiguous</em> region might be painfully small. Say we&#x2019;ve got
-fourteen bytes free, but it&#x2019;s fragmented into two seven-byte pieces with a
+<em>contiguous</em> region might be painfully small. Say we&#8217;ve got
+fourteen bytes free, but it&#8217;s fragmented into two seven-byte pieces with a
 chunk of in-use memory between them. If we try to allocate a twelve-byte
-object, we&#x2019;ll fail. No more sparklies onscreen.</p>
+object, we&#8217;ll fail. No more sparklies onscreen.</p>
 <aside name="park">
 
 <p>Have you ever tried to parallel park on a busy street where the
 already parked cars are spaced out just a <em>little</em> bit too far? If
-they could just bunch up, there&#x2019;d be room for your car, but the free
+they could just bunch up, there&#8217;d be room for your car, but the free
 space is divided up into bits of open curb between half a dozen cars.
-That&#x2019;s fragmentation.</p>
+That&#8217;s fragmentation.</p>
 </aside>
 
 <p><span name="heap"></span></p>
 <p><img src="images/object-pool-heap-fragment.png" /></p>
 <aside name="heap">
 
-<p>Here&#x2019;s how a heap becomes fragmented, and how it can cause an
-allocation to fail even where there&#x2019;s theoretically enough memory
+<p>Here&#8217;s how a heap becomes fragmented, and how it can cause an
+allocation to fail even where there&#8217;s theoretically enough memory
 available.</p>
 </aside>
 
@@ -152,21 +152,21 @@ ultimately hosing the game completely.</p>
 
 <p>Most console makers require games to pass &ldquo;soak tests&rdquo;
 where they leave the game running in demo mode for several days. If
-the game crashes, they don&#x2019;t allow it to ship. While soak tests
-sometimes fail because of a rarely-occurring bug, it&#x2019;s usually
+the game crashes, they don&#8217;t allow it to ship. While soak tests
+sometimes fail because of a rarely-occurring bug, it&#8217;s usually
 creeping fragmentation or memory leakage that brings the game down.</p>
 </aside>
 
 <h3><a href="#the-best-of-both-worlds" name="the-best-of-both-worlds">The best of both worlds</a></h3>
 <p>Because of fragmentation, and because allocation may be slow, games are very
 careful about when and how they manage memory. A simple solution is
-often best: grab a big chunk of memory when the game starts and don&#x2019;t
+often best: grab a big chunk of memory when the game starts and don&#8217;t
 free it until the game ends. But this is a pain for systems where we
 need to create and destroy things while the game is running.</p>
 <p>An object pool gives us the best of both worlds: to the memory
-manager, we&#x2019;re just allocating one big hunk of memory up front and not
+manager, we&#8217;re just allocating one big hunk of memory up front and not
 freeing it while the game is playing. To the users of the pool, we
-can freely allocate and deallocate objects to our heart&#x2019;s content.</p>
+can freely allocate and deallocate objects to our heart&#8217;s content.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>Define a <strong>pool</strong> class that maintains a collection of <strong>reusable
 objects</strong>. Each object supports an <strong>&ldquo;in use&rdquo; query</strong> to
@@ -202,15 +202,15 @@ such as currently playing sounds. Use Object Pool when:</p>
 </ul>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <h3><a href="#the-pool-may-waste-memory-on-unneeded-objects" name="the-pool-may-waste-memory-on-unneeded-objects">The pool may waste memory on unneeded objects</a></h3>
-<p>The size of an object pool needs to be tuned for the game&#x2019;s needs.
-When tuning, it&#x2019;s usually obvious when the pool is too <em>small</em>
-(there&#x2019;s nothing like a crash to get your attention). But also take
-care that the pool isn&#x2019;t too <em>big</em>. A smaller pool frees up memory
+<p>The size of an object pool needs to be tuned for the game&#8217;s needs.
+When tuning, it&#8217;s usually obvious when the pool is too <em>small</em>
+(there&#8217;s nothing like a crash to get your attention). But also take
+care that the pool isn&#8217;t too <em>big</em>. A smaller pool frees up memory
 that could be used for other fun stuff.</p>
 <h3><a href="#only-a-fixed-number-of-objects-can-be-active-at-any-one-time" name="only-a-fixed-number-of-objects-can-be-active-at-any-one-time">Only a fixed number of objects can be active at any one time</a></h3>
 <p>In some ways this is a good thing. Partitioning memory into
 separate pools for different types of objects ensures that, for
-example, a huge sequence of explosions won&#x2019;t cause your particle
+example, a huge sequence of explosions won&#8217;t cause your particle
 system to eat <em>all</em> of the available memory, preventing something more
 critical like a new enemy from being created.</p>
 <p>Nonetheless, this also means being prepared for the possibility that
@@ -235,10 +235,10 @@ cases, consider having pool sizes tuned differently for each
 scenario.</p>
 </li>
 <li>
-<p><em>Just don&#x2019;t create the object.</em> This sounds harsh, but it makes
+<p><em>Just don&#8217;t create the object.</em> This sounds harsh, but it makes
     sense for cases like our particle system. If all particles are in
     use, the screen is probably full of flashing graphics. The user
-    won&#x2019;t notice if the next explosion isn&#x2019;t quite as impressive as
+    won&#8217;t notice if the next explosion isn&#8217;t quite as impressive as
     the ones currently going off.</p>
 </li>
 <li>
@@ -273,8 +273,8 @@ possible object. Otherwise, an unexpectedly large object will stomp
 over the next one and trash memory.</p>
 <p>At the same time, when your objects vary in size, you waste memory.
 Each slot needs to be big enough to accomodate the largest object. If
-objects are rarely that big, you&#x2019;re throwing away memory every time
-you put a smaller one in that slot. It&#x2019;s like going through airport
+objects are rarely that big, you&#8217;re throwing away memory every time
+you put a smaller one in that slot. It&#8217;s like going through airport
 security and using a huge carry-on-sized luggage tray just for your
 keys and wallet.</p>
 <p>When you find yourself burning a lot of memory this way, consider
@@ -288,12 +288,12 @@ When you ask it to allocate a block, it finds in an open slot in the
 pool of the appropriate size and allocates from that pool.</p>
 </aside>
 
-<h3><a href="#reused-objects-aren&#x2019;t-automatically-cleared" name="reused-objects-aren&#x2019;t-automatically-cleared">Reused objects aren&#x2019;t automatically cleared</a></h3>
+<h3><a href="#reused-objects-aren't-automatically-cleared" name="reused-objects-aren't-automatically-cleared">Reused objects aren&#8217;t automatically cleared</a></h3>
 <p>Most memory managers have a debug feature that will clear freshly
 allocated or freed memory to some obvious magic value like
 <code>0xdeadbeef</code>. This helps you find painful bugs caused by uninitialized
-variables or using memory after it&#x2019;s freed.</p>
-<p>Since our object pool isn&#x2019;t going through the memory manager any more
+variables or using memory after it&#8217;s freed.</p>
+<p>Since our object pool isn&#8217;t going through the memory manager any more
 when it reuses an object, we lose that safety net. Worse, the memory
 used for a &ldquo;new&rdquo; object previously held an object of the
 exact same type. This makes it nearly impossible to tell if you forgot
@@ -306,7 +306,7 @@ worth spending a bit of time adding a debug feature that <span name="clear">clea
 memory for an object slot when the object is reclaimed.</p>
 <aside name="clear">
 
-<p>I&#x2019;d be honored if you clear it to <code>0x1deadb0b</code>.</p>
+<p>I&#8217;d be honored if you clear it to <code>0x1deadb0b</code>.</p>
 </aside>
 
 <h3><a href="#unused-objects-will-remain-in-memory" name="unused-objects-will-remain-in-memory">Unused objects will remain in memory</a></h3>
@@ -316,7 +316,7 @@ with fragmentation for you. But pools are still useful there to avoid
 the cost of allocation and deallocation, especially on mobile
 devices with slower CPUs and simpler GC implementations.</p>
 <p>If you do use an object pool there, beware of a potential conflict. Since
-the pool doesn&#x2019;t actually deallocate objects when they&#x2019;re no longer
+the pool doesn&#8217;t actually deallocate objects when they&#8217;re no longer
 in use, they remain in memory. If they contain references to <em>other</em>
 objects, it will prevent the collector from reclaiming those too.
 To avoid this, when a pooled object is no longer in use, clear any
@@ -367,7 +367,7 @@ live state.</p>
 <p>Particles are animated over time using the unsurprisingly named
 <code>animate()</code> function, which should be called once per frame.</p>
 <p>The pool needs to know which particles are available for reuse. It
-gets this from the particle&#x2019;s <code>inUse()</code> function. It takes advantage
+gets this from the particle&#8217;s <code>inUse()</code> function. It takes advantage
 of the fact that particles have a limited lifetime, and uses the
 <code>_framesLeft</code> variable to discover which particles are in use without
 having to store a separate flag.</p>
@@ -418,17 +418,17 @@ parameter.</p>
 
 
 <p>We iterate through the pool looking for the first available particle.
-When we find it, we initialize it and we&#x2019;re done. Note that in this
-implementation, if there aren&#x2019;t any available particles, we simply
-don&#x2019;t create a new one.</p>
-<p>That&#x2019;s all there is to a simple particle system, aside from rendering
+When we find it, we initialize it and we&#8217;re done. Note that in this
+implementation, if there aren&#8217;t any available particles, we simply
+don&#8217;t create a new one.</p>
+<p>That&#8217;s all there is to a simple particle system, aside from rendering
 the particles, of course. We can now create a pool, and create some
 particles using it. The particles will automatically deactivate
 themselves when their lifetime has expired.</p>
 <p>This is good enough to ship a game, but keen eyes may have noticed
 that creating a new particle requires <span name="create">iterating</span> through (potentially)
 the entire collection until we find an open slot. If the pool is very
-large and mostly full, that can get slow. Let&#x2019;s see if we can improve
+large and mostly full, that can get slow. Let&#8217;s see if we can improve
 that without sacrificing any memory.</p>
 <aside name="create">
 
@@ -446,10 +446,10 @@ as many pointers as there are objects in the pool. It would be nice to
 fix our performance problems <em>without</em> giving up any memory.
 Conveniently, there is some memory already lying around we can use:
 the slots holding the unused objects.</p>
-<p>When a particle isn&#x2019;t in use, most of its state is irrelevant. Its
-position and velocity aren&#x2019;t being used. The only state it needs is
-the minimum required to tell if it&#x2019;s dead. For our example, that&#x2019;s the
-<code>_framesLeft</code> member. All those other bits, we can reuse. Here&#x2019;s a revised
+<p>When a particle isn&#8217;t in use, most of its state is irrelevant. Its
+position and velocity aren&#8217;t being used. The only state it needs is
+the minimum required to tell if it&#8217;s dead. For our example, that&#8217;s the
+<code>_framesLeft</code> member. All those other bits, we can reuse. Here&#8217;s a revised
 particle:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
@@ -478,28 +478,28 @@ particle:</p>
 </pre></div>
 
 
-<p>We&#x2019;ve gotten all of the member variables except for <code>framesLeft_</code> and
+<p>We&#8217;ve gotten all of the member variables except for <code>framesLeft_</code> and
 moved them into a <code>live</code> struct inside a <code>state_</code> <span name="union">union</span>. This struct
-holds the particle&#x2019;s state when it&#x2019;s in use. When the particle is
+holds the particle&#8217;s state when it&#8217;s in use. When the particle is
 available, the other case of the union, the <code>next</code> member, is used. It
 holds a pointer to the next available particle after this one.</p>
 <aside name="union">
 
-<p>Unions don&#x2019;t seem to be used that often these days, so the syntax may
-be unfamiliar to you. If you&#x2019;re on a game team, you&#x2019;ve probably got a
+<p>Unions don&#8217;t seem to be used that often these days, so the syntax may
+be unfamiliar to you. If you&#8217;re on a game team, you&#8217;ve probably got a
 &ldquo;memory guy&rdquo;, that beleaguered compatriot whose job it is
 to come up with a solution when the game has inevitably blown its
-memory budget. Ask him about unions. He&#x2019;ll know all about them and
+memory budget. Ask him about unions. He&#8217;ll know all about them and
 other fun bit-packing tricks.</p>
 </aside>
 
 <p>In this way, we use the memory from all of the <em>dead</em> particles to
 create a linked list that threads its way through them. We have our
-collection of pointers to available particles, we&#x2019;re just interleaving
+collection of pointers to available particles, we&#8217;re just interleaving
 it into the particles themselves.</p>
 <p>For this to work, we need to make sure these links are set up
 correctly and are maintained when particles are created and destroyed.
-And, of course, we need to keep track of the list&#x2019;s head:</p>
+And, of course, we need to keep track of the list&#8217;s head:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">ParticlePool</span>
 <span class="p">{</span>
   <span class="c1">// ...</span>
@@ -533,7 +533,7 @@ constructor sets that up:</p>
 available one:</p>
 <aside name="first">
 
-<p>O(1) complexity, baby! Now we&#x2019;re cooking!</p>
+<p>O(1) complexity, baby! Now we&#8217;re cooking!</p>
 </aside>
 
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticlePool</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">yVel</span><span class="p">,</span>
@@ -572,16 +572,16 @@ list:</p>
 <p>There you go, a nice little object pool with constant-time creation
 and deletion.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
-<p>As you&#x2019;ve seen, the simplest object pool implementation is almost
+<p>As you&#8217;ve seen, the simplest object pool implementation is almost
 trivial: create an array of objects and reinitialize them as needed.
 Production code is rarely that minimal. There are several ways to
 expand on that to make the pool more generic, safer to use, or easier
-to maintain. As you implement pools in your games, you&#x2019;ll need to
+to maintain. As you implement pools in your games, you&#8217;ll need to
 answer these questions:</p>
 <h3><a href="#are-objects-coupled-to-the-pool" name="are-objects-coupled-to-the-pool">Are objects coupled to the pool?</a></h3>
-<p>The first question you&#x2019;ll run into when writing an object pool is
+<p>The first question you&#8217;ll run into when writing an object pool is
 whether the objects themselves know they are in a pool. Most of
-the time they will, but you won&#x2019;t have that luxury when writing a
+the time they will, but you won&#8217;t have that luxury when writing a
 generic pool class that can hold arbitrary objects.</p>
 <ul>
 <li>
@@ -595,7 +595,7 @@ generic pool class that can hold arbitrary objects.</p>
 <li>
 <p><em>You can ensure that the objects can only be created by the pool.</em>
     In C++, a simple way to do this is to make the pool class a friend
-    of the object class, and then make the object&#x2019;s constructor
+    of the object class, and then make the object&#8217;s constructor
     private.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
@@ -615,7 +615,7 @@ generic pool class that can hold arbitrary objects.</p>
 
 
 <p>This relationship documents the intended way to use the class and
-ensures your users don&#x2019;t create objects that aren&#x2019;t tracked by the
+ensures your users don&#8217;t create objects that aren&#8217;t tracked by the
 pool.</p>
 </li>
 <li>
@@ -670,7 +670,7 @@ inside the pool class or outside.</p>
 <p><em>The pool can completely encapsulate its objects</em>. Depending on
     the other capabilities your objects need, you may be able to keep
     them completely internal to the pool. This makes sure that other
-    code doesn&#x2019;t maintain references to objects that could be
+    code doesn&#8217;t maintain references to objects that could be
     unexpectedly reused.</p>
 </li>
 <li>
@@ -708,7 +708,7 @@ inside the pool class or outside.</p>
 <p><strong>If outside code initializes the object:</strong></p>
 <ul>
 <li>
-<p><em>The pool&#x2019;s interface can be simpler.</em> Instead of offering
+<p><em>The pool&#8217;s interface can be simpler.</em> Instead of offering
     multiple functions to cover each way an object can be initialized,
     the pool can simply return a reference to the new object.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
@@ -748,7 +748,7 @@ the object exposes.</p>
 <p><em>Outside code may need to handle the failure to create a new
     object.</em> The previous example assumes that <code>create()</code> will always
     successfully return a pointer to an object. If the pool is full,
-    though, it may return <code>NULL</code> instead. To be safe, you&#x2019;ll need to
+    though, it may return <code>NULL</code> instead. To be safe, you&#8217;ll need to
     check for that before you try to initialize the object.</p>
 <div class="codehilite"><pre><span class="n">Particle</span> <span class="o">*</span><span class="n">particle</span> <span class="o">=</span> <span class="n">pool</span><span class="p">.</span><span class="n">create</span><span class="p">();</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">particle</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="n">particle</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
@@ -771,7 +771,7 @@ the object exposes.</p>
 <p>The objects in a pool get reused too, but only over time. &ldquo;Reuse&rdquo; in the
 context of an object pool means reclaiming the memory for an object
 <em>after</em> the original owner is done with it. With an object pool, there
-isn&#x2019;t any expectation that an object will be shared within its
+isn&#8217;t any expectation that an object will be shared within its
 lifetime.</p>
 </li>
 <li>

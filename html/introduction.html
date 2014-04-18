@@ -34,7 +34,7 @@
         <td width="30%" class="section-nav">
           <h2>Introduction</h2>
           <ul><li>
-<a href="#what&#x2019;s-in-store">What&#x2019;s in Store</a></li><li>
+<a href="#what's-in-store">What's in Store</a></li><li>
 <a href="#how-it-relates-to-design-patterns">How it Relates to Design Patterns</a></li><li>
 <a href="#how-to-read-this">How To Read This</a></li><li>
 <a href="#how-the-book-is-formatted">How the Book is Formatted</a></li><li>
@@ -104,7 +104,7 @@ classroom housing a couple of very beat up TRS-80s. Hoping to inspire
 us, a teacher found a printout of some simple BASIC programs for us
 to tinker with.</p>
 <p>The audiocasette drives on the computers were broken, so any time we
-wanted to run one of these programs we&#x2019;d have to carefully type it in
+wanted to run one of these programs we&#8217;d have to carefully type it in
 all over <span name="short">again</span>. This led us to prefer programs that were only a few
 lines long:</p>
 <div class="codehilite"><pre><span class="mi">10</span> <span class="n">PRINT</span> <span class="s">&quot;BOBBY IS RADICAL!!!&quot;</span>
@@ -117,9 +117,9 @@ lines long:</p>
 <p>This is learning the value of short, simple code the hard way.</p>
 </aside>
 
-<p>Even so, the process was fraught with peril. We didn&#x2019;t know <em>how</em> to
+<p>Even so, the process was fraught with peril. We didn&#8217;t know <em>how</em> to
 program, so a tiny syntax error was impenetrable to us. If the program
-didn&#x2019;t work, which was often, we started over from scratch.</p>
+didn&#8217;t work, which was often, we started over from scratch.</p>
 <p>At the back of the stack of pages was a real monster: a program that
 took up several dense pages of code. It took a while before we worked
 up the courage to even try it, but it was irresistable: the title
@@ -133,16 +133,16 @@ a game in itself.) But the die was cast&thinsp;&mdash;&thinsp;from here on out, 
 wanted to be a game programmer.</p>
 <p>When I was in my teens, my family got a Macintosh with QuickBASIC and
 later THINK C. I spent almost all of my <span name="snakes">summer vacations</span> hacking
-together game programs. Learning on my own was slow and painful. I&#x2019;d
+together game programs. Learning on my own was slow and painful. I&#8217;d
 get something up and running quickly&thinsp;&mdash;&thinsp;maybe a map screen, or a
 little puzzle&thinsp;&mdash;&thinsp;but as I added features it got harder and harder.
-Once I couldn&#x2019;t fit the entire program in my head anymore, it was
+Once I couldn&#8217;t fit the entire program in my head anymore, it was
 doomed.</p>
 <aside name="snakes">
 
 <p>A good chunk of my time was also spent catching snakes and turtles in
-the swamps of southern Louisiana. If it wasn&#x2019;t so blisteringly hot
-outside, there&#x2019;s a good chance this would be a herpetology book
+the swamps of southern Louisiana. If it wasn&#8217;t so blisteringly hot
+outside, there&#8217;s a good chance this would be a herpetology book
 instead of a programming one.</p>
 </aside>
 
@@ -153,38 +153,38 @@ C++,&rdquo; I started trying to find books about how to <em>organize</em>
 programs.</p>
 <p>Fast-forward several years and a <span name="friend">new friend</span> hands me a book: <em>Design
 Patterns: Elements of Reusable Object-Oriented Software</em>. Finally! The
-book I&#x2019;d been looking for since I was a teenager. I read it cover to
+book I&#8217;d been looking for since I was a teenager. I read it cover to
 cover in one sitting. I still struggled with my own programs, but it
 was such a relief to see that other people struggled too, and came up
 with solutions. I felt like I finally had a couple of <em>tools</em> to use
 instead of just my bare hands.</p>
 <aside name="friend">
 
-<p>This was the first time I&#x2019;d met a friend of my best friend, and five minutes after meeting him, I sat down on his couch and spent the next few hours completely ignoring him and reading. I&#x2019;d like to think my social skills have improved at least a little since then.</p>
+<p>This was the first time I&#8217;d met a friend of my best friend, and five minutes after meeting him, I sat down on his couch and spent the next few hours completely ignoring him and reading. I&#8217;d like to think my social skills have improved at least a little since then.</p>
 </aside>
 
 <p>In 2001, I landed my dream job: software engineer at Electronic Arts.
-I would be a real game programmer! I couldn&#x2019;t wait to get a look at
+I would be a real game programmer! I couldn&#8217;t wait to get a look at
 some real games and see how the pros put them together. How did they
 build an enormous game like Madden Football when it clearly was too
-big to fit in anyone&#x2019;s head? What was the architecture like? How did
+big to fit in anyone&#8217;s head? What was the architecture like? How did
 they decouple physics and rendering? How did the AI code interact with
 the animation? How did they abstract out audio to work across multiple
 platforms?</p>
 <p>Cracking open the source code was a humbling and surprising
 experience. There was so much brilliant code in graphics, AI,
 animation, and visual effects. We had people who knew how to squeeze
-every last cycle out of a CPU, and put it to good use. Stuff I didn&#x2019;t
+every last cycle out of a CPU, and put it to good use. Stuff I didn&#8217;t
 even know was <em>possible</em>, these people did before lunch.</p>
 <p>But the <em>architecture</em> that this brilliant code hung from was often an
-afterthought. They were so focused on <em>features</em> that there wasn&#x2019;t
+afterthought. They were so focused on <em>features</em> that there wasn&#8217;t
 much attention left for the code between the code. Coupling was rife
 between modules. New features were often bolted onto the codebase
 wherever they could be made to fit. To my disillusioned eyes it looked
 like many programmers, if they ever cracked open <em>Design Patterns</em> at
 all, never got past <a class="pattern"
 href="singleton.html">Singleton</a>.</p>
-<p>Of course, it wasn&#x2019;t really that bad. I&#x2019;d imagined game programmers
+<p>Of course, it wasn&#8217;t really that bad. I&#8217;d imagined game programmers
 sitting in some ivory tower covered in whiteboards, calmly discussing
 architectural minutia for weeks on end. The reality was that the code
 I was looking at was written by people working under intense
@@ -198,11 +198,11 @@ them. I watched coworkers struggle to reinvent good solutions when
 examples of exactly what they needed were nestled in the same codebase
 they were standing on.</p>
 <p>That problem is what this book aims to solve. I dug up and polished
-the best patterns I&#x2019;ve found in games and presented them here so that
+the best patterns I&#8217;ve found in games and presented them here so that
 we can spend our time inventing things instead of <em>re</em>-inventing them.</p>
-<h2><a href="#what&#x2019;s-in-store" name="what&#x2019;s-in-store">What&#x2019;s in Store</a></h2>
+<h2><a href="#what's-in-store" name="what's-in-store">What&#8217;s in Store</a></h2>
 <p>There are already dozens of game programming books out there. Why
-write another? I&#x2019;ll explain by analogy.</p>
+write another? I&#8217;ll explain by analogy.</p>
 <p>Imagine a game codebase as a house. Graphics and sound are the
 appliances and fixtures: a nice chandelier, kitchen sink, big picture
 windows. This is the kind of stuff you can find in other books. These
@@ -213,15 +213,15 @@ book is the joist and the arch, plumbing and wiring&thinsp;&mdash;&thinsp;techni
 that will let you build an elegant and maintainable structure out of a
 few simple parts. Use them to frame the house, then crack open those
 other books to build it out.</p>
-<p>It&#x2019;s easy to <span name="tragedy">underappreciate</span> this. After all, friends won&#x2019;t look at
+<p>It&#8217;s easy to <span name="tragedy">underappreciate</span> this. After all, friends won&#8217;t look at
 your home and say, &ldquo;Wow, nice wiring!&rdquo; But without it, I
 can guarantee they will notice when you flip the lightswitch and your
-beautiful chandelier doesn&#x2019;t turn on.</p>
+beautiful chandelier doesn&#8217;t turn on.</p>
 <aside name="tragedy">
 
 <p>This is the tragedy of software architecture: the better it is, the
-less it&#x2019;s noticed. All people will notice are the features that were
-enabled by it. As the Tao Te Ching says: <em>When the Sage&#x2019;s work is
+less it&#8217;s noticed. All people will notice are the features that were
+enabled by it. As the Tao Te Ching says: <em>When the Sage&#8217;s work is
 done, the people say, &ldquo;We did it all by ourselves!&rdquo;</em></p>
 </aside>
 
@@ -232,7 +232,7 @@ Reusable Object-Oriented Software</em> by Erich Gamma, Richard Helm, Ralph
 Johnson and John Vlissides (ominously called the &ldquo;Gang of
 Four&rdquo;).</p>
 <p>By calling this book &ldquo;Game Programming Patterns,&rdquo; I
-certainly don&#x2019;t intend to imply that the Gang of Four&#x2019;s book is
+certainly don&#8217;t intend to imply that the Gang of Four&#8217;s book is
 <span name="nongames">inapplicable</span> to games. On the contrary: Part Two of this book revisits
 many of the patterns first described in <em>Design Patterns</em>, but with an
 emphasis on how they can be applied to game programming.</p>
@@ -246,24 +246,24 @@ wellspring of good examples of their use.</p>
 
 <p>Instead of trying to refute <em>Design Patterns</em>, I look at this book as
 an <em>extension</em> of it. You can think of <em>Design Patterns</em> as <em>The Joy
-of Cooking</em>. Regardless of what course you&#x2019;re preparing, there will be
-a recipe in there for you. But if you&#x2019;ve decided to really focus on
+of Cooking</em>. Regardless of what course you&#8217;re preparing, there will be
+a recipe in there for you. But if you&#8217;ve decided to really focus on
 baking, a book dedicated to desserts and pastries can take things
 further.</p>
-<p>That&#x2019;s this book. Part Three, the largest part of the book, covers a
-set of new patterns that I&#x2019;ve found used frequently (and often
+<p>That&#8217;s this book. Part Three, the largest part of the book, covers a
+set of new patterns that I&#8217;ve found used frequently (and often
 exclusively) in games. Game software is different from other domains
 in many ways, and these patterns address those differences:</p>
 <ul>
 <li>
-<p>Time and sequencing are often a core part of a game&#x2019;s
+<p>Time and sequencing are often a core part of a game&#8217;s
     architecture. Things must happen in the right order, and at the
     right time.</p>
 </li>
 <li>
 <p>Development cycles are highly compressed and a number of
     programmers need to be able to rapidly build and iterate on a rich
-    set of different behavior without stepping on each others&#x2019; toes or
+    set of different behavior without stepping on each others&#8217; toes or
     leaving footprints all over the codebase.</p>
 </li>
 <li>
@@ -271,7 +271,7 @@ in many ways, and these patterns address those differences:</p>
     Monsters bite the hero, potions are mixed together, and bombs
     blast enemies and friends alike. Coordinating that kind of mass
     constant communication is rare outside of games. If you have two
-    documents open in your word processor, they don&#x2019;t talk to each
+    documents open in your word processor, they don&#8217;t talk to each
     other very often.</p>
 </li>
 <li>
@@ -284,9 +284,9 @@ in many ways, and these patterns address those differences:</p>
 </ul>
 <h2><a href="#how-to-read-this" name="how-to-read-this">How To Read This</a></h2>
 <p>This book is structured like a recipe book because it essentially <em>is</em>
-one. The chapter you&#x2019;re reading now introduces the book and explains
+one. The chapter you&#8217;re reading now introduces the book and explains
 how the rest of the material works. It tells you how to follow a
-recipe, prepare the ingredients, and make sure you don&#x2019;t leave the
+recipe, prepare the ingredients, and make sure you don&#8217;t leave the
 oven on.</p>
 <p>The next section revisits some of the patterns from <em>Design Patterns</em>
 that I feel are particularly relevant to game programming. It will
@@ -319,14 +319,14 @@ dough. This section provides the dough that the later sections will
 bake.</p>
 <p>The <strong>Pattern</strong> section distills the essence of the pattern out of the
 previous example. If you want a dry textbook description of the
-pattern, this is it. It&#x2019;s also a good refresher if you&#x2019;re familiar with a pattern already and want to make sure you don&#x2019;t forget an ingredient.</p>
+pattern, this is it. It&#8217;s also a good refresher if you&#8217;re familiar with a pattern already and want to make sure you don&#8217;t forget an ingredient.</p>
 <p>So far, the pattern has only been explained in terms of a single
 example. But how do you know if <em>your</em> problem is a good one to use
 the pattern on? The <strong>When to Use It</strong> section provides some
-guidelines on when the pattern is useful, and when it&#x2019;s best avoided.
+guidelines on when the pattern is useful, and when it&#8217;s best avoided.
 The <strong>Keep in Mind</strong> section points out implications that using the
 pattern has on your program.</p>
-<p>A pattern is a template for a solution. Each time you use it, you&#x2019;ll
+<p>A pattern is a template for a solution. Each time you use it, you&#8217;ll
 likely implement it differently. The next section, <strong>Design
 Decisions</strong>, covers the different ways you might render the abstract
 pattern into hard code.</p>
@@ -334,13 +334,13 @@ pattern into hard code.</p>
 The <strong>Sample Code</strong> remedies that by walking through an example
 implementation or two. If, like me, you need concrete examples to
 really <em>get</em> something, this is your section.</p>
-<p>To wrap it up, there&#x2019;s a short <strong>See Also</strong> section that shows how
+<p>To wrap it up, there&#8217;s a short <strong>See Also</strong> section that shows how
 this pattern relates to others both in this book and in <em>Design
 Patterns</em>. This will give you a clearer picture of how a pattern lives
 in the larger pattern ecosystem.</p>
 <h2><a href="#how-the-book-is-formatted" name="how-the-book-is-formatted">How the Book is Formatted</a></h2>
 <p>Each <span name="aside">pattern</span> has a set of parts&thinsp;&mdash;&thinsp;the ingredients in its recipe.
-Every implementation will include these parts, so it&#x2019;s important to
+Every implementation will include these parts, so it&#8217;s important to
 note them all. The first time one is mentioned, it will be in <strong>bold
 face</strong>.</p>
 <aside name="aside">
@@ -356,20 +356,20 @@ is defined, like <a class="pattern" href="object-pool.html">Object Pool</a>. Pat
 in <em>Design Patterns</em> will also be capitalized, but instead of a page
 number, will be shown like: <a class="gof-pattern" href="http://www.c2.com/cgi/wiki?DecoratorPattern">Decorator</a>.</p>
 <h2><a href="#about-the-sample-code" name="about-the-sample-code">About the Sample Code</a></h2>
-<p>Code samples in this book are in C++, but that isn&#x2019;t to imply that
+<p>Code samples in this book are in C++, but that isn&#8217;t to imply that
 these patterns are only useful in that language, or that C++ is a
 better language for them than others. Any OOP language will work fine.</p>
-<p>I chose C++ for a couple of reasons. Most importantly, it&#x2019;s currently
+<p>I chose C++ for a couple of reasons. Most importantly, it&#8217;s currently
 the most popular language for programming commercially shipped games.
 It is the <em>lingua franca</em> for this industry. Moreso, the C syntax that
 C++ is based on is also the basis for Java, C#, and many other
 languages. With a little bit of effort, a programmer using any of
 these languages should be able to understand the code samples here.</p>
 <p>The goal of this book is <em>not</em> to teach you C++. The samples here are
-kept as simple as possible and don&#x2019;t represent good C++ style or
+kept as simple as possible and don&#8217;t represent good C++ style or
 usage. Read the code samples for the idea being expressed, not the
 code expressing it.</p>
-<p>To avoid wasting space on code you&#x2019;ve already seen or that isn&#x2019;t
+<p>To avoid wasting space on code you&#8217;ve already seen or that isn&#8217;t
 relevant to the pattern, code will sometimes be omitted in examples.
 When this occurs, an ellipsis will be placed in the sample to show
 where the missing code goes.</p>
@@ -393,7 +393,7 @@ that process will continue after the ink dries on these pages.</p>
 <p>You are a core part of that process. As you develop your own patterns
 and refine (or refute!) the patterns in this one, you contribute to
 the software community. If you have suggestions, corrections, or other
-feedback about what&#x2019;s in here, please get in touch.</p>
+feedback about what&#8217;s in here, please get in touch.</p>
 <p class="footer">&copy; 2009-2014 Robert Nystrom</p>
 </div>
 </div>
