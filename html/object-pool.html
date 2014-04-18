@@ -150,7 +150,7 @@ heap to an unusable foam of open holes and filled-in crevices,
 ultimately hosing the game completely.</p>
 <aside name="soak">
 
-<p>Most console makers require games to pass &ldquo;soak tests&rdquo;
+<p>Most console makers require games to pass &#8220;soak tests&#8221;
 where they leave the game running in demo mode for several days. If
 the game crashes, they don&#8217;t allow it to ship. While soak tests
 sometimes fail because of a rarely-occurring bug, it&#8217;s usually
@@ -169,15 +169,15 @@ freeing it while the game is playing. To the users of the pool, we
 can freely allocate and deallocate objects to our heart&#8217;s content.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>Define a <strong>pool</strong> class that maintains a collection of <strong>reusable
-objects</strong>. Each object supports an <strong>&ldquo;in use&rdquo; query</strong> to
-tell if it is currently &ldquo;alive.&rdquo; When the pool is
+objects</strong>. Each object supports an <strong>&#8220;in use&#8221; query</strong> to
+tell if it is currently &#8220;alive.&#8221; When the pool is
 initialized, it creates the entire collection of objects up front
 (usually in a single contiguous allocation) and initializes them all
-to the &ldquo;not in use&rdquo; state.</p>
+to the &#8220;not in use&#8221; state.</p>
 <p>When you want a new object, ask the pool for one. It finds an
-available object, initializes it to &ldquo;in use&rdquo; and returns
+available object, initializes it to &#8220;in use&#8221; and returns
 it. When the object is no longer needed, it is set back to the
-&ldquo;not in use&rdquo; state. This way, objects can be freely
+&#8220;not in use&#8221; state. This way, objects can be freely
 created and destroyed without needing to allocate memory or other
 resources.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
@@ -219,11 +219,11 @@ are all in use. There are a couple of common strategies to handle
 this.</p>
 <ol>
 <li>
-<p><em>Prevent it outright.</em> This is the most common &ldquo;fix&rdquo;:
+<p><em>Prevent it outright.</em> This is the most common &#8220;fix&#8221;:
     tune the pool sizes so that they never overflow regardless of what
     the user does. For pools of important objects like enemies or
     gameplay items, this is often the right answer. There may be no
-    &ldquo;right&rdquo; way to handle the lack of a free slot to
+    &#8220;right&#8221; way to handle the lack of a free slot to
     create the big boss when the player reaches the end of the level,
     so the smart thing to do is make sure that never happens.</p>
 <p>The downside is that this can force you to sit on a lot of memory
@@ -295,7 +295,7 @@ allocated or freed memory to some obvious magic value like
 variables or using memory after it&#8217;s freed.</p>
 <p>Since our object pool isn&#8217;t going through the memory manager any more
 when it reuses an object, we lose that safety net. Worse, the memory
-used for a &ldquo;new&rdquo; object previously held an object of the
+used for a &#8220;new&#8221; object previously held an object of the
 exact same type. This makes it nearly impossible to tell if you forgot
 to initialize something when you created the new object: the memory
 where the object is stored may already contain <em>almost</em> correct data
@@ -361,8 +361,8 @@ how to use an object pool. First up is the little particle class:</p>
 </pre></div>
 
 
-<p>The default constructor initializes the particle to &ldquo;not in
-use.&rdquo; A later call to <code>init()</code> initializes the particle to a
+<p>The default constructor initializes the particle to &#8220;not in
+use.&#8221; A later call to <code>init()</code> initializes the particle to a
 live state.</p>
 <p>Particles are animated over time using the unsurprisingly named
 <code>animate()</code> function, which should be called once per frame.</p>
@@ -487,7 +487,7 @@ holds a pointer to the next available particle after this one.</p>
 
 <p>Unions don&#8217;t seem to be used that often these days, so the syntax may
 be unfamiliar to you. If you&#8217;re on a game team, you&#8217;ve probably got a
-&ldquo;memory guy&rdquo;, that beleaguered compatriot whose job it is
+&#8220;memory guy&#8221;, that beleaguered compatriot whose job it is
 to come up with a solution when the game has inevitably blown its
 memory budget. Ask him about unions. He&#8217;ll know all about them and
 other fun bit-packing tricks.</p>
@@ -588,8 +588,8 @@ generic pool class that can hold arbitrary objects.</p>
 <p><strong>If objects are coupled to the pool:</strong></p>
 <ul>
 <li>
-<p><em>The implementation is simpler.</em> You can simply put an &ldquo;in
-    use&rdquo; flag or function in your pooled object and be done with
+<p><em>The implementation is simpler.</em> You can simply put an &#8220;in
+    use&#8221; flag or function in your pooled object and be done with
     it.</p>
 </li>
 <li>
@@ -619,14 +619,14 @@ ensures your users don&#8217;t create objects that aren&#8217;t tracked by the
 pool.</p>
 </li>
 <li>
-<p><em>You may be able to avoid storing an explicit &ldquo;in use&rdquo;
+<p><em>You may be able to avoid storing an explicit &#8220;in use&#8221;
     flag.</em> Many objects already retain some state that could be used
     to tell whether it is alive or not. For example, a particle may be
     available for reuse if its current position is offscreen. If the
     object class knows it may be used in a pool, it can provide an
     <code>inUse()</code> method to query that state. This saves the pool from
-    having to burn some extra memory storing a bunch of &ldquo;in
-    use&rdquo; flags.</p>
+    having to burn some extra memory storing a bunch of &#8220;in
+    use&#8221; flags.</p>
 </li>
 </ul>
 </li>
@@ -639,7 +639,7 @@ pool.</p>
     generic reusable pool class.</p>
 </li>
 <li>
-<p><em>The &ldquo;in use&rdquo; state must be tracked outside the
+<p><em>The &#8220;in use&#8221; state must be tracked outside the
     objects.</em> The simplest way to do this is by creating a separate
     bit field.</p>
 <div class="codehilite"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TObject</span><span class="o">&gt;</span>
@@ -764,11 +764,11 @@ the object exposes.</p>
 <li>
 <p>This looks a lot like the <a class="gof-pattern"
     href="flyweight.html">Flyweight pattern</a>.
-    Both maintain a collection of reusable objects. The difference is what &ldquo;reuse&rdquo; means. Flyweight objects are reused by sharing the same instance between
+    Both maintain a collection of reusable objects. The difference is what &#8220;reuse&#8221; means. Flyweight objects are reused by sharing the same instance between
     multiple owners <em>simultaneously</em>. It avoids
     <em>duplicate</em> memory usage by using the same object in multiple
     contexts.</p>
-<p>The objects in a pool get reused too, but only over time. &ldquo;Reuse&rdquo; in the
+<p>The objects in a pool get reused too, but only over time. &#8220;Reuse&#8221; in the
 context of an object pool means reclaiming the memory for an object
 <em>after</em> the original owner is done with it. With an object pool, there
 isn&#8217;t any expectation that an object will be shared within its

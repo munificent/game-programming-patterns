@@ -102,7 +102,7 @@
 <h1>Type Object</h1>
 <h1 class="book"><a href="index.html">Game Programming Patterns</a><span class="section"><a href="behavioral-patterns.html">Behavioral Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
-<p><em>Allow the flexible creation of new &ldquo;classes&rdquo; by creating
+<p><em>Allow the flexible creation of new &#8220;classes&#8221; by creating
 a single class, each instance of which represents a different type of
 object.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
@@ -117,7 +117,7 @@ Monsters also have an attack string. When the monster attacks our
 hero, that text will be shown to the user somehow. (We don&#8217;t care how
 here.)</p>
 <p>The designers tell us that monsters come in a variety of different
-<em>breeds</em>, like &ldquo;dragon&rdquo; or &ldquo;troll.&rdquo; Each breed
+<em>breeds</em>, like &#8220;dragon&#8221; or &#8220;troll.&#8221; Each breed
 describes a <em>kind</em> of monster that exists in the game, and there can
 be multiple monsters of the same breed running around in the dungeon
 at the same time.</p>
@@ -235,11 +235,11 @@ simple. We have a bunch of different monsters in the game, and we want
 to share certain attributes between them. A horde of monsters are
 beating on the hero, and we want some of them to use the same text for
 their attack. We define that by saying that all of those monsters are
-the same &ldquo;breed,&rdquo; and that the breed determines the attack
+the same &#8220;breed,&#8221; and that the breed determines the attack
 string.</p>
 <p>We decided to implement this concept using inheritance, since it lines
 up with our intuition of classes: A dragon is a monster, and each
-dragon in the game is an instance of this dragon &ldquo;class.&rdquo;
+dragon in the game is an instance of this dragon &#8220;class.&#8221;
 Defining each breed as a subclass of an abstract base <code>Monster</code> class,
 and having each monster in the game be an instance of that derived
 breed class mirrors that. We end up with a class hierarchy like this:</p>
@@ -271,7 +271,7 @@ shared between all monsters of the same breed: starting health and the attack st
 <p>To associate monsters with breeds, we give each <code>Monster</code> instance a
 reference to a <code>Breed</code> object containing the information for that breed.
 To get the attack string, a monster just calls a method on its breed.
-The <code>Breed</code> class essentially defines a monster&#8217;s &ldquo;type.&rdquo;
+The <code>Breed</code> class essentially defines a monster&#8217;s &#8220;type.&#8221;
 Each breed instance is an <em>object</em> that represents a different
 conceptual <em>type</em>, hence the name of the pattern: Type Object.</p>
 <p>What&#8217;s especially powerful about this pattern is that now we can
@@ -298,7 +298,7 @@ like subclassing lets us do, but without having a fixed set of
 hard-coded subclasses.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>This pattern is useful anytime you need to define a variety of
-different &ldquo;kinds&rdquo; of things, but baking the kinds into
+different &#8220;kinds&#8221; of things, but baking the kinds into
 your language&#8217;s type system is too rigid. In particular, it&#8217;s useful
 when either of these are true:</p>
 <ul>
@@ -331,7 +331,7 @@ doing for us.</p>
 <aside name="vtable">
 
 <p>Under the hood, C++ virtual methods are implemented using something
-called a &ldquo;virtual function table&rdquo;, or just &ldquo;vtable.&rdquo; A vtable is a simple struct containing a set of
+called a &#8220;virtual function table&#8221;, or just &#8220;vtable.&#8221; A vtable is a simple struct containing a set of
 function pointers, one for each virtual method in a class. There is one vtable in memory for each class. Each instance of a class has a
 pointer to the vtable for its class.</p>
 <p>When you call a virtual function, the code first looks up the vtable
@@ -361,9 +361,9 @@ using this pattern becomes more challenging.</p>
 <p>There are a couple of ways we can get around this limitation. A simple
 solution is to have a fixed set of pre-defined behaviors, and then use
 data in the type object to simply <em>select</em> one of them. For example,
-let&#8217;s say our monster AI will always be either &ldquo;stand
-still&rdquo;, &ldquo;chase hero&rdquo;, or &ldquo;whimper and cower in
-fear&rdquo; (hey, they can&#8217;t all be mighty dragons). We can define
+let&#8217;s say our monster AI will always be either &#8220;stand
+still&#8221;, &#8220;chase hero&#8221;, or &#8220;whimper and cower in
+fear&#8221; (hey, they can&#8217;t all be mighty dragons). We can define
 <span name="fn">functions</span> to implement each of those behaviors. Then we can associate
 an AI algorithm with a breed by simply having it store a pointer to
 the appropriate function.</p>
@@ -397,7 +397,7 @@ and more sense.</p>
 
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>For our first pass at an implementation, let&#8217;s start simple and build
-the basic system described in the &ldquo;Motivation&rdquo; section.
+the basic system described in the &#8220;Motivation&#8221; section.
 We&#8217;ll start with the <code>Breed</code> class:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Breed</span>
 <span class="p">{</span>
@@ -465,7 +465,7 @@ responsible for giving us a new instance.</p>
 
 <aside name="pattern">
 
-<p>&ldquo;Pattern&rdquo; is the right word here. What we&#8217;re talking about
+<p>&#8220;Pattern&#8221; is the right word here. What we&#8217;re talking about
 is one of the classic patterns from Design Patterns: <a
 class="gof-pattern"
 href="http://c2.com/cgi/wiki?FactoryMethodPattern">Factory Method</a>.</p>
@@ -496,7 +496,7 @@ on the class object itself.</p>
 
 
 <p>The key <span name="friend">difference</span> is the <code>newMonster()</code> function in <code>Breed</code>. That&#8217;s our
-&ldquo;constructor&rdquo; factory method. With our original implementation, creating a monster looked like:</p>
+&#8220;constructor&#8221; factory method. With our original implementation, creating a monster looked like:</p>
 <aside name="friend">
 
 <p>There&#8217;s another minor difference here. Because the sample code is in C++, we can use a handy little feature: <em>friend classes.</em></p>
@@ -523,7 +523,7 @@ called. In games, we often want to control that aspect of object
 creation too: we&#8217;ll typically use things like custom allocators or the
 <a class="pattern" href="object-pool.html">Object Pool</a> pattern to
 control where in memory our objects end up.</p>
-<p>Defining a &ldquo;constructor&rdquo; function in <code>Breed</code> gives us a
+<p>Defining a &#8220;constructor&#8221; function in <code>Breed</code> gives us a
 place to put that logic. Instead of simply calling <code>new</code>, the
 <code>newMonster</code> function can pull the memory from a pool or
 custom heap before passing control off to <code>Monster</code> for initialization.
@@ -749,7 +749,7 @@ we wouldn&#8217;t have the opportunity to insert that logic.</p>
 </li>
 </ul>
 <h3><a href="#how-are-typed-objects-created" name="how-are-typed-objects-created">How are typed objects created?</a></h3>
-<p>With this pattern, each &ldquo;object&rdquo; is now a pair of objects:
+<p>With this pattern, each &#8220;object&#8221; is now a pair of objects:
 the main object and the type object it uses. So how do we create and
 bind the two together?</p>
 <ul>
@@ -764,7 +764,7 @@ bind the two together?</p>
 </ul>
 </li>
 <li>
-<p><strong>Call a &ldquo;constructor&rdquo; function on the type object:</strong></p>
+<p><strong>Call a &#8220;constructor&#8221; function on the type object:</strong></p>
 <ul>
 <li><em>The type object controls memory allocation.</em> This is the other
     side of the coin. If we <em>don&#8217;t</em> want users to choose where in
@@ -792,7 +792,7 @@ monster and change its breed to a zombie one.</p>
 <ul>
 <li>
 <p><em>It&#8217;s simpler both to code and to understand.</em> At a conceptual
-    level, &ldquo;type&rdquo; is something most people probably will
+    level, &#8220;type&#8221; is something most people probably will
     not expect to change. This codifies that assumption.</p>
 </li>
 <li>

@@ -125,7 +125,7 @@ method in hand. Singletons (in other words, making it global) were an easy way o
 <p>Ensure a class has one instance, and provide a global point of
 access to it.</p>
 </blockquote>
-<p>We&#8217;ll split that at &ldquo;and&rdquo; and consider each half
+<p>We&#8217;ll split that at &#8220;and&#8221; and consider each half
 separately.</p>
 <h3><a href="#restricting-a-class-to-one-instance" name="restricting-a-class-to-one-instance">Restricting a class to one instance</a></h3>
 <p>There are times when a class cannot perform correctly if there is more
@@ -346,7 +346,7 @@ learned is that global variables are bad, for a variety of reasons:</p>
 <aside name="pure">
 
 <p>Computer scientists call functions that don&#8217;t access or modify global
-state &ldquo;pure&rdquo; functions. Pure functions are easier to
+state &#8220;pure&#8221; functions. Pure functions are easier to
 reason about, easier for the compiler to optimize, and let you do neat
 things like memoization where you cache and reuse the results from
 previous calls to the function.</p>
@@ -407,7 +407,7 @@ problems that globals cause, you&#8217;ll notice that the Singleton pattern
 doesn&#8217;t solve any of them. That&#8217;s because a singleton <em>is</em> global
 state, just encapsulated in a class.</p>
 <h3><a href="#it-solves-two-problems-even-when-you-just-have-one" name="it-solves-two-problems-even-when-you-just-have-one">It solves two problems even when you just have one</a></h3>
-<p>The word &ldquo;and&rdquo; in the Gang of Four&#8217;s description of
+<p>The word &#8220;and&#8221; in the Gang of Four&#8217;s description of
 Singleton is a bit strange. Is this pattern a solution to one problem
 or two? What if we have only one of those? Ensuring a single instance
 is useful, but who says we want to let <em>everyone</em> poke at it?

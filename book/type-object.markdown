@@ -3,7 +3,7 @@
 
 ## Intent
 
-*Allow the flexible creation of new &ldquo;classes&rdquo; by creating
+*Allow the flexible creation of new "classes" by creating
 a single class, each instance of which represents a different type of
 object.*
 
@@ -22,7 +22,7 @@ hero, that text will be shown to the user somehow. (We don't care how
 here.)
 
 The designers tell us that monsters come in a variety of different
-*breeds*, like &ldquo;dragon&rdquo; or &ldquo;troll.&rdquo; Each breed
+*breeds*, like "dragon" or "troll." Each breed
 describes a *kind* of monster that exists in the game, and there can
 be multiple monsters of the same breed running around in the dungeon
 at the same time.
@@ -113,12 +113,12 @@ simple. We have a bunch of different monsters in the game, and we want
 to share certain attributes between them. A horde of monsters are
 beating on the hero, and we want some of them to use the same text for
 their attack. We define that by saying that all of those monsters are
-the same &ldquo;breed,&rdquo; and that the breed determines the attack
+the same "breed," and that the breed determines the attack
 string.
 
 We decided to implement this concept using inheritance, since it lines
 up with our intuition of classes: A dragon is a monster, and each
-dragon in the game is an instance of this dragon &ldquo;class.&rdquo;
+dragon in the game is an instance of this dragon "class."
 Defining each breed as a subclass of an abstract base `Monster` class,
 and having each monster in the game be an instance of that derived
 breed class mirrors that. We end up with a class hierarchy like this:
@@ -160,7 +160,7 @@ shared between all monsters of the same breed: starting health and the attack st
 To associate monsters with breeds, we give each `Monster` instance a
 reference to a `Breed` object containing the information for that breed.
 To get the attack string, a monster just calls a method on its breed.
-The `Breed` class essentially defines a monster's &ldquo;type.&rdquo;
+The `Breed` class essentially defines a monster's "type."
 Each breed instance is an *object* that represents a different
 conceptual *type*, hence the name of the pattern: Type Object.
 
@@ -194,7 +194,7 @@ hard-coded subclasses.
 ## When to Use It
 
 This pattern is useful anytime you need to define a variety of
-different &ldquo;kinds&rdquo; of things, but baking the kinds into
+different "kinds" of things, but baking the kinds into
 your language's type system is too rigid. In particular, it's useful
 when either of these are true:
 
@@ -229,7 +229,7 @@ doing for us.
 <aside name="vtable">
 
 Under the hood, C++ virtual methods are implemented using something
-called a &ldquo;virtual function table&rdquo;, or just &ldquo;vtable.&rdquo; A vtable is a simple struct containing a set of
+called a "virtual function table", or just "vtable." A vtable is a simple struct containing a set of
 function pointers, one for each virtual method in a class. There is one vtable in memory for each class. Each instance of a class has a
 pointer to the vtable for its class.
 
@@ -266,9 +266,9 @@ using this pattern becomes more challenging.
 There are a couple of ways we can get around this limitation. A simple
 solution is to have a fixed set of pre-defined behaviors, and then use
 data in the type object to simply *select* one of them. For example,
-let's say our monster AI will always be either &ldquo;stand
-still&rdquo;, &ldquo;chase hero&rdquo;, or &ldquo;whimper and cower in
-fear&rdquo; (hey, they can't all be mighty dragons). We can define
+let's say our monster AI will always be either "stand
+still", "chase hero", or "whimper and cower in
+fear" (hey, they can't all be mighty dragons). We can define
 <span name="fn">functions</span> to implement each of those behaviors. Then we can associate
 an AI algorithm with a breed by simply having it store a pointer to
 the appropriate function.
@@ -308,7 +308,7 @@ and more sense.
 ## Sample Code
 
 For our first pass at an implementation, let's start simple and build
-the basic system described in the &ldquo;Motivation&rdquo; section.
+the basic system described in the "Motivation" section.
 We'll start with the `Breed` class:
 
 ^code 3
@@ -342,7 +342,7 @@ We can apply this same <span name="pattern">pattern</span> to our type objects:
 
 <aside name="pattern">
 
-&ldquo;Pattern&rdquo; is the right word here. What we're talking about
+"Pattern" is the right word here. What we're talking about
 is one of the classic patterns from Design Patterns: <a
 class="gof-pattern"
 href="http://c2.com/cgi/wiki?FactoryMethodPattern">Factory Method</a>.
@@ -359,7 +359,7 @@ And the class that uses them:
 ^code 6
 
 The key <span name="friend">difference</span> is the `newMonster()` function in `Breed`. That's our
-&ldquo;constructor&rdquo; factory method. With our original implementation, creating a monster looked like:
+"constructor" factory method. With our original implementation, creating a monster looked like:
 
 <aside name="friend">
 
@@ -388,7 +388,7 @@ creation too: we'll typically use things like custom allocators or the
 <a class="pattern" href="object-pool.html">Object Pool</a> pattern to
 control where in memory our objects end up.
 
-Defining a &ldquo;constructor&rdquo; function in `Breed` gives us a
+Defining a "constructor" function in `Breed` gives us a
 place to put that logic. Instead of simply calling `new`, the
 `newMonster` function can pull the memory from a pool or
 custom heap before passing control off to `Monster` for initialization.
@@ -558,7 +558,7 @@ benefits with either choice.
 
 ### How are typed objects created?
 
-With this pattern, each &ldquo;object&rdquo; is now a pair of objects:
+With this pattern, each "object" is now a pair of objects:
 the main object and the type object it uses. So how do we create and
 bind the two together?
 
@@ -570,7 +570,7 @@ bind the two together?
         different memory scenarios (different allocators, on the stack,
         etc.) this gives us the flexibility to do that.
 
-*   **Call a &ldquo;constructor&rdquo; function on the type object:**
+*   **Call a "constructor" function on the type object:**
 
     *   *The type object controls memory allocation.* This is the other
         side of the coin. If we *don't* want users to choose where in
@@ -596,7 +596,7 @@ monster and change its breed to a zombie one.
 *   **If the type doesn't change:**
 
     *   *It's simpler both to code and to understand.* At a conceptual
-        level, &ldquo;type&rdquo; is something most people probably will
+        level, "type" is something most people probably will
         not expect to change. This codifies that assumption.
 
     *   *It's easier to debug.* If we're trying to track down a bug where

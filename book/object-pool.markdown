@@ -63,7 +63,7 @@ ultimately hosing the game completely.
 
 <aside name="soak">
 
-Most console makers require games to pass &ldquo;soak tests&rdquo;
+Most console makers require games to pass "soak tests"
 where they leave the game running in demo mode for several days. If
 the game crashes, they don't allow it to ship. While soak tests
 sometimes fail because of a rarely-occurring bug, it's usually
@@ -87,16 +87,16 @@ can freely allocate and deallocate objects to our heart's content.
 ## The Pattern
 
 Define a **pool** class that maintains a collection of **reusable
-objects**. Each object supports an **&ldquo;in use&rdquo; query** to
-tell if it is currently &ldquo;alive.&rdquo; When the pool is
+objects**. Each object supports an **"in use" query** to
+tell if it is currently "alive." When the pool is
 initialized, it creates the entire collection of objects up front
 (usually in a single contiguous allocation) and initializes them all
-to the &ldquo;not in use&rdquo; state.
+to the "not in use" state.
 
 When you want a new object, ask the pool for one. It finds an
-available object, initializes it to &ldquo;in use&rdquo; and returns
+available object, initializes it to "in use" and returns
 it. When the object is no longer needed, it is set back to the
-&ldquo;not in use&rdquo; state. This way, objects can be freely
+"not in use" state. This way, objects can be freely
 created and destroyed without needing to allocate memory or other
 resources.
 
@@ -139,11 +139,11 @@ your attempt to reuse an object from the pool will fail because they
 are all in use. There are a couple of common strategies to handle
 this.
 
-1.  *Prevent it outright.* This is the most common &ldquo;fix&rdquo;:
+1.  *Prevent it outright.* This is the most common "fix":
     tune the pool sizes so that they never overflow regardless of what
     the user does. For pools of important objects like enemies or
     gameplay items, this is often the right answer. There may be no
-    &ldquo;right&rdquo; way to handle the lack of a free slot to
+    "right" way to handle the lack of a free slot to
     create the big boss when the player reaches the end of the level,
     so the smart thing to do is make sure that never happens.
 
@@ -220,7 +220,7 @@ variables or using memory after it's freed.
 
 Since our object pool isn't going through the memory manager any more
 when it reuses an object, we lose that safety net. Worse, the memory
-used for a &ldquo;new&rdquo; object previously held an object of the
+used for a "new" object previously held an object of the
 exact same type. This makes it nearly impossible to tell if you forgot
 to initialize something when you created the new object: the memory
 where the object is stored may already contain *almost* correct data
@@ -264,8 +264,8 @@ how to use an object pool. First up is the little particle class:
 
 ^code 1
 
-The default constructor initializes the particle to &ldquo;not in
-use.&rdquo; A later call to `init()` initializes the particle to a
+The default constructor initializes the particle to "not in
+use." A later call to `init()` initializes the particle to a
 live state.
 
 Particles are animated over time using the unsurprisingly named
@@ -349,7 +349,7 @@ holds a pointer to the next available particle after this one.
 
 Unions don't seem to be used that often these days, so the syntax may
 be unfamiliar to you. If you're on a game team, you've probably got a
-&ldquo;memory guy&rdquo;, that beleaguered compatriot whose job it is
+"memory guy", that beleaguered compatriot whose job it is
 to come up with a solution when the game has inevitably blown its
 memory budget. Ask him about unions. He'll know all about them and
 other fun bit-packing tricks.
@@ -410,8 +410,8 @@ generic pool class that can hold arbitrary objects.
 
 * **If objects are coupled to the pool:**
 
-     *  *The implementation is simpler.* You can simply put an &ldquo;in
-        use&rdquo; flag or function in your pooled object and be done with
+     *  *The implementation is simpler.* You can simply put an "in
+        use" flag or function in your pooled object and be done with
         it.
 
      *  *You can ensure that the objects can only be created by the pool.*
@@ -425,14 +425,14 @@ generic pool class that can hold arbitrary objects.
         ensures your users don't create objects that aren't tracked by the
         pool.
 
-     *  *You may be able to avoid storing an explicit &ldquo;in use&rdquo;
+     *  *You may be able to avoid storing an explicit "in use"
         flag.* Many objects already retain some state that could be used
         to tell whether it is alive or not. For example, a particle may be
         available for reuse if its current position is offscreen. If the
         object class knows it may be used in a pool, it can provide an
         `inUse()` method to query that state. This saves the pool from
-        having to burn some extra memory storing a bunch of &ldquo;in
-        use&rdquo; flags.
+        having to burn some extra memory storing a bunch of "in
+        use" flags.
 
 * **If objects are not coupled to the pool:**
 
@@ -440,7 +440,7 @@ generic pool class that can hold arbitrary objects.
         decoupling objects from the pool, you may be able to implement a
         generic reusable pool class.
 
-     *  *The &ldquo;in use&rdquo; state must be tracked outside the
+     *  *The "in use" state must be tracked outside the
         objects.* The simplest way to do this is by creating a separate
         bit field.
 
@@ -492,12 +492,12 @@ inside the pool class or outside.
 
 *   This looks a lot like the <a class="gof-pattern"
     href="flyweight.html">Flyweight pattern</a>.
-    Both maintain a collection of reusable objects. The difference is what &ldquo;reuse&rdquo; means. Flyweight objects are reused by sharing the same instance between
+    Both maintain a collection of reusable objects. The difference is what "reuse" means. Flyweight objects are reused by sharing the same instance between
     multiple owners *simultaneously*. It avoids
     *duplicate* memory usage by using the same object in multiple
     contexts.
 
-    The objects in a pool get reused too, but only over time. &ldquo;Reuse&rdquo; in the
+    The objects in a pool get reused too, but only over time. "Reuse" in the
     context of an object pool means reclaiming the memory for an object
     *after* the original owner is done with it. With an object pool, there
     isn't any expectation that an object will be shared within its

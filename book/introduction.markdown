@@ -26,7 +26,7 @@ didn't work, which was often, we started over from scratch.
 At the back of the stack of pages was a real monster: a program that
 took up several dense pages of code. It took a while before we worked
 up the courage to even try it, but it was irresistable: the title
-above the listing was &ldquo;Tunnels and Trolls.&rdquo; We had no idea
+above the listing was "Tunnels and Trolls." We had no idea
 what it did, but it sounded like a game, and what could be cooler than
 a computer game that you programmed yourself?
 
@@ -55,8 +55,8 @@ instead of a programming one.
 
 At first, the challenge was just getting something on screen. Now it
 became figuring out how to write programs bigger than would fit in my
-head. Instead of just reading about &ldquo;How to Program in
-C++,&rdquo; I started trying to find books about how to *organize*
+head. Instead of just reading about "How to Program in
+C++," I started trying to find books about how to *organize*
 programs.
 
 Fast-forward several years and a <span name="friend">new friend</span> hands me a book: *Design
@@ -106,7 +106,7 @@ best they could, and as I gradually realized, their best was often
 very good. The more time I spent working on game code, the more bits
 and pieces of absolute brilliance I found hiding under the surface.
 
-Unfortunately, &ldquo;hiding&rdquo; was often a good description.
+Unfortunately, "hiding" was often a good description.
 There were gems buried in the code, but many people walked right over
 them. I watched coworkers struggle to reinvent good solutions when
 examples of exactly what they needed were nestled in the same codebase
@@ -132,7 +132,7 @@ few simple parts. Use them to frame the house, then crack open those
 other books to build it out.
 
 It's easy to <span name="tragedy">underappreciate</span> this. After all, friends won't look at
-your home and say, &ldquo;Wow, nice wiring!&rdquo; But without it, I
+your home and say, "Wow, nice wiring!" But without it, I
 can guarantee they will notice when you flip the lightswitch and your
 beautiful chandelier doesn't turn on.
 
@@ -141,19 +141,19 @@ beautiful chandelier doesn't turn on.
 This is the tragedy of software architecture: the better it is, the
 less it's noticed. All people will notice are the features that were
 enabled by it. As the Tao Te Ching says: *When the Sage's work is
-done, the people say, &ldquo;We did it all by ourselves!&rdquo;*
+done, the people say, "We did it all by ourselves!"*
 
 </aside>
 
 ## How it Relates to Design Patterns
 
-Any programming book with &ldquo;Patterns&rdquo; in its name clearly
+Any programming book with "Patterns" in its name clearly
 bears a relationship to the classic *Design Patterns: Elements of
 Reusable Object-Oriented Software* by Erich Gamma, Richard Helm, Ralph
-Johnson and John Vlissides (ominously called the &ldquo;Gang of
-Four&rdquo;).
+Johnson and John Vlissides (ominously called the "Gang of
+Four").
 
-By calling this book &ldquo;Game Programming Patterns,&rdquo; I
+By calling this book "Game Programming Patterns," I
 certainly don't intend to imply that the Gang of Four's book is
 <span name="nongames">inapplicable</span> to games. On the contrary: Part Two of this book revisits
 many of the patterns first described in *Design Patterns*, but with an
@@ -220,7 +220,7 @@ grouped into several themes. Each theme describes two opposing forces
 encountered when building a game. The patterns within that theme are
 tools you can use to find a balance between those forces.
 
-For example, the &ldquo;Communicating&rdquo; theme is for patterns
+For example, the "Communicating" theme is for patterns
 that enable parts of a game to communicate with each other. The
 primary force is that game objects *must* interact: bullets must
 collide with enemies, the hero must be able to play heroic sounds. The
