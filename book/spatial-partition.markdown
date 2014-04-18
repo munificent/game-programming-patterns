@@ -12,8 +12,8 @@ basic physics and tangibility of our world. This is why they can feel real despi
 
 One bit of fake reality that we'll focus on here is *location*. Game
 worlds have a sense of *space*, and objects are somewhere in that space.
-This manifests itself in a bunch of ways. The obvious one is physics--objects
-move, collide, and interact--but there are other examples. The audio engine may take into account where
+This manifests itself in a bunch of ways. The obvious one is physics -- objects
+move, collide, and interact -- but there are other examples. The audio engine may take into account where
 sound sources are relative to the player so that distant sounds are quieter. Online chat may be restricted to nearby players.
 
 This means your game engine often needs to answer to the question, "What objects are near this location?" If it has to answer this enough times each frame, it can start to be
@@ -149,7 +149,7 @@ Once all of the units are nestled in their cells, we can let them start hacking 
 
 ^code grid-melee
 
-It just walks each cell and then calls `handleCell` on it. As you can see, we really have partitioned the battlefield into little isolated skirmishes. Each cell then handles its combat like so:
+It walks each cell and then calls `handleCell` on it. As you can see, we really have partitioned the battlefield into little isolated skirmishes. Each cell then handles its combat like so:
 
 ^code handle-cell
 
@@ -177,11 +177,11 @@ Presumably, this gets called by the AI code for computer-controlled units and by
 
 ^code grid-move
 
-That's a mouthful of code, but it's pretty straightforward. The first bit checks to see if we've crossed a cell boundary at all. If not, we can just update the unit's position and we're done.
+That's a mouthful of code, but it's pretty straightforward. The first bit checks to see if we've crossed a cell boundary at all. If not, we can update the unit's position and we're done.
 
-If the unit *has* left its current cell, we remove it from that cell's linked list and then add it back to the grid. Just like with a new unit, that will then insert it in the linked list for its new cell.
+If the unit *has* left its current cell, we remove it from that cell's linked list and then add it back to the grid. Like with adding a new unit, that will insert the unit in the linked list for its new cell.
 
-This is why we're using a doubly-linked list: we can very quickly add and remove units from lists just by setting a few pointers. With lots of units moving around each frame, that can be important.
+This is why we're using a doubly-linked list: we can very quickly add and remove units from lists by setting a few pointers. With lots of units moving around each frame, that can be important.
 
 ### At arm's length
 
@@ -195,7 +195,7 @@ When range gets involved, there's a corner case we need to consider: units in di
 
 <img src="images/spatial-partition-adjacent.png" />
 
-Here, B is within A's attack radius even through their centerpoints are in different cells. To handle this, we will need to compare units not just in the same cell, but in neighboring cells too. To do this, first we'll split the inner loop out of `handleCell()`:
+Here, B is within A's attack radius even through their centerpoints are in different cells. To handle this, we will need to compare units not only in the same cell, but in neighboring cells too. To do this, first we'll split the inner loop out of `handleCell()`:
 
 ^code handle-unit
 
@@ -238,7 +238,7 @@ Our grid example partitioned space into a single flat set of cells. In contrast,
 
 <aside name="couple">
 
-They usually split it in two, four, or eight--nice round numbers to a programmer.
+They usually split it in two, four, or eight -- nice round numbers to a programmer.
 
 </aside>
 
@@ -260,21 +260,21 @@ They usually split it in two, four, or eight--nice round numbers to a programmer
 
     * *It handles empty space more efficiently.* Imagine in our earlier example if one whole side of the battlefield was empty. We'd have a large number of empty cells that we'd still have to allocate memory for and walk each frame.
 
-        Since hierarchical space partitions don't subdivide sparse regions, a large empty space will remain a single partition. Instead of lots of little partitions to walk, there is just a single big one.
+        Since hierarchical space partitions don't subdivide sparse regions, a large empty space will remain a single partition. Instead of lots of little partitions to walk, there is a single big one.
 
     * *It handles densely populated areas more efficiently.* This is the other side of the coin: if you have a bunch of objects all clumped together, a non-hierarchical partition can be ineffective. You'll end up with one partition that has so many objects in it that you may as well not be partitioning at all. A hierarchical partition will adaptively subdivide that into smaller partitions and get you back to having only a few objects to consider at a time.
 
 ### Does the partitioning depend on the set of objects?
 
-In our sample code, the grid spacing was fixed beforehand and we just slotted units into cells. Other partitioning schemes are adaptable: they pick partition boundaries based on the actual set of objects and where they are in the world.
+In our sample code, the grid spacing was fixed beforehand and we slotted units into cells. Other partitioning schemes are adaptable: they pick partition boundaries based on the actual set of objects and where they are in the world.
 
 The goal is have a *balanced* partitioning where each region has roughly the same number of objects in order to get the best performance. Consider in our grid example if all of the units were clustered in one corner of the battlefield. They'd all be in the same cell, and our code for finding attacks would regress right back to the original *O(n&sup2;)* problem that we're trying to solve.
 
 * **If the partitioning is object-independent:**
 
-    * *Objects can be added incrementally.* Adding an object just means finding the right partition and dropping it in, so you can do this one at a time without any performance issues.
+    * *Objects can be added incrementally.* Adding an object means finding the right partition and dropping it in, so you can do this one at a time without any performance issues.
 
-    * *Objects can be moved quickly.* With fixed partitions, moving a unit just means removing it from one and adding it to another. If the partition boundaries themselves change based on the set of objects, then moving one can cause a <span name="sort">boundary</span> to move, which can in turn cause lots of other objects to need to be moved to different partitions.
+    * *Objects can be moved quickly.* With fixed partitions, moving a unit means removing it from one and adding it to another. If the partition boundaries themselves change based on the set of objects, then moving one can cause a <span name="sort">boundary</span> to move, which can in turn cause lots of other objects to need to be moved to different partitions.
 
     <aside name="sort">
 
@@ -322,7 +322,7 @@ The goal is have a *balanced* partitioning where each region has roughly the sam
 
     <aside name="quad">
 
-    A quadtree partitions 2D space. Its 3D analogue is the *octree*: it takes a *volume* and partitions it into eight *cubes*. Aside from the obvious differences, it works just the same as its flatter sibling.
+    A quadtree partitions 2D space. Its 3D analogue is the *octree*: it takes a *volume* and partitions it into eight *cubes*. Aside from the obvious differences, it works the same as its flatter sibling.
 
     </aside>
 
@@ -344,7 +344,7 @@ You can treat your spatial partition as *the* place where the objects in your ga
 
 * **If there is another collection for the objects:**
 
-    * *Traversing all objects is faster.* If the objects in question are "live" and have some processing they need to do, you may find yourself frequently needing to visit every object regardless of its location. Imagine if, in our earlier example, most of the cells were empty. Having to walk the full grid of them just to find the non-empty ones can be a waste of time.
+    * *Traversing all objects is faster.* If the objects in question are "live" and have some processing they need to do, you may find yourself frequently needing to visit every object regardless of its location. Imagine if, in our earlier example, most of the cells were empty. Having to walk the full grid of cells to find the non-empty ones can be a waste of time.
 
         A second collection that just stores the objects gives you a way to walk all them directly. You have two data structures, one optimized for each use case.
 
