@@ -173,23 +173,23 @@
 <div class="codehilite"><pre><span class="c1">// Skeleton variables...</span>
 <span class="n">Entity</span> <span class="n">leftStatue</span><span class="p">;</span>
 <span class="n">Entity</span> <span class="n">rightStatue</span><span class="p">;</span>
-<span class="kt">int</span> <span class="n">leftStatueDelay</span> <span class="o">=</span> <span class="mi">90</span><span class="p">;</span>
-<span class="kt">int</span> <span class="n">rightStatueDelay</span> <span class="o">=</span> <span class="mi">80</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">leftStatueFrames</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">rightStatueFrames</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
 <span class="c1">// Main game loop:</span>
 <span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Skeleton code...</span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="n">leftStatueDelay</span><span class="o">--</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">leftStatueFrames</span> <span class="o">==</span> <span class="mi">90</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="n">leftStatueDelay</span> <span class="o">=</span> <span class="mi">90</span><span class="p">;</span>
+    <span class="n">leftStatueFrames</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="n">leftStatue</span><span class="p">.</span><span class="n">shootLightning</span><span class="p">();</span>
   <span class="p">}</span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="n">rightStatueDelay</span><span class="o">--</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">rightStatueFrames</span> <span class="o">==</span> <span class="mi">80</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="n">rightStatueDelay</span> <span class="o">=</span> <span class="mi">80</span><span class="p">;</span>
+    <span class="n">rightStatueFrames</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="n">rightStatue</span><span class="p">.</span><span class="n">shootLightning</span><span class="p">();</span>
   <span class="p">}</span>
 
@@ -425,12 +425,12 @@
 
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">()</span>
   <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">frames_</span><span class="o">--</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">frames_</span> <span class="o">==</span> <span class="n">delay_</span><span class="p">)</span>
     <span class="p">{</span>
       <span class="n">shootLightning</span><span class="p">();</span>
 
       <span class="c1">// Reset the timer.</span>
-      <span class="n">frames_</span> <span class="o">=</span> <span class="n">delay_</span><span class="p">;</span>
+      <span class="n">frames_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
 

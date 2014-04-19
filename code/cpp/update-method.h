@@ -77,23 +77,23 @@ namespace UpdateMethod
       // Skeleton variables...
       Entity leftStatue;
       Entity rightStatue;
-      int leftStatueDelay = 90;
-      int rightStatueDelay = 80;
+      int leftStatueFrames = 0;
+      int rightStatueFrames = 0;
 
       // Main game loop:
       while (true)
       {
         // Skeleton code...
 
-        if (leftStatueDelay-- == 0)
+        if (++leftStatueFrames == 90)
         {
-          leftStatueDelay = 90;
+          leftStatueFrames = 0;
           leftStatue.shootLightning();
         }
 
-        if (rightStatueDelay-- == 0)
+        if (++rightStatueFrames == 80)
         {
-          rightStatueDelay = 80;
+          rightStatueFrames = 0;
           rightStatue.shootLightning();
         }
 
@@ -238,12 +238,12 @@ namespace UpdateMethod
 
       virtual void update()
       {
-        if (frames_-- == 0)
+        if (++frames_ == delay_)
         {
           shootLightning();
           
           // Reset the timer.
-          frames_ = delay_;
+          frames_ = 0;
         }
       }
 
