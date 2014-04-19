@@ -570,7 +570,7 @@ With this, access to the service is restricted to classes that inherit
         allowing the entire codebase to have access to the same
         service, we can avoid random places in code instantiating
         their own providers because they can't get to the
-        &ldquo;real&rdquo; one.
+        "real" one.
 
     *   *We lose control over where and when the service is used.*
         This is the obvious cost of making something global: anything

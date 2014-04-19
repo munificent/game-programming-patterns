@@ -3,6 +3,12 @@ $(document).ready(function() {
 
   $(".nav").click(function() {
     $(".nav").toggleClass("expanded");
+    $(".scrim").toggleClass("expanded");
+  });
+
+  $(".scrim").click(function() {
+    $(".nav").removeClass("expanded");
+    $(".scrim").removeClass("expanded");
   });
 
   // Since we may not have the height correct for the images, adjust the asides

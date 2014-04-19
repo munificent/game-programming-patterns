@@ -147,10 +147,10 @@ the rendering code without running into the
 
 <aside name="diamond">
 
-The &ldquo;Deadly Diamond&rdquo; occurs in class hierarchies with
+The "Deadly Diamond" occurs in class hierarchies with
 multiple inheritance where there are two different paths to the same
 base class. The pain that causes is a bit out of the scope of this
-book, but just understand that they named it &ldquo;deadly&rdquo; for
+book, but just understand that they named it "deadly" for
 a reason.
 
 </aside>
@@ -195,18 +195,18 @@ shell for these components.
 
 <aside name="component">
 
-&ldquo;Component&rdquo;, like &ldquo;Object&rdquo;, is one of those
+"Component", like "Object", is one of those
 words that means everything and nothing in programming. Because of
 that, it's been used to describe a few concepts. In business software,
-there's a &ldquo;Component&rdquo; design pattern that describes
+there's a "Component" design pattern that describes
 decoupled services that communicate over the web.
 
 I tried to find a different name for this unrelated pattern found in
-games, but &ldquo;Component&rdquo; seems to be the most common term
+games, but "Component" seems to be the most common term
 for it. Since design patterns are about documenting existing
 practices, I don't have the luxury of coining a new term. So,
 following in the footsteps of XNA, Delta3D, and others,
-&ldquo;Component&rdquo; it is.
+"Component" it is.
 
 </aside>
 
@@ -228,7 +228,7 @@ This pattern can be put to good use when any of these is true:
 ## Keep in Mind
 
 This pattern adds a good bit of complexity over simply making a class
-and putting code in it. Each conceptual &ldquo;object&rdquo; becomes a
+and putting code in it. Each conceptual "object" becomes a
 cluster of objects that must be instantiated, initialized, and
 correctly wired together. Communication between the different
 components becomes more challenging, and controlling how they occupy
@@ -236,7 +236,7 @@ memory is more complex.
 
 For a large codebase, this complexity may be worth it for the
 decoupling and code reuse it enables, but take care to ensure you
-aren't over-engineering a &ldquo;solution&rdquo; to a non-existent
+aren't over-engineering a "solution" to a non-existent
 problem before applying this pattern.
 
 Another consequence of using components is that you often have to hop
@@ -282,13 +282,13 @@ To get a clearer picture of how this pattern is applied, we'll start by showing 
 I should point out that using the actual name of the character in the
 codebase is usually a bad idea. The marketing department has an
 annoying habit of demanding name changes days before you ship.
-&ldquo;Focus tests show males between 11 and 15 respond negatively to
-&lsquo;Bjørn&rsquo;. Use &lsquo;Sven&rsquo; instead.&rdquo;
+"Focus tests show males between 11 and 15 respond negatively to
+&lsquo;Bjørn&rsquo;. Use &lsquo;Sven&rsquo; instead."
 
 This is why many software projects use internal-only codenames. Well,
 that and because it's more fun to tell people you're working on
-&ldquo;Big Electric Cat&rdquo; than just &ldquo;the next version of
-Photoshop.&rdquo;
+"Big Electric Cat" than just "the next version of
+Photoshop."
 
 </aside>
 
@@ -355,7 +355,7 @@ The `Bjorn` class now basically does two things: it holds the set of
 components that actually define it, and it holds the state that is
 shared across multiple domains. Position and velocity are still in the
 core `Bjorn` class for two reasons. First, they are
-&ldquo;pan-domain&rdquo; state: almost every component will make use
+"pan-domain" state: almost every component will make use
 of them, so it isn't clear which component *should* own them if we did
 want to push them down.
 
@@ -395,7 +395,7 @@ This instance can be any concrete type that implements our abstract
 a virtual method call, which is a little slower. What do we get in
 return for this cost?
 
-Most consoles require a game to support &ldquo;demo mode.&rdquo; If
+Most consoles require a game to support "demo mode." If
 the player sits at the main menu without doing anything, the game will
 start playing automatically, with the computer standing in for the
 player. This keeps the game from burning the main menu into your TV,
@@ -429,9 +429,9 @@ That, and coffee. Sweet, steaming hot coffee.
 ### No Bjørn at all?
 
 If you look at our `Bjorn` class now, you'll notice there's nothing
-really &ldquo;Bjørn&rdquo; about it -- it's just a
+really "Bjørn" about it -- it's just a
 component bag. In fact, it looks like a pretty good candidate for a
-base &ldquo;game object&rdquo; class that we can use for *every*
+base "game object" class that we can use for *every*
 object in the game. All we need to do is pass in *all* the components,
 and we can build any kind of object just by picking and choosing parts
 like Dr. Frankenstein.
@@ -481,7 +481,7 @@ objects our game needs.
 ## Design Decisions
 
 The most important design question you'll need to answer with this
-pattern is &ldquo;What set of components do I need?&rdquo; The answer
+pattern is "What set of components do I need?" The answer
 there is going to depend on the needs and genre of your game. The
 bigger and more complex your engine is, the more finely you'll likely
 want to slice your components.
@@ -529,7 +529,7 @@ components are part of the *same* object implies that they are part of
 a larger whole and need to coordinate. That means communication.
 
 So how can the components talk to each other? There are a couple of
-options, but unlike most design &ldquo;alternatives&rdquo; in this
+options, but unlike most design "alternatives" in this
 book, these aren't exclusive: you will likely support more than one at
 the same time in your designs.
 
@@ -676,7 +676,7 @@ animation and rendering, user input and AI, physics and collision. If
 you have separate components for each half of those pairs, you may
 find it easiest to just let them know directly about their other half.
 
-Messaging is useful for &ldquo;less important&rdquo; communication.
+Messaging is useful for "less important" communication.
 Its fire-and-forget nature is a good fit for things like having an
 audio component play a sound when a physics component sends a message
 that the object has collided with something.
@@ -706,7 +706,7 @@ communication paths if you need them.
     pattern. Both patterns are about taking part of an object's
     behavior and delegating it to a separate subordinate object. The
     difference is that with the strategy pattern, the separate
-    &ldquo;strategy&rdquo; object is usually stateless -- it
+    "strategy" object is usually stateless -- it
     encapsulates an algorithm but no data. It defines *how* an object
     behaves but not *what* it is.
 

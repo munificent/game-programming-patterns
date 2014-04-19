@@ -4,7 +4,7 @@
 - ### And smaller are sentence caps
 - Use "Naïve" instead of "Naive".
 - Use smart quotes.
-- No spaces around &mdash;.
+- Use " -- " for em dashes.
 - Prefer present tense instead of future.
 - Prefer "we" over "you" or "I".
 - Use *O(n&sup2;)* for Big-O notation, not `O(n^2)`.

@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -21,6 +21,7 @@
 </script>
 </head>
 <body id="top">
+<div class="scrim"></div>
 <div class="nav">
   <div class="bar">
     <div class="column">
@@ -100,10 +101,10 @@
 <h1>Flyweight</h1>
 <h1 class="book"><a href="index.html">Game Programming Patterns</a><span class="section"><a href="design-patterns-revisited.html">Design Patterns Revisited</a></span></h1>
 <p>The fog lifts, revealing a majestic old growth forest. Ancient hemlocks, countless in number, tower over you forming a cathedral of greenery. The stained glass canopy of leaves fragments the sunlight into golden shafts of mist. Between giant trunks, you can make out the massive forest receding into the distance.</p>
-<p>This is the kind of otherworldly setting we dream of as game developers, and scenes like these are often enabled by a pattern whose name couldn&#x2019;t possibly be more modest: the humble Flyweight.</p>
+<p>This is the kind of otherworldly setting we dream of as game developers, and scenes like these are often enabled by a pattern whose name couldn&#8217;t possibly be more modest: the humble Flyweight.</p>
 <h2><a href="#forest-for-the-trees" name="forest-for-the-trees">Forest for the Trees</a></h2>
-<p>I can describe a sprawling woodland with just a few sentences, but actually <em>implementing</em> it in a realtime game is another story. When you&#x2019;ve got an entire forest of individual trees filling the screen, all a graphics programmer sees is the millions of polygons they&#x2019;ll have to somehow shovel onto the GPU every sixtieth of a second.</p>
-<p>We&#x2019;re talking thousands of trees, each with detailed geometry containing thousands of polygons. Even if you have enough <em>memory</em> to describe that forest, in order to render it, that data has to make its way over the bus from the CPU to the GPU.</p>
+<p>I can describe a sprawling woodland with just a few sentences, but actually <em>implementing</em> it in a realtime game is another story. When you&#8217;ve got an entire forest of individual trees filling the screen, all a graphics programmer sees is the millions of polygons they&#8217;ll have to somehow shovel onto the GPU every sixtieth of a second.</p>
+<p>We&#8217;re talking thousands of trees, each with detailed geometry containing thousands of polygons. Even if you have enough <em>memory</em> to describe that forest, in order to render it, that data has to make its way over the bus from the CPU to the GPU.</p>
 <p>Each tree has a bunch of data associated with it:</p>
 <ul>
 <li>A mesh of polygons that define the shape of the trunk, branches, and greenery.</li>
@@ -111,7 +112,7 @@
 <li>Its location and orientation in the forest.</li>
 <li>Tuning parameters like size and tint so that each tree looks different.</li>
 </ul>
-<p>If you were to sketch it out in code, you&#x2019;d have something like this:</p>
+<p>If you were to sketch it out in code, you&#8217;d have something like this:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Tree</span>
 <span class="p">{</span>
 <span class="nl">private:</span>
@@ -127,11 +128,11 @@
 </pre></div>
 
 
-<p>That&#x2019;s a lot of data and the mesh and textures are particularly large. An entire forest of these objects is too much to throw at the GPU in one frame. Fortunately, there&#x2019;s a time-honored trick to handling this.</p>
+<p>That&#8217;s a lot of data and the mesh and textures are particularly large. An entire forest of these objects is too much to throw at the GPU in one frame. Fortunately, there&#8217;s a time-honored trick to handling this.</p>
 <p>The key observation is that even though there may be thousands of trees in the forest, they mostly look similar. They will likely all use the <span name="same">same</span> mesh and textures. That means most of the fields in these objects are the <em>same</em> between all of those instances.</p>
 <aside name="same">
 
-<p>You&#x2019;d have to be crazy or a billionaire to budget for the artists to individually model each tree in an entire forest.</p>
+<p>You&#8217;d have to be crazy or a billionaire to budget for the artists to individually model each tree in an entire forest.</p>
 </aside>
 
 <p><span name="trees"></span></p>
@@ -152,7 +153,7 @@
 </pre></div>
 
 
-<p>The game only needs a single one of these, since there&#x2019;s no reason to have the same meshes and textures in memory a thousand times. Then, each <em>instance</em> of a tree in the world has a <em>reference</em> to that shared <code>TreeModel</code>. What remains in <code>Tree</code> is the state that is instance-specific:</p>
+<p>The game only needs a single one of these, since there&#8217;s no reason to have the same meshes and textures in memory a thousand times. Then, each <em>instance</em> of a tree in the world has a <em>reference</em> to that shared <code>TreeModel</code>. What remains in <code>Tree</code> is the state that is instance-specific:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Tree</span>
 <span class="p">{</span>
 <span class="nl">private:</span>
@@ -171,36 +172,36 @@
 <p><img src="images/flyweight-tree-model.png" /></p>
 <aside name="type">
 
-<p>This looks a lot like the <a href="type-object.html" class="pattern">Type Object</a> pattern. Both involve delegating part of an object&#x2019;s state to some other object shared between a number of instances. However, the intent behind the patterns differs.</p>
-<p>With a Type Object, the goal is to minimize the number of classes you have to define by lifting "types" into your own object model. Any memory sharing you get from that is just bonus. The Flyweight pattern is purely about efficiency.</p>
+<p>This looks a lot like the <a href="type-object.html" class="pattern">Type Object</a> pattern. Both involve delegating part of an object&#8217;s state to some other object shared between a number of instances. However, the intent behind the patterns differs.</p>
+<p>With a Type Object, the goal is to minimize the number of classes you have to define by lifting &#8220;types&#8221; into your own object model. Any memory sharing you get from that is just bonus. The Flyweight pattern is purely about efficiency.</p>
 </aside>
 
-<p>This is all well and good for storing stuff in main memory, but that doesn&#x2019;t help rendering. Before the forest gets on screen, it has to work its way over to the GPU&#x2019;s memory. We need to express this resource sharing in a way that the graphics card understands.</p>
+<p>This is all well and good for storing stuff in main memory, but that doesn&#8217;t help rendering. Before the forest gets on screen, it has to work its way over to the GPU&#8217;s memory. We need to express this resource sharing in a way that the graphics card understands.</p>
 <h2><a href="#a-thousand-instances" name="a-thousand-instances">A Thousand Instances</a></h2>
-<p>To minimize the amount of data we have to push to the GPU, we want to be able to send the shared data&thinsp;&mdash;&thinsp;the <code>TreeModel</code>&thinsp;&mdash;&thinsp;just <em>once</em>. Then, separately, we push over every tree instance&#x2019;s unique data&thinsp;&mdash;&thinsp;its position, color, and scale. Then we tell the GPU, "use that one model to render each of these instances."</p>
-<p>Fortunately, today&#x2019;s graphics APIs and <span name="hardware">cards</span> support exactly that. The details are fiddly, and out of the scope of this book, but both Direct3D and OpenGL have support for <a href="http://en.wikipedia.org/wiki/Geometry_instancing"><em>instanced rendering</em></a>.</p>
-<p>In both APIs, you provide two streams of data. The first is the blob of common data that will be rendered multiple times&thinsp;&mdash;&thinsp;the mesh and textures in our arboreal example. The second is the list of instances and their parameters that will be used to vary that first chunk of data each time it&#x2019;s drawn. With a single draw call, an entire forest appears.</p>
+<p>To minimize the amount of data we have to push to the GPU, we want to be able to send the shared data&thinsp;&mdash;&thinsp;the <code>TreeModel</code>&thinsp;&mdash;&thinsp;just <em>once</em>. Then, separately, we push over every tree instance&#8217;s unique data&thinsp;&mdash;&thinsp;its position, color, and scale. Then we tell the GPU, &#8220;use that one model to render each of these instances.&#8221;</p>
+<p>Fortunately, today&#8217;s graphics APIs and <span name="hardware">cards</span> support exactly that. The details are fiddly, and out of the scope of this book, but both Direct3D and OpenGL have support for <a href="http://en.wikipedia.org/wiki/Geometry_instancing"><em>instanced rendering</em></a>.</p>
+<p>In both APIs, you provide two streams of data. The first is the blob of common data that will be rendered multiple times&thinsp;&mdash;&thinsp;the mesh and textures in our arboreal example. The second is the list of instances and their parameters that will be used to vary that first chunk of data each time it&#8217;s drawn. With a single draw call, an entire forest appears.</p>
 <aside name="hardware">
 
 <p>This graphics card API means that the Flyweight pattern may be the only Gang of Four design pattern to have actual hardware support.</p>
 </aside>
 
 <h2><a href="#the-flyweight-pattern" name="the-flyweight-pattern">The Flyweight Pattern</a></h2>
-<p>Now that we&#x2019;ve got one concrete example under our belts, I can walk you through the general pattern. Flyweight, like its name implies, comes into play when you have objects that need to be more lightweight, generally because you have too many of them.</p>
-<p>With instanced rendering, it&#x2019;s not so much that they take up too much memory as it is they take too much <em>time</em> to push each separate tree over the bus to the GPU, but the basic idea is the same.</p>
-<p>The pattern solves that by separating out an object&#x2019;s data into two kinds: The first kind of data is the stuff that&#x2019;s not specific to a single <em>instance</em> of that object and can be shared across all of them. The Gang of Four calls this the <em>intrinsic</em> state, but I like to think of it as the "context-free" stuff. In the example here, this is the geometry and textures for the tree.</p>
-<p>The rest of the data is the <em>extrinsic</em> state, the stuff that is unique to that instance. In this case, that is each tree&#x2019;s position, scale, and color. Just like in the chunk of sample code up there, this pattern saves memory by sharing one copy of the intrinsic state across every place where an object appears.</p>
-<p>From what we&#x2019;ve seen so far, this just seems like basic resource sharing, and hardly worth being called a pattern. That&#x2019;s partially because in this example here, we could come up with a clear separate <em>identity</em> for the shared state: the <code>TreeModel</code>.</p>
-<p>I find this pattern to be less obvious (and thus more clever) when used in cases where there isn&#x2019;t a real well-defined identity for the shared object. In those cases, it feels more like an object is magically in multiple places at the same time. Let me show you another example.</p>
+<p>Now that we&#8217;ve got one concrete example under our belts, I can walk you through the general pattern. Flyweight, like its name implies, comes into play when you have objects that need to be more lightweight, generally because you have too many of them.</p>
+<p>With instanced rendering, it&#8217;s not so much that they take up too much memory as it is they take too much <em>time</em> to push each separate tree over the bus to the GPU, but the basic idea is the same.</p>
+<p>The pattern solves that by separating out an object&#8217;s data into two kinds: The first kind of data is the stuff that&#8217;s not specific to a single <em>instance</em> of that object and can be shared across all of them. The Gang of Four calls this the <em>intrinsic</em> state, but I like to think of it as the &#8220;context-free&#8221; stuff. In the example here, this is the geometry and textures for the tree.</p>
+<p>The rest of the data is the <em>extrinsic</em> state, the stuff that is unique to that instance. In this case, that is each tree&#8217;s position, scale, and color. Just like in the chunk of sample code up there, this pattern saves memory by sharing one copy of the intrinsic state across every place where an object appears.</p>
+<p>From what we&#8217;ve seen so far, this just seems like basic resource sharing, and hardly worth being called a pattern. That&#8217;s partially because in this example here, we could come up with a clear separate <em>identity</em> for the shared state: the <code>TreeModel</code>.</p>
+<p>I find this pattern to be less obvious (and thus more clever) when used in cases where there isn&#8217;t a real well-defined identity for the shared object. In those cases, it feels more like an object is magically in multiple places at the same time. Let me show you another example.</p>
 <h2><a href="#a-place-to-put-down-roots" name="a-place-to-put-down-roots">A Place To Put Down Roots</a></h2>
-<p>The ground these trees are growing on needs to be represented in our game too. There can be patches of grass, dirt, hills, lakes, rivers, and whatever other terrain you can dream up. We&#x2019;ll make the ground <em>tile-based</em>: the surface of the world is a huge grid of tiny tiles. Each tile is covered in one kind of terrain.</p>
+<p>The ground these trees are growing on needs to be represented in our game too. There can be patches of grass, dirt, hills, lakes, rivers, and whatever other terrain you can dream up. We&#8217;ll make the ground <em>tile-based</em>: the surface of the world is a huge grid of tiny tiles. Each tile is covered in one kind of terrain.</p>
 <p>Each terrain type has a number of properties that affect gameplay:</p>
 <ul>
 <li>A movement cost that determines how quickly players can move through it.</li>
-<li>A flag for whether it&#x2019;s a watery terrain that can be crossed by boats.</li>
+<li>A flag for whether it&#8217;s a watery terrain that can be crossed by boats.</li>
 <li>A texture used to render it.</li>
 </ul>
-<p>Because we game programmers are paranoid about efficiency, there&#x2019;s no way we&#x2019;d store all of that state in <span name="learned">each</span> tile in the world. Instead, a common approach is to use an enum for terrain types:</p>
+<p>Because we game programmers are paranoid about efficiency, there&#8217;s no way we&#8217;d store all of that state in <span name="learned">each</span> tile in the world. Instead, a common approach is to use an enum for terrain types:</p>
 <aside name="learned">
 
 <p>After all, we already learned our lesson with those trees.</p>
@@ -228,8 +229,8 @@
 
 <aside name="grid">
 
-<p>Here I&#x2019;m using a nested array to store the 2D grid. That&#x2019;s efficient in C/C++ because it will pack all of the elements together. In Java or other memory-managed languages, doing that will actually give you an array of rows where each element is a <em>reference</em> to the array of columns, which may not be as memory-friendly as you&#x2019;d like.</p>
-<p>In either case, real code would be better served by hiding this implementation detail behind a nice 2D grid data structure. I&#x2019;m doing this here just to keep it simple.</p>
+<p>Here I&#8217;m using a nested array to store the 2D grid. That&#8217;s efficient in C/C++ because it will pack all of the elements together. In Java or other memory-managed languages, doing that will actually give you an array of rows where each element is a <em>reference</em> to the array of columns, which may not be as memory-friendly as you&#8217;d like.</p>
+<p>In either case, real code would be better served by hiding this implementation detail behind a nice 2D grid data structure. I&#8217;m doing this here just to keep it simple.</p>
 </aside>
 
 <p>To actually get the useful data about a tile, we do something like:</p>
@@ -257,7 +258,7 @@
 </pre></div>
 
 
-<p>You get the idea. This works, but I find it ugly. I think of movement cost and wetness as <em>data</em> about a terrain, but here that&#x2019;s embedded in code. Worse, the data for a single terrain type is smeared across a bunch of methods. It would be really nice to keep all of that encapsulated together. After all, that&#x2019;s what objects are designed for.</p>
+<p>You get the idea. This works, but I find it ugly. I think of movement cost and wetness as <em>data</em> about a terrain, but here that&#8217;s embedded in code. Worse, the data for a single terrain type is smeared across a bunch of methods. It would be really nice to keep all of that encapsulated together. After all, that&#8217;s what objects are designed for.</p>
 <p>It would be great if we could have an actual terrain <em>class</em>, like:</p>
 <p><span name="const"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Terrain</span>
@@ -285,12 +286,12 @@
 
 <aside name="const">
 
-<p>You&#x2019;ll notice that all of the methods here are <code>const</code>. That&#x2019;s no coincidence. Since the same object is used in multiple contexts, if you were to modify it, the changes would appear in multiple places simultaneously.</p>
-<p>That&#x2019;s probably not what you want. Sharing objects to save memory should be an optimization that doesn&#x2019;t affect the visible behavior of the app. Because of this, Flyweight objects are almost always <em>immutable</em>.</p>
+<p>You&#8217;ll notice that all of the methods here are <code>const</code>. That&#8217;s no coincidence. Since the same object is used in multiple contexts, if you were to modify it, the changes would appear in multiple places simultaneously.</p>
+<p>That&#8217;s probably not what you want. Sharing objects to save memory should be an optimization that doesn&#8217;t affect the visible behavior of the app. Because of this, Flyweight objects are almost always <em>immutable</em>.</p>
 </aside>
 
-<p>But we don&#x2019;t want to pay the cost of having an instance of that for each tile in the world. If you look at that class, you&#x2019;ll notice that there&#x2019;s actually <em>nothing</em> in there that&#x2019;s specific to <em>where</em> that tile is. In flyweight terms, <em>all</em> of a terrain&#x2019;s state is "intrinsic" or "context-free".</p>
-<p>Given that, there&#x2019;s no reason to have more than one of each terrain type. Every grass tile on the ground is identical to every other one. Instead of having the world be a grid of enums or Terrain objects, it will be a grid of <em>pointers</em> to <code>Terrain</code> objects:</p>
+<p>But we don&#8217;t want to pay the cost of having an instance of that for each tile in the world. If you look at that class, you&#8217;ll notice that there&#8217;s actually <em>nothing</em> in there that&#8217;s specific to <em>where</em> that tile is. In flyweight terms, <em>all</em> of a terrain&#8217;s state is &#8220;intrinsic&#8221; or &#8220;context-free&#8221;.</p>
+<p>Given that, there&#8217;s no reason to have more than one of each terrain type. Every grass tile on the ground is identical to every other one. Instead of having the world be a grid of enums or Terrain objects, it will be a grid of <em>pointers</em> to <code>Terrain</code> objects:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">World</span>
 <span class="p">{</span>
 <span class="nl">private:</span>
@@ -303,7 +304,7 @@
 
 <p>Each tile that uses the same terrain will point to the same terrain instance.</p>
 <p><img src="images/flyweight-tiles.png" /></p>
-<p>Since the terrain instances are used in multiple places, their lifetimes would be a little more complex to manage if you were to dynamically allocate them. Instead, we&#x2019;ll just store them directly in the world:</p>
+<p>Since the terrain instances are used in multiple places, their lifetimes would be a little more complex to manage if you were to dynamically allocate them. Instead, we&#8217;ll just store them directly in the world:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">World</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -355,7 +356,7 @@
 
 <aside name="generate">
 
-<p>I&#x2019;ll admit this isn&#x2019;t the world&#x2019;s greatest procedural terrain generation algorithm.</p>
+<p>I&#8217;ll admit this isn&#8217;t the world&#8217;s greatest procedural terrain generation algorithm.</p>
 </aside>
 
 <p>Now instead of methods on <code>World</code> for accessing the terrain properties, we can just expose the <code>Terrain</code> object directly:</p>
@@ -371,21 +372,21 @@
 </pre></div>
 
 
-<p>We&#x2019;re back to the pleasant API of working with real objects. And we did this with almost no overhead: a pointer is often no larger than an enum.</p>
+<p>We&#8217;re back to the pleasant API of working with real objects. And we did this with almost no overhead: a pointer is often no larger than an enum.</p>
 <h2><a href="#what-about-performance" name="what-about-performance">What About Performance?</a></h2>
-<p>I say "almost" here because the performance bean counters will rightfully want to know how this compares to using an enum. Referencing the terrain by pointer implies an indirect lookup. To get to some terrain data like the movement cost, you first have to follow the pointer in the grid to find the terrain object, and then find the movement cost there. Chasing a pointer like this can cause a cache miss, which can slow things down.</p>
-<p>As always, the golden rule of optimization is <em>profile first</em>. Modern computer hardware is too complex for performance to be a game of pure reason anymore. In my tests for this chapter, there was no penalty for using a flyweight over an enum. Flyweights were actually noticeably faster. But that&#x2019;s entirely dependent on how other stuff is laid out in memory.</p>
-<p>What I <em>am</em> confident of is that using flyweight objects shouldn&#x2019;t be dismissed out of hand. They give you the advantages of an object-oriented style without the expense of tons of objects. If you find yourself creating an enum and doing lots of switches on it, consider this pattern instead. If you&#x2019;re worried about performance, at least profile first before changing your code to a less maintainable style.</p>
+<p>I say &#8220;almost&#8221; here because the performance bean counters will rightfully want to know how this compares to using an enum. Referencing the terrain by pointer implies an indirect lookup. To get to some terrain data like the movement cost, you first have to follow the pointer in the grid to find the terrain object, and then find the movement cost there. Chasing a pointer like this can cause a cache miss, which can slow things down.</p>
+<p>As always, the golden rule of optimization is <em>profile first</em>. Modern computer hardware is too complex for performance to be a game of pure reason anymore. In my tests for this chapter, there was no penalty for using a flyweight over an enum. Flyweights were actually noticeably faster. But that&#8217;s entirely dependent on how other stuff is laid out in memory.</p>
+<p>What I <em>am</em> confident of is that using flyweight objects shouldn&#8217;t be dismissed out of hand. They give you the advantages of an object-oriented style without the expense of tons of objects. If you find yourself creating an enum and doing lots of switches on it, consider this pattern instead. If you&#8217;re worried about performance, at least profile first before changing your code to a less maintainable style.</p>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
 <li>
-<p>In the tile example, we just eagerly created an instance for each terrain type and stored it in <code>World</code>. That made it easy to find and reuse the shared instances. In many cases, though, you won&#x2019;t want to create <em>all</em> of the flyweights up front.</p>
-<p>If you can&#x2019;t predict which ones you actually need, it&#x2019;s better to create them on demand. To get the advantage of sharing, when you request one, you first see if you&#x2019;ve already created an identical one. If so, you just return that instance.</p>
+<p>In the tile example, we just eagerly created an instance for each terrain type and stored it in <code>World</code>. That made it easy to find and reuse the shared instances. In many cases, though, you won&#8217;t want to create <em>all</em> of the flyweights up front.</p>
+<p>If you can&#8217;t predict which ones you actually need, it&#8217;s better to create them on demand. To get the advantage of sharing, when you request one, you first see if you&#8217;ve already created an identical one. If so, you just return that instance.</p>
 <p>This usually means that you have to encapsulate construction behind some interface that can first look for an existing object. Hiding a constructor like this is an example of the <a href="http://en.wikipedia.org/wiki/Factory_method_pattern" class="gof-pattern">Factory Method</a> pattern.</p>
-<p>In order to return a previously created flyweight, you&#x2019;ll have to keep track of the pool of ones that you&#x2019;ve already instantiated. As the name implies, that means that an <a href="object-pool.html" class="pattern">Object Pool</a> might be a helpful place to store them.</p>
+<p>In order to return a previously created flyweight, you&#8217;ll have to keep track of the pool of ones that you&#8217;ve already instantiated. As the name implies, that means that an <a href="object-pool.html" class="pattern">Object Pool</a> might be a helpful place to store them.</p>
 </li>
 <li>
-<p>When you&#x2019;re using the <a class="pattern" href="state.html">State</a> pattern, you often have "state" objects that don&#x2019;t have any fields that are specific to the machine that the state is being used in. The state&#x2019;s identity and methods are enough to be useful. In that case, you can apply this pattern and reuse that same state instance in multiple state machines at the same time without any problems.</p>
+<p>When you&#8217;re using the <a class="pattern" href="state.html">State</a> pattern, you often have &#8220;state&#8221; objects that don&#8217;t have any fields that are specific to the machine that the state is being used in. The state&#8217;s identity and methods are enough to be useful. In that case, you can apply this pattern and reuse that same state instance in multiple state machines at the same time without any problems.</p>
 </li>
 </ul>
 <p class="footer">&copy; 2009-2014 Robert Nystrom</p>

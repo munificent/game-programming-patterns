@@ -33,7 +33,7 @@ method in hand. Singletons (in other words, making it global) were an easy way o
 > Ensure a class has one instance, and provide a global point of
 > access to it.
 
-We'll split that at &ldquo;and&rdquo; and consider each half
+We'll split that at "and" and consider each half
 separately.
 
 ### Restricting a class to one instance
@@ -183,7 +183,7 @@ learned is that global variables are bad, for a variety of reasons:
     <aside name="pure">
 
     Computer scientists call functions that don't access or modify global
-    state &ldquo;pure&rdquo; functions. Pure functions are easier to
+    state "pure" functions. Pure functions are easier to
     reason about, easier for the compiler to optimize, and let you do neat
     things like memoization where you cache and reuse the results from
     previous calls to the function.
@@ -248,7 +248,7 @@ state, just encapsulated in a class.
 
 ### It solves two problems even when you just have one
 
-The word &ldquo;and&rdquo; in the Gang of Four's description of
+The word "and" in the Gang of Four's description of
 Singleton is a bit strange. Is this pattern a solution to one problem
 or two? What if we have only one of those? Ensuring a single instance
 is useful, but who says we want to let *everyone* poke at it?
