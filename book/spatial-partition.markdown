@@ -149,7 +149,7 @@ Once all of the units are nestled in their cells, we can let them start hacking 
 
 ^code grid-melee
 
-It walks each cell and then calls `handleCell` on it. As you can see, we really have partitioned the battlefield into little isolated skirmishes. Each cell then handles its combat like so:
+It walks each cell and then calls `handleCell()` on it. As you can see, we really have partitioned the battlefield into little isolated skirmishes. Each cell then handles its combat like so:
 
 ^code handle-cell
 
@@ -211,7 +211,7 @@ Those additional `handleUnit()` calls look for hits between the current unit and
 
 <aside name="neighbor">
 
-The cell with the unit is `U`, and the neighboring cells it looks at are `X`:
+The cell with the unit is `U`, and the neighboring cells it looks at are `X`.
 
 <img src="images/spatial-partition-neighbors.png" width="240" />
 
@@ -350,7 +350,7 @@ You can treat your spatial partition as *the* place where the objects in your ga
 
 ## See Also
 
-* I've tried to not discuss specific spatial partitioning structures in detail here to keep the chapter high-level (and not too long!), but your next step from here should be to learn a few of the common ones. Despite their scary names, they are all surprisingly straightforward. The common ones are:
+* I've tried not to discuss specific spatial partitioning structures in detail here to keep the chapter high-level (and not too long!), but your next step from here should be to learn a few of the common structures. Despite their scary names, they are all surprisingly straightforward. The common ones are:
 
     * [Grid](http://en.wikipedia.org/wiki/Grid_(spatial_index))
     * [Quadtree](http://en.wikipedia.org/wiki/Quad_tree)
