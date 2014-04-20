@@ -129,7 +129,7 @@ This lets us make `notify()` in `Subject` protected. That way the derived physic
 
 <aside name="event">
 
-If this were real code, I would absolutely avoid using inheritance here. Instead, I'd make `Physics` *have* an instance of `Subject`. Instead of observing the physics engine itself, the subject would be a separate "falling event" object. Observers could register themselves using something like:
+If this were real code, I would avoid using inheritance here. Instead, I'd make `Physics` *have* an instance of `Subject`. Instead of observing the physics engine itself, the subject would be a separate "falling event" object. Observers could register themselves using something like:
 
 ^code physics-event
 
@@ -360,7 +360,7 @@ That's why it fit our example well: achievements and physics are almost entirely
 
 ## Observers Today
 
-Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was *the* hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hierarchies.
+Design Patterns came out in the <span name="90s">90s</span>. Back then, object-oriented programming was *the* hot paradigm. Every programmer on Earth wanted to "Learn OOP in 30 Days" and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hierarchies.
 
 <aside name="90s">
 

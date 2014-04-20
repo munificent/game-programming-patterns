@@ -41,3 +41,4 @@
 - Do use "virtual" for overridden methods.
 - Use "double" for floating point variables.
 - Q: How are empty constructors formatted? {} on next line?
+- Q: How much should const be used?

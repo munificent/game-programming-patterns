@@ -278,7 +278,7 @@ through it quickly.</p>
 <p>This lets us make <code>notify()</code> in <code>Subject</code> protected. That way the derived physics engine class can call it to send notifications, but code outside of it cannot. Meanwhile, <code>addObserver()</code> and <code>removeObserver()</code> are public, so anything that can get to the physics system can observe it.</p>
 <aside name="event">
 
-<p>If this were real code, I would absolutely avoid using inheritance here. Instead, I&#8217;d make <code>Physics</code> <em>have</em> an instance of <code>Subject</code>. Instead of observing the physics engine itself, the subject would be a separate &#8220;falling event&#8221; object. Observers could register themselves using something like:</p>
+<p>If this were real code, I would avoid using inheritance here. Instead, I&#8217;d make <code>Physics</code> <em>have</em> an instance of <code>Subject</code>. Instead of observing the physics engine itself, the subject would be a separate &#8220;falling event&#8221; object. Observers could register themselves using something like:</p>
 <div class="codehilite"><pre><span class="n">physics</span><span class="p">.</span><span class="n">entityFell</span><span class="p">()</span>
   <span class="p">.</span><span class="n">addObserver</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
 </pre></div>
@@ -489,7 +489,7 @@ option and insert it at the front:</p>
 <p>The observer pattern is a great way to let those mostly unrelated lumps talk to each other without them merging into one big lump. It&#8217;s less useful <em>within</em> a single lump of code dedicated to one feature or aspect.</p>
 <p>That&#8217;s why it fit our example well: achievements and physics are almost entirely unrelated domains, likely implemented by different people. We want the bare minimum of communication between them so that working on either one doesn&#8217;t require much knowledge of the other.</p>
 <h2><a href="#observers-today" name="observers-today">Observers Today</a></h2>
-<p>Design Patterns came out in the <span name="90s">90s</span>. Back then object-oriented programming was <em>the</em> hot paradigm. Every programmer on Earth wanted to &#8220;Learn OOP in 30 Days&#8221; and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hierarchies.</p>
+<p>Design Patterns came out in the <span name="90s">90s</span>. Back then, object-oriented programming was <em>the</em> hot paradigm. Every programmer on Earth wanted to &#8220;Learn OOP in 30 Days&#8221; and middle managers paid them based on the number of classes they created. Engineers judged their mettle by the depth of their inheritance hierarchies.</p>
 <aside name="90s">
 
 <p>That same year, Ace of Base had not one but <em>three</em> hit singles, so that may tell you something about our taste and judgment back then.</p>
