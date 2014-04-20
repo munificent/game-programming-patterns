@@ -192,7 +192,7 @@
 <p>The pattern solves that by separating out an object&#8217;s data into two kinds: The first kind of data is the stuff that&#8217;s not specific to a single <em>instance</em> of that object and can be shared across all of them. The Gang of Four calls this the <em>intrinsic</em> state, but I like to think of it as the &#8220;context-free&#8221; stuff. In the example here, this is the geometry and textures for the tree.</p>
 <p>The rest of the data is the <em>extrinsic</em> state, the stuff that is unique to that instance. In this case, that is each tree&#8217;s position, scale, and color. Just like in the chunk of sample code up there, this pattern saves memory by sharing one copy of the intrinsic state across every place where an object appears.</p>
 <p>From what we&#8217;ve seen so far, this just seems like basic resource sharing, and hardly worth being called a pattern. That&#8217;s partially because in this example here, we could come up with a clear separate <em>identity</em> for the shared state: the <code>TreeModel</code>.</p>
-<p>I find this pattern to be less obvious (and thus more clever) when used in cases where there isn&#8217;t a real well-defined identity for the shared object. In those cases, it feels more like an object is magically in multiple places at the same time. Let me show you another example.</p>
+<p>I find this pattern to be less obvious (and thus more clever) when used in cases where there isn&#8217;t a really well-defined identity for the shared object. In those cases, it feels more like an object is magically in multiple places at the same time. Let me show you another example.</p>
 <h2><a href="#a-place-to-put-down-roots" name="a-place-to-put-down-roots">A Place To Put Down Roots</a></h2>
 <p>The ground these trees are growing on needs to be represented in our game too. There can be patches of grass, dirt, hills, lakes, rivers, and whatever other terrain you can dream up. We&#8217;ll make the ground <em>tile-based</em>: the surface of the world is a huge grid of tiny tiles. Each tile is covered in one kind of terrain.</p>
 <p>Each terrain type has a number of properties that affect gameplay:</p>
@@ -295,7 +295,7 @@
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">World</span>
 <span class="p">{</span>
 <span class="nl">private:</span>
-  <span class="n">Terrain</span><span class="o">*</span> <span class="n">tiles_</span><span class="p">[</span><span class="n">HEIGHT</span><span class="p">][</span><span class="n">WIDTH</span><span class="p">];</span>
+  <span class="n">Terrain</span><span class="o">*</span> <span class="n">tiles_</span><span class="p">[</span><span class="n">WIDTH</span><span class="p">][</span><span class="n">HEIGHT</span><span class="p">];</span>
 
   <span class="c1">// Other stuff...</span>
 <span class="p">};</span>
@@ -372,9 +372,14 @@
 </pre></div>
 
 
-<p>We&#8217;re back to the pleasant API of working with real objects. And we did this with almost no overhead: a pointer is often no larger than an enum.</p>
+<p>We&#8217;re back to the pleasant API of working with real objects, and we did this with almost no overhead: a pointer is often no larger than an enum.</p>
 <h2><a href="#what-about-performance" name="what-about-performance">What About Performance?</a></h2>
-<p>I say &#8220;almost&#8221; here because the performance bean counters will rightfully want to know how this compares to using an enum. Referencing the terrain by pointer implies an indirect lookup. To get to some terrain data like the movement cost, you first have to follow the pointer in the grid to find the terrain object, and then find the movement cost there. Chasing a pointer like this can cause a cache miss, which can slow things down.</p>
+<p>I say &#8220;almost&#8221; here because the performance bean counters will rightfully want to know how this compares to using an enum. Referencing the terrain by pointer implies an indirect lookup. To get to some terrain data like the movement cost, you first have to follow the pointer in the grid to find the terrain object, and then find the movement cost there. Chasing a pointer like this can cause a <span name="cache">cache miss</span>, which can slow things down.</p>
+<aside name="cache">
+
+<p>For lots more on pointer chasing and cache misses, see the chapter on <a href="data-locality.html" class="pattern">Data Locality</a>.</p>
+</aside>
+
 <p>As always, the golden rule of optimization is <em>profile first</em>. Modern computer hardware is too complex for performance to be a game of pure reason anymore. In my tests for this chapter, there was no penalty for using a flyweight over an enum. Flyweights were actually noticeably faster. But that&#8217;s entirely dependent on how other stuff is laid out in memory.</p>
 <p>What I <em>am</em> confident of is that using flyweight objects shouldn&#8217;t be dismissed out of hand. They give you the advantages of an object-oriented style without the expense of tons of objects. If you find yourself creating an enum and doing lots of switches on it, consider this pattern instead. If you&#8217;re worried about performance, at least profile first before changing your code to a less maintainable style.</p>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>

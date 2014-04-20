@@ -90,7 +90,7 @@ The rest of the data is the *extrinsic* state, the stuff that is unique to that 
 
 From what we've seen so far, this just seems like basic resource sharing, and hardly worth being called a pattern. That's partially because in this example here, we could come up with a clear separate *identity* for the shared state: the `TreeModel`.
 
-I find this pattern to be less obvious (and thus more clever) when used in cases where there isn't a real well-defined identity for the shared object. In those cases, it feels more like an object is magically in multiple places at the same time. Let me show you another example.
+I find this pattern to be less obvious (and thus more clever) when used in cases where there isn't a really well-defined identity for the shared object. In those cases, it feels more like an object is magically in multiple places at the same time. Let me show you another example.
 
 ## A Place To Put Down Roots
 
@@ -180,11 +180,17 @@ This way, `World` is no longer coupled to all sorts of details of terrains. If y
 
 ^code use-get-tile
 
-We're back to the pleasant API of working with real objects. And we did this with almost no overhead: a pointer is often no larger than an enum.
+We're back to the pleasant API of working with real objects, and we did this with almost no overhead: a pointer is often no larger than an enum.
 
 ## What About Performance?
 
-I say "almost" here because the performance bean counters will rightfully want to know how this compares to using an enum. Referencing the terrain by pointer implies an indirect lookup. To get to some terrain data like the movement cost, you first have to follow the pointer in the grid to find the terrain object, and then find the movement cost there. Chasing a pointer like this can cause a cache miss, which can slow things down.
+I say "almost" here because the performance bean counters will rightfully want to know how this compares to using an enum. Referencing the terrain by pointer implies an indirect lookup. To get to some terrain data like the movement cost, you first have to follow the pointer in the grid to find the terrain object, and then find the movement cost there. Chasing a pointer like this can cause a <span name="cache">cache miss</span>, which can slow things down.
+
+<aside name="cache">
+
+For lots more on pointer chasing and cache misses, see the chapter on <a href="data-locality.html" class="pattern">Data Locality</a>.
+
+</aside>
 
 As always, the golden rule of optimization is *profile first*. Modern computer hardware is too complex for performance to be a game of pure reason anymore. In my tests for this chapter, there was no penalty for using a flyweight over an enum. Flyweights were actually noticeably faster. But that's entirely dependent on how other stuff is laid out in memory.
 

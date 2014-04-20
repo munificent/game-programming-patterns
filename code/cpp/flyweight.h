@@ -159,7 +159,7 @@ namespace Flyweight
       const Terrain& getTile(int x, int y) const;
       //^omit
     private:
-      Terrain* tiles_[HEIGHT][WIDTH];
+      Terrain* tiles_[WIDTH][HEIGHT];
 
       // Other stuff...
       //^omit
