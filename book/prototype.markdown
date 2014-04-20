@@ -61,7 +61,7 @@ I find something both elegant and yet surprising about this pattern. I can't ima
 
 Well, we don't have to create a separate spawner class for each monster, so that's good. But we *do* have to implement `clone()` in each monster class. That's just about as much code as the spawners.
 
-There are also some nasty semantic ratholes when you sit down to try to write a correct `clone()`. Does it do a deep clone or shallow one? (I.e. when a field is a reference to an object, do we clone that object too, or just the reference?) How does it interact with ownership?
+There are also some nasty semantic ratholes when you sit down to try to write a correct `clone()`. Does it do a deep clone or shallow one? In other words, when a field is a reference to an object, do we clone that object too, or just the reference? How does it interact with ownership?
 
 Also, not only does it not look like it's saving us much code in this contrived problem, there's the fact that it's a *contrived problem*. We had to take as a given that we have separate classes for each monster. These days, that's definitely *not* the way most game engines roll.
 
@@ -155,9 +155,9 @@ No man is an island, but this object is.
 
 </aside>
 
-If that was all Self did, it would be hard to use. Inheritance in class-based languages (despite its faults) gives you a useful mechanism for reusing polymorphic code and avoiding duplication. To accomplish something similar without classes, Self has *delegation*.
+If that was all Self did, it would be hard to use. Inheritance in class-based languages, despite its faults, gives you a useful mechanism for reusing polymorphic code and avoiding duplication. To accomplish something similar without classes, Self has *delegation*.
 
-To find a field or call a method on some object, we first look in the object itself. If it has it, we're done. If it doesn't, we look at the object's <span name="parent">*parent*</span>. This is just is a reference to some other object. When we fail to find a property on the first object, we try its parent (and its parent, and so on). In other words, failed lookups are *delegated* to an object's parent.
+To find a field or call a method on some object, we first look in the object itself. If it has it, we're done. If it doesn't, we look at the object's <span name="parent">*parent*</span>. This is just a reference to some other object. When we fail to find a property on the first object, we try its parent, and its parent, and so on. In other words, failed lookups are *delegated* to an object's parent.
 
 <aside name="parent">
 
@@ -167,7 +167,7 @@ I'm simplifying here. Self actually supports multiple parents. Parents are just 
 
 <img src="images/prototype-delegate.png" />
 
-Parent objects let us reuse behavior (and state!) across multiple objects, so we've covered part of the utility of classes. The other key thing classes do is give us a way to create instances. When you need a new thingamabob, you can just do `new Thingamabob` (or whatever your preferred language's syntax is). A class is implicitly a factory for instances of itself.
+Parent objects let us reuse behavior (and state!) across multiple objects, so we've covered part of the utility of classes. The other key thing classes do is give us a way to create instances. When you need a new thingamabob, you can just do `new Thingamabob()`, or whatever your preferred language's syntax is. A class is implicitly a factory for instances of itself.
 
 Without classes, how do we make new things? In particular, how do we make a bunch of new things that all have stuff in common? Just like the design pattern, the way you do this in Self is by *cloning*.
 
@@ -194,7 +194,7 @@ I was super excited to play with a pure prototype-based language, but once I had
 
 I've since heard through the grapevine that many of the Self programmers came to the same conclusion. The project was far from a loss, though. Self was so dynamic that it needed all sorts of virtual machine innovations in order to run fast enough.
 
-The ideas they invented for just-in-time compilation, garbage collection, and optimizing method dispatch are the exact same techniques (often implemented by the same people!) that now make many of the world's dynamically-typed languages fast enough to use for massively popular applications.
+The ideas they invented for just-in-time compilation, garbage collection, and optimizing method dispatch are the exact same techniques -- often implemented by the same people! -- that now make many of the world's dynamically-typed languages fast enough to use for massively popular applications.
 
 </aside>
 
@@ -264,7 +264,7 @@ Let's review:
 
 * State is stored on the instance itself.
 
-* Behavior goes through a level of indirection (delegating to the prototype) and is stored on a separate object that represents the set of methods shared by all objects of a certain type.
+* Behavior goes through a level of indirection -- delegating to the prototype -- and is stored on a separate object that represents the set of methods shared by all objects of a certain type.
 
 Call me crazy, but that sounds a lot like my description of classes above. You *can* write prototype-style code in JavaScript (*sans* cloning), but the syntax and idioms of the language encourage a class-based approach.
 
@@ -274,7 +274,7 @@ Personally, I think that's a <span name="good">good thing</span>. Like I said, I
 
 OK, I keep talking about things I *don't* like prototypes for, which is making this chapter a real downer. I think of this book as more comedy than tragedy, so let's close this out with an area where I *do* think prototypes, or more specifically *delegation*, can be useful.
 
-If you were to count up all the bytes in a game that are code versus ones that are data, you'd see the fraction that is data has been increasing steadily since the dawn of programming. Early games procedurally generated almost everything so they could fit on floppies and old game cartidges. Today, we think of game code as an "engine" that just runs the game itself which is defined entirely in reams of "assets".
+If you were to count all the bytes in a game that are code compared to the ones that are data, you'd see the fraction of data has been increasing steadily since the dawn of programming. Early games procedurally generated almost everything so they could fit on floppies and old game cartidges. In many games today, the code is just an "engine" that drives the game, which is defined entirely in data.
 
 That's great, but pushing piles of content into data files doesn't magically solve the organizational challenges of a large project. If anything, it makes it harder. The reason we use programming languages is because they have tools for managing complexity.
 
@@ -290,7 +290,7 @@ I mean completely original title in no way inspired by any previously existing t
 
 </aside>
 
-One common approach is to use JSON: data entities are basically *maps*, or *property bags* or any of a dozen other terms because there's nothing programmers like more than <span name="inventing">inventing</span> names for stuff that already exists.
+One common approach is to use JSON: data entities are basically *maps*, or *property bags* or any of a dozen other terms because there's nothing programmers like more than <span name="inventing">inventing</span> a new name for something that already has one.
 
 <aside name="inventing">
 
@@ -377,7 +377,7 @@ Think about bosses and unique items. These are often refinements of a more commo
     {
       "name": "Sword of Head-Detaching",
       "prototype": "longsword",
-      "damage-bonus": "20d8"
+      "damageBonus": "20"
     }
 
 A little extra power in your game engine's data modelling system can make it easier for designers to add lots of little variations to the armaments and beasties populating your game world, and that richness is exactly what delights players.
