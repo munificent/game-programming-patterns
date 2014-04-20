@@ -37,7 +37,7 @@
           <ul><li>
 <a href="#what's-in-store">What's in Store</a></li><li>
 <a href="#how-it-relates-to-design-patterns">How it Relates to Design Patterns</a></li><li>
-<a href="#how-to-read-this">How To Read This</a></li><li>
+<a href="#how-to-read-the-book">How to Read the Book</a></li><li>
 <a href="#how-the-book-is-formatted">How the Book is Formatted</a></li><li>
 <a href="#about-the-sample-code">About the Sample Code</a></li><li>
 <a href="#where-to-go-from-here">Where to Go From Here</a></li></ul>
@@ -203,58 +203,44 @@ the best patterns I&#8217;ve found in games and presented them here so that
 we can spend our time inventing things instead of <em>re</em>-inventing them.</p>
 <h2><a href="#what's-in-store" name="what's-in-store">What&#8217;s in Store</a></h2>
 <p>There are already dozens of game programming books out there. Why
-write another? I&#8217;ll explain by analogy.</p>
-<p>Imagine a game codebase as a house. Graphics and sound are the
-appliances and fixtures: a nice chandelier, kitchen sink, big picture
-windows. This is the kind of stuff you can find in other books. These
-things matter, of course, but this book aims at something a bit more
-humble and fundamental: the framing. Other books can teach you about
-windows and fixtures, faucets and tubs. What I hope to cover in this
-book is the joist and the arch, plumbing and wiring&thinsp;&mdash;&thinsp;techniques
-that will let you build an elegant and maintainable structure out of a
-few simple parts. Use them to frame the house, then crack open those
-other books to build it out.</p>
-<p>It&#8217;s easy to <span name="tragedy">underappreciate</span> this. After all, friends won&#8217;t look at
-your home and say, &#8220;Wow, nice wiring!&#8221; But without it, I
-can guarantee they will notice when you flip the lightswitch and your
-beautiful chandelier doesn&#8217;t turn on.</p>
-<aside name="tragedy">
+write another?</p>
+<p>Most game programming books I&#8217;ve seen fall into one of two categories:</p>
+<ul>
+<li>
+<p><strong>Domain-specific books.</strong> These narrowly-focused books give you a deep dive on some specific aspect of game development. They&#8217;ll teach you about 3D graphics, real-time rendering, physics simulation, artificial intelligence, or audio. These are the areas that many game programmers specialize in as their career progresses.</p>
+</li>
+<li>
+<p><strong>Whole-engine books.</strong> In contrast, these try to span all of the different parts of an entire game engine. They compose them together to build a complete engine suited to some specific genre of game, usually a 3D first-person shooter.</p>
+</li>
+</ul>
+<p>I like both of these kinds of books, but I think they leave some gaps. Books specific to a domain rarely tell you how that chunk of code interacts with the rest of the game. You may be a wizard at physics and rendering, but do you know how to tie them together gracefully?</p>
+<p>The second category covers that, but I find it often too monotlithic and too genre-specific. Especially with the rise of mobile and casual gaming, we&#8217;re in a period where lots of different genres of games are being created. We aren&#8217;t all just cloning Quake anymore. Books that walk you through a single engine aren&#8217;t a good fit when <em>your</em> game doesn&#8217;t fit that mold.</p>
+<p>Instead, what I&#8217;m trying to do here is more <span name="carte"><em>&agrave; la carte</em></span>. Each of the chapters in this book is an independent idea that you can apply to your code. This way, you can mix and match them in a way that works best for the game <em>you</em> want to make.</p>
+<aside name="carte">
 
-<p>This is the tragedy of software architecture: the better it is, the
-less it&#8217;s noticed. All people will notice are the features that were
-enabled by it. As the Tao Te Ching says: <em>When the Sage&#8217;s work is
-done, the people say, &#8220;We did it all by ourselves!&#8221;</em></p>
+<p>Another example of this <em>&agrave; la carte</em> style is the widely beloved <a href="http://www.satori.org/game-programming-gems/"><em>Game Programming Gems</em></a> series.</p>
 </aside>
 
 <h2><a href="#how-it-relates-to-design-patterns" name="how-it-relates-to-design-patterns">How it Relates to Design Patterns</a></h2>
-<p>Any programming book with &#8220;Patterns&#8221; in its name clearly
+<p>Any programming book with <span name="alexander">&#8220;Patterns&#8221;</span> in its name clearly
 bears a relationship to the classic <em>Design Patterns: Elements of
 Reusable Object-Oriented Software</em> by Erich Gamma, Richard Helm, Ralph
 Johnson and John Vlissides (ominously called the &#8220;Gang of
 Four&#8221;).</p>
-<p>By calling this book &#8220;Game Programming Patterns,&#8221; I
-certainly don&#8217;t intend to imply that the Gang of Four&#8217;s book is
-<span name="nongames">inapplicable</span> to games. On the contrary: Part Two of this book revisits
-many of the patterns first described in <em>Design Patterns</em>, but with an
-emphasis on how they can be applied to game programming.</p>
-<aside name="nongames">
+<aside name="alexander">
 
-<p>Conversely, I think this book is applicable to non-game software too.
-The patterns in it can be put to good use in all kinds of software.
-Games are just where I see them encountered the most, and provide a
-wellspring of good examples of their use.</p>
+<p><em>Design Patterns</em> itself was in turn inspired by a previous book. The idea of crafting a language of patterns to describe open-ended solutions to problems comes from <a href="http://en.wikipedia.org/wiki/A_Pattern_Language"><em>A Pattern Language</em></a>, by Christopher Alexander (along with Sarah Ishikawa and Murray Silverstein).</p>
+<p>Their book was about architecture (like <em>real</em> architecture with buildings and walls and stuff), but they hoped others would use the same structure to describe solutions in other fields. <em>Design Patterns</em> is the Gang of Four&#8217;s attempt to do that for software.</p>
 </aside>
 
+<p>By calling this book &#8220;Game Programming Patterns,&#8221; I
+certainly don&#8217;t intend to imply that the Gang of Four&#8217;s book is
+<span name="nongames">inapplicable</span> to games. On the contrary: the second part of this book revisits
+many of the patterns first described in <em>Design Patterns</em>, but with an
+emphasis on how they can be applied to game programming.</p>
+<p>Conversely, I think this book is applicable to non-game software too. The patterns here are useful in many business applications, but I think games make for more engaging examples. Do you really want to read yet another book about employee records and bank accounts?</p>
 <p>Instead of trying to refute <em>Design Patterns</em>, I look at this book as
-an <em>extension</em> of it. You can think of <em>Design Patterns</em> as <em>The Joy
-of Cooking</em>. Regardless of what course you&#8217;re preparing, there will be
-a recipe in there for you. But if you&#8217;ve decided to really focus on
-baking, a book dedicated to desserts and pastries can take things
-further.</p>
-<p>That&#8217;s this book. Part Three, the largest part of the book, covers a
-set of new patterns that I&#8217;ve found used frequently (and often
-exclusively) in games. Game software is different from other domains
-in many ways, and these patterns address those differences:</p>
+an <em>extension</em> of it. While the patterns introduced here are useful in other software, I think they&#8217;re particularly well-suited to engineering challenges encountered most commonly in games:</p>
 <ul>
 <li>
 <p>Time and sequencing are often a core part of a game&#8217;s
@@ -270,10 +256,8 @@ in many ways, and these patterns address those differences:</p>
 <li>
 <p>After all of this behavior is defined, it starts interacting.
     Monsters bite the hero, potions are mixed together, and bombs
-    blast enemies and friends alike. Coordinating that kind of mass
-    constant communication is rare outside of games. If you have two
-    documents open in your word processor, they don&#8217;t talk to each
-    other very often.</p>
+    blast enemies and friends alike. Those interactions must happen
+    without the codebase turning into an intertwined hairball.</p>
 </li>
 <li>
 <p>And, finally, performance is critical in games. Game developers
@@ -283,62 +267,60 @@ in many ways, and these patterns address those differences:</p>
     dropped frames and angry reviewers.</p>
 </li>
 </ul>
-<h2><a href="#how-to-read-this" name="how-to-read-this">How To Read This</a></h2>
-<p>This book is structured like a recipe book because it essentially <em>is</em>
-one. The chapter you&#8217;re reading now introduces the book and explains
-how the rest of the material works. It tells you how to follow a
-recipe, prepare the ingredients, and make sure you don&#8217;t leave the
-oven on.</p>
-<p>The next section revisits some of the patterns from <em>Design Patterns</em>
-that I feel are particularly relevant to game programming. It will
-show you some pitfalls to avoid, and some clever tricks to get the
-most out of them.</p>
-<p>Following that are the recipes: the new patterns themselves. They are
-grouped into several themes. Each theme describes two opposing forces
-encountered when building a game. The patterns within that theme are
-tools you can use to find a balance between those forces.</p>
-<p>For example, the &#8220;Communicating&#8221; theme is for patterns
-that enable parts of a game to communicate with each other. The
-primary force is that game objects <em>must</em> interact: bullets must
-collide with enemies, the hero must be able to play heroic sounds. The
-opposing force is that decoupling and isolating code makes it easier
-to understand, modify, and test. The patterns in this theme let
-modules communicate with each other, but in prescribed ways that
-control the coupling.</p>
-<p>Each pattern within these themes is described using a consistent
+<h2><a href="#how-to-read-the-book" name="how-to-read-the-book">How to Read the Book</a></h2>
+<p>The book is broken into three broad parts. The first introduces and frames the book. It&#8217;s the chapter you&#8217;re reading now along with the <a href="architecture-performance-and-games.html">next one</a>.</p>
+<p>The second part, <a href="design-patterns-revisited.html">&#8220;Design Patterns Revisited&#8221;</a>, goes through a handful of patterns from the Gang of Four book. With each one, I give my spin on it and how I think it relates to game programming.</p>
+<p>Finally, the last part is the real meat of the book. It presents thirteen new design patterns that I&#8217;ve found in games. They&#8217;re grouped into four sections: <a href="sequencing-patterns.html">Sequencing Patterns</a>, <a href="behavioral-patterns.html">Behavioral Patterns</a>, <a href="decoupling-patterns.html">Decoupling Patterns</a>, and <a href="optimization-patterns.html">Optimization Patterns</a>.</p>
+<p>Each pattern within these sections is described using a consistent
 structure so that you can use this book as a reference and quickly
-find what you need.</p>
+find what you need:</p>
+<ul>
+<li>
 <p>The <strong>Intent</strong> section provides a snapshot description of the pattern
 in terms of the problem it intends to solve. This is first so that you
 can hunt through the book quickly to find a pattern that will help you
 with your current struggle.</p>
+</li>
+<li>
 <p>The <strong>Motivation</strong> section describes an example problem that we will
 be applying the pattern to. Unlike concrete algorithms, a pattern is
 usually formless unless applied to some specific problem. Teaching a
 pattern without an example is like teaching baking without mentioning
 dough. This section provides the dough that the later sections will
 bake.</p>
+</li>
+<li>
 <p>The <strong>Pattern</strong> section distills the essence of the pattern out of the
 previous example. If you want a dry textbook description of the
 pattern, this is it. It&#8217;s also a good refresher if you&#8217;re familiar with a pattern already and want to make sure you don&#8217;t forget an ingredient.</p>
+</li>
+<li>
 <p>So far, the pattern has only been explained in terms of a single
 example. But how do you know if <em>your</em> problem is a good one to use
 the pattern on? The <strong>When to Use It</strong> section provides some
 guidelines on when the pattern is useful, and when it&#8217;s best avoided.
 The <strong>Keep in Mind</strong> section points out implications that using the
 pattern has on your program.</p>
+</li>
+<li>
 <p>A pattern is a template for a solution. Each time you use it, you&#8217;ll
 likely implement it differently. The next section, <strong>Design
 Decisions</strong>, covers the different ways you might render the abstract
 pattern into hard code.</p>
+</li>
+<li>
 <p>This is a whole lot of exposition and not a lot of code to look at.
 The <strong>Sample Code</strong> remedies that by walking through an example
 implementation or two. If, like me, you need concrete examples to
 really <em>get</em> something, this is your section.</p>
+</li>
+<li>
 <p>To wrap it up, there&#8217;s a short <strong>See Also</strong> section that shows how
 this pattern relates to others both in this book and in <em>Design
 Patterns</em>. This will give you a clearer picture of how a pattern lives
 in the larger pattern ecosystem.</p>
+</li>
+</ul>
 <h2><a href="#how-the-book-is-formatted" name="how-the-book-is-formatted">How the Book is Formatted</a></h2>
 <p>Each <span name="aside">pattern</span> has a set of parts&thinsp;&mdash;&thinsp;the ingredients in its recipe.
 Every implementation will include these parts, so it&#8217;s important to
@@ -370,6 +352,11 @@ these languages should be able to understand the code samples here.</p>
 kept as simple as possible and don&#8217;t represent good C++ style or
 usage. Read the code samples for the idea being expressed, not the
 code expressing it.</p>
+<p>In particular, the code is not written in &#8220;modern&#8221;&thinsp;&mdash;&thinsp;C++11 or newer &#8212;
+style. It does not use the standard library and rarely uses templates.
+This makes for &#8220;bad&#8221; C++ code, but I hope that by keeping it
+stripped down, it will be more approachable to people coming from C,
+Objective-C, Java, and other languages.</p>
 <p>To avoid wasting space on code you&#8217;ve already seen or that isn&#8217;t
 relevant to the pattern, code will sometimes be omitted in examples.
 When this occurs, an ellipsis will be placed in the sample to show

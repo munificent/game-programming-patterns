@@ -3,9 +3,10 @@ Issues and pull requests are more than welcome!
 
 ## Building the Book
 
-The book is written in Markdown (in `book/`). A little Python script (`script/format.py`) converts that along with a SASS file (`asset/style.scss`) and HTML template (`asset/template.html`) to the final HTML (in `book/`). To run the format script locally, you'll need to have Python 2.7-ish, and install Python Markdown and SmartyPants:
+The book is written in Markdown (in `book/`). A little Python script (`script/format.py`) converts that along with a SASS file (`asset/style.scss`) and HTML template (`asset/template.html`) to the final HTML (in `book/`). To run the format script locally, you'll need to have Python 2.7-ish, and install Python Markdown, Pygments, and SmartyPants:
 
     $ pip install markdown
+    $ pip install pygments
     $ pip install smartypants
 
 You may need `sudo` for those. Once that's done, you can run:
