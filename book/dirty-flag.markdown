@@ -335,12 +335,12 @@ This pattern is fairly specific, so there are only a couple of knobs to twiddle:
     sync point may not be part of the game mechanics. We may just want to hide the
     work behind a loading screen or a cut scene.
 
-    * *Doing the work doesn't impact the user experience.* Unlike the above
+    * *Doing the work doesn't impact the user experience.* Unlike the previous
       option, you can often give something to
         distract the player while the game is busy processing.
 
     * *You lose control over when the work happens.* This is sort of the
-        opposite of the above point. You have micro-scale control over when you
+        opposite of the earlier point. You have micro-scale control over when you
         process, and can make sure the game handles it gracefully.
 
         What you *can't* do is ensure the player actually makes it to the

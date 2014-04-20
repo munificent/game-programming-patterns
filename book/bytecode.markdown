@@ -563,7 +563,7 @@ Our sample VM only works with one kind of value, integers. That makes it easy: t
 
     * *It's object-oriented.* If you adhere to OOP principles, this does things the "right" way and uses polymorphic dispatch for type-specific behavior instead of something like switching on a type tag.
 
-    * *It's verbose.* You have to define a separate class with all of the associated ceremonial verbiage for each data type. Note that in the above examples, we showed the entire definition of *all* of the value types. Here we only covered one!
+    * *It's verbose.* You have to define a separate class with all of the associated ceremonial verbiage for each data type. Note that in the previous examples, we showed the entire definition of *all* of the value types. Here we only covered one!
 
     * *It's inefficient.* To get polymorphism, you have to go through a pointer, which means even tiny values like booleans and numbers get wrapped in objects that are allocated on the heap. Every time you touch a value, you have to do a virtual method call.
 

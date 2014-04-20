@@ -467,7 +467,7 @@ file that defines them. It could look like:
 
 We'd have a chunk of code that reads each breed entry and instantiates
 a new Breed instance with its data. As you can see from the `"parent": "Troll"`
-fields above, the Troll Archer and Troll Wizard breeds inherit from the base
+fields, the Troll Archer and Troll Wizard breeds inherit from the base
 Troll breed.
 
 Since both of them have zero for their health, they'll inherit it from

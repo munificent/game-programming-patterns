@@ -152,7 +152,7 @@
 </aside>
 
 <h2><a href="#how-it-works" name="how-it-works">How it Works</a></h2>
-<p>If you don&#8217;t already know how to implement the pattern, you could probably guess just from the above description, but to keep things easy on you, I&#8217;ll walk
+<p>If you don&#8217;t already know how to implement the pattern, you could probably guess just from the previous description, but to keep things easy on you, I&#8217;ll walk
 through it quickly.</p>
 <h3><a href="#the-observer" name="the-observer">The observer</a></h3>
 <p>We&#8217;ll start with the nosy class that wants to know when another object does something interesting. It accomplishes that by implementing this:</p>
@@ -287,7 +287,7 @@ through it quickly.</p>
 <p>To me, this is the difference between &#8220;observer&#8221; systems and &#8220;event&#8221; systems. With the former, you observe <em>the thing that did something interesting</em>. With the latter, you observe an object that represents <em>the interesting thing that happened</em>.</p>
 </aside>
 
-<p>Now, when the physics engine does something noteworthy, it calls <code>notify()</code> just like in the original motivation example above. That walks the observer list and gives them all the heads up.</p>
+<p>Now, when the physics engine does something noteworthy, it calls <code>notify()</code> just like in the original motivation example before. That walks the observer list and gives them all the heads up.</p>
 <p><img src="images/observer-list.png" /></p>
 <p>Pretty simple, right? Just one class that maintains a list of pointers to instances of some interface. It&#8217;s hard to believe that something so straightforward is the communication backbone of countless programs and app frameworks.</p>
 <p>But it isn&#8217;t without its detractors. When I&#8217;ve asked other game programmers what they think about this pattern, I hear a few common complaints. Let&#8217;s see what we can do to address them, if anything.</p>
@@ -318,7 +318,7 @@ games, memory allocation still matters, even in managed languages. <span name="f
 <p>The <a href="object-pool.html" class="pattern">Object Pool</a> chapter goes into more detail about this and a common technique for avoiding it.</p>
 </aside>
 
-<p>In the example code above, I just used a fixed array because I&#8217;m trying to keep
+<p>In the example code before, I just used a fixed array because I&#8217;m trying to keep
 things dead simple. In real implementations, the observer list is almost always
 a dynamically allocated collection that grows and shrinks as observers are
 added and removed. That memory churn spooks some people.</p>

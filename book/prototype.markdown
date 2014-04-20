@@ -266,7 +266,7 @@ Let's review:
 
 * Behavior goes through a level of indirection -- delegating to the prototype -- and is stored on a separate object that represents the set of methods shared by all objects of a certain type.
 
-Call me crazy, but that sounds a lot like my description of classes above. You *can* write prototype-style code in JavaScript (*sans* cloning), but the syntax and idioms of the language encourage a class-based approach.
+Call me crazy, but that sounds a lot like my description of classes earlier. You *can* write prototype-style code in JavaScript (*sans* cloning), but the syntax and idioms of the language encourage a class-based approach.
 
 Personally, I think that's a <span name="good">good thing</span>. Like I said, I find doubling down on prototypes makes code harder to work with, so I like that JavaScript wraps the core semantics in something a little more classy.
 

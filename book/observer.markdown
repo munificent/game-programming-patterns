@@ -59,7 +59,7 @@ Of course, if you *permanently* remove achievements and nothing else ever listen
 
 ## How it Works
 
-If you don't already know how to implement the pattern, you could probably guess just from the above description, but to keep things easy on you, I'll walk
+If you don't already know how to implement the pattern, you could probably guess just from the previous description, but to keep things easy on you, I'll walk
 through it quickly.
 
 ### The observer
@@ -137,7 +137,7 @@ To me, this is the difference between "observer" systems and "event" systems. Wi
 
 </aside>
 
-Now, when the physics engine does something noteworthy, it calls `notify()` just like in the original motivation example above. That walks the observer list and gives them all the heads up.
+Now, when the physics engine does something noteworthy, it calls `notify()` just like in the original motivation example before. That walks the observer list and gives them all the heads up.
 
 <img src="images/observer-list.png" />
 
@@ -188,7 +188,7 @@ The <a href="object-pool.html" class="pattern">Object Pool</a> chapter goes into
 
 </aside>
 
-In the example code above, I just used a fixed array because I'm trying to keep
+In the example code before, I just used a fixed array because I'm trying to keep
 things dead simple. In real implementations, the observer list is almost always
 a dynamically allocated collection that grows and shrinks as observers are
 added and removed. That memory churn spooks some people.

@@ -383,7 +383,7 @@ particle system object, how would it get one?
 
 *   **Make the state static.**
 
-    In the above example, we were initializing each `Superpower` *instance* with
+    In the previous example, we were initializing each `Superpower` *instance* with
     a particle system. That makes sense when every power needs its own unique
     state. But let's say that the particle system is a
     <a class="pattern" href="singleton.html">Singleton</a>, and every power
