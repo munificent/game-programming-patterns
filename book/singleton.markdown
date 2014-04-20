@@ -262,7 +262,7 @@ information. However, passing an instance of our `Log` class to every
 single function clutters the method signature and distracts from the
 intent of the code.
 
-The obvious fix is to make our Log class a singleton. Every function
+The obvious fix is to make our `Log` class a singleton. Every function
 can then go straight to the class itself to get an instance. But when
 we do that, we inadvertently acquire a strange little restriction. All
 of the sudden, we can no longer create more than one logger.
@@ -282,7 +282,7 @@ limitation is entrenched in every single call site that uses it:
 
     Log::instance().write("Some event.");
 
-In order to make our Log class support multiple instantiation (like it
+In order to make our `Log` class support multiple instantiation (like it
 originally did), we'll have to fix both the class itself and every
 single call site that uses it. Our convenient access isn't so
 convenient anymore.
@@ -404,14 +404,20 @@ This is one half of what the Singleton pattern gives you. As in our
 file system example, it can be critical to ensure there's only a
 single instance of a class.
 
-However, that doesn't necessarily mean we also want to provide public
-global access to that instance. We may want to restrict access to
-certain areas of the code, or even make it entirely private to a
-single class (For example, we may be wrapping our file system wrapper
-inside another wrapper entirely.) In those cases, providing a public
+However, that doesn't necessarily mean we also want to provide *public*,
+*global* access to that instance. We may want to restrict access to
+certain areas of the code, or even make it <span name="wrapper">private</span> to a
+single class. In those cases, providing a public
 global point of access weakens the architecture.
 
-So we need a way to ensure single instantiation without providing
+<aside name="wrapper">
+
+For example, we may be wrapping our file system wrapper
+inside *another* layer of abstraction.
+
+</aside>
+
+We want a way to ensure single instantiation *without* providing
 global access. There are a couple of ways to accomplish this. Here's
 one:
 
@@ -431,8 +437,7 @@ the very nature of the class's structure.
 
 ### To provide convenient access to an instance
 
-Convenient access is the main reason we reach for singletons --
-they make it easy to get our hands on an object we need to use in a
+Convenient access is the main reason we reach for singletons. They make it easy to get our hands on an object we need to use in a
 lot of different places. That ease comes at a cost, though: it becomes
 equally easy to get our hands on the object in places where we *don't*
 want it being used.
@@ -442,7 +447,7 @@ possible while still getting the job done. The smaller the scope an
 object has, the fewer places we need to keep in our head while we're
 working with it. Before we take the shotgun approach of a singleton
 object with *global* scope, let's consider other ways our codebase can
-get access to an object.
+get access to an object:
 
 * **Pass it in.** The simplest solution, and often the best, is to simply pass the
     object you need as an argument to the functions that need it. It's worth
@@ -486,7 +491,7 @@ get access to an object.
 
     <aside name="gameobject">
 
-    This raises the question, "how does `GameObject` get the log
+    This raises the question, "how does `GameObject` get the `Log`
     instance?" A simple solution is to have the base class simply create
     and own a static instance. If you don't want the base class to take
     such an active role, another popular solution is to use dependency
