@@ -696,9 +696,7 @@ small change in <code>Stage</code>:</p>
 all of their states.</p>
 <p>The end result of this is that an actor will only see a slap on the
 frame <em>after</em> it was actually slapped. This way, no matter what order
-they appear in the stage&#8217;s array, they will behave the same. Updating
-the actors happens simultaneously as far as the user or any outside
-code can tell.</p>
+they appear in the stage&#8217;s array, they will behave the same. As far as the user or any outside code can tell, all of the actors update simultaneously within a frame.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>The Double Buffer pattern is pretty straightforward, and the examples
 we&#8217;ve seen so far cover most of the variations you&#8217;re likely to

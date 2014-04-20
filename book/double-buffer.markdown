@@ -461,9 +461,7 @@ all of their states.
 
 The end result of this is that an actor will only see a slap on the
 frame *after* it was actually slapped. This way, no matter what order
-they appear in the stage's array, they will behave the same. Updating
-the actors happens simultaneously as far as the user or any outside
-code can tell.
+they appear in the stage's array, they will behave the same. As far as the user or any outside code can tell, all of the actors update simultaneously within a frame.
 
 ## Design Decisions
 
