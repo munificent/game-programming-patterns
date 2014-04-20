@@ -261,12 +261,12 @@
 <div class="codehilite"><pre><span class="n">Command</span><span class="o">*</span> <span class="n">command</span> <span class="o">=</span> <span class="n">inputHandler</span><span class="p">.</span><span class="n">handleInput</span><span class="p">();</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">command</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="n">command</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">(</span><span class="n">hero</span><span class="p">);</span>
+  <span class="n">command</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">(</span><span class="n">actor</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
 
 
-<p>Assuming <code>hero</code> is a reference to the player&#8217;s character, this correctly drives him based on the user&#8217;s input, so we&#8217;re back to the same behavior we had in the first example. But adding a layer of indirection between the command and the actor that performs it has given us a neat little ability: we could let the player control any actor in the game now by just changing the actor we execute the commands on.</p>
+<p>Assuming <code>actor</code> is a reference to the player&#8217;s character, this correctly drives him based on the user&#8217;s input, so we&#8217;re back to the same behavior we had in the first example. But adding a layer of indirection between the command and the actor that performs it has given us a neat little ability: we could let the player control any actor in the game now by just changing the actor we execute the commands on.</p>
 <p>In practice, that&#8217;s not a common feature. But there is a similar use case that <em>does</em> pop up frequently. So far, we&#8217;ve only considered the player-driven character, but what about all of the other actors in the world? Those are driven by the game&#8217;s AI. We can use this same command pattern as the interface between the AI engine and the actors: the AI code just emits <code>Command</code> objects.</p>
 <p>The decoupling here between the AI that selects commands, and the actor code that performs them gives us a lot of flexibility. We can use different AI modules for different actors. Or we can mix and match AI for different kinds of behavior. Want a more aggressive opponent? Just plug-in a more aggressive AI to generate commands for it. In fact, we can even bolt AI onto the <em>player&#8217;s</em> character, which can be useful for things like demo mode where the game needs to run on auto-pilot.</p>
 <p><span name="queue">By</span> making the commands that control an actor first class objects, we&#8217;ve removed the tight coupling of a direct method call. Instead, think of it as a queue or stream of commands.</p>
@@ -324,18 +324,19 @@
 <p><span name="free"></span></p>
 <div class="codehilite"><pre><span class="n">Command</span><span class="o">*</span> <span class="nf">handleInput</span><span class="p">()</span>
 <span class="p">{</span>
+  <span class="c1">// Get the selected unit...</span>
+  <span class="n">Unit</span><span class="o">*</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">getSelectedUnit</span><span class="p">();</span>
+
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_UP</span><span class="p">))</span> <span class="p">{</span>
     <span class="c1">// Move the unit up one.</span>
-    <span class="kt">int</span> <span class="n">destY</span> <span class="o">=</span> <span class="n">selectedUnit</span><span class="o">-&gt;</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">MoveUnitCommand</span><span class="p">(</span>
-        <span class="n">selectedUnit</span><span class="p">,</span> <span class="n">selectedUnit</span><span class="o">-&gt;</span><span class="n">x</span><span class="p">(),</span> <span class="n">destY</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">destY</span> <span class="o">=</span> <span class="n">unit</span><span class="o">-&gt;</span><span class="n">y</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">MoveUnitCommand</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">unit</span><span class="o">-&gt;</span><span class="n">x</span><span class="p">(),</span> <span class="n">destY</span><span class="p">);</span>
   <span class="p">}</span>
 
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_DOWN</span><span class="p">))</span> <span class="p">{</span>
     <span class="c1">// Move the unit down one.</span>
-    <span class="kt">int</span> <span class="n">destY</span> <span class="o">=</span> <span class="n">selectedUnit</span><span class="o">-&gt;</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">MoveUnitCommand</span><span class="p">(</span>
-        <span class="n">selectedUnit</span><span class="p">,</span> <span class="n">selectedUnit</span><span class="o">-&gt;</span><span class="n">x</span><span class="p">(),</span> <span class="n">destY</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">destY</span> <span class="o">=</span> <span class="n">unit</span><span class="o">-&gt;</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">MoveUnitCommand</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">unit</span><span class="o">-&gt;</span><span class="n">x</span><span class="p">(),</span> <span class="n">destY</span><span class="p">);</span>
   <span class="p">}</span>
 
   <span class="c1">// Other moves...</span>
@@ -350,7 +351,7 @@
 <p>Of course, in a non-garbage-collected language like C++, this means the code executing commands will also be responsible for freeing their memory.</p>
 </aside>
 
-<p>This fact that commands are one-use-only will come to our advantage in a second. To make commands undoable, we define another operation each command class needs to implement:</p>
+<p>The fact that commands are one-use-only will come to our advantage in a second. To make commands undoable, we define another operation each command class needs to implement:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Command</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -396,7 +397,7 @@
 </pre></div>
 
 
-<p>Note that we added some <span name="memento">more state</span> to the class. After we move a unit, it has no recollection of where it used to be. If we want to be able to undo that move, we have to remember its old position ourselves, which is what <code>xBefore_</code> and <code>yBefore_</code> in the command are.</p>
+<p>Note that we added some <span name="memento">more state</span> to the class. After we move a unit, it has no recollection of where it used to be. If we want to be able to undo that move, we have to remember the unit&#8217;s previous position ourselves, which is what <code>xBefore_</code> and <code>yBefore_</code> in the command are.</p>
 <aside name="memento">
 
 <p>This is an obvious place to use the <a href="http://en.wikipedia.org/wiki/Memento_pattern" class="gof-pattern">Memento pattern</a>. Unfortunately, I&#8217;ve never found it to work well.</p>

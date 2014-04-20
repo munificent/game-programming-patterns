@@ -121,7 +121,7 @@ Then we need some code that takes that command and runs it on the actor represen
 
 ^code call-actor-command
 
-Assuming `hero` is a reference to the player's character, this correctly drives him based on the user's input, so we're back to the same behavior we had in the first example. But adding a layer of indirection between the command and the actor that performs it has given us a neat little ability: we could let the player control any actor in the game now by just changing the actor we execute the commands on.
+Assuming `actor` is a reference to the player's character, this correctly drives him based on the user's input, so we're back to the same behavior we had in the first example. But adding a layer of indirection between the command and the actor that performs it has given us a neat little ability: we could let the player control any actor in the game now by just changing the actor we execute the commands on.
 
 In practice, that's not a common feature. But there is a similar use case that *does* pop up frequently. So far, we've only considered the player-driven character, but what about all of the other actors in the world? Those are driven by the game's AI. We can use this same command pattern as the interface between the AI engine and the actors: the AI code just emits `Command` objects.
 
@@ -185,7 +185,7 @@ Of course, in a non-garbage-collected language like C++, this means the code exe
 
 </aside>
 
-This fact that commands are one-use-only will come to our advantage in a second. To make commands undoable, we define another operation each command class needs to implement:
+The fact that commands are one-use-only will come to our advantage in a second. To make commands undoable, we define another operation each command class needs to implement:
 
 ^code undo-command
 
@@ -193,7 +193,7 @@ An `undo()` method reverses the game state changed by the corresponding `execute
 
 ^code undo-move-unit
 
-Note that we added some <span name="memento">more state</span> to the class. After we move a unit, it has no recollection of where it used to be. If we want to be able to undo that move, we have to remember its old position ourselves, which is what `xBefore_` and `yBefore_` in the command are.
+Note that we added some <span name="memento">more state</span> to the class. After we move a unit, it has no recollection of where it used to be. If we want to be able to undo that move, we have to remember the unit's previous position ourselves, which is what `xBefore_` and `yBefore_` in the command are.
 
 <aside name="memento">
 

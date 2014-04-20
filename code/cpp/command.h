@@ -157,15 +157,15 @@ namespace CommandPattern
     void executeCommand()
     {
       InputHandler inputHandler;
-      GameActor hero;
+      GameActor actor;
       //^call-actor-command
       Command* command = inputHandler.handleInput();
       if (command)
       {
-        command->execute(hero);
+        command->execute(actor);
       }
       //^call-actor-command
-      use(hero);
+      use(actor);
     }
   }
 
@@ -209,23 +209,24 @@ namespace CommandPattern
       };
       //^move-unit
 
-      Unit* selectedUnit;
+      Unit* getSelectedUnit() { return NULL; }
 
       //^get-move
       Command* handleInput()
       {
+        // Get the selected unit...
+        Unit* unit = getSelectedUnit();
+
         if (isPressed(BUTTON_UP)) {
           // Move the unit up one.
-          int destY = selectedUnit->y() - 1;
-          return new MoveUnitCommand(
-              selectedUnit, selectedUnit->x(), destY);
+          int destY = unit->y() - 1;
+          return new MoveUnitCommand(unit, unit->x(), destY);
         }
 
         if (isPressed(BUTTON_DOWN)) {
           // Move the unit down one.
-          int destY = selectedUnit->y() + 1;
-          return new MoveUnitCommand(
-              selectedUnit, selectedUnit->x(), destY);
+          int destY = unit->y() + 1;
+          return new MoveUnitCommand(unit, unit->x(), destY);
         }
 
         // Other moves...
