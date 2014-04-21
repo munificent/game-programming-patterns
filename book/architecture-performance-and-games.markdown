@@ -1,11 +1,11 @@
 ^title Architecture, Performance, and Games
 ^section Introduction
 
-Before we plunge headfirst into a pile of patterns, I thought it might help to give you some larger context about how I think about software architecture and how it applies to games. It may help you understand the rest of this book better. If nothing else, when you get dragged into an <span name="ammo">argument</span> about how much design patterns and software architecture suck or are awesome, it will give you some ammo to use.
+Before we plunge headfirst into a pile of patterns, I thought it might help to give you some larger context about how I think about software architecture and how it applies to games. It may help you understand the rest of this book better. If nothing else, when you get dragged into an <span name="ammo">argument</span> about how design patterns and software architecture suck or are awesome, it will give you some ammo to use.
 
 <aside name="ammo">
 
-Note that I didn't presume which side you're taking in that fight. Like any arms dealer, I have wares to offer to all combatants here.
+Note that I didn't presume which side you're taking in that fight. Like any arms dealer, I sell wares to offer to all combatants here.
 
 </aside>
 
@@ -21,7 +21,13 @@ Wow, this paragraph would make a terrible ad for the book.
 
 Instead, it's about the code *between* all of that. It's less about writing code than it is about *organizing* it. Every program has *some* organization, even if it's just "jam the whole thing into `main()` and see what happens", so I think it's more interesting to talk about what makes for *good* organization. How do we tell a good architecture from a bad one?
 
-I've been mulling this question over for about five years. Of course, like you, I have an intuition about good design. We've all suffered through codebases so bad the best you could hope do for them is take them out back and put them out of their misery. Most us created quite a few of those as we learned to program.
+I've been mulling this question over for about five years. Of course, like you, I have an intuition about good design. We've all suffered through codebases so <span name="suffered">bad</span> the best you could hope to do for them is take them out back and put them out of their misery.
+
+<aside name="suffered">
+
+Most of us created a few of these as we learned to program.
+
+</aside>
 
 A lucky few have had the opposite experience, a chance to work with beautifully designed code. The kind of codebase that feels like a perfectly appointed luxury hotel festooned with concierges waiting eagerly on your every whim. What's the difference between the two?
 
@@ -31,7 +37,7 @@ For me, good design means that when I make a change, it's as if the entire progr
 
 That sounds pretty, but it's not exactly actionable. "Just write your code so that changes don't disturb its placid surface." Right.
 
-Let me try to break that down a bit more. The first key piece is that *design is about change*. Someone has to be modifying the codebase. If <span name="zen">no one</span> is touching the code -- whether because it's perfect and complete, or so wretched no one will sully their text editor with it -- its design is irrelevant. The measure of a design is how easily it accommodates changes. With no changes, it's a runner who never runs a race.
+Let me try to break that down a bit more. The first key piece is that *design is about change*. Someone has to be modifying the codebase. If <span name="zen">no one</span> is touching the code -- whether because it's perfect and complete, or so wretched no one will sully their text editor with it -- its design is irrelevant. The measure of a design is how easily it accommodates changes. With no changes, it's a runner who never leaves the starting line.
 
 <aside name="zen">
 
@@ -41,7 +47,7 @@ There's some Zen koan in here somewhere. "If a program falls in the woods and no
 
 ### How do you make a change?
 
-Before you can change the code to add a new feature, or fix a bug, or whatever reason caused you to fire up your editor, you have to understand what the existing code is doing. You don't have to know the whole program, of course, but you need to <span name="ocr">load</aside> all of the pieces of it that are relevant to your problem into your primate brain.
+Before you can change the code to add a new feature, or fix a bug, or whatever reason caused you to fire up your editor, you have to understand what the existing code is doing. You don't have to know the whole program, of course, but you need to <span name="ocr">load</aside> all of the relevant pieces of it into your primate brain.
 
 <aside name="ocr">
 
@@ -51,7 +57,7 @@ It's weird to think that that is literally an OCR process.
 
 We tend to gloss over this step, but it's often the most time-consuming part of programming. If you think paging some data from RAM into disk is slow, try paging it into a simian cerebrum over a pair of optical nerves.
 
-Once you've got all of the right context into your wetware, you think for a bit and figure out your solution. There can be a lot of back and forth here, but often this is relatively straightforward. Once you understand the problem and the parts of the code it touches, the actual coding is sometimes nearly mechanical.
+Once you've got all the right context into your wetware, you think for a bit and figure out your solution. There can be a lot of back and forth here, but often this is relatively straightforward. Once you understand the problem and the parts of the code it touches, the actual coding is sometimes trivial.
 
 You beat your meaty fingers on the keyboard for a while until the right colored lights appear on screen and you're done, right? Not just yet! Before you write <span name="tests">tests</span> and send it off for code review, you often have some clean up to do.
 
@@ -88,7 +94,7 @@ This sounds great, right? Decouple everything and you'll be able to code like th
 
 This feeling is exactly why people get excited about abstraction, modularity, design patterns, and software architecture. A well-architected program really is a joyful experience to work in, and everyone loves having more productive developers. And good architecture makes a *huge* difference in productivity. It's hard to overstate how profound an effect it can have.
 
-But, like all things in life, it doesn't come free. Good architecture takes real time, effort, and discipline. Every time you make a change or implement a feature, you have to work hard to integrate it gracefully into the rest of the program. You have to take great care to both <span name="maintain">organize</span> the code well and *keep* it organized throughout the thousands of little changes that make up a development cycle.
+But, like all things in life, it doesn't come free. Good architecture takes real effort and discipline. Every time you make a change or implement a feature, you have to work hard to integrate it gracefully into the rest of the program. You have to take great care to both <span name="maintain">organize</span> the code well and *keep* it organized throughout the thousands of little changes that make up a development cycle.
 
 <aside name="maintain">
 
@@ -104,19 +110,23 @@ People get really exciting about this. They envision future developers (or just 
 
 But this is where it starts to get tricky. Whenever you add a layer of abstraction or a place where extensibility is supported, you're *speculating* that you will need that flexibility later. You're adding code and complexity to your game that takes time to develop, debug, and maintain.
 
-That effort pays off if you guess right and end up touching that code later. But predicting the future is *hard* and when that modularity doesn't end up being helpful, it quickly becomes actively harmful.
+That effort pays off if you guess right and end up touching that code later. But <span name="yagni">predicting</span> the future is *hard* and when that modularity doesn't end up being helpful, it quickly becomes actively harmful. After all, it is more code you have to deal with.
+
+<aside name="yagni">
+
+Some folks coined the term "YAGNI" -- [You aren't gonna need it](http://en.wikipedia.org/wiki/You_aren't_gonna_need_it) -- as a mantra to use to fight this urge to speculate about what your future self may want.
+
+</aside>
 
 When people get overzealous about this, you get a codebase whose architecture has spiraled out of control. You've got interfaces and abstractions everywhere. Plug-in systems, abstract base classes, virtual methods galore and all sorts of extension points.
 
 It takes you forever to trace through all of that scaffolding to find some real code that does something. When you need to make a change, sure, there's probably an interface there to help, but good luck finding it. In theory, all of this decoupling means you have less code to understand before you can extend it, but the layers of abstraction themselves end up filling up your mental scratch disk.
 
-Codebases like this are what turn people *against* software architecture, and design patterns in particular. It's easy to get so wrapped up in the code itself that you lose sight of the fact that you're trying to ship a *game*. This tarpit sucks in countless developers who spend years working on an "engine" without ever figuring out what it's an engine *for*.
+Codebases like this are what turn people *against* software architecture, and design patterns in particular. It's easy to get so wrapped up in the code itself that you lose sight of the fact that you're trying to ship a *game*. The siren song of extensibility sucks in countless developers who spend years working on an "engine" without ever figuring out what it's an engine *for*.
 
 ## Performance and Speed
 
-There's another critique of software architecture and abstraction that you hear sometimes, especially in game development: that it hurts your game's performance. It's a valid observation.
-
-Many patterns that make your code more flexible rely on virtual dispatch, interfaces, pointers, messages and <span name="templates">other mechanisms</span> that all have at least some runtime cost.
+There's another critique of software architecture and abstraction that you hear sometimes, especially in game development: that it hurts your game's performance. Many patterns that make your code more flexible rely on virtual dispatch, interfaces, pointers, messages and <span name="templates">other mechanisms</span> that all have at least some runtime cost.
 
 <aside name="templates">
 
@@ -134,21 +144,21 @@ But performance is all about assumptions. The art of optimization thrives on con
 
 This doesn't mean flexibility is bad, though! It lets us change our game quickly, and *developer* speed is absolutely vital for getting to a fun experience. No one, not even Will Wright, can come up with a balanced game design on paper. It demands iteration and experimentation.
 
-The faster you can try out ideas and see how they feel, the more you can try. The more you try, the more likely you are to find something great. Even after you've found the right mechanics, you need plenty of time for tuning. A tiny imbalance can wreck the fun of a game.
+The faster you can try out ideas and see how they feel, the more you can try and the more likely you are to find something great. Even after you've found the right mechanics, you need plenty of time for tuning. A tiny imbalance can wreck the fun of a game.
 
 There's no easy answer here. Making your program more flexible so you can prototype faster will have some performance cost. Likewise, optimizing your code will make it less flexible.
 
-My experience, though is that it's a easier to make a fun game fast than it is to a fast game fun. One compromise is to keep the code flexible until the design settles down and then tear out some of the abstraction later to improve your performance.
+My experience, though, is that it's a easier to make a fun game fast than it is to a fast game fun. One compromise is to keep the code flexible until the design settles down and then tear out some of the abstraction later to improve your performance.
 
 ## The Good in Bad Code
 
-That brings me to the next point which is that there's a time and place for different styles of coding. Much of this book is about making maintainable, clean code, so my alliegence is pretty clearly to doing things the "right" way., but there's a lot of value in sloppy code too.
+That brings me to the next point which is that there's a time and place for different styles of coding. Much of this book is about making maintainable, clean code, so my allegiance is pretty clearly to doing things the "right" way, but there's value in slapdash code too.
 
-Writing well-architected code takes careful thought, and that translates to time. Moreso, *maintaining* a good architecture over the life of a project takes a lot of discipline and effort. You have to treat your codebase like a good camper does their campsite: always try to leave it a little better than you found it.
+Writing well-architected code takes careful thought, and that translates to time. Moreso, *maintaining* a good architecture over the life of a project takes a lot of effort. You have to treat your codebase like a good camper does their campsite: always try to leave it a little better than you found it.
 
 This is good when you're going to be living in and working on that code for a long time. But, like I mentioned earlier, game design requires a lot of experimentation and exploration. Especially early on, it's common to write code that you *know* you'll throw away.
 
-If you just want to find out if some gameplay idea plays right at all, spending time architecting it beautifully means burning more time before you can get it on screen and get some feedback. If it ends up not working, that time spent making the code elegant goes to waste when you delete it.
+If you just want to find out if some gameplay idea plays right at all, architecting it beautifully means burning more time before you can get it on screen and get some feedback. If it ends up not working, that time spent making the code elegant goes to waste when you delete it.
 
 Prototyping -- slapping together code that's just barely functional enough to answer a design question -- is a perfectly legitimate programming practice. There is a very large caveat, though. If you write throwaway code, you *must* ensure you're able to throw it away. I've seen bad managers play this game time and time again:
 
@@ -166,7 +176,7 @@ You need to make sure the people using the <span name="throwaway">throwaway</spa
 
 <aside name="throwaway">
 
-One trick to ensuring your prototype code doesn't get turned into real code is to write it in another language than your game uses. That way you *have* to rewrite it before it can end up in your actual game.
+One trick to ensuring your prototype code isn't obliged to become real code is to write it in another language than your game uses. That way you have to rewrite it before it can end up in your actual game.
 
 </aside>
 
@@ -174,53 +184,61 @@ One trick to ensuring your prototype code doesn't get turned into real code is t
 
 We have a few forces in play:
 
-1. We want nice architecture so the code is easier to understand.
+1. <span name="speed">We</span> want nice architecture so the code is easier to understand over the lifetime of the project.
 2. We want fast runtime performance.
-3. We want to get features done quickly right now.
+3. We want to get today's features done quickly.
 
-These forces are at least partially in opposition. Good architecture improves productivity over the long term, but maintaining it means every change requires a little more effort to keep things clean.
+<aside name="speed">
 
-The implementation that's quickest to write is rarely the quickest to *run*. Instead, optimization takes significant engineering time. Once it's done, it tends to calcify the codebase: highly optimized code is very inflexible and very difficult to change.
-
-There's always pressure to get today's work done today and worry about everything else tomorrow. But if cram in features as quickly as we can, our codebase will amass a pile of hacks, bugs, and inconsistencies that will drain our future productivity away.
-
-There's no simple answer here, just trade-offs. Based on the feedback I get, this disheartens a lot of people. Especially for novices who just want to make a game, it's intimidating to hear, "There is no right answer, just different kinds of wrong ones."
-
-But, to me, this is exciting! Look at any field that people dedicate careers to mastering, and in the center you will almost always find a set of intertwined constraints. After all, if there was an easy answer, it would be boring. There's no point is spending your life's passion on a solved problem. You don't hear of someone's distinguished career in <span name="ditch">ditch digging</span>.
-
-<aside name="ditch">
-
-Maybe they do; I didn't research that analogy. For all I know there could be avid ditch digging hobbyists, ditch digging conventions, and a whole subculture around it. Who am I to judge?
+I think it's interesting that these are all really about some kind of speed: our long-term development speed, our short-term speed, and the game's execution speed.
 
 </aside>
 
-In fact, to me this has much in common with games themselves. A game like chess can never be mastered because all of the pieces are so perfectly balanced against one another. This means you can spend your life exploring the vast space of viable strategies.
+These goals are at least partially in opposition. Good architecture improves productivity over the long term, but maintaining it means every change requires a little more effort to keep things clean.
+
+The implementation that's quickest to write is rarely the quickest to *run*. Instead, optimization takes significant engineering time. Once it's done, it tends to calcify the codebase: highly optimized code is inflexible and very difficult to change.
+
+There's always pressure to get today's work done today and worry about everything else tomorrow. But if we cram in features as quickly as we can, our codebase will become a mess of hacks, bugs, and inconsistencies that drain our future productivity.
+
+There's no simple answer here, just trade-offs. From the email I get, this disheartens a lot of people. Especially for novices who just want to make a game, it's intimidating to hear, "There is no right answer, just different flavors of wrong."
+
+But, to me, this is exciting! Look at any field that people dedicate careers to mastering, and in the center you will always find a set of intertwined constraints. After all, if there was an easy answer, everyone would just do that. A field you can master in a week is ultimately boring. You don't hear of someone's distinguished career in <span name="ditch">ditch digging</span>.
+
+<aside name="ditch">
+
+Maybe you do; I didn't research that analogy. For all I know there could be avid ditch digging hobbyists, ditch digging conventions, and a whole subculture around it. Who am I to judge?
+
+</aside>
+
+In fact, to me this has much in common with games themselves. A game like chess can never be mastered because all of the pieces are so perfectly balanced against one another. This means you can spend your life exploring the vast space of viable strategies. A poorly designed game collapses to the one winning tactic played over and over until you get bored and quit.
 
 ## Simplicity
 
-Lately, I feel like if there is any tactic that eases these constraints, it's *simplicity*. In my code today, I try very hard to write the cleanest, most direct solution to the problem. The kind of code where after you read it, you understand exactly what it does and you can't imagine any other possible solution.
+Lately, I feel like if there is any method that eases these constraints, it's *simplicity*. In my code today, I try very hard to write the cleanest, most direct solution to the problem. The kind of code where after you read it, you understand exactly what it does and can't imagine any other possible solution.
 
 I aim to get the data structures and algorithms right (in about that order) and then go from there. I find if I can keep things simple, there's less code overall. That means less code to load into my head in order to change it.
 
-It often runs fast because there's simply not as much overhead and not much code to execute. (This certainly isn't always the case though. `while(true) {}` isn't much code, but it won't be finishing any time soon either.)
+It often runs fast because there's simply not as much overhead and not much code to execute. (This certainly isn't always the case though. You can pack a lot of looping and recursion in a tiny amount of code.)
 
-However, note that I'm saying <span name="simple">simple code</span> takes less time to *read*, not to *write*. You'd think it would be true for both, but the opposite is more often the case. To get to an elegant minimal solution, you have to spend more time distill the code down to its essence.
+However, note that I'm not saying <span name="simple">simple code</span> takes less time to *write*. You'd think it would since you end up with less total code, but a good solution isn't an accretion of code, it's a *distillation* of it.
 
 <aside name="simple">
 
 Blaise Pascal famously ended a letter with, "I would have written a shorter letter, but I did not have the time."
 
+Another choice quote comes from Antoine de Saint-Exupery: "Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away."
+
 Closer to home, I'll note that every time I revise a chapter in this book, it gets shorter. Some chapters are tightened by 20% by the time they're done.
 
 </aside>
 
-We're rarely presented with a clean simple problem. Instead, it's a pile of use cases. You want the X to do Y when Z, but W when A, and so on. In other words, a long list of different example behaviors.
+We're rarely presented with an elegant problem. Instead, it's a pile of use cases. You want the X to do Y when Z, but W when A, and so on. In other words, a long list of different example behaviors.
 
 The solution that takes the least mental effort is to just code up those use cases one at a time. If you look at novice programmers, that's what they often do: they churn out reams of conditional logic for each case they've considered.
 
-But there's nothing elegant in that, and code like that tends to fall over when presented with something even slightly different that the exact examples the coder had in mind. When we think of elegant solutions, what we often have in mind is a *general purpose* one: a small bit of logic that still correctly covers all of our use cases.
+But there's nothing elegant in that, and code in that style tends to fall over when presented with input even slightly different than the examples the coder had in mind. When we think of elegant solutions, what we often have in mind is a *general* one: a small bit of logic that still correctly covers a large space of use cases.
 
-Finding that is a bit like pattern matching or solving a puzzle. It takes effort to see through the scattering of exemplary use cases to the hidden order underlying them all. It's a great feeling when you pull it off.
+Finding that is a bit like pattern matching or solving a puzzle. It takes effort to see through the scattering of example use cases to the hidden order underlying them all. It's a great feeling when you pull it off.
 
 ## Get On With It, Already
 

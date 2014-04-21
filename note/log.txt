@@ -1,3 +1,8 @@
+2014-04-21 - third draft of architecture
+2014-04-20 - #130, #134, #135, #136, #139
+2014-04-19 - #123, #125, #128, #129, merge style guide
+2014-04-18 - fix #137, email
+2014-04-17 - smart quotes and design changes
 2014-04-16 - address #116 #119 #120 #122 #124 #126 #131 #133
 2014-04-15 - email lb
 2014-04-14 - 481 words, finish second draft
