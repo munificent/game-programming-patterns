@@ -346,7 +346,7 @@ aside.sidebar {
 
   padding-left: 22px;
   border-radius: 0;
-  border-left: solid 8px hsl(40, 35%, 93%);
+  border-left: solid 8px hsl(40, 40%, 90%);
 
   p, li {
     font: 14px/20px $sans;
@@ -431,7 +431,7 @@ a.start-reading:hover {
 
 // Sign-up box on front page.
 .sign-up {
-  background: hsl(40, 90%, 98%);
+  background: hsl(40, 90%, 95%);
 
   margin: 0;
   padding: 5px 15px;
@@ -649,11 +649,11 @@ p.footer {
   }
 
   p, li {
-    font: normal 14px/20px $serif;
+    font: normal 13px/22px $serif;
   }
 
   blockquote p {
-    font: italic 15px/22px $serif;
+    font: italic 13px/22px $serif;
   }
 
   code {
@@ -661,7 +661,8 @@ p.footer {
   }
 
   pre {
-    font: normal 12px/15px $mono;
+    padding: 6px;
+    font: normal 12px/16px $mono;
 
     // Scroll horizontally if not wide enough.
     overflow: auto;
@@ -669,6 +670,12 @@ p.footer {
 
   ul, ol {
     padding: 0 0 0 20px;
+  }
+
+  aside {
+    p, li {
+      font: 14px/22px $sans;
+    }
   }
 }
 

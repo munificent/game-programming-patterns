@@ -234,7 +234,7 @@ aside.sidebar {
   border: none;
   padding-left: 22px;
   border-radius: 0;
-  border-left: solid 8px #f3efe7; }
+  border-left: solid 8px #f0e9db; }
   aside.sidebar p, aside.sidebar li {
     font: 14px/20px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
 
@@ -291,7 +291,7 @@ a.start-reading:hover {
   box-shadow: 0 0 10px #99ddff; }
 
 .sign-up {
-  background: #fefbf5;
+  background: #fef6e7;
   margin: 0;
   padding: 5px 15px;
   font: normal 16px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
@@ -487,20 +487,24 @@ p.footer {
     border-left: solid 6px #d9eaf2; }
 
   p, li {
-    font: normal 14px/20px "Merriweather", Georgia, serif; }
+    font: normal 13px/22px "Merriweather", Georgia, serif; }
 
   blockquote p {
-    font: italic 15px/22px "Merriweather", Georgia, serif; }
+    font: italic 13px/22px "Merriweather", Georgia, serif; }
 
   code {
     font-size: 14px; }
 
   pre {
-    font: normal 12px/15px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+    padding: 6px;
+    font: normal 12px/16px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
     overflow: auto; }
 
   ul, ol {
-    padding: 0 0 0 20px; } }
+    padding: 0 0 0 20px; }
+
+  aside p, aside li {
+    font: 14px/22px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; } }
 @media only screen and (max-height: 400px) {
   .nav {
     display: none; } }
