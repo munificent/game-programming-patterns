@@ -25,7 +25,7 @@ didn't work, which was often, we started over from scratch.
 
 At the back of the stack of pages was a real monster: a program that
 took up several dense pages of code. It took a while before we worked
-up the courage to even try it, but it was irresistable: the title
+up the courage to even try it, but it was irresistible: the title
 above the listing was "Tunnels and Trolls." We had no idea
 what it did, but it sounded like a game, and what could be cooler than
 a computer game that you programmed yourself?
@@ -129,7 +129,7 @@ Most game programming books I've seen fall into one of two categories:
 
 I like both of these kinds of books, but I think they leave some gaps. Books specific to a domain rarely tell you how that chunk of code interacts with the rest of the game. You may be a wizard at physics and rendering, but do you know how to tie them together gracefully?
 
-The second category covers that, but I find it often too monotlithic and too genre-specific. Especially with the rise of mobile and casual gaming, we're in a period where lots of different genres of games are being created. We aren't all just cloning Quake anymore. Books that walk you through a single engine aren't a good fit when *your* game doesn't fit that mold.
+The second category covers that, but I find it often too monolithic and too genre-specific. Especially with the rise of mobile and casual gaming, we're in a period where lots of different genres of games are being created. We aren't all just cloning Quake anymore. Books that walk you through a single engine aren't a good fit when *your* game doesn't fit that mold.
 
 Instead, what I'm trying to do here is more <span name="carte">*à la carte*</span>. Each of the chapters in this book is an independent idea that you can apply to your code. This way, you can mix and match them in a way that works best for the game *you* want to make.
 
@@ -172,7 +172,7 @@ an *extension* of it. While the patterns introduced here are useful in other sof
 
 *   Development cycles are highly compressed and a number of
     programmers need to be able to rapidly build and iterate on a rich
-    set of different behavior without stepping on each others' toes or
+    set of different behavior without stepping on each other's toes or
     leaving footprints all over the codebase.
 
 *   After all of this behavior is defined, it starts interacting.
