@@ -493,9 +493,9 @@
 <p>It reads the next <span name="single">byte</span> in the bytecode stream <em>as a number</em>, and pushes it onto the stack.</p>
 <p>Let&#8217;s string a few of these instructions together and watch the interpreter execute them to get a feel for how the stack works. We start with an empty stack and the interpreter pointing to the first instruction:</p>
 <p><img src="images/bytecode-stack-1.png" /></p>
-<p>First, it executes the first <code>INST_LITERAL</code>. That reads the next byte from the bytecode (<code>0</code>) and pushes it onto the stack.</p>
+<p>First, it executes the first <code>INST_LITERAL</code>. That reads the next byte from the bytecode (<code>0</code>) and pushes it onto the stack:</p>
 <p><img src="images/bytecode-stack-2.png" /></p>
-<p>Then it executes the second <code>INST_LITERAL</code>. That reads the <code>10</code> and pushes it.</p>
+<p>Then it executes the second <code>INST_LITERAL</code>. That reads the <code>10</code> and pushes it:</p>
 <p><img src="images/bytecode-stack-3.png" /></p>
 <p>Finally, it executes <code>INST_SET_HEALTH</code>. That pops <code>10</code> and stores it in <code>amount</code>, then pops <code>0</code> and stores it in <code>wizard</code>. Then it calls <code>setHealth()</code> with those parameters.</p>
 <p>Ta-da! We&#8217;ve got a spell that sets your wizard&#8217;s health to ten points. Now we&#8217;ve got enough flexibility to define spells that set either wizard&#8217;s stats to whatever amounts we want. We can also play different sounds and spawn particles.</p>

@@ -309,11 +309,11 @@ Let's string a few of these instructions together and watch the interpreter exec
 
 <img src="images/bytecode-stack-1.png" />
 
-First, it executes the first `INST_LITERAL`. That reads the next byte from the bytecode (`0`) and pushes it onto the stack.
+First, it executes the first `INST_LITERAL`. That reads the next byte from the bytecode (`0`) and pushes it onto the stack:
 
 <img src="images/bytecode-stack-2.png" />
 
-Then it executes the second `INST_LITERAL`. That reads the `10` and pushes it.
+Then it executes the second `INST_LITERAL`. That reads the `10` and pushes it:
 
 <img src="images/bytecode-stack-3.png" />
 

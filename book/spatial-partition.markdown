@@ -295,37 +295,22 @@ The goal is have a *balanced* partitioning, where each region has roughly the sa
 
 * **If the partitioning is object-independent, but *hierarchy* is object-dependent:**
 
-    One spatial partition deserves special mention because it has some of the best characteristics of both fixed partitions and adaptable ones: <span name="quad">quadtrees</span>. A quadtree partitions the world into four cells:
-
-        +-------+-------+
-        | *  *  |       |
-        |       |       |
-        |     * | *     |
-        +-------+-------+
-        |       |      *|
-        |       |   *   |
-        |       |       |
-        +-------+-------+
-
-    The *boundaries* of these squares are fixed: they always slice space right in half. Then, for each of those squares, if are still too many objects in it, it is subdivided:
-
-        +-------+-------+
-        | * |*  |       |
-        |---+---|       |
-        |   | * | *     |
-        +-------+-------+
-        |       |      *|
-        |       |   *   |
-        |       |       |
-        +-------+-------+
-
-    This process continues recursively until every square has fewer than some maximum number of objects. This means that the partitions don't *move* based on the set of objects, but the number of *subdivisions* is object-dependent.
+    One spatial partition deserves special mention because it has some of the best characteristics of both fixed partitions and adaptable ones: <span name="quad">quadtrees</span>.
 
     <aside name="quad">
 
-    A quadtree partitions 2D space. Its 3D analogue is the *octree*: it takes a *volume* and partitions it into eight *cubes*. Aside from the obvious differences, it works just the same as its flatter sibling.
+    A quadtree partitions 2D space. Its 3D analogue is the *octree*: it takes a *volume* and partitions it into eight *cubes*. Aside from the extra
+    dimension, it works the same as its flatter sibling.
 
     </aside>
+
+    A quadtree starts with the entire space as a single partition. If the number of objects in the space exceeds some threshold, it is sliced into four smaller squares. The *boundaries* of these squares are fixed: they always slice space right in half.
+
+    Then, for each of the four squares, we do the same process again, recursively, until every square has a small number of objects in it. Since we only recursively subdivide squares that have a high population, this partitioning adapts to the set of objects, but the partitions don't *move*.
+
+    You can see the partitioning in action reading from left to right here:
+
+    <img src="images/spatial-partition-quadtree.png" />
 
     * *Objects can be added incrementally.* Adding a new object means just finding the right square and adding it. If that bumps that square above the maximum count, it gets subdivided. The other objects in that square get pushed down into the new smaller squares. This requires a little work, but it's a *fixed* amount of effort: the number of objects you have to move will always be less than the maximum object count. Adding a single object can never trigger more than one subdivision.
 

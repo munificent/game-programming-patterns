@@ -71,22 +71,27 @@ I won't get on a soapbox here, but I'll ask you to consider doing more automated
 
 You jammed a bit more code into your game, but you don't want the next person to come along to trip over the wrinkles you left throughout the source. Unless the change is minor, there's usually a bit of reorganization to do to make your new code integrate seamlessly with the rest of the program. If you do it right, the next person to come along won't be able to tell when any line of code was written.
 
-In short, when you have a change to make, you:
+In short, the flow chart for programming is something like:
 
-1. Load the relevant parts of the program into your head.
-2. Figure out and implement the change.
-3. Reorganize and clean up so the change fits in seamlessly.
-4. Rinse, lather, repeat.
+<span name="life-cycle"></span>
+
+<img src="images/architecture-cycle.png" />
+
+<aside name="life-cycle">
+
+The fact that there is no escape from that loop is a little alarming now that I think about it.
+
+</aside>
 
 ### How can decoupling help?
 
-I think much of software architecture focuses on step one. Loading code into neurons is so painfully slow that it pays to find strategies to reduce the volume of it. This book has an entire section on [*decoupling* patterns](decoupling-patterns.html), and a large chunk of *Design Patterns* is about the same idea.
+While it isn't obvious, I think much of software architecture is about that learning phase. Loading code into neurons is so painfully slow that it pays to find strategies to reduce the volume of it. This book has an entire section on [*decoupling* patterns](decoupling-patterns.html), and a large chunk of *Design Patterns* is about the same idea.
 
 You can define "decoupling" a bunch of ways, but I think if two pieces of code are coupled, it means you can't understand one without understanding the other. If you *de*couple them, you can reason about either side independently. That's great because if one of those pieces is relevant to your problem, you only need to load it into your monkey brain and not the other half too.
 
 To me, this is a key goal of software architecture: *minimize the amount of knowledge you need to have in-cranium before you can make progress.*
 
-Steps two and three come into play too, of course. Another definition of decoupling is that a *change* to one piece of code doesn't necessitate a change to another. We obviously need to change *something*, but the less coupling we have, the less that change ripples throughout the rest of the game.
+The later stages into play too, of course. Another definition of decoupling is that a *change* to one piece of code doesn't necessitate a change to another. We obviously need to change *something*, but the less coupling we have, the less that change ripples throughout the rest of the game.
 
 ## At What Cost?
 

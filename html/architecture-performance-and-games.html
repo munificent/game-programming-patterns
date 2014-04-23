@@ -148,18 +148,19 @@
 </aside>
 
 <p>You jammed a bit more code into your game, but you don&#8217;t want the next person to come along to trip over the wrinkles you left throughout the source. Unless the change is minor, there&#8217;s usually a bit of reorganization to do to make your new code integrate seamlessly with the rest of the program. If you do it right, the next person to come along won&#8217;t be able to tell when any line of code was written.</p>
-<p>In short, when you have a change to make, you:</p>
-<ol>
-<li>Load the relevant parts of the program into your head.</li>
-<li>Figure out and implement the change.</li>
-<li>Reorganize and clean up so the change fits in seamlessly.</li>
-<li>Rinse, lather, repeat.</li>
-</ol>
+<p>In short, the flow chart for programming is something like:</p>
+<p><span name="life-cycle"></span></p>
+<p><img src="images/architecture-cycle.png" /></p>
+<aside name="life-cycle">
+
+<p>The fact that there is no escape from that loop is a little alarming now that I think about it.</p>
+</aside>
+
 <h3><a href="#how-can-decoupling-help" name="how-can-decoupling-help">How can decoupling help?</a></h3>
-<p>I think much of software architecture focuses on step one. Loading code into neurons is so painfully slow that it pays to find strategies to reduce the volume of it. This book has an entire section on <a href="decoupling-patterns.html"><em>decoupling</em> patterns</a>, and a large chunk of <em>Design Patterns</em> is about the same idea.</p>
+<p>While it isn&#8217;t obvious, I think much of software architecture is about that learning phase. Loading code into neurons is so painfully slow that it pays to find strategies to reduce the volume of it. This book has an entire section on <a href="decoupling-patterns.html"><em>decoupling</em> patterns</a>, and a large chunk of <em>Design Patterns</em> is about the same idea.</p>
 <p>You can define &#8220;decoupling&#8221; a bunch of ways, but I think if two pieces of code are coupled, it means you can&#8217;t understand one without understanding the other. If you <em>de</em>couple them, you can reason about either side independently. That&#8217;s great because if one of those pieces is relevant to your problem, you only need to load it into your monkey brain and not the other half too.</p>
 <p>To me, this is a key goal of software architecture: <em>minimize the amount of knowledge you need to have in-cranium before you can make progress.</em></p>
-<p>Steps two and three come into play too, of course. Another definition of decoupling is that a <em>change</em> to one piece of code doesn&#8217;t necessitate a change to another. We obviously need to change <em>something</em>, but the less coupling we have, the less that change ripples throughout the rest of the game.</p>
+<p>The later stages into play too, of course. Another definition of decoupling is that a <em>change</em> to one piece of code doesn&#8217;t necessitate a change to another. We obviously need to change <em>something</em>, but the less coupling we have, the less that change ripples throughout the rest of the game.</p>
 <h2><a href="#at-what-cost" name="at-what-cost">At What Cost?</a></h2>
 <p>This sounds great, right? Decouple everything and you&#8217;ll be able to code like the wind. Each change will just mean touching one or two select methods and you can dance across the surface of the codebase leaving nary a shadow on it.</p>
 <p>This feeling is exactly why people get excited about abstraction, modularity, design patterns, and software architecture. A well-architected program really is a joyful experience to work in, and everyone loves having more productive developers. And good architecture makes a <em>huge</em> difference in productivity. It&#8217;s hard to overstate how profound an effect it can have.</p>
