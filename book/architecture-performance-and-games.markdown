@@ -21,7 +21,7 @@ Wow, this paragraph would make a terrible ad for the book.
 
 Instead, it's about the code *between* all of that. It's less about writing code than it is about *organizing* it. Every program has *some* organization, even if it's just "jam the whole thing into `main()` and see what happens", so I think it's more interesting to talk about what makes for *good* organization. How do we tell a good architecture from a bad one?
 
-I've been mulling this question over for about five years. Of course, like you, I have an intuition about good design. We've all suffered through codebases so <span name="suffered">bad</span> the best you could hope to do for them is take them out back and put them out of their misery.
+I've been mulling this question over for about five years. Of course, like you, I have an intuition about good design. We've all suffered through codebases so <span name="suffered">bad</span>, the best you could hope to do for them is take them out back and put them out of their misery.
 
 <aside name="suffered">
 
@@ -109,9 +109,9 @@ Like gardening, it's not enough to put in new plants. You must also weed and pru
 
 </aside>
 
-You have to think about which parts of the program should be decoupled, and introduce abstractions at those points. Likewise, you have to determine where extensibility should be engineered in so future changes are easier to do.
+You have to think about which parts of the program should be decoupled, and introduce abstractions at those points. Likewise, you have to determine where extensibility should be engineered in so future changes are easier to make.
 
-People get really exciting about this. They envision future developers (or just their future self) stepping into the codebase and finding it open-ended, powerful and just beckoning to be extended. They imagine the One Game Engine To Rule Them All.
+People get really excited about this. They envision future developers (or just their future self) stepping into the codebase and finding it open-ended, powerful, and just beckoning to be extended. They imagine the One Game Engine To Rule Them All.
 
 But this is where it starts to get tricky. Whenever you add a layer of abstraction or a place where extensibility is supported, you're *speculating* that you will need that flexibility later. You're adding code and complexity to your game that takes time to develop, debug, and maintain.
 
@@ -137,7 +137,7 @@ There's another critique of software architecture and abstraction that you hear 
 
 One interesting counter-example is templates in C++. Template metaprogramming can sometimes give you the abstraction of interfaces without any penalty at runtime.
 
-There's a spectrum of flexbility here. When you write code to call a concrete method in some class, you're fixing that class at *author* time -- you've hard-coded which class you call into. When you go through a virtual method or interface, the class that gets called isn't known until *runtime*. That's much more flexible, but implies some runtime overhead.
+There's a spectrum of flexibility here. When you write code to call a concrete method in some class, you're fixing that class at *author* time -- you've hard-coded which class you call into. When you go through a virtual method or interface, the class that gets called isn't known until *runtime*. That's much more flexible, but implies some runtime overhead.
 
 Template metaprogramming is somewhere between the two. There, you make the decision of which class to call at *compile time* when the template is instantiated.
 
@@ -153,7 +153,7 @@ The faster you can try out ideas and see how they feel, the more you can try and
 
 There's no easy answer here. Making your program more flexible so you can prototype faster will have some performance cost. Likewise, optimizing your code will make it less flexible.
 
-My experience, though, is that it's a easier to make a fun game fast than it is to a fast game fun. One compromise is to keep the code flexible until the design settles down and then tear out some of the abstraction later to improve your performance.
+My experience, though, is that it's easier to make a fun game fast than it is to a fast game fun. One compromise is to keep the code flexible until the design settles down and then tear out some of the abstraction later to improve your performance.
 
 ## The Good in Bad Code
 
@@ -175,7 +175,7 @@ Prototyping -- slapping together code that's just barely functional enough to an
 
 *A few days pass...*
 
-> Boss: "Hey, that prototype is great, can you just spend a few hours cleaning it up a bit now and we'll call it the real thing?"
+> Boss: "Hey, that prototype is great. Can you just spend a few hours cleaning it up a bit now and we'll call it the real thing?"
 
 You need to make sure the people using the <span name="throwaway">throwaway</span> code understand that even though it kind of looks like it works, it *cannot* be maintained and must be *rewritten*. If there's a *chance* you'll end up having to keep it around, you may have to just defensively write it well.
 
@@ -195,7 +195,7 @@ We have a few forces in play:
 
 <aside name="speed">
 
-I think it's interesting that these are all really about some kind of speed: our long-term development speed, our short-term speed, and the game's execution speed.
+I think it's interesting that these are all really about some kind of speed: our long-term development speed, the game's execution speed, and our short-term development speed.
 
 </aside>
 
