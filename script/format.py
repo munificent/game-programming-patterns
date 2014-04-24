@@ -155,6 +155,8 @@ def formatfile(path, nav, skip_up_to_date):
       section_header = '<span class="section"><a href="{}.html">{}</a></span>'.format(
         section_href, section)
 
+    prev_link, next_link = make_prev_next(title)
+
     contents = contents.replace('<aside', '<aside markdown="1"')
 
     body = markdown.markdown(contents,
@@ -168,7 +170,8 @@ def formatfile(path, nav, skip_up_to_date):
     html = html.replace("{{section_header}}", section_header)
     html = html.replace("{{header}}", title)
     html = html.replace("{{body}}", body)
-    html = html.replace("{{thread}}", make_thread(title))
+    html = html.replace("{{prev}}", prev_link)
+    html = html.replace("{{next}}", next_link)
     html = html.replace("{{navigation}}",
       navigationtohtml(title, navigation))
 
@@ -207,31 +210,23 @@ def title_to_file(title):
     .replace(",", ""))
 
 
-def make_thread(title):
+def make_prev_next(title):
   """Generate the links that thread through the chapters."""
 
-  # TODO: Real links.
   chapter_index = CHAPTERS.index(title)
-  prev_link = None
-  next_link = None
+  prev_link = ""
+  next_link = ""
   if chapter_index > 0:
     prev_href = title_to_file(CHAPTERS[chapter_index - 1])
-    prev_link = '&larr; <a href="{}.html">{}</a>'.format(
+    prev_link = '<span class="prev">&larr; <a href="{}.html">Previous Chapter</a></span>'.format(
       prev_href, CHAPTERS[chapter_index - 1])
 
   if chapter_index < len(CHAPTERS) - 1:
     next_href = title_to_file(CHAPTERS[chapter_index + 1])
-    next_link = '<a href="{}.html">{}</a> &rarr;'.format(
+    next_link = '<span class="next"><a href="{}.html">Next Chapter</a> &rarr;</span>'.format(
       next_href, CHAPTERS[chapter_index + 1])
 
-  if prev_link and next_link:
-    thread = '{} | {}'.format(prev_link, next_link)
-  elif prev_link:
-    thread = prev_link
-  else:
-    thread = next_link
-
-  return thread
+  return (prev_link, next_link)
 
 
 def navigationtohtml(chapter, headers):

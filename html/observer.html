@@ -21,82 +21,6 @@
 </script>
 </head>
 <body id="top">
-<div class="scrim"></div>
-<div class="nav">
-  <div class="bar">
-    <div class="column">
-      <h1 class="thread">&larr; <a href="flyweight.html">Flyweight</a> | <a href="prototype.html">Prototype</a> &rarr;
-      <h1>&equiv; <a href="index.html">Game Programming Patterns</a></h1>
-    </div>
-  </div>
-  <div class="column">
-    <table>
-      <tr>
-        <td width="30%" class="section-nav">
-          <h2>Observer</h2>
-          <ul><li>
-<a href="#achievement-unlocked">Achievement Unlocked</a></li><li>
-<a href="#how-it-works">How it Works</a></li><li>
-<a href="#"it's-too-slow"">"It's Too Slow"</a></li><li>
-<a href="#"it-does-too-much-dynamic-allocation"">"It Does Too Much Dynamic Allocation"</a></li><li>
-<a href="#remaining-problems">Remaining Problems</a></li><li>
-<a href="#observers-today">Observers Today</a></li><li>
-<a href="#observers-tomorrow">Observers Tomorrow</a></li></ul>
-
-        </td>
-        <td width="70%">
-          <h2>Chapters</h2>
-<ul>
-  <li><a href="introduction.html">Introduction</a>
-    <ul>
-      <li><a href="architecture-performance-and-games.html">Architecture, Performance, and Games</a></li>
-    </ul>
-  </li>
-  <li><a href="design-patterns-revisited.html">Design Patterns Revisited</a>
-    <ul>
-      <li><a href="command.html">Command</a>,
-        <a href="flyweight.html">Flyweight</a>,
-        <a href="observer.html">Observer</a>,
-        <a href="prototype.html">Prototype</a>,
-        <a href="singleton.html">Singleton</a>,
-        <a href="state.html">State</a></li>
-    </ul>
-  </li>
-  <li><a href="sequencing-patterns.html">Sequencing Patterns</a>
-    <ul>
-      <li><a href="double-buffer.html">Double Buffer</a>,
-        <a href="game-loop.html">Game Loop</a>,
-        <a href="update-method.html">Update Method</a></li>
-    </ul>
-  </li>
-  <li><a href="behavioral-patterns.html">Behavioral Patterns</a>
-    <ul>
-      <li><a href="bytecode.html">Bytecode</a>,
-      <a href="subclass-sandbox.html">Subclass Sandbox</a>,
-      <a href="type-object.html">Type Object</a></li>
-    </ul>
-  </li>
-  <li><a href="decoupling-patterns.html">Decoupling Patterns</a>
-    <ul>
-      <li><a href="component.html">Component</a>,
-        <a href="event-queue.html">Event Queue</a>,
-        <a href="service-locator.html">Service Locator</a></li>
-    </ul>
-  </li>
-  <li><a href="optimization-patterns.html">Optimization Patterns</a>
-    <ul>
-      <li><a href="data-locality.html">Data Locality</a>,
-      <a href="dirty-flag.html">Dirty Flag</a>,
-      <a href="object-pool.html">Object Pool</a>,
-      <a href="spatial-partition.html">Spatial Partition</a></li>
-    </ul>
-  </li>
-</ul>
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
 <div class="page sidebar">
 <div class="content">
 <h1>Observer</h1>
@@ -526,9 +450,14 @@ option and insert it at the front:</p>
 <p>Unlike more radical models, data binding doesn&#8217;t try to entirely eliminate imperative code and doesn&#8217;t try to architect your entire application around a giant declarative dataflow graph. What it does do is automate the busywork where you&#8217;re tweaking a UI element or calculated property to reflect a change to some value.</p>
 <p>Like other declarative systems, data binding is probably a bit too slow and complex to fit inside the core of a game engine. But I would be surprised if I didn&#8217;t see it start making in-roads into less critical areas of the game like UI.</p>
 <p>In the meantime, the good old Observer pattern will still be here waiting for us. Sure, it&#8217;s not as exciting as some hot technique that manages to cram both &#8220;functional&#8221; and &#8220;reactive&#8221; in its name, but it&#8217;s dead simple and it works. To me, those are often the two most important criteria for a solution.</p>
-<p class="footer">&copy; 2009-2014 Robert Nystrom</p>
+<nav>
+  <span class="prev">&larr; <a href="flyweight.html">Previous Chapter</a></span>
+  <span class="next"><a href="prototype.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+</nav>
 </div>
 </div>
+<footer>&copy; 2009-2014 Robert Nystrom</footer>
 </body>
 <script src="jquery-1.10.1.min.js"></script>
 <script src="script.js"></script>

@@ -1,3 +1,5 @@
+2014-04-24 - redo navigation (#146, #148)
+2014-04-23 - reddit, hn, twitter, email, write blog post, research ebook
 2014-04-22 - photoshop illustrations, send to mailing list, COMPLETE
 2014-04-21 - third draft of architecture
 2014-04-20 - #130, #134, #135, #136, #139

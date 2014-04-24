@@ -21,81 +21,6 @@
 </script>
 </head>
 <body id="top">
-<div class="scrim"></div>
-<div class="nav">
-  <div class="bar">
-    <div class="column">
-      <h1 class="thread">&larr; <a href="command.html">Command</a> | <a href="observer.html">Observer</a> &rarr;
-      <h1>&equiv; <a href="index.html">Game Programming Patterns</a></h1>
-    </div>
-  </div>
-  <div class="column">
-    <table>
-      <tr>
-        <td width="30%" class="section-nav">
-          <h2>Flyweight</h2>
-          <ul><li>
-<a href="#forest-for-the-trees">Forest for the Trees</a></li><li>
-<a href="#a-thousand-instances">A Thousand Instances</a></li><li>
-<a href="#the-flyweight-pattern">The Flyweight Pattern</a></li><li>
-<a href="#a-place-to-put-down-roots">A Place To Put Down Roots</a></li><li>
-<a href="#what-about-performance">What About Performance?</a></li><li>
-<a href="#see-also">See Also</a></li></ul>
-
-        </td>
-        <td width="70%">
-          <h2>Chapters</h2>
-<ul>
-  <li><a href="introduction.html">Introduction</a>
-    <ul>
-      <li><a href="architecture-performance-and-games.html">Architecture, Performance, and Games</a></li>
-    </ul>
-  </li>
-  <li><a href="design-patterns-revisited.html">Design Patterns Revisited</a>
-    <ul>
-      <li><a href="command.html">Command</a>,
-        <a href="flyweight.html">Flyweight</a>,
-        <a href="observer.html">Observer</a>,
-        <a href="prototype.html">Prototype</a>,
-        <a href="singleton.html">Singleton</a>,
-        <a href="state.html">State</a></li>
-    </ul>
-  </li>
-  <li><a href="sequencing-patterns.html">Sequencing Patterns</a>
-    <ul>
-      <li><a href="double-buffer.html">Double Buffer</a>,
-        <a href="game-loop.html">Game Loop</a>,
-        <a href="update-method.html">Update Method</a></li>
-    </ul>
-  </li>
-  <li><a href="behavioral-patterns.html">Behavioral Patterns</a>
-    <ul>
-      <li><a href="bytecode.html">Bytecode</a>,
-      <a href="subclass-sandbox.html">Subclass Sandbox</a>,
-      <a href="type-object.html">Type Object</a></li>
-    </ul>
-  </li>
-  <li><a href="decoupling-patterns.html">Decoupling Patterns</a>
-    <ul>
-      <li><a href="component.html">Component</a>,
-        <a href="event-queue.html">Event Queue</a>,
-        <a href="service-locator.html">Service Locator</a></li>
-    </ul>
-  </li>
-  <li><a href="optimization-patterns.html">Optimization Patterns</a>
-    <ul>
-      <li><a href="data-locality.html">Data Locality</a>,
-      <a href="dirty-flag.html">Dirty Flag</a>,
-      <a href="object-pool.html">Object Pool</a>,
-      <a href="spatial-partition.html">Spatial Partition</a></li>
-    </ul>
-  </li>
-</ul>
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
 <div class="page sidebar">
 <div class="content">
 <h1>Flyweight</h1>
@@ -394,9 +319,14 @@
 <p>When you&#8217;re using the <a class="pattern" href="state.html">State</a> pattern, you often have &#8220;state&#8221; objects that don&#8217;t have any fields that are specific to the machine that the state is being used in. The state&#8217;s identity and methods are enough to be useful. In that case, you can apply this pattern and reuse that same state instance in multiple state machines at the same time without any problems.</p>
 </li>
 </ul>
-<p class="footer">&copy; 2009-2014 Robert Nystrom</p>
+<nav>
+  <span class="prev">&larr; <a href="command.html">Previous Chapter</a></span>
+  <span class="next"><a href="observer.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+</nav>
 </div>
 </div>
+<footer>&copy; 2009-2014 Robert Nystrom</footer>
 </body>
 <script src="jquery-1.10.1.min.js"></script>
 <script src="script.js"></script>

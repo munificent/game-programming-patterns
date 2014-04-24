@@ -1,0 +1,37 @@
+Here's some dimensions of popular programming books on Amazon:
+
+don't make me think    9.1 x 7   x 0.5 inches
+learning python        9.3 x 7.1 x 2.8 inches
+html & css             9.6 x 7.9 x 1   inches
+touch develop          9   x 6   x 0.6 inches
+beginning c++          9   x 7.2 x 1.1 inches
+minecraft for dummies  8.6 x 5.4 x 0.3 inches
+node.js in action      9.2 x 7.4 x 0.8 inches
+invent your own games 10   x 8   x 0.9 inches
+unity 4 by example     9.2 x 7.5 x 1.2 inches
+
+Print on demand printers:
+
+lulu.com
+createspace.com
+lightningsource.com
+blurb.com (seems to target mostly photo books)
+bookbaby.com
+
+Based on those and looking at prices on Lulu, I think the best choice is:
+
+Product Line: Standard
+Binding: Perfect Bound Paperback
+Product Size: Crown Quarto (7.44 x 9.68 inch)
+Interior Color: Black & White
+Paper Quality: 60#
+Cover Finish: Gloss
+Cost per 280 page book: $9.80
+
+On CreateSpace:
+
+Interior Type: Black and White
+Trim Size: 7.5" x 9.25"
+Number of Pages: 280
+Quantity: 1
+Per Book: $4.21 each

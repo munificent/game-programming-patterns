@@ -3,7 +3,7 @@
 - Create account on Amazon Author Central
   Need to have book on Amazon first
 - Write description for book
-- Publisher Genever/Bennington
+- Publisher Genever/Benning
 
 ---
 
@@ -12,10 +12,14 @@ gumroad
 e-junkie
 lulu
 blurb
+https://www.softcover.io/
+smashwords
 
 https://news.ycombinator.com/item?id=6052075
 https://news.ycombinator.com/item?id=7030112
 https://news.ycombinator.com/item?id=632104
+https://www.goodreads.com/topic/show/849429-lulu-vs-createspace
+http://johnplogsdon.blogspot.com/2013/04/physical-books-createspace-vs-lulu-vs.html
 
 ---
 
@@ -36,3 +40,41 @@ Good luck!
 
 http://snook.ca/archives/writing/selling-ebook-on-amazon
 http://apethebook.com/
+
+---
+
+Spent some time looking into using leanpub.com for generating the epub and mobi
+versions. It's pretty simple and works pretty well, if a bit slow. The landing
+page is nice.
+
+The biggest problem is that the output doesn't look that great. The stylsheet
+doesn't handle asides and large bullet points very well. They don't currently
+give you any way to customize this, and if I hack it myself, I can't sell it
+through them.
+
+Q: Does that matter?
+
+It may be simpler just to create the epub archive myself since I'm already
+doing much of the work for it already.
+
+
+---
+
+Looked into being able to sell the epub and mobi files directly from my site.
+It sounds nice in theory, but I think it's not worth the trouble. Pros:
+
+- More money since a publisher won't take a cut.
+- People can get the book right from the site.
+
+Cons:
+
+- Technically complex to set up.
+- Many users don't know what to do with a raw downloaded .epub or .mobi file.
+  Marketplaces like Kindle and iBooks handle getting it into the user's
+  device.
+- May cannibalize my sales on those marketplaces. That in turn could lower the
+  book's ranking there.
+
+All of those cons are serious, but I think the last point is the real nail in
+the coffin. Instead, I think I'll just have links to buy the book from a few
+different marketplaces.

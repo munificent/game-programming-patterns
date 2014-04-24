@@ -20,105 +20,28 @@ body {
   background-image: url("images/background.png");
 }
 
-.nav {
-  position: fixed;
-  width: 100%;
-  bottom: 0;
-  z-index: 3;
+nav {
+  background: hsl(200, 50%, 96%);
 
-  height: 26px;
-  transition: height 0.3s ease,
-              box-shadow 0.3s ease;
+  color: hsl(200, 20%, 60%);
+  font: 14px $sans;
+  margin: 40px -38px 0 -38px;
+  padding: 10px 38px;
 
-  background: hsl(200, 10%, 25%);
-  color: hsl(200, 10%, 55%);
-
-  border-top: solid 1px hsl(200, 20%, 30%);
-
-  box-shadow: 0 0 30px hsla(30, 40%, 20%, 0.3);
-
-  .bar {
-    cursor: pointer;
-    background: hsl(200, 10%, 30%);
-    box-shadow: 0 5px 20px hsla(200, 50%, 20%, 0.3);
-    border-top: solid 1px hsl(200, 20%, 60%);
-    border-bottom: solid 1px hsl(200, 20%, 15%);
-  }
-
-  .column {
-    max-width: 560px;
+  .toc {
+    display: block;
+    width: 150px;
+    text-align: center;
     margin: 0 auto;
-
-    padding: 3px 40px;
   }
 
-  .thread {
+  .prev {
+    float: left;
+  }
+
+  .next {
     float: right;
   }
-
-  a {
-    color: hsl(200, 70%, 60%);
-  }
-
-  a:hover {
-    color: hsl(200, 100%, 90%);
-    border-color: hsl(200, 30%, 50%);
-  }
-
-  h1 {
-    font: 14px $sans;
-    font-weight: 300;
-    padding: 0;
-    margin: 0;
-    border: none;
-
-    a:hover {
-      border: none;
-    }
-  }
-
-  h2 {
-    font: 18px $sans;
-    font-weight: 300;
-    color: hsl(200, 20%, 50%);
-    padding: 10px 0;
-    margin: 0;
-    border: none;
-  }
-
-  table {
-    width: 100%;
-    border-spacing: 0;
-    border-collapse: collapse;
-  }
-
-  ul {
-    padding-left: 16px;
-  }
-
-  p, li {
-    font: 13px/20px $sans;
-    font-weight: 300;
-  }
-}
-
-.scrim {
-  display: none;
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-}
-
-.scrim.expanded {
-  display: block;
-}
-
-.nav.expanded {
-  height: 340px;
-  box-shadow: 0 0 40px hsla(30, 40%, 20%, 0.5);
 }
 
 .page {
@@ -137,19 +60,14 @@ body {
 }
 
 .content {
-  padding: 0 40px 40px 40px;
+  padding: 0 40px 2px 40px;
 
   background: white;
   box-shadow: 0 0 30px hsla(30, 40%, 20%, 0.05);
-  z-index: 2;
 }
 
 .page.sidebar {
   padding-right: 300px;
-}
-
-.nav.sidebar .column {
-  padding-right: 340px;
 }
 
 // Note: We use explicit line heights here so that the positions of the
@@ -552,11 +470,13 @@ a.pdf:after {
 }
 
 // Footer.
-p.footer {
+footer {
+  max-width: 640px;
+  margin: 20px auto;
+
   text-align: center;
   color: #aaa;
   font: 14px $sans;
-  margin-top: 40px;
 }
 
 .narrow-sign-up {
@@ -589,32 +509,10 @@ p.footer {
 .codehilite .nl { color: $primary; } // keyword label (private: etc.)
 .codehilite .nt { color: $primary; } // json key
 
-// If the column is too narrow for the chapter lists in the navigation, kill
-// the section column so the chapters don't wrap and get too tall.
-@media only screen and (max-width: 900px) {
-  .thread {
-    display: none;
-  }
-
-  .section-nav {
-    display: none;
-  }
-}
-
 // On phone-size screens, shrink all of the text a bit.
 @media only screen and (max-width: 479px) {
   .content {
-    padding: 0 20px 20px 20px;
-  }
-
-  .nav {
-    .column {
-      padding: 3px 20px;
-
-      p, li {
-        line-height: 19px;
-      }
-    }
+    padding: 0 20px 2px 20px;
   }
 
   h1 {
@@ -677,14 +575,14 @@ p.footer {
       font: 14px/22px $sans;
     }
   }
-}
 
-// On very short screens (phones in landscape), don't show the nav bar. It's
-// too tall when expanded and fills the screen. Even the collapsed bar takes up
-// too much room, so just kill the nav entirely.
-@media only screen and (max-height: 400px) {
-  .nav {
-    display: none;
+  nav {
+    margin: 20px -18px 0 -18px;
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+
+  footer {
+    font-size: 13px;
   }
 }
-

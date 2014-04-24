@@ -1,16 +1,6 @@
 $(document).ready(function() {
   $(window).resize(refreshAsides);
 
-  $(".nav").click(function() {
-    $(".nav").toggleClass("expanded");
-    $(".scrim").toggleClass("expanded");
-  });
-
-  $(".scrim").click(function() {
-    $(".nav").removeClass("expanded");
-    $(".scrim").removeClass("expanded");
-  });
-
   // Since we may not have the height correct for the images, adjust the asides
   // too when an image is loaded.
   $('img').load(function() {
@@ -32,7 +22,7 @@ $(document).ready(function() {
 });
 
 function refreshAsides() {
-  if ($(document).width() > 700) {
+  if ($(document).width() > 800) {
     sidebarAsides();
   } else {
     inlineAsides();
