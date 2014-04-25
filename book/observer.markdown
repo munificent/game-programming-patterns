@@ -165,7 +165,7 @@ I find this pattern fits best outside of hot code paths anyway, so you can usual
 
 ### It's too *fast?*
 
-In fact, you have to be careful because the Observer pattern *is* synchronous. The subject invokes its observers directly, which means it does't resume its own work until all of the observers have returned from their notification methods. A slow observer can block a subject.
+In fact, you have to be careful because the Observer pattern *is* synchronous. The subject invokes its observers directly, which means it doesn't resume its own work until all of the observers have returned from their notification methods. A slow observer can block a subject.
 
 This sounds scary, but in practice it's not the end of the world. It's just something you have to be aware of. UI programmers -- who've been doing event-based programming like this for ages -- have an established motto for this: "stay off the UI thread".
 
