@@ -165,7 +165,6 @@ namespace DataLocality
     delete [] renderComponents;
   }
 
-
   //^particle-system
   class Particle
   {

@@ -123,7 +123,7 @@ namespace PrototypePattern
     }
     //^callback
 
-    //^spawn-callback
+    //^spawner-callback
     typedef Monster* (*SpawnCallback)();
 
     class Spawner
@@ -141,7 +141,7 @@ namespace PrototypePattern
     private:
       SpawnCallback spawn_;
     };
-    //^spawn-callback
+    //^spawner-callback
 
     void test()
     {

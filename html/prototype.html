@@ -157,7 +157,23 @@
 
 
 <p>This is less boilerplate than rolling a whole class for constructing a monster of some type. Then the one spawner class can just store a function pointer:</p>
-<div class="codehilite"><pre>
+<div class="codehilite"><pre><span class="k">typedef</span> <span class="n">Monster</span><span class="o">*</span> <span class="p">(</span><span class="o">*</span><span class="n">SpawnCallback</span><span class="p">)();</span>
+
+<span class="k">class</span> <span class="nc">Spawner</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+  <span class="n">Spawner</span><span class="p">(</span><span class="n">SpawnCallback</span> <span class="n">spawn</span><span class="p">)</span>
+  <span class="o">:</span> <span class="n">spawn_</span><span class="p">(</span><span class="n">spawn</span><span class="p">)</span>
+  <span class="p">{}</span>
+
+  <span class="n">Monster</span><span class="o">*</span> <span class="n">spawnMonster</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">spawn_</span><span class="p">();</span>
+  <span class="p">}</span>
+
+<span class="nl">private:</span>
+  <span class="n">SpawnCallback</span> <span class="n">spawn_</span><span class="p">;</span>
+<span class="p">};</span>
 </pre></div>
 
 
