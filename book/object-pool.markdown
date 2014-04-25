@@ -37,11 +37,10 @@ object, we'll fail. No more sparklies onscreen.
 
 <aside name="park">
 
-Have you ever tried to parallel park on a busy street where the
-already parked cars are spaced out just a *little* bit too far? If
-they could just bunch up, there'd be room for your car, but the free
-space is divided up into bits of open curb between half a dozen cars.
-That's fragmentation.
+It's like trying to parallel park on a busy street where the
+already parked cars are spread out a bit too far. If
+they'd bunch up, there would be room, but the free
+space is *fragmented* into bits of open curb between half a dozen cars.
 
 </aside>
 
