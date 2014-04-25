@@ -91,7 +91,7 @@ You can define "decoupling" a bunch of ways, but I think if two pieces of code a
 
 To me, this is a key goal of software architecture: *minimize the amount of knowledge you need to have in-cranium before you can make progress.*
 
-The later stages into play too, of course. Another definition of decoupling is that a *change* to one piece of code doesn't necessitate a change to another. We obviously need to change *something*, but the less coupling we have, the less that change ripples throughout the rest of the game.
+The later stages come into play too, of course. Another definition of decoupling is that a *change* to one piece of code doesn't necessitate a change to another. We obviously need to change *something*, but the less coupling we have, the less that change ripples throughout the rest of the game.
 
 ## At What Cost?
 
