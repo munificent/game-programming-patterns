@@ -305,7 +305,7 @@ def includecode(pattern, index, indentation):
 
 def buildnav(searchpath):
   nav = '<div class="nav">\n'
-  nav = nav + '<h1><a href="index.html">Navigation</a></h1>\n'
+  nav = nav + '<h1><a href="/">Navigation</a></h1>\n'
 
   # Read the chapter outline from the index page.
   with open('html/index.html', 'r') as source:
