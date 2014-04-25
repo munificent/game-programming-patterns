@@ -153,7 +153,7 @@ The faster you can try out ideas and see how they feel, the more you can try and
 
 There's no easy answer here. Making your program more flexible so you can prototype faster will have some performance cost. Likewise, optimizing your code will make it less flexible.
 
-My experience, though, is that it's easier to make a fun game fast than it is to a fast game fun. One compromise is to keep the code flexible until the design settles down and then tear out some of the abstraction later to improve your performance.
+My experience, though, is that it's easier to make a fun game fast than it is to make a fast game fun. One compromise is to keep the code flexible until the design settles down and then tear out some of the abstraction later to improve your performance.
 
 ## The Good in Bad Code
 
