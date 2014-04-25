@@ -414,7 +414,7 @@
 <p>Now, the distance the skeleton moves increases as the elapsed time grows. You can also see the additional complexity of dealing with a variable time step. The skeleton may overshoot the bounds of its patrol with a large time slice and we have to carefully handle that.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>With a simple pattern like this, there isn&#8217;t too much variation, but there&#8217;s still a couple of knobs you can turn.</p>
-<h3><a href="#what-class-does-the-<code>update()</code>-method-live-on&#8221; name=&#8221;what-class-does-the-<code>update()</code>-method-live-on&#8221;>What class does the <code>update()</code> method live on?</a></h3>
+<h3><a href="#what-class-does-the-update-method-live-on" name="what-class-does-the-update-method-live-on">What class does the update method live on?</a></h3>
 <p>The most obvious and most important decision you&#8217;ll make is what class to put <code>update()</code> on.</p>
 <ul>
 <li>

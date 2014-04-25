@@ -288,7 +288,7 @@ Now, the distance the skeleton moves increases as the elapsed time grows. You ca
 
 With a simple pattern like this, there isn't too much variation, but there's still a couple of knobs you can turn.
 
-### What class does the `update()` method live on?
+### What class does the update method live on?
 
 The most obvious and most important decision you'll make is what class to put `update()` on.
 
