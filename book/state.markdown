@@ -115,7 +115,7 @@ In particular, the heroine can no longer be in an *invalid* state. With the bool
 
 </aside>
 
-Your problem may outgrow this solution, though. Say we want to add a move where if our heroine ducks for a while, she charges up and then unleashes a special attack. While she's ducking, we need to track the charge time.
+Your problem may outgrow this solution, though. Say we want to add a move where our can heroine duck for a while to charge up and unleash a special attack. While she's ducking, we need to track the charge time.
 
 We add a `chargeTime_` field to `Heroine` to store how long the attack has charged. Assume we already have an <span name="update">`update()`</span> that gets called each frame. In there, we add:
 
@@ -233,7 +233,7 @@ When you dynamically allocate states, you may have to worry about fragmentation 
 
 ## Enter and Exit Actions
 
-The goal of the state pattern is to encapsulate all of the behavior and data for one state in a single class. We've done that pretty well, but there's still a loose end. We moved handling user input and updating the charge time into `DuckingState`, but there's a bit of ducking-specific code left outside. Over in the standing state, when we *start* ducking, it does some initialization:
+The goal of the State pattern is to encapsulate all of the behavior and data for one state in a single class. We've done that pretty well, but there's still a loose end. We moved handling user input and updating the charge time into `DuckingState`, but there's a bit of ducking-specific code left outside. Over in the standing state, when we *start* ducking, it does some initialization:
 
 ^code start-ducking
 
@@ -313,7 +313,7 @@ A more full-featured system would probably have a way for one state machine to *
 
 Each state machine can then respond to inputs, spawn behavior, and change its state independently of the other machine. When the two sets of states are mostly unrelated, this works well.
 
-In practice, you'll find a few cases where the states do interact. For example, maybe she can't fire while jumping, or maybe she can't do a dive attack if she's armed. To handle that, in the code for one state, you'll probably just do some crude `if` tests of the *other* machine's state to coordinate them. Not the most elegant solution, but it gets the job done.
+In practice, you'll find a few cases where the states do interact. For example, maybe she can't fire while jumping, or maybe she can't do a dive attack if she's armed. To handle that, in the code for one state, you'll probably just do some crude `if` tests on the *other* machine's state to coordinate them. Not the most elegant solution, but it gets the job done.
 
 ## Hierarchical State Machines
 
@@ -329,7 +329,7 @@ This has both good and bad implications. Inheritance is a powerful means of code
 
 </aside>
 
-It turns out, this is a common structure called a *hierarchical state machine*. A state can have a *superstate* (making itself a *substate*). When an event comes in, if the substate doesn't handle it, it rolls up the chain of superstates. In other words, it works just like overiding inherited methods.
+It turns out, this is a common structure called a *hierarchical state machine*. A state can have a *superstate* (making itself a *substate*). When an event comes in, if the substate doesn't handle it, it rolls up the chain of superstates. In other words, it works just like overriding inherited methods.
 
 In fact, if we're using the actual State pattern to implement our FSM, we can use class inheritance to implement the hierarchy. Define a base class for the superstate:
 
@@ -339,7 +339,7 @@ And then each substate inherits it:
 
 ^code duck-on-ground
 
-This isn't the only way to implement the hierarchy, of course. If you aren't using the Gang of Four's state pattern, this won't work. Instead, you can model the current state's chain of superstates explicitly using a *stack* of states instead of a single state in the main class.
+This isn't the only way to implement the hierarchy, of course. If you aren't using the Gang of Four's State pattern, this won't work. Instead, you can model the current state's chain of superstates explicitly using a *stack* of states instead of a single state in the main class.
 
 The current state is the one on the top of the stack, under that is its immediate superstate, and then *that* state's superstate and so on. When you dish out some state-specific behavior, you start at the top of the stack and walk down until one of the states handles it. (If none do, you just ignore it.)
 
@@ -379,8 +379,10 @@ Even with those common extensions to state machines, they are still pretty limit
 
 This doesn't mean finite state machines, pushdown automata, and other simple systems aren't useful. They're a good modelling tool for certain kinds of problems. Finite state machines are useful when:
 
-1. You have an entity whose behavior changes based on some internal state.
-2. That state can be rigidly divided into one of a relatively small number of distinct options.
-3. The entity responds to a series of inputs or events over time.
+* You have an entity whose behavior changes based on some internal state.
+
+* That state can be rigidly divided into one of a relatively small number of distinct options.
+
+* The entity responds to a series of inputs or events over time.
 
 In games, they are most known for being used in AI, but they are also common in implementations of user input handling, navigating menu screens, parsing text, network protocols, and other asynchronous behavior.

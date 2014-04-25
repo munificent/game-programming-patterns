@@ -254,7 +254,7 @@
 <p>In particular, the heroine can no longer be in an <em>invalid</em> state. With the boolean flags, some sets of values were possible but meaningless. With the enum, each value is valid.</p>
 </aside>
 
-<p>Your problem may outgrow this solution, though. Say we want to add a move where if our heroine ducks for a while, she charges up and then unleashes a special attack. While she&#8217;s ducking, we need to track the charge time.</p>
+<p>Your problem may outgrow this solution, though. Say we want to add a move where our can heroine duck for a while to charge up and unleash a special attack. While she&#8217;s ducking, we need to track the charge time.</p>
 <p>We add a <code>chargeTime_</code> field to <code>Heroine</code> to store how long the attack has charged. Assume we already have an <span name="update"><code>update()</code></span> that gets called each frame. In there, we add:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>
 <span class="p">{</span>
@@ -451,7 +451,7 @@
 </aside>
 
 <h2><a href="#enter-and-exit-actions" name="enter-and-exit-actions">Enter and Exit Actions</a></h2>
-<p>The goal of the state pattern is to encapsulate all of the behavior and data for one state in a single class. We&#8217;ve done that pretty well, but there&#8217;s still a loose end. We moved handling user input and updating the charge time into <code>DuckingState</code>, but there&#8217;s a bit of ducking-specific code left outside. Over in the standing state, when we <em>start</em> ducking, it does some initialization:</p>
+<p>The goal of the State pattern is to encapsulate all of the behavior and data for one state in a single class. We&#8217;ve done that pretty well, but there&#8217;s still a loose end. We moved handling user input and updating the charge time into <code>DuckingState</code>, but there&#8217;s a bit of ducking-specific code left outside. Over in the standing state, when we <em>start</em> ducking, it does some initialization:</p>
 <div class="codehilite"><pre><span class="c1">// In standing state:</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_DOWN</span><span class="p">)</span>
 <span class="p">{</span>
@@ -552,7 +552,7 @@
 </aside>
 
 <p>Each state machine can then respond to inputs, spawn behavior, and change its state independently of the other machine. When the two sets of states are mostly unrelated, this works well.</p>
-<p>In practice, you&#8217;ll find a few cases where the states do interact. For example, maybe she can&#8217;t fire while jumping, or maybe she can&#8217;t do a dive attack if she&#8217;s armed. To handle that, in the code for one state, you&#8217;ll probably just do some crude <code>if</code> tests of the <em>other</em> machine&#8217;s state to coordinate them. Not the most elegant solution, but it gets the job done.</p>
+<p>In practice, you&#8217;ll find a few cases where the states do interact. For example, maybe she can&#8217;t fire while jumping, or maybe she can&#8217;t do a dive attack if she&#8217;s armed. To handle that, in the code for one state, you&#8217;ll probably just do some crude <code>if</code> tests on the <em>other</em> machine&#8217;s state to coordinate them. Not the most elegant solution, but it gets the job done.</p>
 <h2><a href="#hierarchical-state-machines" name="hierarchical-state-machines">Hierarchical State Machines</a></h2>
 <p>After fleshing out our heroine&#8217;s behavior some more, she&#8217;ll likely have a bunch of similar states. For example, she may have standing, walking, running, and sliding states. In any of those, pressing B jumps and pressing down ducks.</p>
 <p>With a simple state machine implementation, we have to duplicate that code in each of those states. It would be better if we could implement that once and reuse it across all of the states.</p>
@@ -562,7 +562,7 @@
 <p>This has both good and bad implications. Inheritance is a powerful means of code reuse, but also a very strong coupling between two chunks of code. It&#8217;s a big hammer, so swing it carefully.</p>
 </aside>
 
-<p>It turns out, this is a common structure called a <em>hierarchical state machine</em>. A state can have a <em>superstate</em> (making itself a <em>substate</em>). When an event comes in, if the substate doesn&#8217;t handle it, it rolls up the chain of superstates. In other words, it works just like overiding inherited methods.</p>
+<p>It turns out, this is a common structure called a <em>hierarchical state machine</em>. A state can have a <em>superstate</em> (making itself a <em>substate</em>). When an event comes in, if the substate doesn&#8217;t handle it, it rolls up the chain of superstates. In other words, it works just like overriding inherited methods.</p>
 <p>In fact, if we&#8217;re using the actual State pattern to implement our FSM, we can use class inheritance to implement the hierarchy. Define a base class for the superstate:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">OnGroundState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">HeroineState</span>
 <span class="p">{</span>
@@ -602,7 +602,7 @@
 </pre></div>
 
 
-<p>This isn&#8217;t the only way to implement the hierarchy, of course. If you aren&#8217;t using the Gang of Four&#8217;s state pattern, this won&#8217;t work. Instead, you can model the current state&#8217;s chain of superstates explicitly using a <em>stack</em> of states instead of a single state in the main class.</p>
+<p>This isn&#8217;t the only way to implement the hierarchy, of course. If you aren&#8217;t using the Gang of Four&#8217;s State pattern, this won&#8217;t work. Instead, you can model the current state&#8217;s chain of superstates explicitly using a <em>stack</em> of states instead of a single state in the main class.</p>
 <p>The current state is the one on the top of the stack, under that is its immediate superstate, and then <em>that</em> state&#8217;s superstate and so on. When you dish out some state-specific behavior, you start at the top of the stack and walk down until one of the states handles it. (If none do, you just ignore it.)</p>
 <h2><a href="#pushdown-automata" name="pushdown-automata">Pushdown Automata</a></h2>
 <p>There&#8217;s another common extension to finite state machines that also uses a stack of states. Confusingly, the stack represents something entirely different, and is used to solve a different problem.</p>
@@ -630,11 +630,17 @@
 <h2><a href="#so-how-useful-are-they" name="so-how-useful-are-they">So How Useful Are They?</a></h2>
 <p>Even with those common extensions to state machines, they are still pretty limited. The trend these days in game AI is more towards exciting things like <a href="http://www.altdevblogaday.com/2011/02/24/introduction-to-behavior-trees/">behavior trees</a> and <a href="http://web.media.mit.edu/~jorkin/goap.html">planning systems</a>. If AI is what you&#8217;re interested in, all this chapter has done is whet your appetite. You&#8217;ll want to read other books to satisfy it.</p>
 <p>This doesn&#8217;t mean finite state machines, pushdown automata, and other simple systems aren&#8217;t useful. They&#8217;re a good modelling tool for certain kinds of problems. Finite state machines are useful when:</p>
-<ol>
-<li>You have an entity whose behavior changes based on some internal state.</li>
-<li>That state can be rigidly divided into one of a relatively small number of distinct options.</li>
-<li>The entity responds to a series of inputs or events over time.</li>
-</ol>
+<ul>
+<li>
+<p>You have an entity whose behavior changes based on some internal state.</p>
+</li>
+<li>
+<p>That state can be rigidly divided into one of a relatively small number of distinct options.</p>
+</li>
+<li>
+<p>The entity responds to a series of inputs or events over time.</p>
+</li>
+</ul>
 <p>In games, they are most known for being used in AI, but they are also common in implementations of user input handling, navigating menu screens, parsing text, network protocols, and other asynchronous behavior.</p>
 <nav>
   <span class="prev">&larr; <a href="singleton.html">Previous Chapter</a></span>
