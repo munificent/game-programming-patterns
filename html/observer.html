@@ -366,7 +366,7 @@ option and insert it at the front:</p>
 
 <p>The way you avoid dynamic allocation is simple: Since all of those nodes are the same size and type, you pre-allocate an <a href="object-pool.html" class="pattern">Object Pool</a> of them. That gives you a fixed-size pile of list nodes to work with, and you can use and reuse them as you need without having to hit an actual memory allocator.</p>
 <h2><a href="#remaining-problems" name="remaining-problems">Remaining Problems</a></h2>
-<p>I think we&#8217;ve banished the two main boogie men used to scare people off this pattern. As we&#8217;ve seen, it&#8217;s simple, fast, and can be made to play nice with memory management. But does that mean that you should observers all the time?</p>
+<p>I think we&#8217;ve banished the two main boogie men used to scare people off this pattern. As we&#8217;ve seen, it&#8217;s simple, fast, and can be made to play nice with memory management. But does that mean you should use observers all the time?</p>
 <p>Now, that&#8217;s a different question. Like all design patterns, the Observer pattern isn&#8217;t a cure-all. Even when implemented correctly and efficiently, it may not be the right solution. The reason design patterns get a bad rap is because people apply good patterns to the wrong problem and end up making things worse.</p>
 <p>Two challenges remain, one technical and one at something more like the maintainability level. We&#8217;ll do the technical one first because those are always easiest.</p>
 <h3><a href="#destroying-subjects-and-observers" name="destroying-subjects-and-observers">Destroying subjects and observers</a></h3>

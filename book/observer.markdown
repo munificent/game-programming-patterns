@@ -282,7 +282,7 @@ The way you avoid dynamic allocation is simple: Since all of those nodes are the
 
 ## Remaining Problems
 
-I think we've banished the two main boogie men used to scare people off this pattern. As we've seen, it's simple, fast, and can be made to play nice with memory management. But does that mean that you should observers all the time?
+I think we've banished the two main boogie men used to scare people off this pattern. As we've seen, it's simple, fast, and can be made to play nice with memory management. But does that mean you should use observers all the time?
 
 Now, that's a different question. Like all design patterns, the Observer pattern isn't a cure-all. Even when implemented correctly and efficiently, it may not be the right solution. The reason design patterns get a bad rap is because people apply good patterns to the wrong problem and end up making things worse.
 
