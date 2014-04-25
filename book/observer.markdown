@@ -290,7 +290,7 @@ Two challenges remain, one technical and one at something more like the maintain
 
 ### Destroying subjects and observers
 
-The sample code we walked through is solid, but it <span name="destruct">side-steps</span> an important issue: what happens when you delete a subject or an observer? If you just wantonly call `delete` on some observer, a subject may still have a pointer to it. That's now a dangling pointer into deallocated memory. When that subject tries to send a notification, well... things like that are why people end up hating C++.
+The sample code we walked through is solid, but it <span name="destruct">side-steps</span> an important issue: what happens when you delete a subject or an observer? If you just want only call `delete` on some observer, a subject may still have a pointer to it. That's now a dangling pointer into deallocated memory. When that subject tries to send a notification, well... things like that are why people end up hating C++.
 
 <aside name="destruct">
 
