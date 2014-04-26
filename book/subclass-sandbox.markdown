@@ -60,7 +60,9 @@ base class*. Putting them in the base class gives every power subclass direct,
 easy access to them. Making them protected (and likely non-virtual)
 communicates that they exist specifically to be *called* by subclasses.
 
-Once you have these toys to play with, you need a place to use them. For that, we'll define a *sandbox method*: an abstract protected method that subclasses must implement. Given those, to implement a new kind of power, you:
+Once you have these toys to play with, you need a place to use them. For that,
+we'll define a *sandbox method*: an abstract protected method that subclasses
+must implement. Given those, to implement a new kind of power, you:
 
 1.  Subclass `Superpower`.
 
@@ -69,20 +71,24 @@ Once you have these toys to play with, you need a place to use them. For that, w
 3.  Implement the body of that by calling the protected methods that
     `Superpower` provides.
 
-We can fix our redundant code problem now by making those provided operations as high-level as possible. When we see code that's duplicated between lots of the subclasses, we can always roll that up into `Superpower` as a new operation that they can all use.
+We can fix our redundant code problem now by making those provided operations
+as high-level as possible. When we see code that's duplicated between lots of
+the subclasses, we can always roll that up into `Superpower` as a new operation
+that they can all use.
 
 We've addressed our coupling problem by constraining the coupling to one place.
 `Superpower` itself will end up coupled to the different game systems, but our
-hundred subclasses are not. Instead, they are *only* coupled to their
-superclass. When one of those game systems changes, modification to `Superpower`
-itself may be necessary, but dozens of subclasses shouldn't have to be touched.
+hundred derived classes are not. Instead, they are *only* coupled to their
+base class. When one of those game systems changes, modification to
+`Superpower` may be necessary, but dozens of subclasses shouldn't have to be
+touched.
 
 This pattern leads to an architecture where you have a shallow but wide class
-hierarchy. Your <span name="wide">inheritance</span> chains aren't *deep*, but there are a *lot* of
-classes that hang off `Superpower`. By having a single class with a lot of
-direct subclasses, we have a point of leverage in our codebase. Time and love
-that we put into `Superpower` itself can benefit a wide set of classes in the
-game.
+hierarchy. Your <span name="wide">inheritance</span> chains aren't *deep*, but
+there are a *lot* of classes that hang off `Superpower`. By having a single
+class with a lot of direct subclasses, we have a point of leverage in our
+codebase. Time and love that we put into `Superpower` can benefit a wide set of
+classes in the game.
 
 <aside name="wide">
 
@@ -96,7 +102,7 @@ but I find *wide* inheritance trees to be easier to work with than *deep* ones.
 ## The Pattern
 
 A **base class** defines an abstract **sandbox method** and several
-**provided operations**. Marking them protected makes it clear to a user that
+**provided operations**. Marking them protected makes it clear to that
 they are for use by derived classes. Each derived **sandboxed subclass**
 implements the sandbox method using the provided operations.
 
@@ -147,7 +153,7 @@ Because this is such a simple pattern, there isn't much to the sample code.
 That doesn't mean it isn't useful -- the pattern is about the *intent*, and
 not the complexity of its implementation.
 
-We'll start with our `Superpower` superclass:
+We'll start with our `Superpower` base class:
 
 ^code 1
 
@@ -224,13 +230,13 @@ Between these two points, there's a wide middle ground where some operations
 are provided by the base class and others are accessed directly from the
 outside system that defines it. The more operations you provide, the less
 coupled subclasses are to outside systems, but the *more* coupled the base
-class itself is. It removes coupling from the derived classes, but only by
+class is. It removes coupling from the derived classes, but only by
 pushing that up to the base class itself.
 
 That's a win if you have a bunch of derived classes that were all coupled to
 some outside system. By moving that up into a provided operation, you've
 centralized that coupling into one place: the base class. But the more you do
-this, the bigger and harder to maintain the base class itself becomes.
+this, the bigger and harder to maintain that one class becomes.
 
 So where to draw the line? Here's a few rules of thumb:
 
@@ -375,8 +381,8 @@ particle system object, how would it get one?
     <aside name="friend">
 
     With a little trickery like private constructors and friend classes, you
-    can ensure that this `createSuperpower()` function is the *only* function
-    that can actually create powers. That ensures you won't ever forget one of
+    can ensure this `createSkylaunch()` function is the *only* function
+    that can actually create powers. That way, you can't forget any of
     the initialization stages.
 
     </aside>
@@ -420,14 +426,14 @@ particle system object, how would it get one?
     The previous option requires that outside code specifically remember to
     push in the state that the base class needs before it needs it. That places
     the burden of initialization on the surrounding code. Another option is to
-    let the base class itself handle that by pulling in the state it needs.
-    One way to do that is by using a
+    let the base class handle it by pulling in the state it needs. One way to
+    do that is by using a
     <a class="pattern" href="service-locator.html">Service Locator</a>.
 
     ^code 12
 
     Here, `spawnParticles()` needs a particle system. Instead of being *given*
-    one by outside code, it just fetches it itself from the service locator.
+    one by outside code, it just fetches one itself from the service locator.
 
 ## See Also
 

@@ -53,7 +53,7 @@ system, with something like one of these:</p>
 sticky coupling along the way. Every place in the game calling into
 our audio system directly references the concrete AudioSystem class
 and the mechanism for accessing it&thinsp;&mdash;&thinsp;either as a static class or
-a <a class="gof-pattern" href="singleton.html">Singleton</a>.</p>
+a <a class="gof-pattern" href="singleton.html">singleton</a>.</p>
 <p>These callsites, of course, have to be coupled to <em>something</em> in order
 to make a sound play, but letting them poke directly at the concrete
 audio implementation is like giving a hundred strangers directions to
@@ -102,6 +102,17 @@ is adding needless complexity to your code.</p>
 as a more flexible, more configurable cousin of the singleton. When used
 well, it can make your codebase more flexible with little runtime cost.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
+<p>The core difficulty with a service locator is that it takes a dependency&thinsp;&mdash;&thinsp;a
+bit of coupling between two pieces of code&thinsp;&mdash;&thinsp;and defers wiring it up until
+runtime. This gives you flexibility, but the price you pay is that it&#8217;s harder
+to understand what your dependencies are just by reading the code.</p>
+<h3><a href="#the-service-actually-has-to-be-located" name="the-service-actually-has-to-be-located">The service actually has to be located</a></h3>
+<p>With a singleton or a static class, there&#8217;s no chance for the instance
+we need to <em>not</em> be available. Calling code can take for granted that
+it&#8217;s there. But since this pattern has to <em>locate</em> the service, we may
+need to handle cases where that fails. Fortunately, we&#8217;ll cover a
+strategy later to address this and guarantee that we&#8217;ll always get
+<em>some</em> service when you need it.</p>
 <h3><a href="#the-service-doesn't-know-who-is-locating-it" name="the-service-doesn't-know-who-is-locating-it">The service doesn&#8217;t know who is locating it</a></h3>
 <p>Since the locator is globally accessible, any code in the game could be
 requesting a service and then poking at it. This means that service must
@@ -111,13 +122,6 @@ and not during rendering may not work as a service&thinsp;&mdash;&thinsp;it woul
 to ensure that it&#8217;s being used at the right time. So, if a class
 expects to only be used in a certain context, it&#8217;s safest to
 avoid exposing it to the entire world with this pattern.</p>
-<h3><a href="#the-service-actually-has-to-be-located" name="the-service-actually-has-to-be-located">The service actually has to be located</a></h3>
-<p>With a Singleton or a static class, there&#8217;s no chance for the instance
-we need to <em>not</em> be available. Calling code can take for granted that
-it&#8217;s there. But since this pattern has to <em>locate</em> the service, we may
-need to handle cases where that fails. Fortunately, we&#8217;ll cover a
-strategy later to address this and guarantee that we&#8217;ll always get
-<em>some</em> service when you need it.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>Getting back to our audio system problem, let&#8217;s address it by exposing
 the system to the rest of the codebase through a service locator.</p>

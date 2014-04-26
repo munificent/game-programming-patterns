@@ -29,7 +29,7 @@ Either gets us where we're trying to go, but we stumbled into some
 sticky coupling along the way. Every place in the game calling into
 our audio system directly references the concrete AudioSystem class
 and the mechanism for accessing it -- either as a static class or
-a <a class="gof-pattern" href="singleton.html">Singleton</a>.
+a <a class="gof-pattern" href="singleton.html">singleton</a>.
 
 These callsites, of course, have to be coupled to *something* in order
 to make a sound play, but letting them poke directly at the concrete
@@ -91,6 +91,20 @@ well, it can make your codebase more flexible with little runtime cost.
 
 ## Keep in Mind
 
+The core difficulty with a service locator is that it takes a dependency -- a
+bit of coupling between two pieces of code -- and defers wiring it up until
+runtime. This gives you flexibility, but the price you pay is that it's harder
+to understand what your dependencies are just by reading the code.
+
+### The service actually has to be located
+
+With a singleton or a static class, there's no chance for the instance
+we need to *not* be available. Calling code can take for granted that
+it's there. But since this pattern has to *locate* the service, we may
+need to handle cases where that fails. Fortunately, we'll cover a
+strategy later to address this and guarantee that we'll always get
+*some* service when you need it.
+
 ### The service doesn't know who is locating it
 
 Since the locator is globally accessible, any code in the game could be
@@ -101,15 +115,6 @@ and not during rendering may not work as a service -- it wouldn't be able
 to ensure that it's being used at the right time. So, if a class
 expects to only be used in a certain context, it's safest to
 avoid exposing it to the entire world with this pattern.
-
-### The service actually has to be located
-
-With a Singleton or a static class, there's no chance for the instance
-we need to *not* be available. Calling code can take for granted that
-it's there. But since this pattern has to *locate* the service, we may
-need to handle cases where that fails. Fortunately, we'll cover a
-strategy later to address this and guarantee that we'll always get
-*some* service when you need it.
 
 ## Sample Code
 

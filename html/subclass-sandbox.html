@@ -79,7 +79,9 @@ in <em>data</em> instead.</p>
 base class</em>. Putting them in the base class gives every power subclass direct,
 easy access to them. Making them protected (and likely non-virtual)
 communicates that they exist specifically to be <em>called</em> by subclasses.</p>
-<p>Once you have these toys to play with, you need a place to use them. For that, we&#8217;ll define a <em>sandbox method</em>: an abstract protected method that subclasses must implement. Given those, to implement a new kind of power, you:</p>
+<p>Once you have these toys to play with, you need a place to use them. For that,
+we&#8217;ll define a <em>sandbox method</em>: an abstract protected method that subclasses
+must implement. Given those, to implement a new kind of power, you:</p>
 <ol>
 <li>
 <p>Subclass <code>Superpower</code>.</p>
@@ -92,18 +94,22 @@ communicates that they exist specifically to be <em>called</em> by subclasses.</
     <code>Superpower</code> provides.</p>
 </li>
 </ol>
-<p>We can fix our redundant code problem now by making those provided operations as high-level as possible. When we see code that&#8217;s duplicated between lots of the subclasses, we can always roll that up into <code>Superpower</code> as a new operation that they can all use.</p>
+<p>We can fix our redundant code problem now by making those provided operations
+as high-level as possible. When we see code that&#8217;s duplicated between lots of
+the subclasses, we can always roll that up into <code>Superpower</code> as a new operation
+that they can all use.</p>
 <p>We&#8217;ve addressed our coupling problem by constraining the coupling to one place.
 <code>Superpower</code> itself will end up coupled to the different game systems, but our
-hundred subclasses are not. Instead, they are <em>only</em> coupled to their
-superclass. When one of those game systems changes, modification to <code>Superpower</code>
-itself may be necessary, but dozens of subclasses shouldn&#8217;t have to be touched.</p>
+hundred derived classes are not. Instead, they are <em>only</em> coupled to their
+base class. When one of those game systems changes, modification to
+<code>Superpower</code> may be necessary, but dozens of subclasses shouldn&#8217;t have to be
+touched.</p>
 <p>This pattern leads to an architecture where you have a shallow but wide class
-hierarchy. Your <span name="wide">inheritance</span> chains aren&#8217;t <em>deep</em>, but there are a <em>lot</em> of
-classes that hang off <code>Superpower</code>. By having a single class with a lot of
-direct subclasses, we have a point of leverage in our codebase. Time and love
-that we put into <code>Superpower</code> itself can benefit a wide set of classes in the
-game.</p>
+hierarchy. Your <span name="wide">inheritance</span> chains aren&#8217;t <em>deep</em>, but
+there are a <em>lot</em> of classes that hang off <code>Superpower</code>. By having a single
+class with a lot of direct subclasses, we have a point of leverage in our
+codebase. Time and love that we put into <code>Superpower</code> can benefit a wide set of
+classes in the game.</p>
 <aside name="wide">
 
 <p>Lately, you find a lot of people criticizing inheritance in object-oriented
@@ -114,7 +120,7 @@ but I find <em>wide</em> inheritance trees to be easier to work with than <em>de
 
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>A <strong>base class</strong> defines an abstract <strong>sandbox method</strong> and several
-<strong>provided operations</strong>. Marking them protected makes it clear to a user that
+<strong>provided operations</strong>. Marking them protected makes it clear to that
 they are for use by derived classes. Each derived <strong>sandboxed subclass</strong>
 implements the sandbox method using the provided operations.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
@@ -158,7 +164,7 @@ That means much of your codebase is isolated and fairly easy to maintain.</p>
 <p>Because this is such a simple pattern, there isn&#8217;t much to the sample code.
 That doesn&#8217;t mean it isn&#8217;t useful&thinsp;&mdash;&thinsp;the pattern is about the <em>intent</em>, and
 not the complexity of its implementation.</p>
-<p>We&#8217;ll start with our <code>Superpower</code> superclass:</p>
+<p>We&#8217;ll start with our <code>Superpower</code> base class:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -303,12 +309,12 @@ reason why you may decide to <em>not</em> do that. If your behavior is complex a
 are provided by the base class and others are accessed directly from the
 outside system that defines it. The more operations you provide, the less
 coupled subclasses are to outside systems, but the <em>more</em> coupled the base
-class itself is. It removes coupling from the derived classes, but only by
+class is. It removes coupling from the derived classes, but only by
 pushing that up to the base class itself.</p>
 <p>That&#8217;s a win if you have a bunch of derived classes that were all coupled to
 some outside system. By moving that up into a provided operation, you&#8217;ve
 centralized that coupling into one place: the base class. But the more you do
-this, the bigger and harder to maintain the base class itself becomes.</p>
+this, the bigger and harder to maintain that one class becomes.</p>
 <p>So where to draw the line? Here&#8217;s a few rules of thumb:</p>
 <ul>
 <li>
@@ -530,8 +536,8 @@ function, like so:</p>
 <aside name="friend">
 
 <p>With a little trickery like private constructors and friend classes, you
-can ensure that this <code>createSuperpower()</code> function is the <em>only</em> function
-that can actually create powers. That ensures you won&#8217;t ever forget one of
+can ensure this <code>createSkylaunch()</code> function is the <em>only</em> function
+that can actually create powers. That way, you can&#8217;t forget any of
 the initialization stages.</p>
 </aside>
 
@@ -585,8 +591,8 @@ use less memory.</p>
 <p>The previous option requires that outside code specifically remember to
 push in the state that the base class needs before it needs it. That places
 the burden of initialization on the surrounding code. Another option is to
-let the base class itself handle that by pulling in the state it needs.
-One way to do that is by using a
+let the base class handle it by pulling in the state it needs. One way to
+do that is by using a
 <a class="pattern" href="service-locator.html">Service Locator</a>.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
@@ -603,7 +609,7 @@ One way to do that is by using a
 
 
 <p>Here, <code>spawnParticles()</code> needs a particle system. Instead of being <em>given</em>
-one by outside code, it just fetches it itself from the service locator.</p>
+one by outside code, it just fetches one itself from the service locator.</p>
 </li>
 </ul>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
