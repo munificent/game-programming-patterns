@@ -367,7 +367,6 @@ namespace SwapOffset
     static void init() { current_ = 0; }
     static void swap() { current_ = next(); }
 
-  protected:
     void slap()        { slapped_[next()] = true; }
     bool wasSlapped()  { return slapped_[current_]; }
 

@@ -77,8 +77,8 @@ purposes.
 
 In order to get our game to appear on screen, all we ultimately do is
 write to that array. All of the crazy advanced graphics algorithms we
-have eventually boil down to just that: setting byte values in the
-framebuffer. But there's a little problem:
+have boil down to just that: setting byte values in the framebuffer.
+But there's a little problem.
 
 Earlier, I said computers are sequential. If it's executing a chunk of
 *our* rendering code, we don't expect it to be doing anything else at
@@ -87,11 +87,11 @@ happen in the middle of our program running. One of those is that the
 video display will be reading from the framebuffer *constantly* while
 our game runs. This can cause a problem for us.
 
-Let's say we want a big red circle to appear on screen. Our program
-starts looping through the framebuffer, setting pixels to red. What we
+Let's say we want a happy face to appear on screen. Our program
+starts looping through the framebuffer, coloring pixels. What we
 don't realize is that the video driver is pulling from the framebuffer
 right as we're writing to it. As it scans across the pixels we've
-written, our circle starts to appear. But then it outpaces us and
+written, our face starts to appear. But then it outpaces us and
 moves into pixels we haven't gotten to yet. The result is *tearing:* a
 hideous visual bug where you see half of something drawn on screen.
 
@@ -113,7 +113,7 @@ The result (Fig. 4) is that the user sees half of the drawing. The name "tearing
 
 This is why we need this pattern. Our program renders the pixels one
 at a time, but we need the display driver to see them all at
-once -- one refresh the circle isn't there, the next one it is.
+once -- one refresh the face isn't there, the next one it is.
 Double buffering solves this. I'll explain how by analogy.
 
 ### Act 1, Scene 1
@@ -301,8 +301,8 @@ This way, the video driver never sees the buffer that we're working
 on. The only remaining piece of the puzzle is the call to `swap()`
 when the scene is done drawing the frame. That swaps the two buffers
 by simply switching the `next_` and `current_` references. The next
-time the video driver calls `getBuffer()` it will now get the new
-buffer we just finished drawing and put our recently drawing buffer
+time the video driver calls `getBuffer()`, it will now get the new
+buffer we just finished drawing and put our recently drawn buffer
 onscreen. No more tearing or unsightly glitches.
 
 ### Not just for graphics
