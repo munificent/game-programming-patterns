@@ -288,7 +288,7 @@ When a parent node moves, all of its children's world coordinates are invalidate
 
 <aside name="branch">
 
-There's a subtle assumption here that the `if` check is faster than a matrix multiply. Intuitively, you would think it is: surely testing a single bit is faster than a bunch of floating point arithematic.
+There's a subtle assumption here that the `if` check is faster than a matrix multiply. Intuitively, you would think it is: surely testing a single bit is faster than a bunch of floating point arithmetic.
 
 However, modern CPUs are fantastically complex. They rely heavily on *pipelining* -- queueing up a series of sequential instructions. A branch like our `if` here can cause a *branch misprediction* and force the CPU lose cycles refilling the pipeline.
 

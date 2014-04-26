@@ -10,7 +10,7 @@ their shared base class.*
 
 Every kid has dreamed of being a superhero, but, unfortunately, cosmic rays are in short supply here on Earth. Games that let you pretend to be a superhero are the closest approximation. Because our game designers have never learned to say, "no", *our* superhero game is planning to have dozens, if not hundreds of different superpowers that players may have.
 
-Our plan is that we'll have a `Superpower` base class. Then we'll have a <span name="lots">derived</span> class that implements each superpower. We'll divy up the design doc among our team of programmers and get coding. When we're done, we'll have a hundred superpower classes.
+Our plan is that we'll have a `Superpower` base class. Then we'll have a <span name="lots">derived</span> class that implements each superpower. We'll divvy up the design doc among our team of programmers and get coding. When we're done, we'll have a hundred superpower classes.
 
 <aside name="lots">
 

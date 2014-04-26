@@ -163,7 +163,7 @@ It took a while, but most of us learned the hard way that global variables are b
 
 Say some AI code posts an "entity died" event to a queue when a virtual minion shuffles off its mortal coil. That event hangs out in the queue for who knows how many frames until it eventually works its way to the front and gets processed.
 
-Meanwhile, the experience system wants to track the heroine's bodycount and reward her for her grisly efficiency. It receives these "entity died" events then determines the kind of entity slain and the difficulty of the kill so it can dish out an appropriate reward.
+Meanwhile, the experience system wants to track the heroine's body count and reward her for her grisly efficiency. It receives these "entity died" events then determines the kind of entity slain and the difficulty of the kill so it can dish out an appropriate reward.
 
 That requires various pieces of state in the world. We need the entity that died to see how tough it was. We may want to inspect its surroundings to see what other obstacles or minions were nearby. But if the event isn't received until later, that stuff may be gone. The entity may have been deallocated, and other nearby foes may have wandered off.
 

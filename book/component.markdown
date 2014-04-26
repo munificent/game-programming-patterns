@@ -299,7 +299,7 @@ the game. It reads the joystick to determine how to accelerate the
 baker. Then it resolves its new position with the physics engine.
 Finally, it draws Bjørn onto the screen.
 
-The sample implemention here is trivially simple. There's no gravity,
+The sample implementation here is trivially simple. There's no gravity,
 animation, or any of the dozens of other details that make a character
 fun to play. Even so, we can see that we've got a single function that
 several different coders on our team will probably have to spend time

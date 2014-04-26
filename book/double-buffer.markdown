@@ -394,7 +394,7 @@ occurs:
       Chump was slapped, so he slaps Harry
     Stage update ends
 
-So, in a single frame, our initial slap on Harry has propogated
+So, in a single frame, our initial slap on Harry has propagated
 through all of the comedians. Now let's mix things up a bit. Lets say
 we reorder the comedians within the stages array, but leaving them
 still facing each other the same way.

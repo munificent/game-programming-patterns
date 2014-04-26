@@ -224,7 +224,7 @@ This looks like a winner:
 
  *  Players with faster machines are rewarded with smoother gameplay.
 
-But, alas, there's a serious problem lurking ahead: we've made the game <span name="deterministic">non-determinstic</span> and unstable. Here's one example of the trap we've set for ourselves:
+But, alas, there's a serious problem lurking ahead: we've made the game <span name="deterministic">non-deterministic</span> and unstable. Here's one example of the trap we've set for ourselves:
 
 <aside name="deterministic">
 
