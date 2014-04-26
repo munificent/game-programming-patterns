@@ -17,7 +17,7 @@ Who knows? Maybe there is a market for games with no challenge. "Click 10 Ten Ti
 
 </aside>
 
-This crypt needs some guards -- some enemies our brave heroine can grapple with. First up, we want a re-animated <span name="brains">skeleton guard</span> to patrol back and forth in front of the door. Ignorining everything you probably already know about game programming, the simplest possible code to make that skeleton lurch back and forth is something like:
+This crypt needs some guards -- some enemies our brave heroine can grapple with. First up, we want a re-animated <span name="brains">skeleton guard</span> to patrol back and forth in front of the door. Ignoring everything you probably already know about game programming, the simplest possible code to make that skeleton lurch back and forth is something like:
 
 <aside name="brains">
 
