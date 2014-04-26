@@ -245,7 +245,7 @@ face**.
 
 <aside name="aside">
 
-Asides, extra information, and dumb jokes are placed in asides. Feel
+Asides, extra information, and dumb jokes are placed in boxes like this one. Feel
 free to skip them if you want.
 
 </aside>
