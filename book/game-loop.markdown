@@ -212,12 +212,6 @@ Say you've got a bullet shooting across the screen. With a fixed time step, each
 you *scale that velocity by the elapsed time*. As the time step gets bigger, the
 bullet moves farther in each frame. So that bullet will get across the screen in the *same* amount of *real* time, even if it's twenty small fast steps, or four big slow ones.
 
-<p class="note">
-
-A graphic here would help.
-
-</p>
-
 This looks like a winner:
 
  *  The game plays at a consistent rate on different hardware.

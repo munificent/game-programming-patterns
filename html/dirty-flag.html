@@ -299,7 +299,7 @@ turn up uses of this pattern.</p>
 
 <aside name="branch">
 
-<p>There&#8217;s a subtle assumption here that the <code>if</code> check is faster than a matrix multiply. Intuitively, you would think it is: surely testing a single bit is faster than a bunch of floating point arithematic.</p>
+<p>There&#8217;s a subtle assumption here that the <code>if</code> check is faster than a matrix multiply. Intuitively, you would think it is: surely testing a single bit is faster than a bunch of floating point arithmetic.</p>
 <p>However, modern CPUs are fantastically complex. They rely heavily on <em>pipelining</em>&thinsp;&mdash;&thinsp;queueing up a series of sequential instructions. A branch like our <code>if</code> here can cause a <em>branch misprediction</em> and force the CPU lose cycles refilling the pipeline.</p>
 <p>The <a href="data-locality.html" class="pattern">Data Locality</a> chapter has more about how modern CPUs try to go faster and how you can avoid tripping them up like this.</p>
 </aside>

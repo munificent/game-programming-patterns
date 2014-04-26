@@ -511,7 +511,7 @@
 <p>There&#8217;s just one problem left: actually creating the bytecode. So far, we&#8217;ve taken bits of pseudocode and compiled them to bytecode by hand. Unless you&#8217;ve got a <em>lot</em> of free time, that&#8217;s not going to work in practice.</p>
 <h3><a href="#spellcasting-tools" name="spellcasting-tools">Spellcasting tools</a></h3>
 <p>One of our initial goals was to have a <em>higher</em>-level way to author behavior, but we&#8217;ve gone and created something <em>lower</em>-level than C++. It has the runtime performance and safety we want, but absolutely none of the designer-friendly usability.</p>
-<p>To fill that gap, we need some tooling. We need a program that lets users define the high-level behavior of a spell, then takes that and generates the apppropriate low-level stack machine bytecode.</p>
+<p>To fill that gap, we need some tooling. We need a program that lets users define the high-level behavior of a spell, then takes that and generates the appropriate low-level stack machine bytecode.</p>
 <p>That probably sounds way harder than making the VM. Many programmers were dragged through a compilers class in college and took away from it nothing but PTSD triggered by the sight of a <span name="dragon">book</span> with a dragon on the cover or the words &#8220;<a href="http://en.wikipedia.org/wiki/Lex_(software)">lex</a>&#8221; and &#8220;<a href="http://en.wikipedia.org/wiki/Yacc">yacc</a>&#8220;.</p>
 <aside name="dragon">
 

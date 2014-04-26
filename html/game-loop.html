@@ -220,12 +220,6 @@ electrical don&#8217;t take us seriously.</p>
 <p>Say you&#8217;ve got a bullet shooting across the screen. With a fixed time step, each frame you&#8217;ll move it according to its velocity. With a variable time step,
 you <em>scale that velocity by the elapsed time</em>. As the time step gets bigger, the
 bullet moves farther in each frame. So that bullet will get across the screen in the <em>same</em> amount of <em>real</em> time, even if it&#8217;s twenty small fast steps, or four big slow ones.</p>
-<p class="note">
-
-A graphic here would help.
-
-</p>
-
 <p>This looks like a winner:</p>
 <ul>
 <li>
@@ -235,7 +229,7 @@ A graphic here would help.
 <p>Players with faster machines are rewarded with smoother gameplay.</p>
 </li>
 </ul>
-<p>But, alas, there&#8217;s a serious problem lurking ahead: we&#8217;ve made the game <span name="deterministic">non-determinstic</span> and unstable. Here&#8217;s one example of the trap we&#8217;ve set for ourselves:</p>
+<p>But, alas, there&#8217;s a serious problem lurking ahead: we&#8217;ve made the game <span name="deterministic">non-deterministic</span> and unstable. Here&#8217;s one example of the trap we&#8217;ve set for ourselves:</p>
 <aside name="deterministic">
 
 <p>&#8220;Deterministic&#8221; means that every time you run the program, if you give it the same inputs, you get the exact same outputs back. As you can imagine it&#8217;s much easier to track down bugs in deterministic programs: find the inputs that caused the bug the first time, and you can cause it every time.</p>
