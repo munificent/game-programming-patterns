@@ -336,7 +336,7 @@
 <p>Supporting multiple levels of undo isn&#8217;t much harder. Instead of remembering the last command, we keep a list of commands and a reference to the &#8220;current&#8221; one. When the player executes a command, we append it to the list and point &#8220;current&#8221; at it.</p>
 <p><img src="images/command-undo.png" /></p>
 <p>When the player chooses &#8220;Undo&#8221;, we undo the current command and move the current pointer back. When they <span name="replay">redo</span>, we advance the pointer and then execute that command. If they choose a new command after undoing some, everything in the list after the current command is discarded.</p>
-<p>Maybe I&#8217;m just easily impressed, but when I first implemented this in a level editor, I was as giddy as a schoolgirl at how straightforward it was and how well it worked. It takes discipline to make sure every data modification goes through a command, but once you do that, the rest is easy.</p>
+<p>The first time I implemented this in a level editor, I felt like a wizard. I was astonished at how straightforward it was and how well it worked. It takes discipline to make sure every data modification goes through a command, but once you do that, the rest is easy.</p>
 <aside name="replay">
 
 <p>Redo may not be common in games, but re-<em>play</em> is. A na&iuml;ve implementation would record the entire game state at each frame so it can be replayed, but that would use too much memory.</p>

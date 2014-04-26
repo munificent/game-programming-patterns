@@ -215,7 +215,7 @@ Supporting multiple levels of undo isn't much harder. Instead of remembering the
 
 When the player chooses "Undo", we undo the current command and move the current pointer back. When they <span name="replay">redo</span>, we advance the pointer and then execute that command. If they choose a new command after undoing some, everything in the list after the current command is discarded.
 
-Maybe I'm just easily impressed, but when I first implemented this in a level editor, I was as giddy as a schoolgirl at how straightforward it was and how well it worked. It takes discipline to make sure every data modification goes through a command, but once you do that, the rest is easy.
+The first time I implemented this in a level editor, I felt like a wizard. I was astonished at how straightforward it was and how well it worked. It takes discipline to make sure every data modification goes through a command, but once you do that, the rest is easy.
 
 <aside name="replay">
 
