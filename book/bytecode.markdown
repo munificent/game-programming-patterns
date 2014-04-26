@@ -407,7 +407,7 @@ There's just one problem left: actually creating the bytecode. So far, we've tak
 
 One of our initial goals was to have a *higher*-level way to author behavior, but we've gone and created something *lower*-level than C++. It has the runtime performance and safety we want, but absolutely none of the designer-friendly usability.
 
-To fill that gap, we need some tooling. We need a program that lets users define the high-level behavior of a spell, then takes that and generates the apppropriate low-level stack machine bytecode.
+To fill that gap, we need some tooling. We need a program that lets users define the high-level behavior of a spell, then takes that and generates the appropriate low-level stack machine bytecode.
 
 That probably sounds way harder than making the VM. Many programmers were dragged through a compilers class in college and took away from it nothing but PTSD triggered by the sight of a <span name="dragon">book</span> with a dragon on the cover or the words "[lex](http://en.wikipedia.org/wiki/Lex_(software))" and "[yacc](http://en.wikipedia.org/wiki/Yacc)".
 
