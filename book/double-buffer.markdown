@@ -545,7 +545,7 @@ quickly as possible.
     *   *Swapping can take more time.* This, of course, is the big
         negative point. Our swap operation now means copying the
         entire buffer in memory. If the buffer is large, like an
-        entire framebuffer, it can a signficant chunk of time to do
+        entire framebuffer, it can take a significant chunk of time to do
         this. Since nothing can read or write to *either* buffer
         while this is happening, that's a big limitation.
 
