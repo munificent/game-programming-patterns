@@ -215,7 +215,7 @@
 </aside>
 
 <h2><a href="#undo-and-redo" name="undo-and-redo">Undo and Redo</a></h2>
-<p>The last example is the most well-known use of this pattern. If a command object can <em>do</em> things, it&#8217;s a small step for it be able to <em>undo</em> them. Undo is used in some more strategic games where you can roll back moves that you didn&#8217;t like. It&#8217;s mandatory in tools that people use to <em>create</em> games. The <span name="hate">surest way</span> to make your game designers hate you is giving them a level editor that can&#8217;t undo their fat-fingered mistakes.</p>
+<p>The last example is the most well-known use of this pattern. If a command object can <em>do</em> things, it&#8217;s a small step for it be able to <em>undo</em> them. Undo is used in some strategy games where you can roll back moves that you didn&#8217;t like. It&#8217;s mandatory in tools that people use to <em>create</em> games. The <span name="hate">surest way</span> to make your game designers hate you is giving them a level editor that can&#8217;t undo their fat-fingered mistakes.</p>
 <aside name="hate">
 
 <p>I may be speaking from experience here.</p>
@@ -359,6 +359,23 @@
   <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="nx">unit</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
   <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>We could support both undo and redo using a pair of closures:</p>
+<div class="codehilite"><pre><span class="kd">function</span> <span class="nx">makeMoveUnitCommand</span><span class="p">(</span><span class="nx">unit</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">xBefore</span><span class="p">,</span> <span class="nx">yBefore</span><span class="p">;</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="nx">undo</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">xBefore</span> <span class="o">=</span> <span class="nx">unit</span><span class="p">.</span><span class="nx">x</span><span class="p">();</span>
+      <span class="nx">yBefore</span> <span class="o">=</span> <span class="nx">unit</span><span class="p">.</span><span class="nx">y</span><span class="p">();</span>
+      <span class="nx">unit</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">redo</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">unit</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">xBefore</span><span class="p">,</span> <span class="nx">yBefore</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
 <span class="p">}</span>
 </pre></div>
 

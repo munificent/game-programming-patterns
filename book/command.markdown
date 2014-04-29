@@ -155,7 +155,7 @@ If we take those commands and make them *serializable*, we could send the stream
 
 ## Undo and Redo
 
-The last example is the most well-known use of this pattern. If a command object can *do* things, it's a small step for it be able to *undo* them. Undo is used in some more strategic games where you can roll back moves that you didn't like. It's mandatory in tools that people use to *create* games. The <span name="hate">surest way</span> to make your game designers hate you is giving them a level editor that can't undo their fat-fingered mistakes.
+The last example is the most well-known use of this pattern. If a command object can *do* things, it's a small step for it be able to *undo* them. Undo is used in some strategy games where you can roll back moves that you didn't like. It's mandatory in tools that people use to *create* games. The <span name="hate">surest way</span> to make your game designers hate you is giving them a level editor that can't undo their fat-fingered mistakes.
 
 <aside name="hate">
 
@@ -249,6 +249,23 @@ For example, if we were building a game in JavaScript, we could create a move un
       return function() {
         unit.moveTo(x, y);
       }
+    }
+
+We could support both undo and redo using a pair of closures:
+
+    :::javascript
+    function makeMoveUnitCommand(unit, x, y) {
+      var xBefore, yBefore;
+      return {
+        undo: function() {
+          xBefore = unit.x();
+          yBefore = unit.y();
+          unit.moveTo(x, y);
+        },
+        redo: function() {
+          unit.moveTo(xBefore, yBefore);
+        }
+      };
     }
 
 If you're comfortable with a functional style, this way of doing things is natural. If you aren't, I hope this chapter helped you along the way a bit. For me, the lesson here is that the usefulness of the command pattern really shows how useful the functional paradigm is for many problems.
