@@ -256,7 +256,7 @@
 <p>In particular, the heroine can no longer be in an <em>invalid</em> state. With the boolean flags, some sets of values were possible but meaningless. With the enum, each value is valid.</p>
 </aside>
 
-<p>Your problem may outgrow this solution, though. Say we want to add a move where our can heroine duck for a while to charge up and unleash a special attack. While she&#8217;s ducking, we need to track the charge time.</p>
+<p>Your problem may outgrow this solution, though. Say we want to add a move where our heroine can duck for a while to charge up and unleash a special attack. While she&#8217;s ducking, we need to track the charge time.</p>
 <p>We add a <code>chargeTime_</code> field to <code>Heroine</code> to store how long the attack has charged. Assume we already have an <span name="update"><code>update()</code></span> that gets called each frame. In there, we add:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>
 <span class="p">{</span>

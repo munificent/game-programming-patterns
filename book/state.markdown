@@ -115,7 +115,7 @@ In particular, the heroine can no longer be in an *invalid* state. With the bool
 
 </aside>
 
-Your problem may outgrow this solution, though. Say we want to add a move where our can heroine duck for a while to charge up and unleash a special attack. While she's ducking, we need to track the charge time.
+Your problem may outgrow this solution, though. Say we want to add a move where our heroine can duck for a while to charge up and unleash a special attack. While she's ducking, we need to track the charge time.
 
 We add a `chargeTime_` field to `Heroine` to store how long the attack has charged. Assume we already have an <span name="update">`update()`</span> that gets called each frame. In there, we add:
 
