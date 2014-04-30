@@ -228,7 +228,7 @@
 <h3><a href="#you'll-miss-your-debugger" name="you'll-miss-your-debugger">You&#8217;ll miss your debugger</a></h3>
 <p>Programming is hard. We know what we want the machine to do, but we don&#8217;t always communicate that correctly&thinsp;&mdash;&thinsp;we write bugs. To help find and fix those, we&#8217;ve amassed a pile of tools to understand what our code is doing wrong, and how to right it.</p>
 <p>We have debuggers, static analyzers, decompilers, etc. All of those tools are designed to work with some existing language: either machine code or something higher level.</p>
-<p>When you define your own bytecode VM, you leave those tools behind. Sure, you can step through the VM in your debugger, but that tells you what the VM <em>itself</em> is doing, and not what the bytecode it&#8217;s interpreting is up to. It certainly doesn&#8217;t help you map that bytecode back to the high-level form is was compiled from.</p>
+<p>When you define your own bytecode VM, you leave those tools behind. Sure, you can step through the VM in your debugger, but that tells you what the VM <em>itself</em> is doing, and not what the bytecode it&#8217;s interpreting is up to. It certainly doesn&#8217;t help you map that bytecode back to the high-level form it was compiled from.</p>
 <p>If the behavior you&#8217;re defining is simple, you can scrape by without too much tooling to help you debug it. But as the scale of your content grows, plan to invest real time into features that help users see what their bytecode is doing. Those features might not <span name="debugger">ship</span> in your game, but they&#8217;ll be critical to ensure that you actually <em>can</em> ship your game.</p>
 <aside name="debugger">
 
