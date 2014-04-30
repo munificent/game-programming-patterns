@@ -154,7 +154,7 @@ namespace Flyweight
       World()
       : grassTerrain_(1, false, GRASS_TEXTURE),
         hillTerrain_(3, false, HILL_TEXTURE),
-        riverTerrain_(1, true, RIVER_TEXTURE)
+        riverTerrain_(2, true, RIVER_TEXTURE)
       {}
       const Terrain& getTile(int x, int y) const;
       //^omit
@@ -247,7 +247,7 @@ namespace Flyweight
       World()
       : grassTerrain_(1, false, GRASS_TEXTURE),
         hillTerrain_(3, false, HILL_TEXTURE),
-        riverTerrain_(1, true, RIVER_TEXTURE)
+        riverTerrain_(2, true, RIVER_TEXTURE)
       {}
 
     private:
