@@ -39,9 +39,6 @@ nav {
   background: white;
   box-shadow: 0 0 30px rgba(71, 51, 31, 0.05); }
 
-.page.sidebar {
-  padding-right: 300px; }
-
 h1 {
   font: 200 60px "Source Sans Pro", Georgia, serif;
   padding: 100px 0 4px 0;
@@ -168,26 +165,10 @@ aside {
   aside img {
     padding: 0; }
 
-aside.sidebar {
-  position: absolute;
-  width: 240px;
-  right: 30px;
-  padding: 0;
-  background: none;
-  border: none;
-  padding-left: 22px;
-  border-radius: 0;
-  border-left: solid 8px #f0e9db; }
-  aside.sidebar p, aside.sidebar li {
-    font: 14px/20px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
-
 .index h1 {
   border: none; }
 .index aside {
   display: none; }
-.index aside.sidebar {
-  display: block;
-  border-left: none; }
 .index h2, .index h3 {
   border-left: none;
   margin-left: 0;
@@ -349,11 +330,6 @@ footer {
   border-radius: 4px;
   border-top: solid 1px #f7e3ba; }
 
-.page.sidebar .narrow-toc {
-  display: none; }
-.page.sidebar .narrow-sign-up {
-  display: none; }
-
 .codehilite .k {
   color: #1481b8; }
 
@@ -446,3 +422,28 @@ footer {
 
   footer {
     font-size: 13px; } }
+@media only screen and (min-width: 800px) {
+  .page {
+    padding-right: 300px; }
+
+  aside {
+    position: absolute;
+    width: 240px;
+    right: 30px;
+    padding: 0;
+    background: none;
+    border: none;
+    padding-left: 22px;
+    border-radius: 0;
+    border-left: solid 8px #f0e9db; }
+    aside p, aside li {
+      font: 14px/20px "Source Sans Pro", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif; }
+
+  .index aside {
+    display: block;
+    border-left: none; }
+
+  .page .narrow-toc {
+    display: none; }
+  .page .narrow-sign-up {
+    display: none; } }

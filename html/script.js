@@ -22,24 +22,10 @@ $(document).ready(function() {
 });
 
 function refreshAsides() {
-  if ($(document).width() > 800) {
-    sidebarAsides();
-  } else {
-    inlineAsides();
-  }
-}
+  // Don't position them if they're inline.
+  if ($(document).width() < 800) return;
 
-// Moves the asides into the main content column.
-function inlineAsides() {
-  $(".page").removeClass("sidebar");
-  $(".nav").removeClass("sidebar");
-  $("aside").removeClass("sidebar");
-}
-
-// Moves the asides to a second column on the right.
-function sidebarAsides() {
-  $(".page").addClass("sidebar");
-  $(".nav").addClass("sidebar");
+  // Vertically position the asides next to the span they annotate.
   $("aside").each(function() {
     var aside = $(this);
 
@@ -51,7 +37,6 @@ function sidebarAsides() {
       return;
     }
 
-    aside.addClass("sidebar");
     aside.offset({top: span.position().top - 3});
   });
 }

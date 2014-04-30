@@ -66,10 +66,6 @@ nav {
   box-shadow: 0 0 30px hsla(30, 40%, 20%, 0.05);
 }
 
-.page.sidebar {
-  padding-right: 300px;
-}
-
 // Note: We use explicit line heights here so that the positions of the
 // elements don't change after the fonts are loaded asynchronously. That way,
 // when we position the asides procedurally, they are in the right place.
@@ -252,25 +248,6 @@ aside {
   }
 }
 
-aside.sidebar {
-  position: absolute;
-  width: 240px;
-  right: 30px;
-
-  // Clear out the inline aside styles.
-  padding: 0;
-  background: none;
-  border: none;
-
-  padding-left: 22px;
-  border-radius: 0;
-  border-left: solid 8px hsl(40, 40%, 90%);
-
-  p, li {
-    font: 14px/20px $sans;
-  }
-}
-
 // The front page gets a bit of special styling.
 .index {
   h1 {
@@ -279,12 +256,6 @@ aside.sidebar {
 
   aside {
     display: none;
-  }
-
-  // Don't highlight the aside.
-  aside.sidebar {
-    display: block;
-    border-left: none;
   }
 
   // No little tab boxes next to the headers.
@@ -484,17 +455,6 @@ footer {
   border-top: solid 1px hsl(40, 80%, 85%);
 }
 
-// Normally, show the chapter list in the sidebar, so don't show it here.
-.page.sidebar {
-  .narrow-toc {
-    display: none;
-  }
-
-  .narrow-sign-up {
-    display: none;
-  }
-}
-
 // Syntax highlighting.
 .codehilite .k  { color: $primary; } // keyword
 .codehilite .kd { color: $primary; } // keyword declaration
@@ -584,5 +544,52 @@ footer {
 
   footer {
     font-size: 13px;
+  }
+}
+
+// On wide enough screens, put the asides on the... side.
+@media only screen and (min-width: 800px) {
+  .page {
+    padding-right: 300px;
+  }
+
+  aside {
+    position: absolute;
+    width: 240px;
+    right: 30px;
+
+    // Clear out the inline aside styles.
+    padding: 0;
+    background: none;
+    border: none;
+
+    padding-left: 22px;
+    border-radius: 0;
+    border-left: solid 8px hsl(40, 40%, 90%);
+
+    p, li {
+      font: 14px/20px $sans;
+    }
+  }
+
+
+  // The front page gets a bit of special styling.
+  .index {
+    // Don't highlight the aside.
+    aside {
+      display: block;
+      border-left: none;
+    }
+  }
+
+  // Normally, show the chapter list in the sidebar, so don't show it here.
+  .page {
+    .narrow-toc {
+      display: none;
+    }
+
+    .narrow-sign-up {
+      display: none;
+    }
   }
 }
