@@ -678,13 +678,19 @@ means:</p>
     can be really helpful on a large team when a feature we&#8217;re
     working on may be dependent on some other system that isn&#8217;t
     in place yet.</p>
-<p>The downside is that it may make it harder to debug a missing
-service. Imagine that some code in the game uses a service to
-access some data and then makes a decision based on it. If it
-gets a null service instead of a real one and gets dummy data
-from it, the game may not behave as expected. It could take
-effort to trace that issue back to the fact that a service
-wasn&#8217;t there when we thought it would be.</p>
+<p>The downside is that it may be harder to debug an <em>unintentionally</em>
+missing service. Say the game uses a service to access some data and
+then make a decision based on it. If we&#8217;ve failed to register the real
+service and that code gets a null service instead, the game may not
+behave like we want. <span name="null">It</span> will take some work
+to trace that issue back to the fact that a service wasn&#8217;t there when
+we thought it would be.</p>
+<aside name="null">
+
+<p>We can alleviate this by having the null service print some debug
+output whenever it&#8217;s used.</p>
+</aside>
+
 </li>
 </ul>
 </li>

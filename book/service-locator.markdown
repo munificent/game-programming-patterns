@@ -536,13 +536,20 @@ that it can vary, based on differing answers to a few core questions:
         working on may be dependent on some other system that isn't
         in place yet.
 
-        The downside is that it may make it harder to debug a missing
-        service. Imagine that some code in the game uses a service to
-        access some data and then makes a decision based on it. If it
-        gets a null service instead of a real one and gets dummy data
-        from it, the game may not behave as expected. It could take
-        effort to trace that issue back to the fact that a service
-        wasn't there when we thought it would be.
+        The downside is that it may be harder to debug an *unintentionally*
+        missing service. Say the game uses a service to access some data and
+        then make a decision based on it. If we've failed to register the real
+        service and that code gets a null service instead, the game may not
+        behave like we want. <span name="null">It</span> will take some work
+        to trace that issue back to the fact that a service wasn't there when
+        we thought it would be.
+
+        <aside name="null">
+
+        We can alleviate this by having the null service print some debug
+        output whenever it's used.
+
+        </aside>
 
 Among these options, the one I see used most frequently is simply
 asserting that the service will be found. By the time a game gets out
