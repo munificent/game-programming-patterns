@@ -4,3 +4,11 @@ code/flyweight/tiles/Build/
 xcuserdata/
 *.xcuserstate
 project.xcworkspace/
+
+# idea files
+.idea/
+*.iml
+
+# build output files
+html/*.html
+!html/index.html
