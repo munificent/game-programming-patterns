@@ -1,3 +1,5 @@
+2014-04-30 - 6 emails, 3 bugs, revise introduction
+2014-04-29 - 8 emails, 4 bugs
 2014-04-28 - 12 emails few bug fixes
 2014-04-27 - 20 emails
 2014-04-26 - 4 pull requests, 10 bugs
