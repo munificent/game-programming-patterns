@@ -251,18 +251,18 @@ For example, if we were building a game in JavaScript, we could create a move un
       }
     }
 
-We could support both undo and redo using a pair of closures:
+We could add support for undo as well using a pair of closures:
 
     :::javascript
     function makeMoveUnitCommand(unit, x, y) {
       var xBefore, yBefore;
       return {
-        undo: function() {
+        execute: function() {
           xBefore = unit.x();
           yBefore = unit.y();
           unit.moveTo(x, y);
         },
-        redo: function() {
+        undo: function() {
           unit.moveTo(xBefore, yBefore);
         }
       };
