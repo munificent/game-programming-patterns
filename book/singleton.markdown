@@ -449,9 +449,18 @@ working with it. Before we take the shotgun approach of a singleton
 object with *global* scope, let's consider other ways our codebase can
 get access to an object:
 
-* **Pass it in.** The simplest solution, and often the best, is to simply pass the
-    object you need as an argument to the functions that need it. It's worth
-    considering before we discard it as too cumbersome.
+* **Pass it in.** The <span name="di">simplest</span> solution, and often the
+  best, is to simply pass the object you need as an argument to the functions
+  that need it. It's worth considering before we discard it as too cumbersome.
+
+    <aside name="di">
+
+    Some use the term "dependency injection" to refer
+    to this. Instead of code reaching *out* and finding its dependencies by calling into something global, the dependencies are pushed *in* to the code that needs it through parameters.
+
+    Others reserve "dependency injection" for more complex ways of providing dependencies to code.
+
+    </aside>
 
     Consider a function for rendering objects. In order to render, it
     needs access to an object that represents the graphics device and maintains the render state. It's very common to just pass that in to all of the rendering functions, usually as a parameter named something like `context`.
