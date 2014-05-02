@@ -268,7 +268,7 @@ This pattern lets us separate *populating* the game world from *implementing* it
 
 ### Passing time
 
-That's key pattern, but I'll just touch on a common refinement. So far, we've assumed every call to `update()` advances the state of the game world by the same fixed unit of time.
+That's the key pattern, but I'll just touch on a common refinement. So far, we've assumed every call to `update()` advances the state of the game world by the same fixed unit of time.
 
 I happen to prefer that, but many games use a <span name="variable">*variable time step*</span>. In those, each turn of the game loop may simulate a larger or smaller slice of time depending on how long it took to process and render the previous frame.
 
