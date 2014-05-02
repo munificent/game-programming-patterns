@@ -237,7 +237,7 @@ bullet moves farther in each frame. So that bullet will get across the screen in
 <p>Computers are naturally deterministic: they follow programs mechanically. Non-determinism appears when the messy real world creeps in. For example, networking, the system clock, and thread scheduling all rely on bits of the external world outside of the program&#8217;s control.</p>
 </aside>
 
-<p>Say we&#8217;ve got a two-player networked game and Fred has some beast of a gaming machine while George is using his grandmother&#8217;s antique PC. That aforementioned bullet is flying across both of their screens. On Fred&#8217;s machine, the game is running super fast, so each time step is tiny. We cram like 50 frames in the second it takes the bullet to cross the screen. Poor George can only fit about five in.</p>
+<p>Say we&#8217;ve got a two-player networked game and Fred has some beast of a gaming machine while George is using his grandmother&#8217;s antique PC. That aforementioned bullet is flying across both of their screens. On Fred&#8217;s machine, the game is running super fast, so each time step is tiny. We cram, like, 50 frames in the second it takes the bullet to cross the screen. Poor George can only fit about five in.</p>
 <p>This means on Fred&#8217;s machine, the physics engine updates the bullet&#8217;s position 50 times, but George&#8217;s only does it five times. Most games use floating point numbers and those are subject to <em>rounding error</em>. Each time you add two floating point numbers, the answer you get back can be a bit off. Fred&#8217;s machine is doing ten times as many operations, so he&#8217;ll accumulate a bigger error than George. The <em>same</em> bullet will end up in <em>different places</em> on their machines.</p>
 <p>This is just one nasty problem a variable time step can cause, but there&#8217;s more. In order to run in real-time, game physics engines are approximations of the real laws of mechanics. To keep those approximations from <span name="blowup">blowing up</span>, damping is applied. That damping is carefully tuned to a certain time step. Vary that, and the physics gets unstable.</p>
 <aside name="blowup">
@@ -292,7 +292,7 @@ bullet moves farther in each frame. So that bullet will get across the screen in
 <p>There&#8217;s one issue we&#8217;re left with, and that&#8217;s residual lag. We update the game at a fixed time step, but we render at arbitrary points in time. This means that from the user&#8217;s perspective, the game will often display at a point in time between two updates.</p>
 <p>Here&#8217;s a timeline:</p>
 <p><img src="images/game-loop-timeline.png" /></p>
-<p>As you can see, we update at a nice tight fixed interval. Meanwhile, we render
+<p>As you can see, we update at a nice tight, fixed interval. Meanwhile, we render
 whenever we can. It&#8217;s less frequent than updating, and isn&#8217;t steady either.
 Both of those are OK. The lame part is that we don&#8217;t always render right at the
 point of updating. Look at the third render time. It&#8217;s right between two updates:</p>
@@ -453,7 +453,7 @@ loop to keep the game from running too fast.</p>
 <li>
 <p><strong>Variable time step:</strong></p>
 <p>I&#8217;ll put this in here as an option in the solution space, with the caveat
-that most game developers I see recommend against doing it. It&#8217;s good to
+that most game developers I know recommend against it. It&#8217;s good to
 remember <em>why</em> it&#8217;s a bad idea, though.</p>
 <ul>
 <li>
