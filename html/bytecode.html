@@ -567,15 +567,17 @@
 <li>
 <p><strong>With a register-based VM:</strong></p>
 <ul>
-<li><em>Instructions are larger.</em> Since instructions need arguments for stack offsets, a single instruction needs more bits. For example, an instruction in <span name="lua">Lua</span>&thinsp;&mdash;&thinsp;probably the most well-known register-based VM&thinsp;&mdash;&thinsp;is a full 32-bits. It uses 6 bits for the instruction type, and the rest are arguments.</li>
-</ul>
+<li>
+<p><em>Instructions are larger.</em> Since instructions need arguments for stack offsets, a single instruction needs more bits. For example, an instruction in <span name="lua">Lua</span>&thinsp;&mdash;&thinsp;probably the most well-known register-based VM&thinsp;&mdash;&thinsp;is a full 32-bits. It uses 6 bits for the instruction type, and the rest are arguments.</p>
 <aside name="lua">
 
 <p>Lua doesn&#8217;t specify their bytecode format and it changes from version to version. What I&#8217;m describing here is true as of Lua 5.1. For an absolutely amazing deep dive into Lua&#8217;s internals, read <a href="http://luaforge.net/docman/83/98/ANoFrillsIntroToLua51VMInstructions.pdf">this</a>.</p>
 </aside>
 
-<ul>
-<li><em>You have fewer instructions.</em> Since each instruction can do more work, you don&#8217;t need as many of them. Some say you get a performance improvement since you don&#8217;t have to shuffle values around in the stack as much.</li>
+</li>
+<li>
+<p><em>You have fewer instructions.</em> Since each instruction can do more work, you don&#8217;t need as many of them. Some say you get a performance improvement since you don&#8217;t have to shuffle values around in the stack as much.</p>
+</li>
 </ul>
 </li>
 </ul>

@@ -192,9 +192,8 @@ available to be reused as the new next buffer.</p>
 <p>This pattern is one of those ones where you&#8217;ll know when you need it.
 If you have a system that lacks double buffering, it will probably
 look visibly wrong (tearing, etc.) or will behave incorrectly. But saying, &#8220;you&#8217;ll know when you need it&#8221; doesn&#8217;t give you much to go
-on. More specifically, this pattern is appropriate when these four
-things are true:</p>
-<ol>
+on. More specifically, this pattern is appropriate when all of these are true:</p>
+<ul>
 <li>
 <p>We have some state that is being modified incrementally.</p>
 </li>
@@ -209,7 +208,7 @@ things are true:</p>
 <p>We want to be able to read the state and we don&#8217;t want to have to
     wait while it&#8217;s being written.</p>
 </li>
-</ol>
+</ul>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <p>Unlike larger architectural patterns, double buffering exists at a
 lower implementation level. Because of this, it has fewer consequences
@@ -687,7 +686,7 @@ captures.</p>
 </ul>
 </li>
 <li>
-<p><strong>Copy the data between the buffers.</strong></p>
+<p><strong>Copy the data between the buffers:</strong></p>
 <p>If we can&#8217;t just repoint users to the other buffer, the only other
 option is to actually copy the data from the next frame to the
 current frame. This is how our slapstick comedians work. In that

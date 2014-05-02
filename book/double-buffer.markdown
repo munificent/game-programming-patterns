@@ -201,17 +201,16 @@ available to be reused as the new next buffer.
 This pattern is one of those ones where you'll know when you need it.
 If you have a system that lacks double buffering, it will probably
 look visibly wrong (tearing, etc.) or will behave incorrectly. But saying, "you'll know when you need it" doesn't give you much to go
-on. More specifically, this pattern is appropriate when these four
-things are true:
+on. More specifically, this pattern is appropriate when all of these are true:
 
-1.  We have some state that is being modified incrementally.
+ *  We have some state that is being modified incrementally.
 
-2.  That same state may be accessed in the middle of modification.
+ *  That same state may be accessed in the middle of modification.
 
-3.  We want to prevent the code that's accessing the state from
+ *  We want to prevent the code that's accessing the state from
     seeing the work-in-progress.
 
-4.  We want to be able to read the state and we don't want to have to
+ *  We want to be able to read the state and we don't want to have to
     wait while it's being written.
 
 ## Keep in Mind
@@ -527,7 +526,7 @@ quickly as possible.
 
         </aside>
 
-*   **Copy the data between the buffers.**
+*   **Copy the data between the buffers:**
 
     If we can't just repoint users to the other buffer, the only other
     option is to actually copy the data from the next frame to the

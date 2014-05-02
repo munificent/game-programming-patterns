@@ -126,6 +126,7 @@ such as currently playing sounds. Use Object Pool when:</p>
 </li>
 </ul>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
+<p>You normally rely on a garbage collector or just <code>malloc()</code> and <code>free()</code> to handle memory management for you. By using an object pool, you&#8217;re saying, &#8220;I know better how these bytes should be handled.&#8221; That means the onus is on you to deal with this pattern&#8217;s limitations.</p>
 <h3><a href="#the-pool-may-waste-memory-on-unneeded-objects" name="the-pool-may-waste-memory-on-unneeded-objects">The pool may waste memory on unneeded objects</a></h3>
 <p>The size of an object pool needs to be tuned for the game&#8217;s needs.
 When tuning, it&#8217;s usually obvious when the pool is too <em>small</em>

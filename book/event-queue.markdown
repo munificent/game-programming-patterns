@@ -153,6 +153,8 @@ Queues give control to the code that pulls from it: the receiver can delay proce
 
 ## Keep in Mind
 
+Unlike some more modest patterns in this book, event queues are complex and tend to have a wide-reaching effect on the architecture of our games. That means you'll want to think hard about how -- or if -- you use it.
+
 ### A central event queue is a global variable
 
 One common use of this pattern is for a sort of Grand Central Station that all parts of the game can route messages through. It's a powerful piece of infrastructure, but *powerful* doesn't always mean *good*.
@@ -370,7 +372,7 @@ I've used "event" and "message" interchangeably so far because it mostly doesn't
 
     * *The scope of the queue tends to be broader.* Event queues are often used to *broadcast* events to any and all interested parties. To allow maximum flexibility for which parties can be interested, these queues tend to be more globally visible.
 
-* **When you queue messages:**
+* **If you queue messages:**
 
     A <span name="command">"message"</href="observer.html"> or "request" describes an action that we *want* to happen *in the future*, like "play sound". You can think of this as an asynchronous API to a service.
 

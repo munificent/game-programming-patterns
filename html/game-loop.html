@@ -111,7 +111,7 @@ Then <span name="update"><code>update()</code></span> advances the game simulati
 <p>The common terms for one crank of the game loop are &#8220;tick&#8221; or &#8220;frame&#8221;.</p>
 </aside>
 
-<p>Meanwhile, the <em>player</em>&#8216;s actual clock is ticking. If we measure how quickly the game loop cycles in terms of real time, we get the game&#8217;s &#8220;frames per second&#8221;.
+<p>Meanwhile, the <em>player&#8217;s</em> actual clock is ticking. If we measure how quickly the game loop cycles in terms of real time, we get the game&#8217;s &#8220;frames per second&#8221;.
 If the game loop cycles quickly, the FPS is high and the game moves smoothly
 and quickly. If it&#8217;s slow, the game jerks along like a stop motion movie.</p>
 <p>With the crude loop we have now where it just cycles as quickly as it can,
@@ -141,10 +141,9 @@ With libraries you own the main game loop and call into the library.
 An engine owns the loop and calls into <em>your</em> code.</p>
 </aside>
 
-<p>You might think you won&#8217;t need this if you&#8217;re making a turn-based game. But keep in mind that even though the <em>game state</em> won&#8217;t advance until the user takes their turn, the <em>visual</em> and <em>audible</em> state of the game usually does. Animation and music keep running even when it&#8217;s &#8220;waiting&#8221; for you to take your turn.</p>
+<p>You might think you won&#8217;t need this if you&#8217;re making a turn-based game. But even there, though the <em>game state</em> won&#8217;t advance until the user takes their turn, the <em>visual</em> and <em>audible</em> state of the game usually does. Animation and music keep running even when it&#8217;s &#8220;waiting&#8221; for you to take your turn.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
-<h3><a href="#this-is-the-core-loop-of-your-game" name="this-is-the-core-loop-of-your-game">This is the core loop of your game</a></h3>
-<p>Seems obvious, I know, but code in the game loop will be running constantly. They say a program spends <span name="percent">90%</span> of its time in 10% of the code. Your game loop will be firmly in that 10%. Think carefully about performance and make sure you profile when you make changes to your core loop.</p>
+<p>The loop we&#8217;re talking about here is some of the most important code in your game. They say a program spends <span name="percent">90%</span> of its time in 10% of the code. Your game loop will be firmly in that 10%. Take care with this code, and be mindful of its efficiency.</p>
 <aside name="percent">
 
 <p>Made up statistics like this are why &#8220;real&#8221; engineers like mechanical and

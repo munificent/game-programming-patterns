@@ -420,16 +420,16 @@
 <p>The most obvious and most important decision you&#8217;ll make is what class to put <code>update()</code> on.</p>
 <ul>
 <li>
-<p><strong>The entity class.</strong></p>
+<p><strong>The entity class:</strong></p>
 <p>This is the simplest option if you already have an entity class since it doesn&#8217;t bring any additional classes into play. This may work if you don&#8217;t have too many kinds of entities, but the industry is generally moving away from this.</p>
 <p>Having to subclass <code>Entity</code> every time you want a new behavior is brittle and painful when you have a large number of different kinds. You&#8217;ll eventually find yourself wanting to reuse pieces of code in a way that doesn&#8217;t gracefully map to a single inheritance hierarchy and then you&#8217;re stuck.</p>
 </li>
 <li>
-<p><strong>The component class.</strong></p>
+<p><strong>The component class:</strong></p>
 <p>If you&#8217;re already using the <a href="component.html" class="pattern">Component pattern</a>, this is a no-brainer. It lets each component update itself independently. In the same way that the update pattern in general lets you decouple game entities from each other in the game world, this lets you decouple <em>parts of a single entity</em> from each other. Rendering, physics, and AI can all take care of themselves.</p>
 </li>
 <li>
-<p><strong>A delegate class.</strong></p>
+<p><strong>A delegate class:</strong></p>
 <p>There are other patterns that involve delegating part of a class&#8217;s behavior to another object. The <a href="state.html" class="pattern">State pattern</a> does this so that you can change an object&#8217;s behavior by changing what it delegates to. The <a href="type-object.html" class="pattern">Type Object</a> pattern does this so that you can share behavior across a bunch of entities of the same &#8220;kind&#8221;.</p>
 <p>If you&#8217;re using one of those patterns, it&#8217;s natural to put <code>update()</code> on that delegated class. In that case, you may still have the <code>update()</code> method on the main class, but it will be non-virtual and just forward to the delegate object. Something like:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Entity</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>

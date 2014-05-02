@@ -292,17 +292,17 @@ With a simple pattern like this, there isn't too much variation, but there's sti
 
 The most obvious and most important decision you'll make is what class to put `update()` on.
 
-* **The entity class.**
+* **The entity class:**
 
     This is the simplest option if you already have an entity class since it doesn't bring any additional classes into play. This may work if you don't have too many kinds of entities, but the industry is generally moving away from this.
 
     Having to subclass `Entity` every time you want a new behavior is brittle and painful when you have a large number of different kinds. You'll eventually find yourself wanting to reuse pieces of code in a way that doesn't gracefully map to a single inheritance hierarchy and then you're stuck.
 
-* **The component class.**
+* **The component class:**
 
     If you're already using the <a href="component.html" class="pattern">Component pattern</a>, this is a no-brainer. It lets each component update itself independently. In the same way that the update pattern in general lets you decouple game entities from each other in the game world, this lets you decouple *parts of a single entity* from each other. Rendering, physics, and AI can all take care of themselves.
 
-* **A delegate class.**
+* **A delegate class:**
 
     There are other patterns that involve delegating part of a class's behavior to another object. The <a href="state.html" class="pattern">State pattern</a> does this so that you can change an object's behavior by changing what it delegates to. The <a href="type-object.html" class="pattern">Type Object</a> pattern does this so that you can share behavior across a bunch of entities of the same "kind".
 

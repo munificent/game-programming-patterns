@@ -117,6 +117,8 @@ such as currently playing sounds. Use Object Pool when:
 
 ## Keep in Mind
 
+You normally rely on a garbage collector or just `malloc()` and `free()` to handle memory management for you. By using an object pool, you're saying, "I know better how these bytes should be handled." That means the onus is on you to deal with this pattern's limitations.
+
 ### The pool may waste memory on unneeded objects
 
 The size of an object pool needs to be tuned for the game's needs.

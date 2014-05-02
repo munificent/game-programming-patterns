@@ -476,11 +476,12 @@ Register-based VMs still have a stack. The only difference is that instructions 
 
     * *Instructions are larger.* Since instructions need arguments for stack offsets, a single instruction needs more bits. For example, an instruction in <span name="lua">Lua</span> -- probably the most well-known register-based VM -- is a full 32-bits. It uses 6 bits for the instruction type, and the rest are arguments.
 
-    <aside name="lua">
+        <aside name="lua">
 
-    Lua doesn't specify their bytecode format and it changes from version to version. What I'm describing here is true as of Lua 5.1. For an absolutely amazing deep dive into Lua's internals, read [this](http://luaforge.net/docman/83/98/ANoFrillsIntroToLua51VMInstructions.pdf).
+        Lua doesn't specify their bytecode format and it changes from version to version. What I'm describing here is true as of Lua 5.1. For an absolutely amazing deep dive into Lua's internals, read [this](http://luaforge.net/docman/83/98/ANoFrillsIntroToLua51VMInstructions.pdf).
 
-    </aside>
+        </aside>
+
 
     * *You have fewer instructions.* Since each instruction can do more work, you don't need as many of them. Some say you get a performance improvement since you don't have to shuffle values around in the stack as much.
 

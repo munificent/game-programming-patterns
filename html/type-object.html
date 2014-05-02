@@ -239,6 +239,10 @@ when either of these are true:</p>
 </li>
 </ul>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
+<p>This pattern is about moving the definition of a &#8220;type&#8221; from the imperative
+but rigid language of code into the more flexible but less behavioral world of
+objects in memory. The flexibility is good, but you lose some things by
+hoisting your types into data.</p>
 <h3><a href="#the-type-objects-have-to-be-tracked-manually" name="the-type-objects-have-to-be-tracked-manually">The type objects have to be tracked manually</a></h3>
 <p>One advantage of using something like <span name="vtable">C++&#8217;s</span> type system is that the
 compiler handles all of the bookkeeping for the classes automatically.
@@ -269,7 +273,7 @@ are the Type Object pattern applied to C, handled automatically by the
 compiler.</p>
 </aside>
 
-<h3><a href="#it's-harder-to-define-behavior-for-each-type" name="it's-harder-to-define-behavior-for-each-type">It&#8217;s harder to define behavior for each type</a></h3>
+<h3><a href="#it's-harder-to-define-*behavior*-for-each-type" name="it's-harder-to-define-*behavior*-for-each-type">It&#8217;s harder to define <em>behavior</em> for each type</a></h3>
 <p>With subclassing, you can override a method and do whatever you want
 to: calculate values procedurally, call other code, etc. The sky is
 the limit. We could define a monster subclass whose attack string

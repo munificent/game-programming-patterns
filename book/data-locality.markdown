@@ -403,49 +403,49 @@ Noel Llopis' [famous article](http://gamesfromwithin.com/data-oriented-design) t
 
 Up to this point, we've avoided subclassing and virtual methods. We assumed we have nice packed arrays of *homogenous* objects. That way, we know they're all the exact same size. But polymorphism and dynamic dispatch are useful tools, too. How do we reconcile this?
 
-**Don't:**
+ *  **Don't:**
 
-The <span name="type">simplest</span> answer is to just avoid subclassing, or at least avoid it in places where you're optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.
+    The <span name="type">simplest</span> answer is to just avoid subclassing, or at least avoid it in places where you're optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.
 
-<aside name="type">
+    <aside name="type">
 
-One way to keep much of the flexibility of polymorphism without using subclassing is through the <a href="type-object.html" class="pattern">Type Object</a> pattern.
+    One way to keep much of the flexibility of polymorphism without using subclassing is through the <a href="type-object.html" class="pattern">Type Object</a> pattern.
 
-</aside>
+    </aside>
 
-  * *It's safe and easy.* You know exactly what class you're dealing with and all objects are obviously the same size.
+    * *It's safe and easy.* You know exactly what class you're dealing with and all objects are obviously the same size.
 
-  * *It's faster.* Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. While the cost of this varies widely across different hardware, there is <span name="cpp">*some*</span> cost to dynamic dispatch.
+    * *It's faster.* Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. While the cost of this varies widely across different hardware, there is <span name="cpp">*some*</span> cost to dynamic dispatch.
 
-<aside name="cpp">
+    <aside name="cpp">
 
-As usual, the only absolute is that there are no absolutes. In most cases, a C++ compiler will require an indirection for a virtual method call. But in *some* cases, the compiler may be able to do *devirtualization* and statically call the right method if it knows what concrete type the receiver is. Devirtualization is more common in just-in-time compilers for languages like Java and JavaScript.
+    As usual, the only absolute is that there are no absolutes. In most cases, a C++ compiler will require an indirection for a virtual method call. But in *some* cases, the compiler may be able to do *devirtualization* and statically call the right method if it knows what concrete type the receiver is. Devirtualization is more common in just-in-time compilers for languages like Java and JavaScript.
 
-</aside>
+    </aside>
 
-  * *It's inflexible.* Of course, the reason we use dynamic dispatch is because it gives us a powerful way to vary behavior between objects. If you want different entities in your game to have their own rendering styles, or their own special moves and attacks, virtual methods are a proven way to model that. Having to instead stuff all of that code into a single non-virtual method that does something like a big `switch` gets messy quickly.
+    * *It's inflexible.* Of course, the reason we use dynamic dispatch is because it gives us a powerful way to vary behavior between objects. If you want different entities in your game to have their own rendering styles, or their own special moves and attacks, virtual methods are a proven way to model that. Having to instead stuff all of that code into a single non-virtual method that does something like a big `switch` gets messy quickly.
 
-**Use separate arrays for each type:**
+ *  **Use separate arrays for each type:**
 
-We use polymorphism so that we can invoke behavior on an object whose type we don't know. In other words, we have a mixed bag of stuff and we want each object in there to do its own thing when we tell it to go.
+    We use polymorphism so that we can invoke behavior on an object whose type we don't know. In other words, we have a mixed bag of stuff and we want each object in there to do its own thing when we tell it to go.
 
-But that just raises the question of why mix the bag to begin with? Instead, why not just maintain separate homogenous collections for each type?
+    But that just raises the question of why mix the bag to begin with? Instead, why not just maintain separate homogenous collections for each type?
 
-  * *It keeps objects tightly packed.* Since each array only contains objects of one class, there's no padding or other weirdness.
+    * *It keeps objects tightly packed.* Since each array only contains objects of one class, there's no padding or other weirdness.
 
-  * *You can statically dispatch.* Once you've got objects partitioned by type, you don't actually need polymorphism at all any more. You can use regular non-virtual method calls.
+    * *You can statically dispatch.* Once you've got objects partitioned by type, you don't actually need polymorphism at all any more. You can use regular non-virtual method calls.
 
-  * *You have to keep track of a bunch of collections.* If you have a lot of different object types, the overhead and complexity of maintaining separate arrays for each can be a chore.
+    * *You have to keep track of a bunch of collections.* If you have a lot of different object types, the overhead and complexity of maintaining separate arrays for each can be a chore.
 
-  * *You have to be aware of every type*. Since you have to maintain separate collections for each type, you can't be decoupled from the *set* of classes. Part of the magic of polymorphism is that it's *open-ended*: code that works with an interface can be completely decoupled from the potentially large set of types that implement that interface.
+    * *You have to be aware of every type*. Since you have to maintain separate collections for each type, you can't be decoupled from the *set* of classes. Part of the magic of polymorphism is that it's *open-ended*: code that works with an interface can be completely decoupled from the potentially large set of types that implement that interface.
 
-**Use a collection of pointers:**
+ *  **Use a collection of pointers:**
 
-If you weren't worried about caching, this is the natural solution. Just have an array of pointers to some base class or interface type. All the polymorphism you could want, and objects can be whatever size they want.
+    If you weren't worried about caching, this is the natural solution. Just have an array of pointers to some base class or interface type. All the polymorphism you could want, and objects can be whatever size they want.
 
-  * *It's flexible.* The code that consumes the collection can work with objects of any type as long as it supports the interface you care about. It's completely open-ended.
+    * *It's flexible.* The code that consumes the collection can work with objects of any type as long as it supports the interface you care about. It's completely open-ended.
 
-  * *It's less cache-friendly.* Of course, the whole reason we're discussing other options here is because this means cache-unfriendly pointer indirection. But, remember, if this code isn't performance critical, that's probably OK.
+    * *It's less cache-friendly.* Of course, the whole reason we're discussing other options here is because this means cache-unfriendly pointer indirection. But, remember, if this code isn't performance critical, that's probably OK.
 
 ### How are game entities defined?
 
@@ -453,60 +453,60 @@ If you use this pattern in tandem with the <a href="component.html" class="patte
 
 The question then is how should it be represented? How does it keep track of its components?
 
-**If game entities are classes with pointers to their components:**
+ * **If game entities are classes with pointers to their components:**
 
-This is what our first example looked like. It's sort of the vanilla OOP solution. You've got a class for `GameEntity`, and it has pointers to the components it owns. Since they're just pointers, it's agnostic about where and how those components are actually organized in memory.
+    This is what our first example looked like. It's sort of the vanilla OOP solution. You've got a class for `GameEntity`, and it has pointers to the components it owns. Since they're just pointers, it's agnostic about where and how those components are actually organized in memory.
 
-  * *You can store components in contiguous arrays.* Since the game entity doesn't care where its components are, you can organize them in a nice packed array to optimize iterating over them.
+    * *You can store components in contiguous arrays.* Since the game entity doesn't care where its components are, you can organize them in a nice packed array to optimize iterating over them.
 
-  * *Given an entity, you can easily get to its components.* They're just a pointer indirection away.
+    * *Given an entity, you can easily get to its components.* They're just a pointer indirection away.
 
-  * *Moving components in memory is hard.* When components get enabled or disabled, you may want to move them around in the array to keep the active ones up front and contiguous. If you move a component while the entity has a raw pointer to it, though, that pointer gets broken if you aren't careful. You'll have to make sure to update the entity's pointer at the same time.
+    * *Moving components in memory is hard.* When components get enabled or disabled, you may want to move them around in the array to keep the active ones up front and contiguous. If you move a component while the entity has a raw pointer to it, though, that pointer gets broken if you aren't careful. You'll have to make sure to update the entity's pointer at the same time.
 
-**If game entities are classes with IDs for their components:**
+ *  **If game entities are classes with IDs for their components:**
 
-The challenge with raw pointers to components is that it makes it harder to move them around in memory. You can address that by using something more abstract: an ID or index that can be used to *look up* a component.
+    The challenge with raw pointers to components is that it makes it harder to move them around in memory. You can address that by using something more abstract: an ID or index that can be used to *look up* a component.
 
-The actual semantics of the ID and lookup process are up to you. It could be as simple as storing a unique ID in each component and walking the array, or more complex like a hash table that maps IDs to their current index in the component array.
+    The actual semantics of the ID and lookup process are up to you. It could be as simple as storing a unique ID in each component and walking the array, or more complex like a hash table that maps IDs to their current index in the component array.
 
-  * *It's more complex.* Your ID system doesn't have to be rocket science, but it's still more work than a basic pointer. You'll have to implement and debug it, and there will be memory overhead for bookkeeping.
+    * *It's more complex.* Your ID system doesn't have to be rocket science, but it's still more work than a basic pointer. You'll have to implement and debug it, and there will be memory overhead for bookkeeping.
 
-  * *It's slower*. It's hard to beat traversing a raw pointer. There may be some actual searching or hashing involved to get from an entity to one of its components.
+    * *It's slower*. It's hard to beat traversing a raw pointer. There may be some actual searching or hashing involved to get from an entity to one of its components.
 
-  * *You'll need access to the component "manager".* The basic idea is that you have some abstract ID that identifies a component. You can use it to get a reference to the actual component object. But to do that, you need to hand that ID to something that can actually find the component. That will be the class that wraps your raw contiguous array of component objects.
+    * *You'll need access to the component "manager".* The basic idea is that you have some abstract ID that identifies a component. You can use it to get a reference to the actual component object. But to do that, you need to hand that ID to something that can actually find the component. That will be the class that wraps your raw contiguous array of component objects.
 
-    With raw pointers, if you have a game entity, you can find its components. With this, you <span name="singleton">need</span> the game entity *and the component registry too*.
+        With raw pointers, if you have a game entity, you can find its components. With this, you <span name="singleton">need</span> the game entity *and the component registry too*.
 
-<aside name="singleton">
+        <aside name="singleton">
 
-You may be thinking, "I'll just make it a singleton! Problem solved!" Well, sort of. You might want to check out <a href="singleton.html">the chapter</a> on those first.
+        You may be thinking, "I'll just make it a singleton! Problem solved!" Well, sort of. You might want to check out <a href="singleton.html">the chapter</a> on those first.
 
-</aside>
+        </aside>
 
-**If the game entity is *itself* just an ID:**
+ *  **If the game entity is *itself* just an ID:**
 
-This is a newer style that some game engines use. Once you've moved all of your entity's behavior and state out of the main class and into components, what's left? It turns out, not much. The only thing an entity does is bind a set of components together. It exists just to say *this* AI component and *this* physics component and *this* render component define one living entity in the world.
+    This is a newer style that some game engines use. Once you've moved all of your entity's behavior and state out of the main class and into components, what's left? It turns out, not much. The only thing an entity does is bind a set of components together. It exists just to say *this* AI component and *this* physics component and *this* render component define one living entity in the world.
 
-That's important because components interact. The render component needs to know where the entity is, which may be a property of the physics component. The AI component wants to move the entity, so it needs to apply a force to the physics component. Each component needs a way to get the other sibling components of the entity it's a part of.
+    That's important because components interact. The render component needs to know where the entity is, which may be a property of the physics component. The AI component wants to move the entity, so it needs to apply a force to the physics component. Each component needs a way to get the other sibling components of the entity it's a part of.
 
-Some smart people realized all you need for that is an ID. Instead of the entity knowing its components, the components know their entity. Each component knows the ID of the entity that owns it. When the AI component needs the physics component for its entity, it just asks for the physics component with the same entity ID that it holds.
+    Some smart people realized all you need for that is an ID. Instead of the entity knowing its components, the components know their entity. Each component knows the ID of the entity that owns it. When the AI component needs the physics component for its entity, it just asks for the physics component with the same entity ID that it holds.
 
-Your entity *classes* disappear entirely, replaced by a glorified wrapper around a number.
+    Your entity *classes* disappear entirely, replaced by a glorified wrapper around a number.
 
-  * *Entities are tiny.* When you want to pass around a reference to a game entity, it's just a single value.
+    * *Entities are tiny.* When you want to pass around a reference to a game entity, it's just a single value.
 
-  * *Entities are empty.* Of course, the downside of moving everything out of entities is that you *have* to move everything out of entities. You no longer have a place to put non-component-specific state or behavior. This style
-  doubles down on the component pattern.
+    * *Entities are empty.* Of course, the downside of moving everything out of entities is that you *have* to move everything out of entities. You no longer have a place to put non-component-specific state or behavior. This style
+    doubles down on the component pattern.
 
-  * *You don't have to manage their lifetime.* Since entities are just dumb value types, they don't need to be explicitly allocated and freed. An entity implicitly "dies" when all of its components are destroyed.
+    * *You don't have to manage their lifetime.* Since entities are just dumb value types, they don't need to be explicitly allocated and freed. An entity implicitly "dies" when all of its components are destroyed.
 
-  * *Looking up a component for an entity may be slow.* This is the same problem as the previous answer, but in the opposite direction. To find a component for some entity, you have to map an ID to an object. That process may be costly.
+    * *Looking up a component for an entity may be slow.* This is the same problem as the previous answer, but in the opposite direction. To find a component for some entity, you have to map an ID to an object. That process may be costly.
 
-    This time, though, it *is* performance critical. Components often interact with their siblings during update, so you will need to find components frequently. One solution is to make the "ID" of an entity just the index of the component in its array.
+        This time, though, it *is* performance critical. Components often interact with their siblings during update, so you will need to find components frequently. One solution is to make the "ID" of an entity just the index of the component in its array.
 
-    If every entity has the same set of components, then your component arrays are completely parallel. The component in slot three of the AI component array will be for the same entity that the physics component in slot three of *its* array is associated with.
+        If every entity has the same set of components, then your component arrays are completely parallel. The component in slot three of the AI component array will be for the same entity that the physics component in slot three of *its* array is associated with.
 
-    Keep in mind, though, that this *forces* you to keep those arrays in parallel. That's hard if you want to start sorting or packing them by different criteria. You may have some entities with disabled physics and others that are invisible. There's no way to sort the physics and render component arrays optimally for both cases if they have to stay in sync with each other.
+        Keep in mind, though, that this *forces* you to keep those arrays in parallel. That's hard if you want to start sorting or packing them by different criteria. You may have some entities with disabled physics and others that are invisible. There's no way to sort the physics and render component arrays optimally for both cases if they have to stay in sync with each other.
 
 ## See Also
 

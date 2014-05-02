@@ -126,26 +126,28 @@ fit when:
 
 ## Keep in Mind
 
-### It can make the base class overly heavy
+"Inheritance" is a bad word in many programming circles these days, and one
+reason is that base classes tend to accrete more and more code. This pattern
+is particularly susceptible to that.
 
-Since every dependency that a subclass has ends up flowing through the base
-class first, it can end up large and deeply coupled to the rest of the
-game. Also, the subclasses themselves are deeply tied to the base
-class. Those together mean that making changes to it can be difficult without breaking something -- you've got the [brittle base class problem][].
-
-If you find this pattern is turning your base class into a giant bowl of
-code stew, consider pulling some of the provided operations out into separate
-classes that the base class can dole out responsibility to. The
-<a class="pattern" href="component.html">Component</a> pattern can help here.
-
-[brittle base class problem]: http://en.wikipedia.org/wiki/Fragile_base_class
-
-### Derived classes are *only* coupled to their base class
+Since subclasses go through their base class to reach the rest of the game,
+the base class ends up coupled to every system any derived class needs to talk
+to. Of course, the subclasses are also intimately tied to their base
+class. That spiderweb of coupling makes it very hard to change the base class
+without breaking something -- you've got the [brittle base class problem][].
 
 The flip side of the coin is that since most of your coupling has been pushed
-up to the base class, the derived classes are now much more cleanly separated.
-Ideally, most of the total volume of your game code will be in those subclasses.
-That means much of your codebase is isolated and fairly easy to maintain.
+up to the base class, the derived classes are now much more cleanly separated
+from the rest of the world. Ideally, most of your behavior will be in those
+subclasses. That means much of your codebase is isolated and easier to
+maintain.
+
+Still, if you find this pattern is turning your base class into a giant bowl
+of code stew, consider pulling some of the provided operations out into
+separate classes that the base class can dole out responsibility to. The <a
+class="pattern" href="component.html">Component</a> pattern can help here.
+
+[brittle base class problem]: http://en.wikipedia.org/wiki/Fragile_base_class
 
 ## Sample Code
 
@@ -334,7 +336,7 @@ hidden from its subclasses. In our first example, the `Superpower` class
 provided a `spawnParticles()` method. If the implementation of that needs some
 particle system object, how would it get one?
 
-*   **Pass it to the base class constructor.**
+*   **Pass it to the base class constructor:**
 
     The simplest solution is to have the base class take it as a constructor
     argument:
@@ -355,7 +357,7 @@ particle system object, how would it get one?
     to the base class, every constructor in each of our derived classes will
     have to be modified to pass it along.
 
-*   **Do two-stage initialization.**
+*   **Do two-stage initialization:**
 
     To avoid passing everything through the constructor, we can split
     initialization into two steps. The constructor will take no
@@ -387,7 +389,7 @@ particle system object, how would it get one?
 
     </aside>
 
-*   **Make the state static.**
+*   **Make the state static:**
 
     In the previous example, we were initializing each `Superpower` *instance* with
     a particle system. That makes sense when every power needs its own unique
@@ -421,7 +423,7 @@ particle system object, how would it get one?
     have to store it for each instance of `Superpower`, so we've made the class
     use less memory.
 
-*   **Use a service locator.**
+*   **Use a service locator:**
 
     The previous option requires that outside code specifically remember to
     push in the state that the base class needs before it needs it. That places
