@@ -443,11 +443,13 @@ particle system object, how would it get one?
     <a class="pattern href="update-method.html">Update Method</a> pattern, your
     update method will very often also be a sandbox method.
 
-*   The <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Template_method_pattern">Template Method Pattern</a> pattern is basically the inverse
-    of this. In that pattern, the base class defines a single high-level
-    method that it implements by calling primitive operations. These primitive
-    operations are abstract and get implemented by the subclasses.
+*   This pattern is a role reversal of the <a class="gof-pattern"
+    href="http://en.wikipedia.org/wiki/Template_method_pattern">Template Method
+    Pattern</a>. In both patterns, you implement a method using a set of primitive operations. With Subclass Sandbox, the method is in
+    the derived class and the primitive operations are in the base class. With
+    Template Method, the *base* class has the method and the primitive
+    operations are implemented by the *derived* class.
 
-    So where the Subclass Sandbox pattern provides the primitives and delegates
-    the high-level behavior to subclasses, the Template Method Pattern provides
-    the high-level behavior and delegates the primitives.
+*   You can also consider this a variation on the <a class="gof-pattern"
+    href="http://en.wikipedia.org/wiki/Template_method_pattern">Facade
+    Pattern</a>. That pattern hides a number of different systems behind a single simplified API. With Subclass Sandbox, the base class acts as a facade thats hides the entire game engine from the subclasses.
