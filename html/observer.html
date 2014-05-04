@@ -372,7 +372,7 @@ option and insert it at the front:</p>
 <p>Now, that&#8217;s a different question. Like all design patterns, the Observer pattern isn&#8217;t a cure-all. Even when implemented correctly and efficiently, it may not be the right solution. The reason design patterns get a bad rap is because people apply good patterns to the wrong problem and end up making things worse.</p>
 <p>Two challenges remain, one technical and one at something more like the maintainability level. We&#8217;ll do the technical one first because those are always easiest.</p>
 <h3><a href="#destroying-subjects-and-observers" name="destroying-subjects-and-observers">Destroying subjects and observers</a></h3>
-<p>The sample code we walked through is solid, but it <span name="destruct">side-steps</span> an important issue: what happens when you delete a subject or an observer? If you just want only call <code>delete</code> on some observer, a subject may still have a pointer to it. That&#8217;s now a dangling pointer into deallocated memory. When that subject tries to send a notification, well&#8230; things like that are why people end up hating C++.</p>
+<p>The sample code we walked through is solid, but it <span name="destruct">side-steps</span> an important issue: what happens when you delete a subject or an observer? If you carelessly call <code>delete</code> on some observer, a subject may still have a pointer to it. That&#8217;s now a dangling pointer into deallocated memory. When that subject tries to send a notification, well&#8230; things like that are why people end up hating C++.</p>
 <aside name="destruct">
 
 <p>Not to point fingers, but I&#8217;ll note that <em>Design Patterns</em> doesn&#8217;t mention this issue at all.</p>
