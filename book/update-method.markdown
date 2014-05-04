@@ -67,7 +67,7 @@ Since some stickler will call me on this, yes, they don't behave *truly concurre
 
 </aside>
 
-The game loop has a dynamic collection of objects, so adding and removing them from the level is easy: just add and remove them from the collection. Nothing is hardcoded anymore, and we can even populate the level using some kind of data file, which is exactly what our level designers want.
+The game loop has a dynamic collection of objects, so adding and removing them from the level is easy -- just add and remove them from the collection. Nothing is hardcoded anymore, and we can even populate the level using some kind of data file, which is exactly what our level designers want.
 
 ## The Pattern
 
@@ -81,15 +81,15 @@ However, if the game is more abstract and the moving pieces are less like living
 
 <aside name="pawn">
 
-You may not need to update their *behavior* each frame, but even in a boardgame, you may still want to update their *animation* every frame. This pattern can help for that too.
+You may not need to update their *behavior* each frame, but even in a boardgame, you may still want to update their *animation* every frame. This pattern can help with that too.
 
 </aside>
 
 Update methods work well when:
 
 * Your game has a number of objects or systems that need to run simultaneously.
-* Each one's behavior is mostly independent of the others.
-* They need to be simulated over time.
+* Each object's behavior is mostly independent of the others.
+* The objects need to be simulated over time.
 
 ## Keep in Mind
 
@@ -123,7 +123,7 @@ The <a href="state.html" class="pattern">State pattern</a> can often help here. 
 
 ### Objects all simulate each frame but are not truly concurrent
 
-In this pattern, the game loops over a collection of objects and updates each one. Inside the `update()` call, most objects are able to reach out and touch the rest of the game world, including other objects that are being updated. This means that the *order* that the objects are updated is significant.
+In this pattern, the game loops over a collection of objects and updates each one. Inside the `update()` call, most objects are able to reach out and touch the rest of the game world, including other objects that are being updated. This means the *order* in which the objects are updated is significant.
 
 If A comes before B in the list of objects, then when A updates, it will see B's previous state. But when B updates, it will <span name="double-buffer">see</span> A's *new* state, since it's already updated this frame. Even though from the player's perspective everything is moving at the "same" time, the core of the game is still turn-based. It's just that a complete turn is only one frame long.
 
@@ -153,7 +153,7 @@ But that does mean that the new object gets a chance to act during the frame tha
 
 ^code skip-added
 
-Here, `objects` is an array of the updatable objects in the game, and `numObjects` is its length. When new objects are added, it gets incremented. We cache the length in `numObjectsThisTurn` at the beginning of the loop so that the iteration stops before we get to any new objects added during the current frame.
+Here, `objects_` is an array of the updatable objects in the game, and `numObjects_` is its length. When new objects are added, it gets incremented. We cache the length in `numObjectsThisTurn` at the beginning of the loop so that the iteration stops before we get to any new objects added during the current frame.
 
 A hairier problem is when objects are *removed* while iterating. You vanquish some foul beast and now it needs to get yanked out of the object list. If it happens to be before the current object you're updating in the list, you can accidentally skip an object:
 
@@ -245,13 +245,13 @@ OK, back to the task at hand. Our original motivation was to be able to define a
 
 ^code skeleton
 
-As you can see, we pretty much just cut that chunk of code from the game loop earlier in the chapter and pasted it into `Skeleton`'s `update()` method. The one minor difference is that `patrollingLeft_` has been made into a field instead of a local variable. That way its value sticks around between calls to `update()`.
+As you can see, we pretty much just cut that chunk of code from the game loop earlier in the chapter and pasted it into `Skeleton`&#8217;s `update()` method. The one minor difference is that `patrollingLeft_` has been made into a field instead of a local variable. That way its value sticks around between calls to `update()`.
 
 Let's do this again with the statue:
 
 ^code statue
 
-Again, most of the change is just moving code out of the game loop and into the class and renaming some stuff. In this case, though, we've actually made the codebase simpler. In the original nasty imperative code, there were separate local variables for each statue's frame counter and rate of fire.
+Again, most of the change is just moving code from the game loop into the class and renaming some stuff. In this case, though, we've actually made the codebase simpler. In the original nasty imperative code, there were separate local variables for each statue's frame counter and rate of fire.
 
 <span name="uml"></span>
 <img src="images/update-method-uml.png"/>
@@ -304,7 +304,7 @@ The most obvious and most important decision you'll make is what class to put `u
 
 * **A delegate class:**
 
-    There are other patterns that involve delegating part of a class's behavior to another object. The <a href="state.html" class="pattern">State pattern</a> does this so that you can change an object's behavior by changing what it delegates to. The <a href="type-object.html" class="pattern">Type Object</a> pattern does this so that you can share behavior across a bunch of entities of the same "kind".
+    There are other patterns that involve delegating part of a class's behavior to another object. The <a href="state.html" class="pattern">State</a> pattern does this so that you can change an object's behavior by changing what it delegates to. The <a href="type-object.html" class="pattern">Type Object</a> pattern does this so that you can share behavior across a bunch of entities of the same "kind".
 
     If you're using one of those patterns, it's natural to put `update()` on that delegated class. In that case, you may still have the `update()` method on the main class, but it will be non-virtual and just forward to the delegate object. Something like:
 
@@ -336,7 +336,7 @@ One alternative is to maintain a separate collection of just the "live" objects 
 
         Another option to mitigate this is to have two collections, but have the other collection only contain the *inactive* entities instead of all of them.
 
-    * *You have to keep the collections in sync.* When objects are created or completely destroyed (and not just made temporarily inactive), you have to remember to modify both the master collection and this one.
+    * *You have to keep the collections in sync.* When objects are created or completely destroyed (and not just made temporarily inactive), you have to remember to modify both the master collection and active object one.
 
 The metric that should guide your approach here is how many inactive objects you tend to have. The more you have, the more useful it is to have a separate collection that avoids them during your core game loop.
 
