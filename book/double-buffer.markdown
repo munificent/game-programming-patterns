@@ -364,7 +364,7 @@ actor he faces.
 
 ^code 7
 
-Now lets throw some comedians on a stage and see what happens. We'll
+Now, let's throw some comedians on a stage and see what happens. We'll
 set up three comedians, each facing the next. The last one will face
 the first, in a big circle:
 
@@ -376,7 +376,7 @@ in the stage's array:
 
 <img src="images/double-buffer-slaps-1.png" />
 
-Now, let's slap Harry to get things going and see what happens when
+We'll slap Harry to get things going and see what happens when
 we start processing:
 
 ^code 9
@@ -394,8 +394,8 @@ occurs:
     Stage update ends
 
 So, in a single frame, our initial slap on Harry has propagated
-through all of the comedians. Now let's mix things up a bit. Lets say
-we reorder the comedians within the stages array, but leaving them
+through all of the comedians. Now, to mix things up a bit, let's say
+we reorder the comedians within the stages array, but leave them
 still facing each other the same way.
 
 <img src="images/double-buffer-slaps-2.png" />

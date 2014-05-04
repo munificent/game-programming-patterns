@@ -282,7 +282,7 @@ Instead of copying and pasting a chunk of code in ten places, we move it into a 
 
 When your game's data reaches a certain size, you really start wanting similar features. Data modelling is a deep subject that I can't hope to do justice here, but I do want to throw out one feature for you to consider in your own games: using prototypes and delegation for reusing data.
 
-Lets say we're defining the data model for the <span name="shameless">shameless Gauntlet rip-off</span> I mentioned earlier. The game designers need to specify the attributes for monsters and items in some kind of files.
+Let's say we're defining the data model for the <span name="shameless">shameless Gauntlet rip-off</span> I mentioned earlier. The game designers need to specify the attributes for monsters and items in some kind of files.
 
 <aside name="shameless">
 

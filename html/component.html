@@ -164,7 +164,7 @@ the classes that need it without resorting to multiple inheritance.
 The only other option is to push everything up into <code>GameObject</code>, but
 then <code>Zone</code> is wasting memory on rendering data it doesn&#8217;t need and
 <code>Decoration</code> is doing the same with physics.</p>
-<p>Now lets try it with components. Our <span name="menu">subclasses disappear completely.
+<p>Now, let&#8217;s try it with components. Our <span name="menu">subclasses disappear completely.
 Instead, we have a single <code>GameObject</code> class and two component
 classes: <code>PhysicsComponent</code> and <code>GraphicsComponent</code>. A decoration is
 simply a <code>GameObject</code> with a <code>GraphicsComponent</code> but no
@@ -332,7 +332,7 @@ several different coders on our team will probably have to spend time
 in and it&#8217;s starting to get a bit messy. Imagine this scaled up to
 a thousand lines and you can get an idea of how painful it can become.</p>
 <h3><a href="#splitting-out-a-domain" name="splitting-out-a-domain">Splitting out a domain</a></h3>
-<p>Starting with one domain, lets pull a piece out of <code>Bjorn</code> and push it
+<p>Starting with one domain, let&#8217;s pull a piece out of <code>Bjorn</code> and push it
 into a separate component class. We&#8217;ll start with the first domain
 that gets processed: input. The first thing <code>Bjorn</code> does is read in
 user input and adjust his velocity based on it. Let&#8217;s move that logic
