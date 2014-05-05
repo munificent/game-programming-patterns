@@ -42,15 +42,15 @@
 <div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Patrol right.</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">double</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="n">skeleton</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+    <span class="n">skeleton</span><span class="p">.</span><span class="n">setX</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
   <span class="p">}</span>
 
   <span class="c1">// Patrol left.</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span><span class="o">--</span><span class="p">)</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">double</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span><span class="o">--</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="n">skeleton</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+    <span class="n">skeleton</span><span class="p">.</span><span class="n">setX</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -63,7 +63,7 @@
 </aside>
 <div class="codehilite"><pre><span class="n">Entity</span> <span class="n">skeleton</span><span class="p">;</span>
 <span class="kt">bool</span> <span class="n">patrollingLeft</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-<span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">double</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
 <span class="c1">// Main game loop:</span>
 <span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
@@ -79,7 +79,7 @@
     <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="mi">100</span><span class="p">)</span> <span class="n">patrollingLeft</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
   <span class="p">}</span>
 
-  <span class="n">skeleton</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+  <span class="n">skeleton</span><span class="p">.</span><span class="n">setX</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
 
   <span class="c1">// Handle user input and render game...</span>
 <span class="p">}</span>
@@ -127,20 +127,20 @@
 <aside name="simultaneously">
 <p>Since some stickler will call me on this, yes, they don&#8217;t behave <em>truly concurrently</em>. While one object is updating, none of the others are. We&#8217;ll get into this more in a bit.</p>
 </aside>
-<p>The game loop has a dynamic collection of objects, so adding and removing them from the level is easy: just add and remove them from the collection. Nothing is hardcoded anymore, and we can even populate the level using some kind of data file, which is exactly what our level designers want.</p>
+<p>The game loop has a dynamic collection of objects, so adding and removing them from the level is easy&thinsp;&mdash;&thinsp;just add and remove them from the collection. Nothing is hardcoded anymore, and we can even populate the level using some kind of data file, which is exactly what our level designers want.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>The <strong>game world</strong> maintains a <strong>collection of objects</strong>. Each object implements an <strong>update method</strong> that simulates one frame of the object&#8217;s behavior. Each frame, the game updates every object in the collection.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>If the <a href="game-loop.html" class="pattern">Game Loop pattern</a> is the best thing since sliced bread, then this pattern is its butter. A wide swath of games featuring live entities that the player interacts with use this pattern in some form or other. If the game has space marines, dragons, martians, ghosts, or athletes, there&#8217;s a good chance it uses this pattern.</p>
 <p>However, if the game is more abstract and the moving pieces are less like living actors and more like pieces on a chessboard, this pattern is often a poor fit. In a game like chess, you don&#8217;t need to simulate all of the pieces concurrently, and you probably don&#8217;t need to tell the <span name="pawn">pawns</span> to update themselves every frame.</p>
 <aside name="pawn">
-<p>You may not need to update their <em>behavior</em> each frame, but even in a boardgame, you may still want to update their <em>animation</em> every frame. This pattern can help for that too.</p>
+<p>You may not need to update their <em>behavior</em> each frame, but even in a boardgame, you may still want to update their <em>animation</em> every frame. This pattern can help with that too.</p>
 </aside>
 <p>Update methods work well when:</p>
 <ul>
 <li>Your game has a number of objects or systems that need to run simultaneously.</li>
-<li>Each one&#8217;s behavior is mostly independent of the others.</li>
-<li>They need to be simulated over time.</li>
+<li>Each object&#8217;s behavior is mostly independent of the others.</li>
+<li>The objects need to be simulated over time.</li>
 </ul>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <p>This pattern is pretty simple so there aren&#8217;t a lot of hidden surprises in its dark corners. Still, every line of code has its ramifications.</p>
@@ -158,7 +158,7 @@
 <p>When we changed this to a one-frame-at-a-time form, we had to create a <code>patrollingLeft</code> variable to track that. When we return out of the code, the execution position is lost so we need to explicitly store enough information to restore it on the next frame.</p>
 <p>The <a href="state.html" class="pattern">State pattern</a> can often help here. Part of the reason state machines are common in games is because (like their name implies) they store the kind of state that you need to pick up where you left off.</p>
 <h3><a href="#objects-all-simulate-each-frame-but-are-not-truly-concurrent" name="objects-all-simulate-each-frame-but-are-not-truly-concurrent">Objects all simulate each frame but are not truly concurrent</a></h3>
-<p>In this pattern, the game loops over a collection of objects and updates each one. Inside the <code>update()</code> call, most objects are able to reach out and touch the rest of the game world, including other objects that are being updated. This means that the <em>order</em> that the objects are updated is significant.</p>
+<p>In this pattern, the game loops over a collection of objects and updates each one. Inside the <code>update()</code> call, most objects are able to reach out and touch the rest of the game world, including other objects that are being updated. This means the <em>order</em> in which the objects are updated is significant.</p>
 <p>If A comes before B in the list of objects, then when A updates, it will see B&#8217;s previous state. But when B updates, it will <span name="double-buffer">see</span> A&#8217;s <em>new</em> state, since it&#8217;s already updated this frame. Even though from the player&#8217;s perspective everything is moving at the &#8220;same&#8221; time, the core of the game is still turn-based. It&#8217;s just that a complete turn is only one frame long.</p>
 <aside name="double-buffer">
 <p>If, for some reason, you decide you <em>don&#8217;t</em> want your game to be sequential like this, you would need to use something like the <a href="double-buffer.html" class="pattern">Double Buffer</a> pattern. That makes the order that A and B update not matter because <em>both</em> of them will see the previous frame&#8217;s state.</p>
@@ -172,19 +172,19 @@
 <p>When you&#8217;re using this pattern, a lot of the game&#8217;s behavior ends up nestled in these update methods. That often includes code that adds or removes updatable objects from the game.</p>
 <p>For example, say a skeleton guard drops an item when slain. With a new object, you can usually just add it to the end of the list without too much trouble. You&#8217;ll keep iterating over that list and eventually get to the new one at the end and update it too.</p>
 <p>But that does mean that the new object gets a chance to act during the frame that it was spawned, before the player has had a chance to even see it. If you don&#8217;t want that to happen, one simple fix is to cache the number of objects in the list at the beginning of the update loop and only update that many before stopping:</p>
-<div class="codehilite"><pre><span class="kt">int</span> <span class="n">numObjectsThisTurn</span> <span class="o">=</span> <span class="n">numObjects</span><span class="p">;</span>
+<div class="codehilite"><pre><span class="kt">int</span> <span class="n">numObjectsThisTurn</span> <span class="o">=</span> <span class="n">numObjects_</span><span class="p">;</span>
 <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numObjectsThisTurn</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="n">objects</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">();</span>
+  <span class="n">objects_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 
 
-<p>Here, <code>objects</code> is an array of the updatable objects in the game, and <code>numObjects</code> is its length. When new objects are added, it gets incremented. We cache the length in <code>numObjectsThisTurn</code> at the beginning of the loop so that the iteration stops before we get to any new objects added during the current frame.</p>
+<p>Here, <code>objects_</code> is an array of the updatable objects in the game, and <code>numObjects_</code> is its length. When new objects are added, it gets incremented. We cache the length in <code>numObjectsThisTurn</code> at the beginning of the loop so that the iteration stops before we get to any new objects added during the current frame.</p>
 <p>A hairier problem is when objects are <em>removed</em> while iterating. You vanquish some foul beast and now it needs to get yanked out of the object list. If it happens to be before the current object you&#8217;re updating in the list, you can accidentally skip an object:</p>
-<div class="codehilite"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numObjects</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<div class="codehilite"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numObjects_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="n">objects</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">();</span>
+  <span class="n">objects_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -206,15 +206,21 @@
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="n">Entity</span><span class="p">()</span>
-  <span class="o">:</span> <span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">y</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  <span class="o">:</span> <span class="n">x_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">y_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
   <span class="p">{}</span>
 
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Entity</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-<span class="nl">protected:</span>
-  <span class="kt">double</span> <span class="n">x</span><span class="p">;</span>
-  <span class="kt">double</span> <span class="n">y</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">x</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">x_</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kt">double</span> <span class="n">y</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">y_</span><span class="p">;</span> <span class="p">}</span>
+
+  <span class="kt">void</span> <span class="n">setX</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span> <span class="n">x_</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kt">void</span> <span class="n">setY</span><span class="p">(</span><span class="kt">double</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span> <span class="n">y_</span> <span class="o">=</span> <span class="n">y</span><span class="p">;</span> <span class="p">}</span>
+
+<span class="nl">private:</span>
+  <span class="kt">double</span> <span class="n">x_</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">y_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
@@ -292,13 +298,13 @@
   <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">patrollingLeft_</span><span class="p">)</span>
     <span class="p">{</span>
-      <span class="n">x</span><span class="o">--</span><span class="p">;</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="n">patrollingLeft_</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+      <span class="n">setX</span><span class="p">(</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="n">patrollingLeft_</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="k">else</span>
     <span class="p">{</span>
-      <span class="n">x</span><span class="o">++</span><span class="p">;</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="mi">100</span><span class="p">)</span> <span class="n">patrollingLeft_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+      <span class="n">setX</span><span class="p">(</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="p">()</span> <span class="o">==</span> <span class="mi">100</span><span class="p">)</span> <span class="n">patrollingLeft_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
 
@@ -308,7 +314,7 @@
 </pre></div>
 
 
-<p>As you can see, we pretty much just cut that chunk of code from the game loop earlier in the chapter and pasted it into <code>Skeleton</code>&#8216;s <code>update()</code> method. The one minor difference is that <code>patrollingLeft_</code> has been made into a field instead of a local variable. That way its value sticks around between calls to <code>update()</code>.</p>
+<p>As you can see, we pretty much just cut that chunk of code from the game loop earlier in the chapter and pasted it into <code>Skeleton</code>&#8217;s <code>update()</code> method. The one minor difference is that <code>patrollingLeft_</code> has been made into a field instead of a local variable. That way its value sticks around between calls to <code>update()</code>.</p>
 <p>Let&#8217;s do this again with the statue:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Statue</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Entity</span>
 <span class="p">{</span>
@@ -341,7 +347,7 @@
 </pre></div>
 
 
-<p>Again, most of the change is just moving code out of the game loop and into the class and renaming some stuff. In this case, though, we&#8217;ve actually made the codebase simpler. In the original nasty imperative code, there were separate local variables for each statue&#8217;s frame counter and rate of fire.</p>
+<p>Again, most of the change is just moving code from the game loop into the class and renaming some stuff. In this case, though, we&#8217;ve actually made the codebase simpler. In the original nasty imperative code, there were separate local variables for each statue&#8217;s frame counter and rate of fire.</p>
 <p><span name="uml"></span>
 <img src="images/update-method-uml.png"/></p>
 <aside name="uml">
@@ -350,7 +356,7 @@
 <p>Now that those have been moved into the <code>Statue</code> class itself, you can create as many as you want and each instance will have its own little timer. That&#8217;s really the motivation behind this pattern: it&#8217;s now much easier to add new entities to the game world because each one brings along everything it needs to take care of itself.</p>
 <p>This pattern lets us separate <em>populating</em> the game world from <em>implementing</em> it. This in turn gives us the flexibility to populate the world using something like a separate data file or level editor.</p>
 <h3><a href="#passing-time" name="passing-time">Passing time</a></h3>
-<p>That&#8217;s key pattern, but I&#8217;ll just touch on a common refinement. So far, we&#8217;ve assumed every call to <code>update()</code> advances the state of the game world by the same fixed unit of time.</p>
+<p>That&#8217;s the key pattern, but I&#8217;ll just touch on a common refinement. So far, we&#8217;ve assumed every call to <code>update()</code> advances the state of the game world by the same fixed unit of time.</p>
 <p>I happen to prefer that, but many games use a <span name="variable"><em>variable time step</em></span>. In those, each turn of the game loop may simulate a larger or smaller slice of time depending on how long it took to process and render the previous frame.</p>
 <aside name="variable">
 <p>The <a href="game-loop.html" class="pattern">Game Loop</a> chapter has a lot more on the advantages and disadvantages of fixed and variable time steps.</p>
@@ -386,17 +392,17 @@
 <p>The most obvious and most important decision you&#8217;ll make is what class to put <code>update()</code> on.</p>
 <ul>
 <li>
-<p><strong>The entity class.</strong></p>
+<p><strong>The entity class:</strong></p>
 <p>This is the simplest option if you already have an entity class since it doesn&#8217;t bring any additional classes into play. This may work if you don&#8217;t have too many kinds of entities, but the industry is generally moving away from this.</p>
 <p>Having to subclass <code>Entity</code> every time you want a new behavior is brittle and painful when you have a large number of different kinds. You&#8217;ll eventually find yourself wanting to reuse pieces of code in a way that doesn&#8217;t gracefully map to a single inheritance hierarchy and then you&#8217;re stuck.</p>
 </li>
 <li>
-<p><strong>The component class.</strong></p>
+<p><strong>The component class:</strong></p>
 <p>If you&#8217;re already using the <a href="component.html" class="pattern">Component pattern</a>, this is a no-brainer. It lets each component update itself independently. In the same way that the update pattern in general lets you decouple game entities from each other in the game world, this lets you decouple <em>parts of a single entity</em> from each other. Rendering, physics, and AI can all take care of themselves.</p>
 </li>
 <li>
-<p><strong>A delegate class.</strong></p>
-<p>There are other patterns that involve delegating part of a class&#8217;s behavior to another object. The <a href="state.html" class="pattern">State pattern</a> does this so that you can change an object&#8217;s behavior by changing what it delegates to. The <a href="type-object.html" class="pattern">Type Object</a> pattern does this so that you can share behavior across a bunch of entities of the same &#8220;kind&#8221;.</p>
+<p><strong>A delegate class:</strong></p>
+<p>There are other patterns that involve delegating part of a class&#8217;s behavior to another object. The <a href="state.html" class="pattern">State</a> pattern does this so that you can change an object&#8217;s behavior by changing what it delegates to. The <a href="type-object.html" class="pattern">Type Object</a> pattern does this so that you can share behavior across a bunch of entities of the same &#8220;kind&#8221;.</p>
 <p>If you&#8217;re using one of those patterns, it&#8217;s natural to put <code>update()</code> on that delegated class. In that case, you may still have the <code>update()</code> method on the main class, but it will be non-virtual and just forward to the delegate object. Something like:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Entity</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>
 <span class="p">{</span>
@@ -433,7 +439,7 @@
 <p>Another option to mitigate this is to have two collections, but have the other collection only contain the <em>inactive</em> entities instead of all of them.</p>
 </li>
 <li>
-<p><em>You have to keep the collections in sync.</em> When objects are created or completely destroyed (and not just made temporarily inactive), you have to remember to modify both the master collection and this one.</p>
+<p><em>You have to keep the collections in sync.</em> When objects are created or completely destroyed (and not just made temporarily inactive), you have to remember to modify both the master collection and active object one.</p>
 </li>
 </ul>
 </li>

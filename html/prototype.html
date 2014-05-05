@@ -216,7 +216,7 @@
 <h3><a href="#first-class-types" name="first-class-types">First-class types</a></h3>
 <p>The previous two solutions address the need to have a class, <code>Spawner</code>, which is parameterized by a type. In C++, types aren&#8217;t generally first-class, so that requires some <span name="type-obj">gymnastics</span>. If you&#8217;re using a dynamically-typed language like JavaScript, Python or Ruby where classes <em>are</em> just regular objects you can pass around, you can solve this much more directly.</p>
 <aside name="type-obj">
-<p>In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pattern is another workaround for the lack of first-class types. That pattern can still be useful even in languages with them, though, because it lets <em>you</em> define what a &#8220;type&#8221; is. You may want different semantics than what the language&#8217;s built-in classes.</p>
+<p>In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pattern is another workaround for the lack of first-class types. That pattern can still be useful even in languages with them, though, because it lets <em>you</em> define what a &#8220;type&#8221; is. You may want different semantics than what the language&#8217;s built-in classes provide.</p>
 </aside>
 <p>When you make a spawner, just pass in the class of monster that it should construct&thinsp;&mdash;&thinsp;literally the actual runtime object that represents the monster&#8217;s class. Easy as pie.</p>
 <p>With all of these options, I honestly can&#8217;t say I&#8217;ve found a case where I felt the prototype <em>design pattern</em> was the best answer. Maybe your experience will be different, but for now let&#8217;s put that away and talk about something else: prototypes as a <em>language paradigm</em>.</p>
@@ -323,7 +323,7 @@
 <p>That&#8217;s great, but pushing piles of content into data files doesn&#8217;t magically solve the organizational challenges of a large project. If anything, it makes it harder. The reason we use programming languages is because they have tools for managing complexity.</p>
 <p>Instead of copying and pasting a chunk of code in ten places, we move it into a function that we can call by name. Instead of copying a method in a bunch of classes, we can put it in a separate class that those classes inherit from or mix in.</p>
 <p>When your game&#8217;s data reaches a certain size, you really start wanting similar features. Data modelling is a deep subject that I can&#8217;t hope to do justice here, but I do want to throw out one feature for you to consider in your own games: using prototypes and delegation for reusing data.</p>
-<p>Lets say we&#8217;re defining the data model for the <span name="shameless">shameless Gauntlet rip-off</span> I mentioned earlier. The game designers need to specify the attributes for monsters and items in some kind of files.</p>
+<p>Let&#8217;s say we&#8217;re defining the data model for the <span name="shameless">shameless Gauntlet rip-off</span> I mentioned earlier. The game designers need to specify the attributes for monsters and items in some kind of files.</p>
 <aside name="shameless">
 <p>I mean completely original title in no way inspired by any previously existing top-down multi-player dungeon crawl arcade games. Please don&#8217;t sue me.</p>
 </aside>

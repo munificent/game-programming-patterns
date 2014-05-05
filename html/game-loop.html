@@ -99,7 +99,7 @@ Then <span name="update"><code>update()</code></span> advances the game simulati
 <aside name="tick">
 <p>The common terms for one crank of the game loop are &#8220;tick&#8221; or &#8220;frame&#8221;.</p>
 </aside>
-<p>Meanwhile, the <em>player</em>&#8216;s actual clock is ticking. If we measure how quickly the game loop cycles in terms of real time, we get the game&#8217;s &#8220;frames per second&#8221;.
+<p>Meanwhile, the <em>player&#8217;s</em> actual clock is ticking. If we measure how quickly the game loop cycles in terms of real time, we get the game&#8217;s &#8220;frames per second&#8221;.
 If the game loop cycles quickly, the FPS is high and the game moves smoothly
 and quickly. If it&#8217;s slow, the game jerks along like a stop motion movie.</p>
 <p>With the crude loop we have now where it just cycles as quickly as it can,
@@ -125,10 +125,9 @@ state</strong>, and <strong>renders the game</strong>. It tracks the passage of 
 With libraries you own the main game loop and call into the library.
 An engine owns the loop and calls into <em>your</em> code.</p>
 </aside>
-<p>You might think you won&#8217;t need this if you&#8217;re making a turn-based game. But keep in mind that even though the <em>game state</em> won&#8217;t advance until the user takes their turn, the <em>visual</em> and <em>audible</em> state of the game usually does. Animation and music keep running even when it&#8217;s &#8220;waiting&#8221; for you to take your turn.</p>
+<p>You might think you won&#8217;t need this if you&#8217;re making a turn-based game. But even there, though the <em>game state</em> won&#8217;t advance until the user takes their turn, the <em>visual</em> and <em>audible</em> state of the game usually does. Animation and music keep running even when it&#8217;s &#8220;waiting&#8221; for you to take your turn.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
-<h3><a href="#this-is-the-core-loop-of-your-game" name="this-is-the-core-loop-of-your-game">This is the core loop of your game</a></h3>
-<p>Seems obvious, I know, but code in the game loop will be running constantly. They say a program spends <span name="percent">90%</span> of its time in 10% of the code. Your game loop will be firmly in that 10%. Think carefully about performance and make sure you profile when you make changes to your core loop.</p>
+<p>The loop we&#8217;re talking about here is some of the most important code in your game. They say a program spends <span name="percent">90%</span> of its time in 10% of the code. Your game loop will be firmly in that 10%. Take care with this code, and be mindful of its efficiency.</p>
 <aside name="percent">
 <p>Made up statistics like this are why &#8220;real&#8221; engineers like mechanical and
 electrical don&#8217;t take us seriously.</p>
@@ -216,7 +215,7 @@ bullet moves farther in each frame. So that bullet will get across the screen in
 <p>&#8220;Deterministic&#8221; means that every time you run the program, if you give it the same inputs, you get the exact same outputs back. As you can imagine it&#8217;s much easier to track down bugs in deterministic programs: find the inputs that caused the bug the first time, and you can cause it every time.</p>
 <p>Computers are naturally deterministic: they follow programs mechanically. Non-determinism appears when the messy real world creeps in. For example, networking, the system clock, and thread scheduling all rely on bits of the external world outside of the program&#8217;s control.</p>
 </aside>
-<p>Say we&#8217;ve got a two-player networked game and Fred has some beast of a gaming machine while George is using his grandmother&#8217;s antique PC. That aforementioned bullet is flying across both of their screens. On Fred&#8217;s machine, the game is running super fast, so each time step is tiny. We cram like 50 frames in the second it takes the bullet to cross the screen. Poor George can only fit about five in.</p>
+<p>Say we&#8217;ve got a two-player networked game and Fred has some beast of a gaming machine while George is using his grandmother&#8217;s antique PC. That aforementioned bullet is flying across both of their screens. On Fred&#8217;s machine, the game is running super fast, so each time step is tiny. We cram, like, 50 frames in the second it takes the bullet to cross the screen. Poor George can only fit about five in.</p>
 <p>This means on Fred&#8217;s machine, the physics engine updates the bullet&#8217;s position 50 times, but George&#8217;s only does it five times. Most games use floating point numbers and those are subject to <em>rounding error</em>. Each time you add two floating point numbers, the answer you get back can be a bit off. Fred&#8217;s machine is doing ten times as many operations, so he&#8217;ll accumulate a bigger error than George. The <em>same</em> bullet will end up in <em>different places</em> on their machines.</p>
 <p>This is just one nasty problem a variable time step can cause, but there&#8217;s more. In order to run in real-time, game physics engines are approximations of the real laws of mechanics. To keep those approximations from <span name="blowup">blowing up</span>, damping is applied. That damping is carefully tuned to a certain time step. Vary that, and the physics gets unstable.</p>
 <aside name="blowup">
@@ -265,7 +264,7 @@ bullet moves farther in each frame. So that bullet will get across the screen in
 <p>There&#8217;s one issue we&#8217;re left with, and that&#8217;s residual lag. We update the game at a fixed time step, but we render at arbitrary points in time. This means that from the user&#8217;s perspective, the game will often display at a point in time between two updates.</p>
 <p>Here&#8217;s a timeline:</p>
 <p><img src="images/game-loop-timeline.png" /></p>
-<p>As you can see, we update at a nice tight fixed interval. Meanwhile, we render
+<p>As you can see, we update at a nice tight, fixed interval. Meanwhile, we render
 whenever we can. It&#8217;s less frequent than updating, and isn&#8217;t steady either.
 Both of those are OK. The lame part is that we don&#8217;t always render right at the
 point of updating. Look at the third render time. It&#8217;s right between two updates:</p>
@@ -422,7 +421,7 @@ loop to keep the game from running too fast.</p>
 <li>
 <p><strong>Variable time step:</strong></p>
 <p>I&#8217;ll put this in here as an option in the solution space, with the caveat
-that most game developers I see recommend against doing it. It&#8217;s good to
+that most game developers I know recommend against it. It&#8217;s good to
 remember <em>why</em> it&#8217;s a bad idea, though.</p>
 <ul>
 <li>
