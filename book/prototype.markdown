@@ -113,7 +113,7 @@ The previous two solutions address the need to have a class, `Spawner`, which is
 
 <aside name="type-obj">
 
-In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pattern is another workaround for the lack of first-class types. That pattern can still be useful even in languages with them, though, because it lets *you* define what a "type" is. You may want different semantics than what the language's built-in classes.
+In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pattern is another workaround for the lack of first-class types. That pattern can still be useful even in languages with them, though, because it lets *you* define what a "type" is. You may want different semantics than what the language's built-in classes provide.
 
 </aside>
 

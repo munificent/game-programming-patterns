@@ -223,7 +223,7 @@
 <p>The previous two solutions address the need to have a class, <code>Spawner</code>, which is parameterized by a type. In C++, types aren&#8217;t generally first-class, so that requires some <span name="type-obj">gymnastics</span>. If you&#8217;re using a dynamically-typed language like JavaScript, Python or Ruby where classes <em>are</em> just regular objects you can pass around, you can solve this much more directly.</p>
 <aside name="type-obj">
 
-<p>In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pattern is another workaround for the lack of first-class types. That pattern can still be useful even in languages with them, though, because it lets <em>you</em> define what a &#8220;type&#8221; is. You may want different semantics than what the language&#8217;s built-in classes.</p>
+<p>In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pattern is another workaround for the lack of first-class types. That pattern can still be useful even in languages with them, though, because it lets <em>you</em> define what a &#8220;type&#8221; is. You may want different semantics than what the language&#8217;s built-in classes provide.</p>
 </aside>
 
 <p>When you make a spawner, just pass in the class of monster that it should construct&thinsp;&mdash;&thinsp;literally the actual runtime object that represents the monster&#8217;s class. Easy as pie.</p>
