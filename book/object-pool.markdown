@@ -255,13 +255,14 @@ references it has to other objects.
 
 ## Sample Code
 
-### First pass
-
 Real-world particle systems will often apply gravity, wind, friction,
 and other physical effects. Our much simpler sample will just move
 particles in a straight line for a certain number of frames and then
 kill the particle. Not exactly film caliber, but it should illustrate
-how to use an object pool. First up is the little particle class:
+how to use an object pool.
+
+We'll start with the simplest possible implementation. First up is the little
+particle class:
 
 ^code 1
 
@@ -282,9 +283,16 @@ The pool class is also simple:
 
 ^code 2
 
-The `create()` function lets external code create new particles. The
-game calls `animate()` once per frame, which in turn animates each
-particle in the pool.
+The `create()` function lets external code create new particles. The game calls
+<span name="update">`animate()`</span> once per frame, which in turn animates
+each particle in the pool.
+
+<aside name="update">
+
+This `animate()` method is an example of the <a href="update-method.html"
+class="pattern">Update Method</a> pattern.
+
+</aside>
 
 The particles themselves are simply stored in a fixed-size array in
 the class. In this sample implementation, the pool size is hardcoded
@@ -309,8 +317,8 @@ themselves when their lifetime has expired.
 This is good enough to ship a game, but keen eyes may have noticed
 that creating a new particle requires <span name="create">iterating</span> through (potentially)
 the entire collection until we find an open slot. If the pool is very
-large and mostly full, that can get slow. Let's see if we can improve
-that without sacrificing any memory.
+large and mostly full, that can get slow. Let's see how we can improve
+that.
 
 <aside name="create">
 
@@ -319,52 +327,55 @@ our algorithms class.
 
 </aside>
 
-### Faster particle creation
+### A free list
 
-A simple way to improve performance is to store a collection of
-pointers to each of the free particles in the pool. When we need to
-create a new one, we pull the first pointer from the collection and
-reuse the particle it points to.
+If we don't want to waste time *finding* free particles, the obvious answer is
+to not lose track of them. We could store a separate list of pointers to each
+unused particle. Then, when we need to create a particle, we just remove the
+first pointer from the list and reuse the particle it points to.
 
-Of course, this requires us to maintain an entire separate array with
-as many pointers as there are objects in the pool. It would be nice to
-fix our performance problems *without* giving up any memory.
-Conveniently, there is some memory already lying around we can use:
-the slots holding the unused objects.
+Unfortunately, this would require us to maintain an entire separate array with
+as many pointers as there are objects in the pool. After all, when we first
+create the pool, *all* particles are unused, so the list would initially have a
+pointer to every object in the pool.
 
-When a particle isn't in use, most of its state is irrelevant. Its
-position and velocity aren't being used. The only state it needs is
-the minimum required to tell if it's dead. For our example, that's the
-`_framesLeft` member. All those other bits, we can reuse. Here's a revised
-particle:
+It would be nice to fix our performance problems *without* sacrificing any
+memory. Conveniently, there is some memory already lying around we can borrow:
+the data for the unused particles themselves.
+
+When a particle isn't in use, most of its state is irrelevant. Its position and
+velocity aren't being used. The only state it needs is the stuff required to
+tell if it's dead. In our example, that's the `_framesLeft` member. All those
+other bits can reused. Here's a revised particle:
 
 ^code 4
 
-We've gotten all of the member variables except for `framesLeft_` and
-moved them into a `live` struct inside a `state_` <span name="union">union</span>. This struct
-holds the particle's state when it's in use. When the particle is
-available, the other case of the union, the `next` member, is used. It
-holds a pointer to the next available particle after this one.
+We've gotten all of the member variables except for `framesLeft_` and moved them
+into a `live` struct inside a `state_` <span name="union">union</span>. This
+struct holds the particle's state when it's being animated. When the particle is
+unused, the other case of the union, the `next` member, is used. It holds a
+pointer to the next available particle after this one.
 
 <aside name="union">
 
-Unions don't seem to be used that often these days, so the syntax may
-be unfamiliar to you. If you're on a game team, you've probably got a
-"memory guy", that beleaguered compatriot whose job it is
-to come up with a solution when the game has inevitably blown its
-memory budget. Ask him about unions. He'll know all about them and
-other fun bit-packing tricks.
+Unions don't seem to be used that often these days, so the syntax may be
+unfamiliar to you. If you're on a game team, you've probably got a "memory
+guru", that beleaguered compatriot whose job it is to come up with a solution
+when the game has inevitably blown its memory budget. Ask them about unions.
+They'll know all about them and other fun bit-packing tricks.
 
 </aside>
 
-In this way, we use the memory from all of the *dead* particles to
-create a linked list that threads its way through them. We have our
-collection of pointers to available particles, we're just interleaving
-it into the particles themselves.
+We can use these pointers to build a linked list that chains together every
+unused particle in the pool. We have the list of available particles we need,
+but did't need to use any additional memory. Instead, we cannibalize the memory
+of the dead particles themselves to store the list.
 
-For this to work, we need to make sure these links are set up
-correctly and are maintained when particles are created and destroyed.
-And, of course, we need to keep track of the list's head:
+This clever technique is called a [*free
+list*](http://en.wikipedia.org/wiki/Free_list). For it to work, we need to make
+sure the pointers are initialized correctly and are maintained when particles
+are created and destroyed. And, of course, we need to keep track of the list's
+head:
 
 ^code 5
 
