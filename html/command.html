@@ -339,16 +339,16 @@
 </pre></div>
 
 
-<p>We could support both undo and redo using a pair of closures:</p>
+<p>We could add support for undo as well using a pair of closures:</p>
 <div class="codehilite"><pre><span class="kd">function</span> <span class="nx">makeMoveUnitCommand</span><span class="p">(</span><span class="nx">unit</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">xBefore</span><span class="p">,</span> <span class="nx">yBefore</span><span class="p">;</span>
   <span class="k">return</span> <span class="p">{</span>
-    <span class="nx">undo</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">execute</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="nx">xBefore</span> <span class="o">=</span> <span class="nx">unit</span><span class="p">.</span><span class="nx">x</span><span class="p">();</span>
       <span class="nx">yBefore</span> <span class="o">=</span> <span class="nx">unit</span><span class="p">.</span><span class="nx">y</span><span class="p">();</span>
       <span class="nx">unit</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
     <span class="p">},</span>
-    <span class="nx">redo</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">undo</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="nx">unit</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">xBefore</span><span class="p">,</span> <span class="nx">yBefore</span><span class="p">);</span>
     <span class="p">}</span>
   <span class="p">};</span>

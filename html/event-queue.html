@@ -143,6 +143,7 @@
 <p>Meanwhile, the natural way for B to process that request is by <em>pulling</em> it in at a convenient time in <em>its</em> run cycle. When you have a push model on one end and a pull model on the other, you need a buffer between them. That&#8217;s what a queue provides that simpler decoupling patterns don&#8217;t.</p>
 <p>Queues give control to the code that pulls from it: the receiver can delay processing, aggregate requests, or discard them entirely. But it does this by taking control <em>away</em> from the sender. All it can do is throw a request on the queue and hope for the best. This makes queues a poor fit when the sender needs a response.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
+<p>Unlike some more modest patterns in this book, event queues are complex and tend to have a wide-reaching effect on the architecture of our games. That means you&#8217;ll want to think hard about how&thinsp;&mdash;&thinsp;or if&thinsp;&mdash;&thinsp;you use it.</p>
 <h3><a href="#a-central-event-queue-is-a-global-variable" name="a-central-event-queue-is-a-global-variable">A central event queue is a global variable</a></h3>
 <p>One common use of this pattern is for a sort of Grand Central Station that all parts of the game can route messages through. It&#8217;s a powerful piece of infrastructure, but <em>powerful</em> doesn&#8217;t always mean <em>good</em>.</p>
 <p>It took a while, but most of us learned the hard way that global variables are bad. When you have a piece of state that any part of the program can poke at, all sorts of subtle interdependencies creep in. This pattern wraps that state in a nice little protocol, but it&#8217;s still a global, with all of the danger that entails.</p>
@@ -424,7 +425,7 @@
 </ul>
 </li>
 <li>
-<p><strong>When you queue messages:</strong></p>
+<p><strong>If you queue messages:</strong></p>
 <p>A <span name="command">&#8220;message&#8221;</href="observer.html"> or &#8220;request&#8221; describes an action that we <em>want</em> to happen <em>in the future</em>, like &#8220;play sound&#8221;. You can think of this as an asynchronous API to a service.</p>
 <aside name="command">
 

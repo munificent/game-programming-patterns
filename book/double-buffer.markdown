@@ -201,17 +201,16 @@ available to be reused as the new next buffer.
 This pattern is one of those ones where you'll know when you need it.
 If you have a system that lacks double buffering, it will probably
 look visibly wrong (tearing, etc.) or will behave incorrectly. But saying, "you'll know when you need it" doesn't give you much to go
-on. More specifically, this pattern is appropriate when these four
-things are true:
+on. More specifically, this pattern is appropriate when all of these are true:
 
-1.  We have some state that is being modified incrementally.
+ *  We have some state that is being modified incrementally.
 
-2.  That same state may be accessed in the middle of modification.
+ *  That same state may be accessed in the middle of modification.
 
-3.  We want to prevent the code that's accessing the state from
+ *  We want to prevent the code that's accessing the state from
     seeing the work-in-progress.
 
-4.  We want to be able to read the state and we don't want to have to
+ *  We want to be able to read the state and we don't want to have to
     wait while it's being written.
 
 ## Keep in Mind
@@ -365,7 +364,7 @@ actor he faces.
 
 ^code 7
 
-Now lets throw some comedians on a stage and see what happens. We'll
+Now, let's throw some comedians on a stage and see what happens. We'll
 set up three comedians, each facing the next. The last one will face
 the first, in a big circle:
 
@@ -377,7 +376,7 @@ in the stage's array:
 
 <img src="images/double-buffer-slaps-1.png" />
 
-Now, let's slap Harry to get things going and see what happens when
+We'll slap Harry to get things going and see what happens when
 we start processing:
 
 ^code 9
@@ -395,8 +394,8 @@ occurs:
     Stage update ends
 
 So, in a single frame, our initial slap on Harry has propagated
-through all of the comedians. Now let's mix things up a bit. Lets say
-we reorder the comedians within the stages array, but leaving them
+through all of the comedians. Now, to mix things up a bit, let's say
+we reorder the comedians within the stages array, but leave them
 still facing each other the same way.
 
 <img src="images/double-buffer-slaps-2.png" />
@@ -527,7 +526,7 @@ quickly as possible.
 
         </aside>
 
-*   **Copy the data between the buffers.**
+*   **Copy the data between the buffers:**
 
     If we can't just repoint users to the other buffer, the only other
     option is to actually copy the data from the next frame to the

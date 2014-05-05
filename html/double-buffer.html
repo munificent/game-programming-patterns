@@ -180,9 +180,8 @@ available to be reused as the new next buffer.</p>
 <p>This pattern is one of those ones where you&#8217;ll know when you need it.
 If you have a system that lacks double buffering, it will probably
 look visibly wrong (tearing, etc.) or will behave incorrectly. But saying, &#8220;you&#8217;ll know when you need it&#8221; doesn&#8217;t give you much to go
-on. More specifically, this pattern is appropriate when these four
-things are true:</p>
-<ol>
+on. More specifically, this pattern is appropriate when all of these are true:</p>
+<ul>
 <li>
 <p>We have some state that is being modified incrementally.</p>
 </li>
@@ -197,7 +196,7 @@ things are true:</p>
 <p>We want to be able to read the state and we don&#8217;t want to have to
     wait while it&#8217;s being written.</p>
 </li>
-</ol>
+</ul>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <p>Unlike larger architectural patterns, double buffering exists at a
 lower implementation level. Because of this, it has fewer consequences
@@ -457,7 +456,7 @@ actor he faces.</p>
 </pre></div>
 
 
-<p>Now lets throw some comedians on a stage and see what happens. We&#8217;ll
+<p>Now, let&#8217;s throw some comedians on a stage and see what happens. We&#8217;ll
 set up three comedians, each facing the next. The last one will face
 the first, in a big circle:</p>
 <div class="codehilite"><pre><span class="n">Stage</span> <span class="n">stage</span><span class="p">;</span>
@@ -480,7 +479,7 @@ the first, in a big circle:</p>
 The arrows show who is facing who, and the numbers show their index
 in the stage&#8217;s array:</p>
 <p><img src="images/double-buffer-slaps-1.png" /></p>
-<p>Now, let&#8217;s slap Harry to get things going and see what happens when
+<p>We&#8217;ll slap Harry to get things going and see what happens when
 we start processing:</p>
 <div class="codehilite"><pre><span class="n">harry</span><span class="o">-&gt;</span><span class="n">slap</span><span class="p">();</span>
 
@@ -502,8 +501,8 @@ occurs:</p>
 
 
 <p>So, in a single frame, our initial slap on Harry has propagated
-through all of the comedians. Now let&#8217;s mix things up a bit. Lets say
-we reorder the comedians within the stages array, but leaving them
+through all of the comedians. Now, to mix things up a bit, let&#8217;s say
+we reorder the comedians within the stages array, but leave them
 still facing each other the same way.</p>
 <p><img src="images/double-buffer-slaps-2.png" /></p>
 <p>We&#8217;ll leave the rest of the stage setup alone, but replace the chunk
@@ -669,7 +668,7 @@ captures.</p>
 </ul>
 </li>
 <li>
-<p><strong>Copy the data between the buffers.</strong></p>
+<p><strong>Copy the data between the buffers:</strong></p>
 <p>If we can&#8217;t just repoint users to the other buffer, the only other
 option is to actually copy the data from the next frame to the
 current frame. This is how our slapstick comedians work. In that

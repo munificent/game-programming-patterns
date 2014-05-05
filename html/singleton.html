@@ -578,9 +578,16 @@ object with <em>global</em> scope, let&#8217;s consider other ways our codebase 
 get access to an object:</p>
 <ul>
 <li>
-<p><strong>Pass it in.</strong> The simplest solution, and often the best, is to simply pass the
-    object you need as an argument to the functions that need it. It&#8217;s worth
-    considering before we discard it as too cumbersome.</p>
+<p><strong>Pass it in.</strong> The <span name="di">simplest</span> solution, and often the
+  best, is to simply pass the object you need as an argument to the functions
+  that need it. It&#8217;s worth considering before we discard it as too cumbersome.</p>
+<aside name="di">
+
+<p>Some use the term &#8220;dependency injection&#8221; to refer
+to this. Instead of code reaching <em>out</em> and finding its dependencies by calling into something global, the dependencies are pushed <em>in</em> to the code that needs it through parameters.</p>
+<p>Others reserve &#8220;dependency injection&#8221; for more complex ways of providing dependencies to code.</p>
+</aside>
+
 <p>Consider a function for rendering objects. In order to render, it
 needs access to an object that represents the graphics device and maintains the render state. It&#8217;s very common to just pass that in to all of the rendering functions, usually as a parameter named something like <code>context</code>.</p>
 <p>On the other hand, some objects don&#8217;t belong in the signature of a

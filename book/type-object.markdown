@@ -207,6 +207,11 @@ when either of these are true:
 
 ## Keep in Mind
 
+This pattern is about moving the definition of a "type" from the imperative
+but rigid language of code into the more flexible but less behavioral world of
+objects in memory. The flexibility is good, but you lose some things by
+hoisting your types into data.
+
 ### The type objects have to be tracked manually
 
 One advantage of using something like <span name="vtable">C++'s</span> type system is that the
@@ -244,7 +249,7 @@ compiler.
 
 </aside>
 
-### It's harder to define behavior for each type
+### It's harder to define *behavior* for each type
 
 With subclassing, you can override a method and do whatever you want
 to: calculate values procedurally, call other code, etc. The sky is

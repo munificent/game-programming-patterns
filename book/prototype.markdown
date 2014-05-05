@@ -113,7 +113,7 @@ The previous two solutions address the need to have a class, `Spawner`, which is
 
 <aside name="type-obj">
 
-In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pattern is another workaround for the lack of first-class types. That pattern can still be useful even in languages with them, though, because it lets *you* define what a "type" is. You may want different semantics than what the language's built-in classes.
+In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pattern is another workaround for the lack of first-class types. That pattern can still be useful even in languages with them, though, because it lets *you* define what a "type" is. You may want different semantics than what the language's built-in classes provide.
 
 </aside>
 
@@ -282,7 +282,7 @@ Instead of copying and pasting a chunk of code in ten places, we move it into a 
 
 When your game's data reaches a certain size, you really start wanting similar features. Data modelling is a deep subject that I can't hope to do justice here, but I do want to throw out one feature for you to consider in your own games: using prototypes and delegation for reusing data.
 
-Lets say we're defining the data model for the <span name="shameless">shameless Gauntlet rip-off</span> I mentioned earlier. The game designers need to specify the attributes for monsters and items in some kind of files.
+Let's say we're defining the data model for the <span name="shameless">shameless Gauntlet rip-off</span> I mentioned earlier. The game designers need to specify the attributes for monsters and items in some kind of files.
 
 <aside name="shameless">
 

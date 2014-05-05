@@ -163,7 +163,7 @@ The only other option is to push everything up into `GameObject`, but
 then `Zone` is wasting memory on rendering data it doesn't need and
 `Decoration` is doing the same with physics.
 
-Now lets try it with components. Our <span name="menu">subclasses disappear completely.
+Now, let's try it with components. Our <span name="menu">subclasses disappear completely.
 Instead, we have a single `GameObject` class and two component
 classes: `PhysicsComponent` and `GraphicsComponent`. A decoration is
 simply a `GameObject` with a `GraphicsComponent` but no
@@ -308,7 +308,7 @@ a thousand lines and you can get an idea of how painful it can become.
 
 ### Splitting out a domain
 
-Starting with one domain, lets pull a piece out of `Bjorn` and push it
+Starting with one domain, let's pull a piece out of `Bjorn` and push it
 into a separate component class. We'll start with the first domain
 that gets processed: input. The first thing `Bjorn` does is read in
 user input and adjust his velocity based on it. Let's move that logic

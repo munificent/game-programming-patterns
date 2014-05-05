@@ -15,8 +15,8 @@ namespace UpdateMethod
   {
     struct Entity
     {
-      int x;
       void shootLightning() {}
+      void setX(double x) {}
     };
 
     void refreshGame() {}
@@ -29,15 +29,15 @@ namespace UpdateMethod
       while (true)
       {
         // Patrol right.
-        for (int x = 0; x < 100; x++)
+        for (double x = 0; x < 100; x++)
         {
-          skeleton.x = x;
+          skeleton.setX(x);
         }
 
         // Patrol left.
-        for (int x = 100; x > 0; x--)
+        for (double x = 100; x > 0; x--)
         {
-          skeleton.x = x;
+          skeleton.setX(x);
         }
       }
       //^just-patrol
@@ -48,7 +48,7 @@ namespace UpdateMethod
       //^patrol-in-loop
       Entity skeleton;
       bool patrollingLeft = false;
-      int x = 0;
+      double x = 0;
 
       // Main game loop:
       while (true)
@@ -64,7 +64,7 @@ namespace UpdateMethod
           if (x == 100) patrollingLeft = true;
         }
 
-        skeleton.x = x;
+        skeleton.setX(x);
 
         // Handle user input and render game...
       }
@@ -118,26 +118,26 @@ namespace UpdateMethod
 
     void skipAdded()
     {
-      int numObjects = 0;
-      Entity* objects[MAX_ENTITIES];
+      int numObjects_ = 0;
+      Entity* objects_[MAX_ENTITIES];
       //^skip-added
-      int numObjectsThisTurn = numObjects;
+      int numObjectsThisTurn = numObjects_;
       for (int i = 0; i < numObjectsThisTurn; i++)
       {
-        objects[i]->update();
+        objects_[i]->update();
       }
       //^skip-added
     }
 
     void skipRemoved()
     {
-      int numObjects = 0;
-      Entity* objects[MAX_ENTITIES];
+      int numObjects_ = 0;
+      Entity* objects_[MAX_ENTITIES];
 
       //^skip-removed
-      for (int i = 0; i < numObjects; i++)
+      for (int i = 0; i < numObjects_; i++)
       {
-        objects[i]->update();
+        objects_[i]->update();
       }
       //^skip-removed
     }
@@ -152,15 +152,21 @@ namespace UpdateMethod
     {
     public:
       Entity()
-      : x(0), y(0)
+      : x_(0), y_(0)
       {}
 
       virtual ~Entity() {}
       virtual void update() = 0;
 
-    protected:
-      double x;
-      double y;
+      double x() const { return x_; }
+      double y() const { return y_; }
+
+      void setX(double x) { x_ = x; }
+      void setY(double y) { y_ = y; }
+
+    private:
+      double x_;
+      double y_;
     };
     //^entity-class
 
@@ -212,13 +218,13 @@ namespace UpdateMethod
       {
         if (patrollingLeft_)
         {
-          x--;
-          if (x == 0) patrollingLeft_ = false;
+          setX(x() - 1);
+          if (x() == 0) patrollingLeft_ = false;
         }
         else
         {
-          x++;
-          if (x == 100) patrollingLeft_ = true;
+          setX(x() + 1);
+          if (x() == 100) patrollingLeft_ = true;
         }
       }
 

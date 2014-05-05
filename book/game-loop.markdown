@@ -89,7 +89,7 @@ The common terms for one crank of the game loop are "tick" or "frame".
 
 </aside>
 
-Meanwhile, the *player*'s actual clock is ticking. If we measure how quickly the game loop cycles in terms of real time, we get the game's "frames per second".
+Meanwhile, the *player's* actual clock is ticking. If we measure how quickly the game loop cycles in terms of real time, we get the game's "frames per second".
 If the game loop cycles quickly, the FPS is high and the game moves smoothly
 and quickly. If it's slow, the game jerks along like a stop motion movie.
 
@@ -135,13 +135,11 @@ An engine owns the loop and calls into *your* code.
 
 </aside>
 
-You might think you won't need this if you're making a turn-based game. But keep in mind that even though the *game state* won't advance until the user takes their turn, the *visual* and *audible* state of the game usually does. Animation and music keep running even when it's "waiting" for you to take your turn.
+You might think you won't need this if you're making a turn-based game. But even there, though the *game state* won't advance until the user takes their turn, the *visual* and *audible* state of the game usually does. Animation and music keep running even when it's "waiting" for you to take your turn.
 
 ## Keep in Mind
 
-### This is the core loop of your game
-
-Seems obvious, I know, but code in the game loop will be running constantly. They say a program spends <span name="percent">90%</span> of its time in 10% of the code. Your game loop will be firmly in that 10%. Think carefully about performance and make sure you profile when you make changes to your core loop.
+The loop we're talking about here is some of the most important code in your game. They say a program spends <span name="percent">90%</span> of its time in 10% of the code. Your game loop will be firmly in that 10%. Take care with this code, and be mindful of its efficiency.
 
 <aside name="percent">
 
@@ -228,7 +226,7 @@ Computers are naturally deterministic: they follow programs mechanically. Non-de
 
 </aside>
 
-Say we've got a two-player networked game and Fred has some beast of a gaming machine while George is using his grandmother's antique PC. That aforementioned bullet is flying across both of their screens. On Fred's machine, the game is running super fast, so each time step is tiny. We cram like 50 frames in the second it takes the bullet to cross the screen. Poor George can only fit about five in.
+Say we've got a two-player networked game and Fred has some beast of a gaming machine while George is using his grandmother's antique PC. That aforementioned bullet is flying across both of their screens. On Fred's machine, the game is running super fast, so each time step is tiny. We cram, like, 50 frames in the second it takes the bullet to cross the screen. Poor George can only fit about five in.
 
 This means on Fred's machine, the physics engine updates the bullet's position 50 times, but George's only does it five times. Most games use floating point numbers and those are subject to *rounding error*. Each time you add two floating point numbers, the answer you get back can be a bit off. Fred's machine is doing ten times as many operations, so he'll accumulate a bigger error than George. The *same* bullet will end up in *different places* on their machines.
 
@@ -283,7 +281,7 @@ Here's a timeline:
 
 <img src="images/game-loop-timeline.png" />
 
-As you can see, we update at a nice tight fixed interval. Meanwhile, we render
+As you can see, we update at a nice tight, fixed interval. Meanwhile, we render
 whenever we can. It's less frequent than updating, and isn't steady either.
 Both of those are OK. The lame part is that we don't always render right at the
 point of updating. Look at the third render time. It's right between two updates:
@@ -433,7 +431,7 @@ on it. The PDP-1 was a 2 kHz machine with only 4,096 words of memory yet Steve R
 * **Variable time step:**
 
     I'll put this in here as an option in the solution space, with the caveat
-    that most game developers I see recommend against doing it. It's good to
+    that most game developers I know recommend against it. It's good to
     remember *why* it's a bad idea, though.
 
     *   *It adapts to playing both too slowly and too fast.* If the game can't

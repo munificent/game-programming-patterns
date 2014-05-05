@@ -1,3 +1,9 @@
+2014-05-03 - 6 bugs
+2014-05-02 - 5 bugs, 3 emails, make design sections consistent
+2014-05-01 - 3 bugs, work on style guide for chapter structure, work on making
+             keep in mind sections more consistent
+2014-04-30 - 6 emails, 3 bugs, revise introduction
+2014-04-29 - 8 emails, 4 bugs
 2014-04-28 - 12 emails few bug fixes
 2014-04-27 - 20 emails
 2014-04-26 - 4 pull requests, 10 bugs
