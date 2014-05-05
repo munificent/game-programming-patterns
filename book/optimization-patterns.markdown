@@ -1,12 +1,12 @@
 ^title Низкоуровневая оптимизация
 
-While the rising tide of faster and faster hardware has lifted most software above worrying about performance, games are one of the few remaining exceptions. Players always want richer, more realistic and exciting experiences. Screens are crowded with games vying for a player's attention -- and cash! -- and the game that pushes the hardware the farthest often wins.
+Компоненты компьютера становятся все быстрее и быстрее, и програмное обеспечение все меньше заботится о производительности. Игры - одно из немногих оставшихся исключений. Игроки всегда желают более насыщенную, более реалистичную и возбуждающую атмосферу. Рынок переполнен играми, борющимися за внимание игрока -- и его деньги! И часто здесь выигрывает программа, которая использует аппаратную поддержку лучше остальных.
 
-Optimizing for performance is a deep art that touches all aspects of software. Low-level coders master the myriad idiosyncracies of hardware architectures. Meanwhile, algorithms researchers compete to prove mathematically whose procedure is the most efficient.
+Оптимизация производительности - это глубокое искусство, которая затрагивает все аспекты программы. Программисты нижнего уровня должны мастерски управлять множеством особенностей аппаратной архитектуры. В то время как разработчики алгоритмов стараются создать более эффективную, с точки зрения математики, последовательность действий.
 
-Here, I touch on a few mid-level patterns that are often used to speed up a game. [Data Locality](data-locality.html) introduces you to the modern computer's memory hierarchy and how you can use it to your advantage. The [Dirty Flag](dirty-flag.html) pattern helps you avoid unnecessary computation while [Object Pools](object-pool.html) help you avoid unnecessary allocation. [Spatial Partitioning](spatial-partition.html) speeds up the virtual world and its inhabitants' arrangement in space.
+В этой части, я попробую осветить несколько несложных подходов, который часто используют для оптимизации. [Data Locality](data-locality.html) познакомит вас с иерархией памяти современного компьютера и как её можно использовать в свою пользу. Паттерн [Dirty Flag](dirty-flag.html) поможет вам избежать чрезмерных вычислений, а [Object Pools](object-pool.html) избавит от лишних объектов. [Spatial Partitioning](spatial-partition.html) ускорит виртуальный мир и расположение его жителей в пространстве.
 
-## The Patterns
+## Способы оптимизации
 
 * [Data Locality](data-locality.html)
 * [Dirty Flag](dirty-flag.html)

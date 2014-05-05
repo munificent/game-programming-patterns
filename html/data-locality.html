@@ -27,24 +27,23 @@
 <div class="content">
 <h1>Data Locality</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="низкоуровневая-оптимизация.html">Низкоуровневая оптимизация</a></span></h1>
-<h2><a href="#intent" name="intent">Intent</a></h2>
-<p><em>Speed memory access by arranging data to take advantage of CPU caching.</em></p>
+<h2><a href="#общая-мысль" name="общая-мысль">Общая мысль</a></h2>
+<p><em>Если расположить данные в памяти специальным образом, то это поможет кешам процессора.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>We&#8217;ve been lied to. They keep showing us charts where CPU speed goes up and up every year as if Moore&#8217;s Law isn&#8217;t just a historical observation but some kind of divine right. Without lifting a finger, we software folks watch our programs magically accelerate just by virtue of new hardware.</p>
-<p>Chips <em>have</em> been getting faster (though even that&#8217;s plateauing now), but the hardware heads failed to mention something. Sure, we can <em>process</em> data faster than ever, but we can&#8217;t <em>get</em> that data faster.</p>
+<p>Нас обманули. Нам показывают графики, на которых скорость процессоров растёт все выше и выше, как будто закон Мура - это не просто историческое наблюдение, а какое-то непререкаемое правило. Не отрывая задниц от кресла, мы, программисты, наблюдаем, как наши программы волшебным образом ускоряются благодаря апгрейду.</p>
+<p>Процессоры <em>ускорялись</em> (сейчас график больше похож на плато), но главные по железу забыли нам кое-что сказать. Конечно, мы можем <em>обработать</em> данные быстрее чем раньше, но мы не можем <em>получить</em> их быстрее.</p>
 <p><span name="legend"></span></p>
 <p><img src="images/data-locality-chart.png" /></p>
 <aside name="legend">
-<p>Processor and RAM speed relative to their respective speeds in 1980. As you can see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.</p>
-<p>Data for this is from &#8220;Computer architecture: a quantitative approach&#8221;
-by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht&#8217;s &#8220;<a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf">Pitfalls of Object-Oriented Programming</a>&#8220;.</p>
+<p>Скорость процессора и доступа к памяти относительно уровня 1980-го года. Как видно, скорость процессоров растет как на дрожжах, а вот доступ к памяти плетётся далеко позади.</p>
+<p>Данные взяты из &#8220;Computer architecture: a quantitative approach&#8221; John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht&#8217;s &#8220;<a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf">Pitfalls of Object-Oriented Programming</a>&#8220;.</p>
 </aside>
-<p>For your super-fast CPU to blow through a ream of calculations, it actually has to get the data out of main memory and into registers. As you can see, RAM hasn&#8217;t been keeping up with increasing CPU speeds. Not even close.</p>
-<p>With today&#8217;s hardware, it can take <em>hundreds</em> of cycles to fetch a byte of data from <span name="ram">RAM</span>. If most instructions need data, and it takes hundreds of cycles to get it, how is that our CPUs aren&#8217;t sitting idle 99% of the time waiting for data?</p>
-<p>Actually, they <em>are</em> stuck waiting on memory an astonishingly large fraction of time these days, but it&#8217;s not as bad as it could be. To explain how, let&#8217;s take a trip to the Land of Overly Long Analogies&#8230;</p>
+<p>Для того, чтобы сверхбыстрый процессор провернул свои вычисления, ему, вообще-то, нужно выгрузить данные из главной памяти в свои регистры. И как видите, память не так быстра, как скорость процессора. Даже близко не так.</p>
+<p>С современным уровнем развития железа, может понадобиться <em>сотни</em> тактов, чтобы вытащить байт из <span name="ram">памяти</span>. Если большинство операций связано с данными, и нужно сотни тактов, чтобы их получить - как так получается, что наши процессоры не бездельничают 99% времени, ожидая поступления данных?</p>
+<p>На самом деле, они <em>действительно</em> ждут памать удивительно большую часть своего времени, но все не так плохо, как это могло бы быть. Чтобы объяснить почему, давайте совершим путешествие в Царство Длинных Лирических Отступлений&#8230;</p>
 <aside name="ram">
-<p>It&#8217;s called &#8220;Random access memory&#8221; because, unlike disc drives, you can theoretically access any piece of it as quick as any other. You don&#8217;t have to worry about reading things consecutively like you do a disc.</p>
-<p>Or, at least, you <em>didn&#8217;t</em>. As we&#8217;ll see, RAM isn&#8217;t so random access anymore.</p>
+<p>Она называется RAM (&#8220;Random access memory&#8221;) потому что, в отличие от дисковых накопителей, можно получить доступ к любому участку памяти одинаково быстро (это в теории). То есть не нужно считывать всю память по порядку, чтоб добраться до нужного места.</p>
+<p>Или, по крайней мере, в обычном случае не нужно. Как будет видно дальше, RAM не всегда настолько рандомна, как кажется.</p>
 </aside>
 <h3><a href="#a-data-warehouse" name="a-data-warehouse">A data warehouse</a></h3>
 <p>Imagine you&#8217;re an accountant in a tiny little office. Your job is to request a box of papers then do some <span name="accountant">accountant</span>-y stuff with them&thinsp;&mdash;&thinsp;add up a bunch of numbers or something. You must do this for specific labeled boxes according to some arcane logic that only makes sense to other accountants.</p>

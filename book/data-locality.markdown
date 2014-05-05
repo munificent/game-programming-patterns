@@ -1,15 +1,15 @@
 ^title Data Locality
 ^section Низкоуровневая оптимизация
 
-## Intent
+## Общая мысль
 
-*Speed memory access by arranging data to take advantage of CPU caching.*
+*Если расположить данные в памяти специальным образом, то это поможет кешам процессора.*
 
 ## Motivation
 
-We've been lied to. They keep showing us charts where CPU speed goes up and up every year as if Moore's Law isn't just a historical observation but some kind of divine right. Without lifting a finger, we software folks watch our programs magically accelerate just by virtue of new hardware.
+Нас обманули. Нам показывают графики, на которых скорость процессоров растёт все выше и выше, как будто закон Мура - это не просто историческое наблюдение, а какое-то непререкаемое правило. Не отрывая задниц от кресла, мы, программисты, наблюдаем, как наши программы волшебным образом ускоряются благодаря апгрейду.
 
-Chips *have* been getting faster (though even that's plateauing now), but the hardware heads failed to mention something. Sure, we can *process* data faster than ever, but we can't *get* that data faster.
+Процессоры *ускорялись* (сейчас график больше похож на плато), но главные по железу забыли нам кое-что сказать. Конечно, мы можем *обработать* данные быстрее чем раньше, но мы не можем *получить* их быстрее.
 
 <span name="legend"></span>
 
@@ -17,24 +17,23 @@ Chips *have* been getting faster (though even that's plateauing now), but the ha
 
 <aside name="legend">
 
-Processor and RAM speed relative to their respective speeds in 1980. As you can see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.
+Скорость процессора и доступа к памяти относительно уровня 1980-го года. Как видно, скорость процессоров растет как на дрожжах, а вот доступ к памяти плетётся далеко позади.
 
-Data for this is from "Computer architecture: a quantitative approach"
-by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht's "[Pitfalls of Object-Oriented Programming](http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf)".
+Данные взяты из "Computer architecture: a quantitative approach" John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht's "[Pitfalls of Object-Oriented Programming](http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf)".
 
 </aside>
 
-For your super-fast CPU to blow through a ream of calculations, it actually has to get the data out of main memory and into registers. As you can see, RAM hasn't been keeping up with increasing CPU speeds. Not even close.
+Для того, чтобы сверхбыстрый процессор провернул свои вычисления, ему, вообще-то, нужно выгрузить данные из главной памяти в свои регистры. И как видите, память не так быстра, как скорость процессора. Даже близко не так.
 
-With today's hardware, it can take *hundreds* of cycles to fetch a byte of data from <span name="ram">RAM</span>. If most instructions need data, and it takes hundreds of cycles to get it, how is that our CPUs aren't sitting idle 99% of the time waiting for data?
+С современным уровнем развития железа, может понадобиться *сотни* тактов, чтобы вытащить байт из <span name="ram">памяти</span>. Если большинство операций связано с данными, и нужно сотни тактов, чтобы их получить - как так получается, что наши процессоры не бездельничают 99% времени, ожидая поступления данных?
 
-Actually, they *are* stuck waiting on memory an astonishingly large fraction of time these days, but it's not as bad as it could be. To explain how, let's take a trip to the Land of Overly Long Analogies...
+На самом деле, они *действительно* ждут памать удивительно большую часть своего времени, но все не так плохо, как это могло бы быть. Чтобы объяснить почему, давайте совершим путешествие в Царство Длинных Лирических Отступлений...
 
 <aside name="ram">
 
-It's called "Random access memory" because, unlike disc drives, you can theoretically access any piece of it as quick as any other. You don't have to worry about reading things consecutively like you do a disc.
+Она называется RAM ("Random access memory") потому что, в отличие от дисковых накопителей, можно получить доступ к любому участку памяти одинаково быстро (это в теории). То есть не нужно считывать всю память по порядку, чтоб добраться до нужного места.
 
-Or, at least, you *didn't*. As we'll see, RAM isn't so random access anymore.
+Или, по крайней мере, в обычном случае не нужно. Как будет видно дальше, RAM не всегда настолько рандомна, как кажется.
 
 </aside>
 
