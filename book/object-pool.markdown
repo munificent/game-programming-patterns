@@ -1,5 +1,5 @@
 ^title Object Pool
-^section Optimization Patterns
+^section Паттерны оптимизации
 
 ## Intent
 

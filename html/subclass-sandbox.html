@@ -34,14 +34,12 @@ their shared base class.</em></p>
 <p>Every kid has dreamed of being a superhero, but, unfortunately, cosmic rays are in short supply here on Earth. Games that let you pretend to be a superhero are the closest approximation. Because our game designers have never learned to say, &#8220;no&#8221;, <em>our</em> superhero game is planning to have dozens, if not hundreds of different superpowers that players may have.</p>
 <p>Our plan is that we&#8217;ll have a <code>Superpower</code> base class. Then we&#8217;ll have a <span name="lots">derived</span> class that implements each superpower. We&#8217;ll divvy up the design doc among our team of programmers and get coding. When we&#8217;re done, we&#8217;ll have a hundred superpower classes.</p>
 <aside name="lots">
-
 <p>When you find yourself with a <em>lot</em> of subclasses, like in this example, that
 often means a data-driven approach is better. Instead of lots of
 <em>code</em> for defining different powers, try finding a way to define that behavior
 in <em>data</em> instead.</p>
 <p>Patterns like <a class="pattern" href="type-object.html">Type Object</a>, <a class="pattern" href="bytecode.html">Bytecode</a>, and <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Interpreter_pattern">Interpreter</a> can all help.</p>
 </aside>
-
 <p>We want to immerse our players in a world teeming with variety. Whatever power they dreamed up when they were a kid, we want in our game. That means these superpower subclasses will need to do just about everything: play sounds, spawn visual effects, interact with AI, create and destroy other game entities, and mess with physics. There&#8217;s no corner of the codebase that won&#8217;t get touched by them.</p>
 <p>Let&#8217;s say we just unleash our team and get them writing superpower classes. What&#8217;s going to happen?</p>
 <ul>
@@ -113,13 +111,11 @@ class with a lot of direct subclasses, we have a point of leverage in our
 codebase. Time and love that we put into <code>Superpower</code> can benefit a wide set of
 classes in the game.</p>
 <aside name="wide">
-
 <p>Lately, you find a lot of people criticizing inheritance in object-oriented
 languages. Inheritance <em>is</em> problematic&thinsp;&mdash;&thinsp;there&#8217;s really no deeper
 coupling in a codebase than the one between a base class and its subclass &#8212;
 but I find <em>wide</em> inheritance trees to be easier to work with than <em>deep</em> ones.</p>
 </aside>
-
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>A <strong>base class</strong> defines an abstract <strong>sandbox method</strong> and several
 <strong>provided operations</strong>. Marking them protected makes it clear to that
@@ -222,11 +218,9 @@ itself.</p>
 
 
 <aside name="jump">
-
 <p>OK, maybe being able to <em>jump</em> isn&#8217;t all that <em>super</em>, but I&#8217;m trying to keep
 things basic here.</p>
 </aside>
-
 <p>This power springs the superhero into the air, playing an appropriate sound and
 kicking up a little cloud of dust. If all of the superpowers were this
 simple&thinsp;&mdash;&thinsp;just combination of a sound, particle affect, and motion &#8212;
@@ -292,21 +286,17 @@ elaborate it a bit.</p>
 
 <p>Since we have access to some state, now our sandbox method can do actual interesting control flow. Here it&#8217;s still just a couple of simple <code>if</code> statements, but you can do <span name="data">anything</span> you want. By having the sandbox method be an actual full-fledged method that contains arbitrary code, the sky&#8217;s the limit.</p>
 <aside name="data">
-
 <p>Earlier I suggested a data-driven approach for powers. This is one
 reason why you may decide to <em>not</em> do that. If your behavior is complex and imperative, that makes it more difficult to define in data.</p>
 </aside>
-
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>As you can see, this is a fairly &#8220;soft&#8221; pattern. It describes a basic idea, but doesn&#8217;t have a lot of detailed mechanics. That means you&#8217;ll be making some interesting choices each time you apply it. Here are some questions to consider.</p>
-<h3><a href="#what-operations-should-be-provided" name="what-operations-should-be-provided">What operations should be provided?</a></h3>
+<h3><a href="#what-operations-should-be-provided?" name="what-operations-should-be-provided?">What operations should be provided?</a></h3>
 <p>This is the biggest question. It deeply affects how this pattern feels and how well it works. At the minimum end of the spectrum, the base class doesn&#8217;t provide <em>any</em> operations. It just has a sandbox method. To implement it, you&#8217;ll have to call into systems outside of the base class. If you take that angle, it&#8217;s probably not even fair to say you&#8217;re using this pattern.</p>
 <p>On the other end of the spectrum, the base class provides <span name="include"><em>every</em></span> operation that a subclass may need. Subclasses are <em>only</em> coupled to the base class and don&#8217;t call into any outside systems whatsoever.</p>
 <aside name="include">
-
 <p>Concretely, this means each source file for a subclass would only need a single <code>#include</code>: the one for its base class.</p>
 </aside>
-
 <p>Between these two points, there&#8217;s a wide middle ground where some operations
 are provided by the base class and others are accessed directly from the
 outside system that defines it. The more operations you provide, the less
@@ -368,7 +358,7 @@ The advantage, though, is that it keeps that field
 encapsulated in <code>Superpower</code> so subclasses can&#8217;t poke at it.</p>
 </li>
 </ul>
-<h3><a href="#should-methods-be-provided-directly,-or-through-objects-that-contain-them" name="should-methods-be-provided-directly,-or-through-objects-that-contain-them">Should methods be provided directly, or through objects that contain them?</a></h3>
+<h3><a href="#should-methods-be-provided-directly,-or-through-objects-that-contain-them?" name="should-methods-be-provided-directly,-or-through-objects-that-contain-them?">Should methods be provided directly, or through objects that contain them?</a></h3>
 <p>The challenge with this pattern is that you can end up with a painfully large
 number of methods crammed into your base class. You can mitigate that by moving
 some of those methods over to other classes. The provided operations in the
@@ -461,7 +451,7 @@ things for you:</p>
     encapsulates all of its other dependencies.</p>
 </li>
 </ul>
-<h3><a href="#how-does-the-base-class-get-the-state-that-it-needs" name="how-does-the-base-class-get-the-state-that-it-needs">How does the base class get the state that it needs?</a></h3>
+<h3><a href="#how-does-the-base-class-get-the-state-that-it-needs?" name="how-does-the-base-class-get-the-state-that-it-needs?">How does the base class get the state that it needs?</a></h3>
 <p>Your base class will often need some data that it wants to encapsulate and keep
 hidden from its subclasses. In our first example, the <code>Superpower</code> class
 provided a <code>spawnParticles()</code> method. If the implementation of that needs some
@@ -632,7 +622,7 @@ the high-level behavior and delegates the primitives.</p>
 </li>
 </ul>
 <nav>
-  <span class="prev">&larr; <a href="bytecode.html">Previous Chapter</a></span>
+  <span class="prev">&larr; <a href="bytecode.html">Предыдущая глава</a></span>
   <span class="next"><a href="type-object.html">Next Chapter</a> &rarr;</span>
   <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
 </nav>

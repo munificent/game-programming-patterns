@@ -235,7 +235,7 @@ If I were making a real game, I'd probably do that too. But <span name="chapter"
 
 <aside name="chapter">
 
-<a href="component.html" class="pattern">This one</a> is.
+ <a href="component.html" class="pattern">This one</a> is.
 
 </aside>
 

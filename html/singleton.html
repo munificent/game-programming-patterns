@@ -41,13 +41,11 @@ treating a bullet wound with a splint. Since it&#8217;s so overused, most
 of this chapter will be about <em>avoiding</em> singletons, but first, let&#8217;s
 go over the pattern itself.</p>
 <aside name="instance">
-
 <p>When much of the industry moved to object-oriented programming from C, one
 problem they ran into was &#8220;how do I get an instance?&#8221; They had some method they
 wanted to call, but didn&#8217;t have an instance of the object that provides that
 method in hand. Singletons (in other words, making it global) were an easy way out.</p>
 </aside>
-
 <h2><a href="#the-singleton-pattern" name="the-singleton-pattern">The Singleton Pattern</a></h2>
 <p><em>Design Patterns</em> summarizes Singleton like this:</p>
 <blockquote>
@@ -126,12 +124,10 @@ local static variable is only run once even in the presence of
 concurrency. So, assuming you&#8217;ve got a modern C++ compiler, this code
 is thread-safe where the first example is not.</p>
 <aside name="thread">
-
 <p>Of course, the thread-safety of your singleton class itself is an
 entirely different question! This just ensures that its
 <em>initialization</em> is.</p>
 </aside>
-
 <h2><a href="#why-we-use-it" name="why-we-use-it">Why We Use It</a></h2>
 <p>It seems we have a winner. Our file system wrapper is available
 wherever we need it without the tedium of passing it around
@@ -372,14 +368,12 @@ originally did), we&#8217;ll have to fix both the class itself and every
 single call site that uses it. Our convenient access isn&#8217;t so
 convenient anymore.</p>
 <aside name="worse">
-
 <p>It could be even worse than this. Imagine your <code>Log</code> class is in a
 library being shared across several <em>games</em>. Now, to change the
 design, you&#8217;ll have to coordinate the change across several groups of
 people, most of whom have neither the time nor the motivation to fix
 it.</p>
 </aside>
-
 <h3><a href="#lazy-initialization-takes-control-away-from-you" name="lazy-initialization-takes-control-away-from-you">Lazy initialization takes control away from you</a></h3>
 <p>In the desktop PC world of virtual memory and soft performance
 requirements, lazy initialization is a smart trick. Games are a
@@ -395,11 +389,9 @@ allocates a chunk of heap when it initializes, we want to know <em>when</em>
 that initialization is going to happen, so that we can control <em>where</em>
 in the heap that memory will live.</p>
 <aside name="fragment">
-
 <p>See <a class="pattern" href="object-pool.html">Object Pool</a> for a detailed
 explanation of memory fragmentation.</p>
 </aside>
-
 <p>Because of these two problems, most games I&#8217;ve seen don&#8217;t rely on lazy
 initialization. Instead, they implement the Singleton pattern like
 this:</p>
@@ -429,7 +421,6 @@ entirely and use static functions instead? Calling <code>Foo::bar()</code> is
 simpler than <code>Foo::instance().bar()</code>, and also makes it clear that you
 really are dealing with static memory.</p>
 <aside name="static">
-
 <p>The usual argument for choosing singletons over static classes is
 that if you decide to change the static class into a non-static one
 later, you&#8217;ll need to fix every call site. In theory, you don&#8217;t have
@@ -440,7 +431,6 @@ does <code>Foo::instance().bar()</code> in one line. So, if we changed Foo to no
 be a singleton, we&#8217;d still have to touch every call site. Given that,
 I&#8217;d rather have a simpler class, and a simpler syntax to call into it.</p>
 </aside>
-
 <h2><a href="#what-we-can-do-instead" name="what-we-can-do-instead">What We Can Do Instead</a></h2>
 <p>If I&#8217;ve accomplished my goal so far, you&#8217;ll think twice before you
 pull Singleton out of your toolbox the next time you have a problem.
@@ -540,11 +530,9 @@ certain areas of the code, or even make it <span name="wrapper">private</span> t
 single class. In those cases, providing a public
 global point of access weakens the architecture.</p>
 <aside name="wrapper">
-
 <p>For example, we may be wrapping our file system wrapper
 inside <em>another</em> layer of abstraction.</p>
 </aside>
-
 <p>We want a way to ensure single instantiation <em>without</em> providing
 global access. There are a couple of ways to accomplish this. Here&#8217;s
 one:</p>
@@ -730,7 +718,7 @@ gives instances of a class access to some shared state without making it globall
 available. The <a class="pattern" href="service-locator.html">Service Locator</a>
 <em>does</em> make an object globally available, but it gives you more flexibility with how that object is configured.</p>
 <nav>
-  <span class="prev">&larr; <a href="prototype.html">Previous Chapter</a></span>
+  <span class="prev">&larr; <a href="prototype.html">Предыдущая глава</a></span>
   <span class="next"><a href="state.html">Next Chapter</a> &rarr;</span>
   <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
 </nav>

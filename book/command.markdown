@@ -201,7 +201,7 @@ This is an obvious place to use the <a href="http://en.wikipedia.org/wiki/Mement
 
 Commands tend to modify a small part of an object's state. Snapshotting the rest of the object's unchanged data is a waste of memory. It's cheaper to just manually store only the bits of data you change.
 
-<a href="http://en.wikipedia.org/wiki/Persistent_data_structure">*Persistent data structures*</a> are another option. With these, every modification to an object returns a new one, leaving the original unchanged. Through clever implementation, these new objects share data with the previous ones, so it's much cheaper than cloning the entire object.
+ <a href="http://en.wikipedia.org/wiki/Persistent_data_structure">*Persistent data structures*</a> are another option. With these, every modification to an object returns a new one, leaving the original unchanged. Through clever implementation, these new objects share data with the previous ones, so it's much cheaper than cloning the entire object.
 
 Using this, each command stores a reference to the object before the command was performed, and undo just means switching back to the old object.
 

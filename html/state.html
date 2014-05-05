@@ -31,10 +31,8 @@
 <p>That&#8217;s a lot to cover, so to keep things as short as possible, the code samples here leave out a few details that you&#8217;ll have to fill in on your own. I hope they&#8217;re still clear enough for you to get the big picture.</p>
 <p>Don&#8217;t feel sad if you&#8217;ve never heard of a state machine. While well known to <span name="two-camps">AI and compiler</span> hackers, they aren&#8217;t that familiar to other programming circles. I think they should be more widely known, so I&#8217;m going to throw them at a different kind of problem here.</p>
 <aside name="two-camps">
-
 <p>This echoes the early days of artificial intelligence. In the 50s and 60s, much of AI research was focused on language processing. Many of the techniques compilers now use for parsing programming languages were invented for parsing human languages.</p>
 </aside>
-
 <h2><a href="#we've-all-been-there" name="we've-all-been-there">We&#8217;ve All Been There</a></h2>
 <p>We&#8217;re working on a little side-scrolling platformer. Our job is to implement the heroine that is the player&#8217;s avatar in the game world. That means making her respond to user input. Push the B button and she should jump. Simple enough:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
@@ -65,10 +63,8 @@
 
 
 <aside name="landing">
-
 <p>There should also be code that sets <code>isJumping_</code> back to <code>false</code> when the heroine touches the ground. I&#8217;ve omitted that here for brevity&#8217;s sake.</p>
 </aside>
-
 <p>Next, we want the heroine to duck if the player presses down while she&#8217;s on the ground, and stand back up when the button is released:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
@@ -166,11 +162,9 @@
 <p>We check that you can&#8217;t air jump while jumping, but not while diving. Yet another field&#8230;</p>
 <p>Something is clearly <span name="se">wrong</span> with our approach. Every time we touch this handful of code we break something. We need to add a bunch more moves&thinsp;&mdash;&thinsp;we haven&#8217;t even added <em>walking</em> yet&thinsp;&mdash;&thinsp;but at this rate it will collapse into a heap of bugs before we&#8217;re done with it.</p>
 <aside name="se">
-
 <p>Those coders you idolize who always seem to create flawless code aren&#8217;t simply superhuman programmers. Instead, they have an intuition about which <em>kinds</em> of code are error-prone, and they steer away from that.</p>
 <p>Complex branching and mutable state&thinsp;&mdash;&thinsp;fields that change over time&thinsp;&mdash;&thinsp;are two of those error-prone kinds of code and this has both.</p>
 </aside>
-
 <h2><a href="#finite-state-machines-to-the-rescue" name="finite-state-machines-to-the-rescue">Finite State Machines to the Rescue</a></h2>
 <p>In a fit of frustration, you sweep everything off your desk except a pen and paper and start drawing a flowchart. You draw a box for each thing the heroine can be doing: standing, jumping, ducking, and diving. When she can respond to a button press in one of those states, you draw an arrow from that box, label it with that button, and connect it to the state she changes to.</p>
 <p><img src="images/state-flowchart.png"/></p>
@@ -193,11 +187,9 @@
 </ul>
 <p>In their pure form, that&#8217;s the whole banana: states, inputs, and transitions. You can draw it out like a little flowchart. Unfortunately, the compiler doesn&#8217;t recognize our scribbles, so how do we go about <em>implementing</em> one? The Gang of Four&#8217;s State pattern is one way which we&#8217;ll get to, but let&#8217;s start simpler.</p>
 <aside name="adventure">
-
 <p>My favorite analogy for FSMs is the old text adventure games like Zork. You have a world of rooms that are connected to each other by exits. You explore them by entering commands like &#8220;go north&#8221;.</p>
 <p>This maps directly to a state machine: each room is a state. The room you&#8217;re in is the current state. Each room&#8217;s exits are its transitions. The navigation commands are the inputs.</p>
 </aside>
-
 <h2><a href="#enums-and-switches" name="enums-and-switches">Enums and Switches</a></h2>
 <p>One problem our <code>Heroine</code> class has is some combinations of those boolean fields aren&#8217;t valid: <code>isJumping_</code> and <code>isDucking_</code> should never both be true, for example. When you have a handful of flags where only one is <code>true</code> at a time, that&#8217;s a hint that what you really want is an <em>enum</em>.</p>
 <p>In this case, that enum is exactly the set of states for our FSM, so let&#8217;s define that:</p>
@@ -252,10 +244,8 @@
 
 <p>This seems trivial, but it&#8217;s a real improvement over the previous code. We still have some conditional branching, but we simplified the <span name="invalid">mutable</span> state to a single field. All of the code for handling a single state is now nicely lumped together. This is the simplest way to implement a state machine and is fine for some uses.</p>
 <aside name="invalid">
-
 <p>In particular, the heroine can no longer be in an <em>invalid</em> state. With the boolean flags, some sets of values were possible but meaningless. With the enum, each value is valid.</p>
 </aside>
-
 <p>Your problem may outgrow this solution, though. Say we want to add a move where our heroine can duck for a while to charge up and unleash a special attack. While she&#8217;s ducking, we need to track the charge time.</p>
 <p>We add a <code>chargeTime_</code> field to <code>Heroine</code> to store how long the attack has charged. Assume we already have an <span name="update"><code>update()</code></span> that gets called each frame. In there, we add:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>
@@ -273,10 +263,8 @@
 
 
 <aside name="update">
-
 <p>If you guessed that this is the <a href="update-method.html" class="pattern">Update Method</a> pattern, you win a prize!</p>
 </aside>
-
 <p>We need to reset the timer when she starts ducking, so we modify <code>handleInput()</code>:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
@@ -302,10 +290,8 @@
 <h2><a href="#the-state-pattern" name="the-state-pattern">The State Pattern</a></h2>
 <p>For people deeply into the object-oriented mindset, every conditional <span name="branch">branch</span> is an opportunity to use dynamic dispatch (in other words a virtual method call in C++). I think you can go too far down that rabbithole. Sometimes an <code>if</code> is all you need.</p>
 <aside name="branch">
-
 <p>There&#8217;s a historical basis for this. Many of the original object-oriented apostles like Design Patterns&#8217; Gang of Four, and Refactoring&#8217;s Martin Fowler came from Smalltalk. There, <code>ifThen:</code> is just a method you invoke on the condition, which is implemented differently by the <code>true</code> and <code>false</code> objects.</p>
 </aside>
-
 <p>But in our example, we&#8217;ve reached a tipping point where something object-oriented is a better fit. That gets us to the State pattern. In the words of the Gang of Four:</p>
 <blockquote>
 <p>Allow an object to alter its behavior when its internal state changes. The object will appear to change its class.</p>
@@ -380,7 +366,6 @@
 
 <p>In order to &#8220;change state&#8221;, we just need to assign <code>state_</code> to point to a different <code>HeroineState</code> object. That&#8217;s the State pattern in its entirety.</p>
 <aside name="delegate">
-
 <p>This looks like the <a href="http://en.wikipedia.org/wiki/Strategy_pattern" class="gof-pattern">Strategy</a> and <a href="type-object.html" class="pattern">Type Object</a> patterns. In all three, you have a main object that delegates to another subordinate one. The difference is <em>intent</em>.</p>
 <ul>
 <li>
@@ -394,22 +379,17 @@
 </li>
 </ul>
 </aside>
-
-<h2><a href="#where-are-the-state-objects" name="where-are-the-state-objects">Where Are the State Objects?</a></h2>
+<h2><a href="#where-are-the-state-objects?" name="where-are-the-state-objects?">Where Are the State Objects?</a></h2>
 <p>I did gloss over one bit here. To change states, we need to assign <code>state_</code> to point to the new one, but where does that object come from? With our enum implementation, that was a no-brainer: enum values are just primitives like numbers. But now our states are classes which means we need an actual instance to point to. There are two common answers to this:</p>
 <h3><a href="#static-states" name="static-states">Static states</a></h3>
 <p>If the state object doesn&#8217;t have any other <span name="fn">fields</span>, then the only data it stores is a pointer to the internal virtual method table so that its methods can be called. In that case, there&#8217;s no reason to ever have more than one instance of it: every instance would be identical anyway.</p>
 <aside name="fn">
-
 <p>If your state has no fields and only <em>one</em> virtual method in it, you can simplify this pattern even more. Replace each state <em>class</em> with a state <em>function</em>&thinsp;&mdash;&thinsp;just a plain vanilla top-level function. Then the <code>state_</code> field in your main class becomes a simple function pointer.</p>
 </aside>
-
 <p>In that case, you can just make a single <em>static</em> instance. Even if you have a bunch of FSMs all going at the same time in that same state, they can all point to the <span name="flyweight">same instance</span> since it has nothing machine-specific about it.</p>
 <aside name="flyweight">
-
 <p>This is the <a href="flyweight.html" class="gof-pattern">Flyweight Pattern</a>.</p>
 </aside>
-
 <p><em>Where</em> you put that static instance is up to you. Find a place that makes sense. For no particular reason, let&#8217;s put ours inside the base state class:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">HeroineState</span>
 <span class="p">{</span>
@@ -448,10 +428,8 @@
 
 <p>This lets each FSM have its own instance of the state. When I can, I prefer to use static states since they don&#8217;t burn memory and CPU cycles allocating objects each state change. For states that are more, uh, <em>stateful</em>, though, this is the way to go.</p>
 <aside name="fragment">
-
 <p>When you dynamically allocate states, you may have to worry about fragmentation and memory usage. The <a href="flyweight.html" class="gof-pattern">Flyweight</a> and <a href="object-pool.html" class="pattern">Object Pool</a> patterns can help.</p>
 </aside>
-
 <h2><a href="#enter-and-exit-actions" name="enter-and-exit-actions">Enter and Exit Actions</a></h2>
 <p>The goal of the State pattern is to encapsulate all of the behavior and data for one state in a single class. We&#8217;ve done that pretty well, but there&#8217;s still a loose end. We moved handling user input and updating the charge time into <code>DuckingState</code>, but there&#8217;s a bit of ducking-specific code left outside. Over in the standing state, when we <em>start</em> ducking, it does some initialization:</p>
 <div class="codehilite"><pre><span class="c1">// In standing state:</span>
@@ -500,15 +478,13 @@
 <p>Now ducking really is encapsulated. One particularly nice thing about entry actions is that they run when you enter the state regardless of which state you&#8217;re coming <em>from</em>.</p>
 <p>Most real-world state graphs have multiple transitions into the same state. For example, maybe our heroine can fire her weapon while standing, ducking, and jumping. That means you end up duplicating some code everywhere that transition occurs. Entry actions give you a place to consolidate that.</p>
 <p>We can, of course, also extend this to support an <em>exit action</em>. This is just a method we call on the state we&#8217;re <em>leaving</em> right before we switch to the new state.</p>
-<h2><a href="#what's-the-catch" name="what's-the-catch">What&#8217;s the Catch?</a></h2>
+<h2><a href="#what's-the-catch?" name="what's-the-catch?">What&#8217;s the Catch?</a></h2>
 <p>I&#8217;ve spent all this time selling you on FSMs and now I&#8217;m going to pull the rug out from under you. Everything I&#8217;ve said so far is true, and they are a good fit for some problems. But their greatest virtue is also their greatest flaw.</p>
 <p>State machines help you untangle hairy code by enforcing a very <span name="turing">constrained</span> structure on it. All you&#8217;ve got is a fixed set of states, a single current state, and some hardcoded transitions.</p>
 <aside name="turing">
-
 <p>A finite state machine isn&#8217;t even <em>Turing complete</em>. Automata theory describes computation using a series of abstract models, each more complex than the previous. A <em>Turing machine</em> is one of the most expressive models.</p>
 <p>&#8220;Turing complete&#8221; means a system (usually a programming language) is expressive enough to implement a Turing machine in it, which means all Turing complete languages are, in some ways, equally expressive. FSMs are not expressive enough to do this.</p>
 </aside>
-
 <p>If you try using a state machine for something more complex like game AI, you will slam face-first into the limitations of that model. Thankfully, our forebears have found ways to dodge some of those barriers. I&#8217;ll close this chapter out by walking you through a couple of them.</p>
 <h2><a href="#concurrent-state-machines" name="concurrent-state-machines">Concurrent State Machines</a></h2>
 <p>We&#8217;ve decided to give our heroine the ability to carry a gun. When she&#8217;s packing heat, she can still do everything she could before: run, jump, duck, etc. But she also needs to be able to fire her weapon while doing it.</p>
@@ -516,10 +492,8 @@
 <p>Add a couple of more weapons and the number of states explodes combinatorially. Not only is it a huge number of states, it&#8217;s a huge amount of redundancy: the unarmed and armed states are almost identical except for the little bit of code to handle firing.</p>
 <p>The problem is that we&#8217;ve <span name="combination">jammed</span> two pieces of state&thinsp;&mdash;&thinsp;what she&#8217;s <em>doing</em> and what she&#8217;s <em>carrying</em>&thinsp;&mdash;&thinsp;into a single machine. To model all possible combinations, we would need a state for each <em>pair</em>. The fix is obvious: have two separate state machines.</p>
 <aside name="combination">
-
 <p>If we want to cram <em>n</em> states for what she&#8217;s doing and <em>m</em> states for what she&#8217;s carrying into a single machine, we need <em>n &times; m</em> states. With two machines, it&#8217;s just <em>n + m</em>.</p>
 </aside>
-
 <p>We keep our original state machine for what she&#8217;s doing and leave it alone. Then we define a separate state machine for what she&#8217;s carrying. <code>Heroine</code> will have <em>two</em> &#8220;state&#8221; references, one for each, like:</p>
 <p><span name="equip-state"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Heroine</span>
@@ -534,10 +508,8 @@
 
 
 <aside name="equip-state">
-
 <p>For illustrative purposes, we&#8217;re using the full State pattern for her equipment. In practice, since it just has two states, a boolean flag would work too.</p>
 </aside>
-
 <p>When the heroine delegates inputs to the states, she hands it to both of them:</p>
 <p><span name="consume"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
@@ -549,10 +521,8 @@
 
 
 <aside name="consume">
-
 <p>A more full-featured system would probably have a way for one state machine to <em>consume</em> an input so that the other doesn&#8217;t receive it. That would prevent both machines from erroneously trying to respond to the same input.</p>
 </aside>
-
 <p>Each state machine can then respond to inputs, spawn behavior, and change its state independently of the other machine. When the two sets of states are mostly unrelated, this works well.</p>
 <p>In practice, you&#8217;ll find a few cases where the states do interact. For example, maybe she can&#8217;t fire while jumping, or maybe she can&#8217;t do a dive attack if she&#8217;s armed. To handle that, in the code for one state, you&#8217;ll probably just do some crude <code>if</code> tests on the <em>other</em> machine&#8217;s state to coordinate them. Not the most elegant solution, but it gets the job done.</p>
 <h2><a href="#hierarchical-state-machines" name="hierarchical-state-machines">Hierarchical State Machines</a></h2>
@@ -560,10 +530,8 @@
 <p>With a simple state machine implementation, we have to duplicate that code in each of those states. It would be better if we could implement that once and reuse it across all of the states.</p>
 <p>If this was just object-oriented code instead of a state machine, one way to share code across those states would be using <span name="inheritance">inheritance</span>. We could define a class for an &#8220;on ground&#8221; state that handles jumping and ducking. Standing, walking, running, and sliding would then inherit from that and add their own additional behavior.</p>
 <aside name="inheritance">
-
 <p>This has both good and bad implications. Inheritance is a powerful means of code reuse, but also a very strong coupling between two chunks of code. It&#8217;s a big hammer, so swing it carefully.</p>
 </aside>
-
 <p>It turns out, this is a common structure called a <em>hierarchical state machine</em>. A state can have a <em>superstate</em> (making itself a <em>substate</em>). When an event comes in, if the substate doesn&#8217;t handle it, it rolls up the chain of superstates. In other words, it works just like overriding inherited methods.</p>
 <p>In fact, if we&#8217;re using the actual State pattern to implement our FSM, we can use class inheritance to implement the hierarchy. Define a base class for the superstate:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">OnGroundState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">HeroineState</span>
@@ -611,10 +579,8 @@
 <p>The problem is that finite state machines have no concept of <em>history</em>. You know what state you <em>are</em> in, but have no memory of what state you <em>were</em> in. There&#8217;s no easy way to go back to a previous state.</p>
 <p>Here&#8217;s an example: Earlier, we let our fearless heroine arm herself to the teeth. When she fires her gun, we need a new state that plays the firing animation and spawns the bullet and any visual effects. So we slap together a <code>FiringState</code> and make <span name="shared">all of the states</span> that she can fire from transition into that when the fire button is pressed.</p>
 <aside name="shared">
-
 <p>Since this is behavior duplicated across several states, this may also be a good place to use a hierarchical state machine to reuse that code.</p>
 </aside>
-
 <p>The tricky part is what state she transitions to <em>after</em> firing. She can pop off a round while standing, running, jumping, and ducking. When the firing sequence is complete, she should transition back to what she was doing before.</p>
 <p>If we&#8217;re sticking with a vanilla FSM, we&#8217;ve already forgotten what state she was in. To keep track of it, we&#8217;d have to define a slew of nearly identical states&thinsp;&mdash;&thinsp;firing while standing, firing while running, firing while jumping, and so on&thinsp;&mdash;&thinsp;just so that each one can have a hardcoded transition that goes back to the right state when it&#8217;s done.</p>
 <p>What we&#8217;d really like is a way to <em>store</em> the state she was in before firing and then <em>recall</em> it later. Again, automata theory is here to help. The relevant data structure is called a <a href="http://en.wikipedia.org/wiki/Pushdown_automaton"><em>pushdown automaton</em></a>.</p>
@@ -629,7 +595,7 @@
 </ol>
 <p><img src="images/state-pushdown.png" /></p>
 <p>This is just what we need for firing. We create a <em>single</em> firing state. When the fire button is pressed while in any other state, we <em>push</em> the firing state onto the stack. When the firing animation is done, we <em>pop</em> that state off, and the pushdown automaton automatically transitions us right back to the state we were in before.</p>
-<h2><a href="#so-how-useful-are-they" name="so-how-useful-are-they">So How Useful Are They?</a></h2>
+<h2><a href="#so-how-useful-are-they?" name="so-how-useful-are-they?">So How Useful Are They?</a></h2>
 <p>Even with those common extensions to state machines, they are still pretty limited. The trend these days in game AI is more towards exciting things like <a href="http://www.altdevblogaday.com/2011/02/24/introduction-to-behavior-trees/">behavior trees</a> and <a href="http://web.media.mit.edu/~jorkin/goap.html">planning systems</a>. If AI is what you&#8217;re interested in, all this chapter has done is whet your appetite. You&#8217;ll want to read other books to satisfy it.</p>
 <p>This doesn&#8217;t mean finite state machines, pushdown automata, and other simple systems aren&#8217;t useful. They&#8217;re a good modelling tool for certain kinds of problems. Finite state machines are useful when:</p>
 <ul>
@@ -645,7 +611,7 @@
 </ul>
 <p>In games, they are most known for being used in AI, but they are also common in implementations of user input handling, navigating menu screens, parsing text, network protocols, and other asynchronous behavior.</p>
 <nav>
-  <span class="prev">&larr; <a href="singleton.html">Previous Chapter</a></span>
+  <span class="prev">&larr; <a href="singleton.html">Предыдущая глава</a></span>
   <span class="next"><a href="sequencing-patterns.html">Next Chapter</a> &rarr;</span>
   <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
 </nav>

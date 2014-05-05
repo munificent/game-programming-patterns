@@ -57,13 +57,11 @@ According to the design, a dragon <span name="isa">is a</span> kind of monster, 
 another kind, and so on with the other breeds. Thinking
 object-oriented, that leads us to a <code>Monster</code> base class:</p>
 <aside name="isa">
-
 <p>This is the so-called &#8220;is-a&#8221; relationship. In conventional OOP
 thinking, since a dragon &#8220;is-a&#8221; monster, we model that by making
 Dragon a subclass of Monster. As we&#8217;ll see, subclassing is only one
 way of enshrining a conceptual relation like that into code.</p>
 </aside>
-
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -112,10 +110,8 @@ health that is appropriate for that breed.</p>
 
 
 <aside name="exclaim">
-
 <p>Exclamation points make everything more exciting!</p>
 </aside>
-
 <p>Each class derived from <code>Monster</code> passes in the starting health, and
 overrides <code>getAttack()</code> to return the attack string for that breed.
 Everything works as expected, and before long we&#8217;ve got our hero
@@ -172,10 +168,8 @@ breed class mirrors that. We end up with a class hierarchy like this:</p>
 <p><span name="inherits-arrow"></span></p>
 <p><img src="images/type-object-subclasses.png" /></p>
 <aside name="inherits-arrow">
-
 <p>Here, the <img src="images/arrow-inherits.png" class="arrow" /> means &#8220;inherits from&#8221;.</p>
 </aside>
-
 <p>Each instance of a monster in the game will be of one of the derived
 monster types. The more breeds we have, the bigger the class hierarchy. That&#8217;s the problem of course: adding new breeds means
 adding new code, and each breed has to be compiled in as its own type.</p>
@@ -186,10 +180,8 @@ code so that each monster <em>has</em> a breed. Instead of subclassing
 <p><span name="references-arrow"></span></p>
 <p><img src="images/type-object-breed.png" /></p>
 <aside name="references-arrow">
-
 <p>Here, the <img src="images/arrow-references.png" class="arrow" /> means &#8220;is referenced by&#8221;.</p>
 </aside>
-
 <p>That&#8217;s it. Two classes. Notice that there&#8217;s no inheritance at all.
 With this system, each monster in the game is simply an instance of
 class <code>Monster</code>. The <code>Breed</code> class contains the information that&#8217;s
@@ -255,7 +247,6 @@ a reference to a valid breed.</p>
 but the cost is we have to re-implement some of what it used to be
 doing for us.</p>
 <aside name="vtable">
-
 <p>Under the hood, C++ virtual methods are implemented using something
 called a &#8220;virtual function table&#8221;, or just &#8220;vtable.&#8221; A vtable is a simple struct containing a set of
 function pointers, one for each virtual method in a class. There is one vtable in memory for each class. Each instance of a class has a
@@ -268,7 +259,6 @@ vtable is the reference the monster holds to its breed. C++ classes
 are the Type Object pattern applied to C, handled automatically by the
 compiler.</p>
 </aside>
-
 <h3><a href="#it's-harder-to-define-behavior-for-each-type" name="it's-harder-to-define-behavior-for-each-type">It&#8217;s harder to define behavior for each type</a></h3>
 <p>With subclassing, you can override a method and do whatever you want
 to: calculate values procedurally, call other code, etc. The sky is
@@ -294,11 +284,9 @@ fear&#8221; (hey, they can&#8217;t all be mighty dragons). We can define
 an AI algorithm with a breed by simply having it store a pointer to
 the appropriate function.</p>
 <aside name="fn">
-
 <p>Sound familiar again? Now we&#8217;re back to really implementing vtables
 in <em>our</em> type objects.</p>
 </aside>
-
 <p>Another more powerful solution is to actually support defining
 behavior completely in <span name="data">data</span>. The <a class="gof-pattern"
 href="http://c2.com/cgi-bin/wiki?InterpreterPattern">Interpreter</a>,
@@ -308,7 +296,6 @@ in a data file and use that to create a data structure for one of
 these patterns, we&#8217;ve moved the behavior&#8217;s definition completely out
 of code and into content.</p>
 <aside name="data">
-
 <p>Over time, games are getting more data-driven. Hardware gets more
 powerful, and we find ourselves limited more by how much content we
 can author than how hard we can push the hardware. With a 64K
@@ -320,7 +307,6 @@ of less optimal runtime performance. Since hardware keeps getting
 better but our brainpower doesn&#8217;t, that trade-off starts to make more
 and more sense.</p>
 </aside>
-
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>For our first pass at an implementation, let&#8217;s start simple and build
 the basic system described in the &#8220;Motivation&#8221; section.
@@ -371,7 +357,7 @@ determine its starting health. To get the attack string, the monster
 simply forwards the call to its breed.</p>
 <p>This very simple chunk of code is the core idea of the pattern.
 Everything from here on out is bonus.</p>
-<h3><a href="#making-type-objects-more-like-types-constructors" name="making-type-objects-more-like-types-constructors">Making type objects more like types: constructors</a></h3>
+<h3><a href="#making-type-objects-more-like-types:-constructors" name="making-type-objects-more-like-types:-constructors">Making type objects more like types: constructors</a></h3>
 <p>With what we have now, we construct a monster directly and are
 responsible for passing in its breed. This is a bit backwards from
 how regular objects are instantiated in most OOP languages: we don&#8217;t
@@ -390,7 +376,6 @@ responsible for giving us a new instance.</p>
 
 
 <aside name="pattern">
-
 <p>&#8220;Pattern&#8221; is the right word here. What we&#8217;re talking about
 is one of the classic patterns from Design Patterns: <a
 class="gof-pattern"
@@ -400,7 +385,6 @@ objects. In Ruby, Smalltalk, Objective-C, and other languages where
 classes are objects, you construct new instances by calling a method
 on the class object itself.</p>
 </aside>
-
 <p>And the class that uses them:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
 <span class="p">{</span>
@@ -424,11 +408,9 @@ on the class object itself.</p>
 <p>The key <span name="friend">difference</span> is the <code>newMonster()</code> function in <code>Breed</code>. That&#8217;s our
 &#8220;constructor&#8221; factory method. With our original implementation, creating a monster looked like:</p>
 <aside name="friend">
-
 <p>There&#8217;s another minor difference here. Because the sample code is in C++, we can use a handy little feature: <em>friend classes.</em></p>
 <p>We&#8217;ve made <code>Monster</code>&#8216;s constructor private which prevents anyone from calling it directly. Friend classes sidestep that restriction so <code>Breed</code> can still access it. This means the <em>only</em> way to create monsters by going through <code>newMonster()</code>.</p>
 </aside>
-
 <div class="codehilite"><pre><span class="n">Monster</span><span class="o">*</span> <span class="n">monster</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Monster</span><span class="p">(</span><span class="n">someBreed</span><span class="p">);</span>
 </pre></div>
 
@@ -587,7 +569,7 @@ non-programmers) will need to be able to easily understand it. The
 simpler we can make it, the more usable it will be. So what we&#8217;ll
 cover here is the well-trodden design space, and we&#8217;ll leave the far
 reaches for the academics and explorers.</p>
-<h3><a href="#is-the-type-object-encapsulated-or-exposed" name="is-the-type-object-encapsulated-or-exposed">Is the Type Object encapsulated or exposed?</a></h3>
+<h3><a href="#is-the-type-object-encapsulated-or-exposed?" name="is-the-type-object-encapsulated-or-exposed?">Is the Type Object encapsulated or exposed?</a></h3>
 <p>In our sample implementation, Monster has a reference to a Breed, but
 it doesn&#8217;t publicly expose it. Outside code can&#8217;t get directly at the
 monster&#8217;s breed. From the codebase&#8217;s perspective, monsters are
@@ -605,12 +587,10 @@ essentially typeless, and the fact that they have breeds is an implementation de
 
 
 <aside name="null">
-
 <p>As in other examples in this book, we&#8217;re following a convention where
 we return objects by reference instead of pointer to indicate to users
 that NULL will never be returned.</p>
 </aside>
-
 <p>Doing this changes the design of Monster. The fact that all Monsters
 have breeds is now a publicly-visible part of its API. There are
 benefits with either choice.</p>
@@ -674,7 +654,7 @@ we wouldn&#8217;t have the opportunity to insert that logic.</p>
 </ul>
 </li>
 </ul>
-<h3><a href="#how-are-typed-objects-created" name="how-are-typed-objects-created">How are typed objects created?</a></h3>
+<h3><a href="#how-are-typed-objects-created?" name="how-are-typed-objects-created?">How are typed objects created?</a></h3>
 <p>With this pattern, each &#8220;object&#8221; is now a pair of objects:
 the main object and the type object it uses. So how do we create and
 bind the two together?</p>
@@ -702,7 +682,7 @@ bind the two together?</p>
 </ul>
 </li>
 </ul>
-<h3><a href="#can-the-type-change" name="can-the-type-change">Can the type change?</a></h3>
+<h3><a href="#can-the-type-change?" name="can-the-type-change?">Can the type change?</a></h3>
 <p>So far, we&#8217;ve presumed that once an object is created and bound to its
 type object that that binding will never change. The type an object is
 created with is the type it dies with. This isn&#8217;t strictly necessary.
@@ -754,7 +734,7 @@ new type.</p>
 </ul>
 </li>
 </ul>
-<h3><a href="#what-kind-of-inheritance-is-supported" name="what-kind-of-inheritance-is-supported">What kind of inheritance is supported?</a></h3>
+<h3><a href="#what-kind-of-inheritance-is-supported?" name="what-kind-of-inheritance-is-supported?">What kind of inheritance is supported?</a></h3>
 <ul>
 <li>
 <p><strong>No inheritance:</strong></p>
@@ -845,7 +825,7 @@ too.</p>
 </li>
 </ul>
 <nav>
-  <span class="prev">&larr; <a href="subclass-sandbox.html">Previous Chapter</a></span>
+  <span class="prev">&larr; <a href="subclass-sandbox.html">Предыдущая глава</a></span>
   <span class="next"><a href="decoupling-patterns.html">Next Chapter</a> &rarr;</span>
   <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
 </nav>

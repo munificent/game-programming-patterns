@@ -33,16 +33,12 @@
 <p>The player&#8217;s mighty valkyrie is on a quest to steal glorious jewels from where they rest on the bones of the long-dead sorcerer-king. She tentatively approaches the entrance of his magnificent crypt and is attacked by&#8230; <em>nothing</em>. No cursed statues shooting lightning at her. No undead warriors patrolling the entrance. She just walks right in grabs the loot. <span name="win">Game over.</span> You win.</p>
 <p>Well, that won&#8217;t do.</p>
 <aside name="win">
-
 <p>Who knows? Maybe there is a market for games with no challenge. &#8220;Click 10 Ten Times To Win!&#8221; could be the next smash hit.</p>
 </aside>
-
 <p>This crypt needs some guards&thinsp;&mdash;&thinsp;some enemies our brave heroine can grapple with. First up, we want a re-animated <span name="brains">skeleton guard</span> to patrol back and forth in front of the door. Ignoring everything you probably already know about game programming, the simplest possible code to make that skeleton lurch back and forth is something like:</p>
 <aside name="brains">
-
 <p>If the sorcerer-king wanted more intelligent behavior, he should have re-animated something that still had brain tissue.</p>
 </aside>
-
 <div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Patrol right.</span>
@@ -63,10 +59,8 @@
 <p>The problem here, of course, is that the skeleton moves back and forth, but the player never sees it. The program is locked in an infinite loop, which is not exactly a fun gameplay experience. What we actually want is for the skeleton to move one step <em>each frame</em>.</p>
 <p>We&#8217;ll have to remove those loops and rely on the outer <span name="game-loop1">game loop</span> for iteration. That ensures the game keeps responding to user input and rendering while the guard is making his rounds. Like:</p>
 <aside name="game-loop1">
-
 <p>Naturally, <a href="game-loop.html" class="pattern">Game Loop</a> is another pattern in this book.</p>
 </aside>
-
 <div class="codehilite"><pre><span class="n">Entity</span> <span class="n">skeleton</span><span class="p">;</span>
 <span class="kt">bool</span> <span class="n">patrollingLeft</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
 <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
@@ -125,18 +119,14 @@
 
 <p>I&#8217;m pretty sure you can tell this isn&#8217;t trending towards something we&#8217;d enjoy maintaining. We&#8217;ve got an increasingly large pile of variables and imperative code all stuffed in the game loop, each handling one specific entity in the game. To get them all up and running at the same time, we&#8217;ve <span name="mush">mushed</span> their code together.</p>
 <aside name="mush">
-
 <p>Anytime &#8220;mushed&#8221; accurately describes your development process, you likely have a problem.</p>
 </aside>
-
 <p>The pattern we&#8217;ll use to fix this is so simple you probably have it in mind already: <em>Each entity in the game should encapsulate its own behavior.</em> This will keep the game loop uncluttered and make it easy to add and remove entities.</p>
 <p>To do this, we need an <em>abstraction layer</em>, and we create that by defining an abstract <code>update()</code> method. The game loop maintains a collection of objects, but it doesn&#8217;t know their concrete types. All it knows is that they have an <code>update()</code> method. This separates each object&#8217;s behavior both from the game loop and from the other objects.</p>
 <p>Each frame, the game loop walks the collection and calls <code>update()</code> on each object. This gives each one a chance to perform one frame&#8217;s worth of behavior. By calling it on all objects every frame, they all behave <span name="simultaneously">simultaneously</span>.</p>
 <aside name="simultaneously">
-
 <p>Since some stickler will call me on this, yes, they don&#8217;t behave <em>truly concurrently</em>. While one object is updating, none of the others are. We&#8217;ll get into this more in a bit.</p>
 </aside>
-
 <p>The game loop has a dynamic collection of objects, so adding and removing them from the level is easy: just add and remove them from the collection. Nothing is hardcoded anymore, and we can even populate the level using some kind of data file, which is exactly what our level designers want.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>The <strong>game world</strong> maintains a <strong>collection of objects</strong>. Each object implements an <strong>update method</strong> that simulates one frame of the object&#8217;s behavior. Each frame, the game updates every object in the collection.</p>
@@ -144,10 +134,8 @@
 <p>If the <a href="game-loop.html" class="pattern">Game Loop pattern</a> is the best thing since sliced bread, then this pattern is its butter. A wide swath of games featuring live entities that the player interacts with use this pattern in some form or other. If the game has space marines, dragons, martians, ghosts, or athletes, there&#8217;s a good chance it uses this pattern.</p>
 <p>However, if the game is more abstract and the moving pieces are less like living actors and more like pieces on a chessboard, this pattern is often a poor fit. In a game like chess, you don&#8217;t need to simulate all of the pieces concurrently, and you probably don&#8217;t need to tell the <span name="pawn">pawns</span> to update themselves every frame.</p>
 <aside name="pawn">
-
 <p>You may not need to update their <em>behavior</em> each frame, but even in a boardgame, you may still want to update their <em>animation</em> every frame. This pattern can help for that too.</p>
 </aside>
-
 <p>Update methods work well when:</p>
 <ul>
 <li>Your game has a number of objects or systems that need to run simultaneously.</li>
@@ -160,13 +148,11 @@
 <p>When you compare the first two chunks of code, the second is a good bit more complex. Both simply make the skeleton guard walk back and forth, but the second one does this while yielding control to the game loop each frame.</p>
 <p>That change is <span name="coroutine">almost</span> always necessary to handle user input, rendering and the other stuff that the game loop takes care of, so the first example wasn&#8217;t very practical. But it&#8217;s worth keeping in mind there&#8217;s this sunk complexity cost when you julienne your behavioral code like this.</p>
 <aside name="coroutine">
-
 <p>I say &#8220;almost&#8221; here because sometimes you can have your cake and eat it too. You can have straight-line code that never returns for your object behavior, while simultaneously having a number of them running concurrently and coordinating with the game loop.</p>
 <p>What you need is a system that lets you have multiple &#8220;threads&#8221; of execution going on at the same time. If the code for an object can just pause and resume in the middle of what it&#8217;s doing, instead of having to <em>return</em> completely, you can write it in a more imperative form.</p>
 <p>Actual threads are usually too heavyweight for this to work well, but if your language supports lightweight concurrency constructs like generators, coroutines, or fibers, you may be able to use those.</p>
 <p>The <a href="bytecode.html" class="pattern">Bytecode</a> pattern is another option that creates threads of execution at the application level.</p>
 </aside>
-
 <h3><a href="#you-have-to-store-state-to-resume-where-you-left-off-each-frame" name="you-have-to-store-state-to-resume-where-you-left-off-each-frame">You have to store state to resume where you left off each frame</a></h3>
 <p>In the first code sample, we didn&#8217;t have any variables to indicate whether the guard was moving left or right. That was implicit based on which code was currently executing.</p>
 <p>When we changed this to a one-frame-at-a-time form, we had to create a <code>patrollingLeft</code> variable to track that. When we return out of the code, the execution position is lost so we need to explicitly store enough information to restore it on the next frame.</p>
@@ -175,17 +161,13 @@
 <p>In this pattern, the game loops over a collection of objects and updates each one. Inside the <code>update()</code> call, most objects are able to reach out and touch the rest of the game world, including other objects that are being updated. This means that the <em>order</em> that the objects are updated is significant.</p>
 <p>If A comes before B in the list of objects, then when A updates, it will see B&#8217;s previous state. But when B updates, it will <span name="double-buffer">see</span> A&#8217;s <em>new</em> state, since it&#8217;s already updated this frame. Even though from the player&#8217;s perspective everything is moving at the &#8220;same&#8221; time, the core of the game is still turn-based. It&#8217;s just that a complete turn is only one frame long.</p>
 <aside name="double-buffer">
-
 <p>If, for some reason, you decide you <em>don&#8217;t</em> want your game to be sequential like this, you would need to use something like the <a href="double-buffer.html" class="pattern">Double Buffer</a> pattern. That makes the order that A and B update not matter because <em>both</em> of them will see the previous frame&#8217;s state.</p>
 </aside>
-
 <p>This is mostly a good thing as far as the game logic is concerned. Updating objects in parallel leads you to some unpleasant semantic corners. Imagine a game of chess where black and white moved at the same time. They both try to make a move that places a piece in the same currently empty square. How should this be resolved?</p>
 <p>Updating <span name="sequential">sequentially</span> solves this: each update incrementally changes the world from one valid state to the next with no period of time where things are ambiguous and need to be reconciled.</p>
 <aside name="sequential">
-
 <p>It may also help multiplayer since you have a serialized set of moves that can be sent over the network.</p>
 </aside>
-
 <h3><a href="#be-careful-modifying-the-object-list-while-updating" name="be-careful-modifying-the-object-list-while-updating">Be careful modifying the object list while updating</a></h3>
 <p>When you&#8217;re using this pattern, a lot of the game&#8217;s behavior ends up nestled in these update methods. That often includes code that adds or removes updatable objects from the game.</p>
 <p>For example, say a skeleton guard drops an item when slain. With a new object, you can usually just add it to the end of the list without too much trouble. You&#8217;ll keep iterating over that list and eventually get to the new one at the end and update it too.</p>
@@ -212,15 +194,11 @@
 <p>Since we&#8217;re updating her, <code>i</code> is 1. She slays the foul beast so it gets removed from the array. The heroine shifts up to 0, and the hapless peasant shifts up to 1. After updating the heroine, <code>i</code> is incremented to 2. As you can see on the right, the hapless peasant is skipped over and never gets updated.</p>
 <p><span name="backwards">One fix</span> is to just be careful when you remove objects and update any iteration variables to take the removal into account. Another is to defer removals until you&#8217;re done walking the list. Mark the object as &#8220;dead&#8221; but leave it in place. During updating, make sure to skip any dead objects. Then, when that&#8217;s <span name="defer">done</span>, walk the list again to remove the corpses.</p>
 <aside name="backwards">
-
 <p>You could also walk the list backwards when you update. That way removing an item doesn&#8217;t shift any of the items yet to be updated.</p>
 </aside>
-
 <aside name="defer">
-
 <p>If you have multiple threads processing the items in the update loop, then you are even more likely to defer any modification to it to avoid costly thread synchronization during updates.</p>
 </aside>
-
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>This pattern is so straightforward the sample code almost belabors the point. That doesn&#8217;t mean the pattern isn&#8217;t <em>useful</em>. It&#8217;s useful in part <em>because</em> it&#8217;s simple: it&#8217;s a clean solution to a problem without a lot of ornamentation.</p>
 <p>But just to keep things concrete, let&#8217;s walk through a basic implementation. We&#8217;ll start with an entity class that will represent the skeletons and statues:</p>
@@ -261,10 +239,8 @@
 
 
 <aside name="array">
-
 <p>In a real-world program, you&#8217;d probably use an actual collection class, but I&#8217;m just using a vanilla array here to keep things simple.</p>
 </aside>
-
 <p>Now that everything is set up, the game implements the pattern by updating each entity every frame:</p>
 <p><span name="game-loop"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">World</span><span class="o">::</span><span class="n">gameLoop</span><span class="p">()</span>
@@ -286,11 +262,9 @@
 
 
 <aside name="game-loop">
-
 <p>As the name of the method implies, this is an example of the <a href="game-loop.html" class="pattern">Game Loop</a> pattern.</p>
 </aside>
-
-<h3><a href="#subclassing-entities" name="subclassing-entities">Subclassing entities?!</a></h3>
+<h3><a href="#subclassing-entities?!" name="subclassing-entities?!">Subclassing entities?!</a></h3>
 <p>There are some readers whose skin is crawling right now because I&#8217;m using inheritance on the main entity class to define different behaviors. If you don&#8217;t happen to see the problem, I&#8217;ll provide some context.</p>
 <p>When the game industry emerged from the primordial seas of 6502 assembly code and VBLANKs onto the shores of object-oriented languages, developers went into a software architecture fad frenzy. One of the biggest was using inheritance. Towering, Byzantine class hierarchies were built, big enough to blot out the sun.</p>
 <p>It turns out that was a terrible idea and no one can maintain giant <span name="subclass">class</span> hierarchies without it crumbling around them. Even the Gang of Four knew this in 1994 when they wrote:</p>
@@ -298,17 +272,13 @@
 <p>Favor &#8216;object composition&#8217; over &#8216;class inheritance&#8217;.</p>
 </blockquote>
 <aside name="subclass">
-
 <p>Just between you and me, I think the pendulum has swung a bit too far <em>away</em> from subclassing. I generally avoid it, but being dogmatic about <em>not</em> using inheritance is as bad as being dogmatic about using it. You can use it in moderation without having to be a teetotaler.</p>
 </aside>
-
 <p>When this realization percolated through the game industry, the solution that emerged was the <a href="component.html" class="pattern">Component</a> pattern. Using that, <code>update()</code> would be on the component types instead of <code>Entity</code>. That lets you avoid creating complicated class hierarchies of entities to define and reuse behavior. Instead, you just mix and match components.</p>
 <p>If I were making a real game, I&#8217;d probably do that too. But <span name="chapter">this chapter</span> isn&#8217;t about components. It&#8217;s about <code>update()</code> methods, and the simplest way I can show them, with as few moving parts as possible, is by putting that method right on <code>Entity</code> and making a few subclasses.</p>
 <aside name="chapter">
-
 <p><a href="component.html" class="pattern">This one</a> is.</p>
 </aside>
-
 <h3><a href="#defining-entities" name="defining-entities">Defining entities</a></h3>
 <p>OK, back to the task at hand. Our original motivation was to be able to define a patrolling skeleton guard and some lightning-bolt-unleashing magical statues. Let&#8217;s start with our bony friend. To define his patrolling behavior, we make a new entity that implements <code>update()</code> appropriately:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Skeleton</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Entity</span>
@@ -375,20 +345,16 @@
 <p><span name="uml"></span>
 <img src="images/update-method-uml.png"/></p>
 <aside name="uml">
-
 <p>Do people still care about UML? If so, here&#8217;s what we just created.</p>
 </aside>
-
 <p>Now that those have been moved into the <code>Statue</code> class itself, you can create as many as you want and each instance will have its own little timer. That&#8217;s really the motivation behind this pattern: it&#8217;s now much easier to add new entities to the game world because each one brings along everything it needs to take care of itself.</p>
 <p>This pattern lets us separate <em>populating</em> the game world from <em>implementing</em> it. This in turn gives us the flexibility to populate the world using something like a separate data file or level editor.</p>
 <h3><a href="#passing-time" name="passing-time">Passing time</a></h3>
 <p>That&#8217;s key pattern, but I&#8217;ll just touch on a common refinement. So far, we&#8217;ve assumed every call to <code>update()</code> advances the state of the game world by the same fixed unit of time.</p>
 <p>I happen to prefer that, but many games use a <span name="variable"><em>variable time step</em></span>. In those, each turn of the game loop may simulate a larger or smaller slice of time depending on how long it took to process and render the previous frame.</p>
 <aside name="variable">
-
 <p>The <a href="game-loop.html" class="pattern">Game Loop</a> chapter has a lot more on the advantages and disadvantages of fixed and variable time steps.</p>
 </aside>
-
 <p>That means that each <code>update()</code> call needs to know how far the hand of the virtual clock has swung, so you&#8217;ll often see the elapsed time passed in. For example, we can make our patrolling skeleton handle a variable time step like so:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Skeleton</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="kt">double</span> <span class="n">elapsed</span><span class="p">)</span>
 <span class="p">{</span>
@@ -416,7 +382,7 @@
 <p>Now, the distance the skeleton moves increases as the elapsed time grows. You can also see the additional complexity of dealing with a variable time step. The skeleton may overshoot the bounds of its patrol with a large time slice and we have to carefully handle that.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>With a simple pattern like this, there isn&#8217;t too much variation, but there&#8217;s still a couple of knobs you can turn.</p>
-<h3><a href="#what-class-does-the-update-method-live-on" name="what-class-does-the-update-method-live-on">What class does the update method live on?</a></h3>
+<h3><a href="#what-class-does-the-update-method-live-on?" name="what-class-does-the-update-method-live-on?">What class does the update method live on?</a></h3>
 <p>The most obvious and most important decision you&#8217;ll make is what class to put <code>update()</code> on.</p>
 <ul>
 <li>
@@ -443,7 +409,7 @@
 <p>Doing this lets you define new behavior by changing out the delegated object. Like using components, it gives you the flexibility to change behavior without having to define an entirely new subclass.</p>
 </li>
 </ul>
-<h3><a href="#how-are-dormant-objects-handled" name="how-are-dormant-objects-handled">How are dormant objects handled?</a></h3>
+<h3><a href="#how-are-dormant-objects-handled?" name="how-are-dormant-objects-handled?">How are dormant objects handled?</a></h3>
 <p>You often have a number of objects in the world that for whatever reason temporarily don&#8217;t need to be updated. They could be disabled, or off-screen, or not unlocked yet. If a large number of objects are in this state, it can be a waste of CPU cycles to walk over them each frame only to do nothing.</p>
 <p>One alternative is to maintain a separate collection of just the &#8220;live&#8221; objects that do need updating. When an object is disabled, it&#8217;s removed from the collection. When it gets re-enabled, it&#8217;s added back. This way, you only iterate over items that actually have real work do to.</p>
 <ul>
@@ -492,7 +458,7 @@
 </li>
 </ul>
 <nav>
-  <span class="prev">&larr; <a href="game-loop.html">Previous Chapter</a></span>
+  <span class="prev">&larr; <a href="game-loop.html">Предыдущая глава</a></span>
   <span class="next"><a href="behavioral-patterns.html">Next Chapter</a> &rarr;</span>
   <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
 </nav>

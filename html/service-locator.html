@@ -193,7 +193,6 @@ you can define:</p>
 
 
 <aside name="di">
-
 <p>The technique this uses is called <em>dependency injection</em>, an awkward
 bit of jargon for a very simple idea. Say you have one class
 that depends on another. In our case, our <code>Locator</code> class needs an
@@ -202,7 +201,6 @@ responsible for constructing that itself. Dependency injection
 instead says that outside code is responsible for <em>injecting</em> that
 dependency into the object that needs it.</p>
 </aside>
-
 <p>The static <code>getAudio()</code> function does the locating&thinsp;&mdash;&thinsp;we can call
 it from anywhere in the codebase and it will give us back an instance
 of our <code>Audio</code> service to use:</p>
@@ -244,14 +242,12 @@ href="singleton.html">Singleton</a>, which affects the design of the
 service <span name="temporal">before</span> a provider has been registered, it returns <code>NULL</code>. If
 the calling code doesn&#8217;t check that, we&#8217;re going to crash the game.</p>
 <aside name="temporal">
-
 <p>I sometimes hear this called &#8220;temporal coupling&#8221;: two separate pieces
 of code that must be called in the right order for the program to work
 correctly. All stateful software has some degree of this, but as with
 other kinds of coupling, reducing it makes the codebase easier to
 manage.</p>
 </aside>
-
 <p>Fortunately, there&#8217;s another design pattern called &#8220;Null Object&#8221; we
 can use to address this. The basic idea is that in places where we
 would return <code>NULL</code> when we fail to find or create an object, we
@@ -301,7 +297,6 @@ actually do anything. Now, we change our locator to this:</p>
 
 
 <aside name="ref">
-
 <p>You may notice we&#8217;re returning the service by reference instead of by
 pointer now. Since references in C++ are (in theory!) never <code>NULL</code>,
 returning a reference is a hint to users of the code that they can
@@ -313,7 +308,6 @@ correctly defaults to the null provider. In return, it moves the
 branch out of <code>getAudio()</code>, which will save us a couple of cycles
 every time the service is accessed.</p>
 </aside>
-
 <p>Calling code will never know that a &#8220;real&#8221; service wasn&#8217;t found, nor
 does it have to worry about handling <code>NULL</code>. It&#8217;s guaranteed to
 always get back a valid object.</p>
@@ -322,14 +316,12 @@ we want to <span name="disable">disable</span> a system temporarily, we now have
 so: simply don&#8217;t register a provider for the service and the locator
 will default to a null provider.</p>
 <aside name="disable">
-
 <p>Turning off audio is handy during development. It frees up some memory
 and CPU cycles. More importantly, when you break into a debugger just
 as a loud sound starts playing, it saves you from having your eardrums
 shredded. There&#8217;s nothing like twenty milliseconds of a scream sound effect
 looping at full volume to get your blood flowing in the morning.</p>
 </aside>
-
 <h3><a href="#logging-decorator" name="logging-decorator">Logging decorator</a></h3>
 <p>Now that our system is pretty robust, let&#8217;s discuss another refinement
 this pattern lets us do: decorated services. I&#8217;ll explain with an
@@ -407,7 +399,7 @@ you can both <em>disable</em> audio and yet still log the sounds that it
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>We&#8217;ve covered a typical implementation, but there&#8217;s a couple of ways
 that it can vary, based on differing answers to a few core questions:</p>
-<h3><a href="#how-is-the-service-located" name="how-is-the-service-located">How is the service located?</a></h3>
+<h3><a href="#how-is-the-service-located?" name="how-is-the-service-located?">How is the service located?</a></h3>
 <ul>
 <li>
 <p><strong>Outside code registers it:</strong></p>
@@ -561,7 +553,7 @@ specification.</p>
 </ul>
 </li>
 </ul>
-<h3><a href="#what-happens-if-service-could-not-be-located" name="what-happens-if-service-could-not-be-located">What happens if service could not be located?</a></h3>
+<h3><a href="#what-happens-if-service-could-not-be-located?" name="what-happens-if-service-could-not-be-located?">What happens if service could not be located?</a></h3>
 <ul>
 <li>
 <p><strong>Let the user handle it:</strong></p>
@@ -699,7 +691,7 @@ doesn&#8217;t take much effort to implement, and can spare you from some
 downtime during development when a service isn&#8217;t available. It also
 gives you an easy way to turn a service off if it&#8217;s buggy or is just
 distracting you from what you&#8217;re working on.</p>
-<h3><a href="#what-is-the-scope-of-the-service" name="what-is-the-scope-of-the-service">What is the scope of the service?</a></h3>
+<h3><a href="#what-is-the-scope-of-the-service?" name="what-is-the-scope-of-the-service?">What is the scope of the service?</a></h3>
 <p>Up to this point, we&#8217;ve assumed that the locator will provide access
 to the service to <em>anyone</em> who wants it. While this is the typical way
 the pattern is used, another option is to limit access to a single
@@ -787,8 +779,8 @@ be global.</p>
 </li>
 </ul>
 <nav>
-  <span class="prev">&larr; <a href="event-queue.html">Previous Chapter</a></span>
-  <span class="next"><a href="optimization-patterns.html">Next Chapter</a> &rarr;</span>
+  <span class="prev">&larr; <a href="event-queue.html">Предыдущая глава</a></span>
+  <span class="next"><a href="паттерны-оптимизации.html">Next Chapter</a> &rarr;</span>
   <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
 </nav>
 </div>

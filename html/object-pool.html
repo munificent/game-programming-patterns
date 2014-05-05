@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 
-<title>Object Pool &middot; Optimization Patterns &middot; Game Programming Patterns</title>
+<title>Object Pool &middot; Паттерны оптимизации &middot; Game Programming Patterns</title>
 
 <!-- Tell mobile browsers we're optimized for them and they don't need to crop
      the viewport. -->
@@ -26,7 +26,7 @@
 <div class="page sidebar">
 <div class="content">
 <h1>Object Pool</h1>
-<h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="optimization-patterns.html">Optimization Patterns</a></span></h1>
+<h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="паттерны-оптимизации.html">Паттерны оптимизации</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Improve performance and memory use by reusing objects from a fixed
 pool instead of allocating and freeing them individually.</em></p>
@@ -54,34 +54,28 @@ fourteen bytes free, but it&#8217;s fragmented into two seven-byte pieces with a
 chunk of in-use memory between them. If we try to allocate a twelve-byte
 object, we&#8217;ll fail. No more sparklies onscreen.</p>
 <aside name="park">
-
 <p>It&#8217;s like trying to parallel park on a busy street where the
 already parked cars are spread out a bit too far. If
 they&#8217;d bunch up, there would be room, but the free
 space is <em>fragmented</em> into bits of open curb between half a dozen cars.</p>
 </aside>
-
 <p><span name="heap"></span></p>
 <p><img src="images/object-pool-heap-fragment.png" /></p>
 <aside name="heap">
-
 <p>Here&#8217;s how a heap becomes fragmented, and how it can cause an
 allocation to fail even where there&#8217;s theoretically enough memory
 available.</p>
 </aside>
-
 <p>Even if fragmentation is infrequent, it can still <span name="soak">gradually</span> reduce the
 heap to an unusable foam of open holes and filled-in crevices,
 ultimately hosing the game completely.</p>
 <aside name="soak">
-
 <p>Most console makers require games to pass &#8220;soak tests&#8221;
 where they leave the game running in demo mode for several days. If
 the game crashes, they don&#8217;t allow it to ship. While soak tests
 sometimes fail because of a rarely-occurring bug, it&#8217;s usually
 creeping fragmentation or memory leakage that brings the game down.</p>
 </aside>
-
 <h3><a href="#the-best-of-both-worlds" name="the-best-of-both-worlds">The best of both worlds</a></h3>
 <p>Because of fragmentation, and because allocation may be slow, games are very
 careful about when and how they manage memory. A simple solution is
@@ -206,13 +200,11 @@ keys and wallet.</p>
 splitting the pool into <span name="pools">separate</span> pools for different sizes of
 object&thinsp;&mdash;&thinsp;big trays for luggage, little trays for pocket stuff.</p>
 <aside name="pools">
-
 <p>This is a common pattern for implementing speed-efficient memory
 managers. The manager has a number of pools of different block sizes.
 When you ask it to allocate a block, it finds in an open slot in the
 pool of the appropriate size and allocates from that pool.</p>
 </aside>
-
 <h3><a href="#reused-objects-aren't-automatically-cleared" name="reused-objects-aren't-automatically-cleared">Reused objects aren&#8217;t automatically cleared</a></h3>
 <p>Most memory managers have a debug feature that will clear freshly
 allocated or freed memory to some obvious magic value like
@@ -230,10 +222,8 @@ objects in the pool <em>fully</em> initializes the object. It may even be
 worth spending a bit of time adding a debug feature that <span name="clear">clears</span> the
 memory for an object slot when the object is reclaimed.</p>
 <aside name="clear">
-
 <p>I&#8217;d be honored if you clear it to <code>0x1deadb0b</code>.</p>
 </aside>
-
 <h3><a href="#unused-objects-will-remain-in-memory" name="unused-objects-will-remain-in-memory">Unused objects will remain in memory</a></h3>
 <p>Object pools are less common in systems that support garbage
 collection because the memory manager will usually deal
@@ -356,11 +346,9 @@ the entire collection until we find an open slot. If the pool is very
 large and mostly full, that can get slow. Let&#8217;s see if we can improve
 that without sacrificing any memory.</p>
 <aside name="create">
-
 <p>Creating a particle has O(n) complexity, for those of us who remember
 our algorithms class.</p>
 </aside>
-
 <h3><a href="#faster-particle-creation" name="faster-particle-creation">Faster particle creation</a></h3>
 <p>A simple way to improve performance is to store a collection of
 pointers to each of the free particles in the pool. When we need to
@@ -409,7 +397,6 @@ holds the particle&#8217;s state when it&#8217;s in use. When the particle is
 available, the other case of the union, the <code>next</code> member, is used. It
 holds a pointer to the next available particle after this one.</p>
 <aside name="union">
-
 <p>Unions don&#8217;t seem to be used that often these days, so the syntax may
 be unfamiliar to you. If you&#8217;re on a game team, you&#8217;ve probably got a
 &#8220;memory guy&#8221;, that beleaguered compatriot whose job it is
@@ -417,7 +404,6 @@ to come up with a solution when the game has inevitably blown its
 memory budget. Ask him about unions. He&#8217;ll know all about them and
 other fun bit-packing tricks.</p>
 </aside>
-
 <p>In this way, we use the memory from all of the <em>dead</em> particles to
 create a linked list that threads its way through them. We have our
 collection of pointers to available particles, we&#8217;re just interleaving
@@ -457,10 +443,8 @@ constructor sets that up:</p>
 <p>Now to create a new particle we just jump directly to the <span name="first">first</span>
 available one:</p>
 <aside name="first">
-
 <p>O(1) complexity, baby! Now we&#8217;re cooking!</p>
 </aside>
-
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticlePool</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">yVel</span><span class="p">,</span>
                           <span class="kt">int</span> <span class="n">lifetime</span><span class="p">)</span>
 <span class="p">{</span>
@@ -503,7 +487,7 @@ Production code is rarely that minimal. There are several ways to
 expand on that to make the pool more generic, safer to use, or easier
 to maintain. As you implement pools in your games, you&#8217;ll need to
 answer these questions:</p>
-<h3><a href="#are-objects-coupled-to-the-pool" name="are-objects-coupled-to-the-pool">Are objects coupled to the pool?</a></h3>
+<h3><a href="#are-objects-coupled-to-the-pool?" name="are-objects-coupled-to-the-pool?">Are objects coupled to the pool?</a></h3>
 <p>The first question you&#8217;ll run into when writing an object pool is
 whether the objects themselves know they are in a pool. Most of
 the time they will, but you won&#8217;t have that luxury when writing a
@@ -583,7 +567,7 @@ pool.</p>
 </ul>
 </li>
 </ul>
-<h3><a href="#what-is-responsible-for-initializing-the-reused-objects" name="what-is-responsible-for-initializing-the-reused-objects">What is responsible for initializing the reused objects?</a></h3>
+<h3><a href="#what-is-responsible-for-initializing-the-reused-objects?" name="what-is-responsible-for-initializing-the-reused-objects?">What is responsible for initializing the reused objects?</a></h3>
 <p>In order to reuse an existing object, it must be reinitialized with
 new state. A key question here is whether to reinitialize the object
 inside the pool class or outside.</p>
@@ -706,7 +690,7 @@ lifetime.</p>
 </li>
 </ul>
 <nav>
-  <span class="prev">&larr; <a href="dirty-flag.html">Previous Chapter</a></span>
+  <span class="prev">&larr; <a href="dirty-flag.html">Предыдущая глава</a></span>
   <span class="next"><a href="spatial-partition.html">Next Chapter</a> &rarr;</span>
   <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
 </nav>

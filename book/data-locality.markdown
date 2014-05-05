@@ -1,5 +1,5 @@
 ^title Data Locality
-^section Optimization Patterns
+^section Паттерны оптимизации
 
 ## Intent
 

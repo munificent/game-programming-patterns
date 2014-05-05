@@ -33,10 +33,8 @@
 <p>If there is one pattern this book couldn&#8217;t live without, this is it. Game loops are the quintessential example of a &#8220;game programming pattern&#8221;. Almost every game has one, no two are exactly alike, and relatively few programs outside of games use them.</p>
 <p>To see how they&#8217;re useful, let&#8217;s take a quick trip down memory lane. In the olden days of computer programming when everyone had <span name="beard">beards</span>, programs worked like your dishwasher: you dumped a load of code in, pushed a button, waited, and got results out. Done. These were <em>batch mode</em> programs: once the work was done, the program stopped.</p>
 <aside name="beard">
-
 <p>Ada Lovelace and Rear Admiral Grace Hopper had honorary beards.</p>
 </aside>
-
 <p>You still see these today, though we thankfully don&#8217;t have to write them on punch cards any more. Shell scripts, command line programs, and even the little Python script that turns a pile of Markdown into this book are all batch mode programs.</p>
 <h3><a href="#interview-with-a-cpu" name="interview-with-a-cpu">Interview with a CPU</a></h3>
 <p>Eventually, programmers realized having to drop off a batch of code at the computing office and come back a few hours later for the results was a terribly slow way to get the bugs out of your program. They wanted immediate feedback. <em>Interactive</em> programs were born. Some of the first interactive programs were games:</p>
@@ -51,10 +49,8 @@
 
 
 <aside name="cave">
-
 <p>This is <a href="http://en.wikipedia.org/wiki/Colossal_Cave_Adventure">Colossal Cave Adventure</a>, the first adventure game.</p>
 </aside>
-
 <p>You could have a live conversation with the program. It waited for your input, then would respond to you. Then you would reply back, taking turns just like you learned to do in kindergarten. When it was your turn, it sat there doing nothing. Something like:</p>
 <p><span name="exit"></span></p>
 <div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
@@ -66,10 +62,8 @@
 
 
 <aside name="exit">
-
 <p>This loops forever, so there&#8217;s no way to quit the game. A real game would do something like <code>while (!done)</code> and set <code>done</code> to exit. I&#8217;ve omitted that to keep things simple.</p>
 </aside>
-
 <h3><a href="#event-loops" name="event-loops">Event loops</a></h3>
 <p>Modern graphic UI applications look surprisingly similar to old adventure games once you shuck their skin off. Your word processor usually just sits there doing nothing until you press a key or click something:</p>
 <div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
@@ -83,10 +77,8 @@
 <p>The main difference is that instead of <em>text commands</em>, the program is waiting for <em>user input events</em>&thinsp;&mdash;&thinsp;mouse clicks and key presses. It still works basically like the old text adventures where the program <span name="idle"><em>blocks</em></span> waiting for user input, which is a problem.</p>
 <p>Unlike most other software, games keep moving even when the user isn&#8217;t providing input. If you sit staring at the screen, the game doesn&#8217;t freeze. Animations keep animating. Visual effects dance and sparkle. If you&#8217;re unlucky, that monster keeps chomping on your hero.</p>
 <aside name="idle">
-
 <p>Most event loops do have &#8220;idle&#8221; events so you can intermittently do stuff without user input. That&#8217;s good enough for a blinking cursor or a progress bar, but too rudimentary for games.</p>
 </aside>
-
 <p>This is the first key part of a real game loop: <em>it processes user input, but doesn&#8217;t wait</em> for it. The loop always keeps spinning:</p>
 <div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
@@ -100,17 +92,13 @@
 <p>We&#8217;ll refine this later, but the basic pieces are here. <code>processInput()</code> handles any user input that&#8217;s happened since the last call.
 Then <span name="update"><code>update()</code></span> advances the game simulation one step. It runs AI and physics (usually in that order). Finally, <code>render()</code> draws the game so the player can see what happened.</p>
 <aside name="update">
-
 <p>As you might guess from the name, <code>update()</code> is a good place to use the <a href="update-method.html" class="pattern">Update Method</a> pattern.</p>
 </aside>
-
 <h3><a href="#a-world-out-of-time" name="a-world-out-of-time">A world out of time</a></h3>
 <p>If this loop isn&#8217;t blocking on input, that leads to the obvious question: how <em>fast</em> does it spin? Each turn through the game loop advances the state of the game by some amount. From the perspective of an inhabitant of the game world, the hand of their clock has <span name="tick">ticked</span> forward.</p>
 <aside name="tick">
-
 <p>The common terms for one crank of the game loop are &#8220;tick&#8221; or &#8220;frame&#8221;.</p>
 </aside>
-
 <p>Meanwhile, the <em>player</em>&#8216;s actual clock is ticking. If we measure how quickly the game loop cycles in terms of real time, we get the game&#8217;s &#8220;frames per second&#8221;.
 If the game loop cycles quickly, the FPS is high and the game moves smoothly
 and quickly. If it&#8217;s slow, the game jerks along like a stop motion movie.</p>
@@ -121,10 +109,8 @@ two factors determine the frame rate. The first is <em>how much work it has to d
 <p>In early video games, that second factor was fixed. If you wrote a game for the NES or Apple IIe, you knew <em>exactly</em> what CPU your game was running on and you could (and did) code specifically for that. All you had to worry about was how much work you did each tick.</p>
 <p>Older games were carefully coded to do just enough work each frame so that the game ran at the speed the developers wanted. But if you tried to play that same game on a faster or slower <span name="turbo">machine</span>, then the game itself would speed up or slow down.</p>
 <aside name="turbo">
-
 <p>This is why old PCs used to have &#8220;<a href="http://en.wikipedia.org/wiki/Turbo_button">turbo</a>&#8221; buttons. New PCs were faster and couldn&#8217;t play old games because the game would run too fast. Turning the turbo button <em>off</em> would slow the machine down and make the game playable.</p>
 </aside>
-
 <p>These days, though, few developers have the luxury of knowing exactly what hardware their game will run on. Instead, our games must intelligently adapt to a variety of devices.</p>
 <p>This is the other key job of a game loop: <em>it runs the game at a consistent speed despite differences in the underlying hardware.</em></p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
@@ -135,22 +121,18 @@ state</strong>, and <strong>renders the game</strong>. It tracks the passage of 
 <p>Using the wrong pattern can be worse than using no pattern at all, so this section is normally here to caution against over-enthusiasm. The goal of design patterns isn&#8217;t just to cram as many into your codebase as you can.</p>
 <p>But this pattern is a bit different. I can say with pretty good confidence that you <em>will</em> use this pattern. If you&#8217;re using a game <span name="engine">engine</span>, you won&#8217;t write it yourself, but it&#8217;s still there.</p>
 <aside name="engine">
-
 <p>For me, this is the difference between an &#8220;engine&#8221; and a &#8220;library&#8221;.
 With libraries you own the main game loop and call into the library.
 An engine owns the loop and calls into <em>your</em> code.</p>
 </aside>
-
 <p>You might think you won&#8217;t need this if you&#8217;re making a turn-based game. But keep in mind that even though the <em>game state</em> won&#8217;t advance until the user takes their turn, the <em>visual</em> and <em>audible</em> state of the game usually does. Animation and music keep running even when it&#8217;s &#8220;waiting&#8221; for you to take your turn.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <h3><a href="#this-is-the-core-loop-of-your-game" name="this-is-the-core-loop-of-your-game">This is the core loop of your game</a></h3>
 <p>Seems obvious, I know, but code in the game loop will be running constantly. They say a program spends <span name="percent">90%</span> of its time in 10% of the code. Your game loop will be firmly in that 10%. Think carefully about performance and make sure you profile when you make changes to your core loop.</p>
 <aside name="percent">
-
 <p>Made up statistics like this are why &#8220;real&#8221; engineers like mechanical and
 electrical don&#8217;t take us seriously.</p>
 </aside>
-
 <h3><a href="#you-may-need-to-coordinate-with-the-platform's-event-loop" name="you-may-need-to-coordinate-with-the-platform's-event-loop">You may need to coordinate with the platform&#8217;s event loop</a></h3>
 <p>If you&#8217;re building your game on top of an OS or platform that has a graphic UI and event loop built in, then you have <em>two</em> application loops in play. They&#8217;ll need to play nice together.</p>
 <p>Sometimes, you can just take control and make your loop the only one. For example, if you&#8217;re writing a game against the venerable Windows API, your <code>main()</code> can just have a game loop. Inside, you can call <code>PeekMessage()</code> to handle and dispatch events from the OS. Unlike <code>GetMessage()</code>, <code>PeekMessage()</code> doesn&#8217;t block waiting for user input so your game loop will keep cranking.</p>
@@ -175,10 +157,8 @@ electrical don&#8217;t take us seriously.</p>
 <p><img src="images/game-loop-simple.png"/></p>
 <p>The code looks a bit like this:</p>
 <aside name="16">
-
 <p><code>1000 ms / FPS = ms per frame</code></p>
 </aside>
-
 <div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">double</span> <span class="n">start</span> <span class="o">=</span> <span class="n">getCurrentTime</span><span class="p">();</span>
@@ -233,27 +213,21 @@ bullet moves farther in each frame. So that bullet will get across the screen in
 </ul>
 <p>But, alas, there&#8217;s a serious problem lurking ahead: we&#8217;ve made the game <span name="deterministic">non-deterministic</span> and unstable. Here&#8217;s one example of the trap we&#8217;ve set for ourselves:</p>
 <aside name="deterministic">
-
 <p>&#8220;Deterministic&#8221; means that every time you run the program, if you give it the same inputs, you get the exact same outputs back. As you can imagine it&#8217;s much easier to track down bugs in deterministic programs: find the inputs that caused the bug the first time, and you can cause it every time.</p>
 <p>Computers are naturally deterministic: they follow programs mechanically. Non-determinism appears when the messy real world creeps in. For example, networking, the system clock, and thread scheduling all rely on bits of the external world outside of the program&#8217;s control.</p>
 </aside>
-
 <p>Say we&#8217;ve got a two-player networked game and Fred has some beast of a gaming machine while George is using his grandmother&#8217;s antique PC. That aforementioned bullet is flying across both of their screens. On Fred&#8217;s machine, the game is running super fast, so each time step is tiny. We cram like 50 frames in the second it takes the bullet to cross the screen. Poor George can only fit about five in.</p>
 <p>This means on Fred&#8217;s machine, the physics engine updates the bullet&#8217;s position 50 times, but George&#8217;s only does it five times. Most games use floating point numbers and those are subject to <em>rounding error</em>. Each time you add two floating point numbers, the answer you get back can be a bit off. Fred&#8217;s machine is doing ten times as many operations, so he&#8217;ll accumulate a bigger error than George. The <em>same</em> bullet will end up in <em>different places</em> on their machines.</p>
 <p>This is just one nasty problem a variable time step can cause, but there&#8217;s more. In order to run in real-time, game physics engines are approximations of the real laws of mechanics. To keep those approximations from <span name="blowup">blowing up</span>, damping is applied. That damping is carefully tuned to a certain time step. Vary that, and the physics gets unstable.</p>
 <aside name="blowup">
-
 <p>&#8220;Blowing up&#8221; is literal here. When a physics engine flakes out, objects can get completely wrong velocities and launch themselves into the air.</p>
 </aside>
-
 <p>This instability is bad enough that this example is only here as a cautionary tale and to lead us to something better&#8230;</p>
 <h3><a href="#play-catch-up" name="play-catch-up">Play catch up</a></h3>
 <p>One part of the engine that usually <em>isn&#8217;t</em> affected by a variable time step is <span name="render">rendering</span>. Since the rendering engine captures an instant in time, it doesn&#8217;t care how much time advanced since the last one. It renders things wherever they happen to be right then.</p>
 <aside name="render">
-
 <p>This is more or less true. Things like motion blur can be affected by time step, but if they&#8217;re a bit off, the player doesn&#8217;t usually notice.</p>
 </aside>
-
 <p>We can use this fact to our advantage. We&#8217;ll <em>update</em> the game using a fixed time step because that makes everything simpler and more stable for physics and AI. But we&#8217;ll allow flexibility in when we <em>render</em> in order to free up some processor time.</p>
 <p>It goes like this: A certain amount of real time has elapsed since the last turn of the game loop. This is how much game time we need to simulate for the game&#8217;s &#8220;now&#8221; to catch up with the player&#8217;s. We do that using a <em>series</em> of <em>fixed</em> time steps. The code looks a bit like:</p>
 <div class="codehilite"><pre><span class="kt">double</span> <span class="n">previous</span> <span class="o">=</span> <span class="n">getCurrentTime</span><span class="p">();</span>
@@ -284,10 +258,8 @@ bullet moves farther in each frame. So that bullet will get across the screen in
 <p>But be careful not to make it <em>too</em> short. You need to make sure the time step is greater than the time it takes to process an <code>update()</code>, even on the
 <span name="bail">slowest</span> hardware. Otherwise, your game simply can&#8217;t catch up.</p>
 <aside name="bail">
-
 <p>I left it out here, but you can safeguard this by having the inner update loop bail after a maximum number of iterations. The game will slow down then, but that&#8217;s better than locking up completely.</p>
 </aside>
-
 <p>Fortunately, we&#8217;ve bought ourselves some breathing room here. The trick is that we&#8217;ve <em>yanked rendering out of the update loop</em>. That frees up a bunch of CPU time. The end result is the game <em>simulates</em> at a constant rate using safe fixed time steps across a range of hardware. It&#8217;s just that the player&#8217;s <em>visible window</em> into the game gets choppier on a slower machine.</p>
 <h3><a href="#stuck-in-the-middle" name="stuck-in-the-middle">Stuck in the middle</a></h3>
 <p>There&#8217;s one issue we&#8217;re left with, and that&#8217;s residual lag. We update the game at a fixed time step, but we render at arbitrary points in time. This means that from the user&#8217;s perspective, the game will often display at a point in time between two updates.</p>
@@ -307,16 +279,14 @@ point of updating. Look at the third render time. It&#8217;s right between two u
 
 
 <aside name="normal">
-
 <p>We divide by <code>MS_PER_UPDATE</code> here to <em>normalize</em> the value. The value passed to <code>render()</code> will vary from 0 (right at the previous frame) to just under 1.0 (right at the next frame), regardless of the update time step. This way, the renderer doesn&#8217;t have to worry about the frame rate. It just deals in values from 0 to 1.</p>
 </aside>
-
 <p>The renderer knows each game object <em>and its current velocity</em>. Say that bullet is 20 pixels from the left side of the screen and is moving right 400 pixels per frame. If we are halfway between frames, then we&#8217;ll end up passing 0.5 to <code>render()</code>. So it draws the bullet half a frame ahead, at 220 pixels. Ta-da, smooth motion.</p>
 <p>Of course, it may turn out that that extrapolation is wrong. When we actually calculate the next frame, we may discover the bullet hit an obstacle or slowed down or something. We rendered its position interpolated between where it was on the last frame and where we <em>think</em> it will be on the next frame. But we don&#8217;t know that until we&#8217;ve actually done the full update with physics and AI.</p>
 <p>So the extrapolation is a bit of a guess and sometimes ends up wrong. Fortunately, though, those kinds of corrections aren&#8217;t usually noticeable. At least, they&#8217;re less noticeable than the stuttering you get if you don&#8217;t extrapolate at all.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>Despite the length of this chapter, I&#8217;ve left out more than I&#8217;ve included. Once you throw in things like synchronizing with the display&#8217;s refresh rate, multithreading, and GPUs, a real game loop can get pretty hairy. At a high level, though, here are a few questions you&#8217;ll likely answer:</p>
-<h3><a href="#do-you-own-the-game-loop,-or-does-the-platform" name="do-you-own-the-game-loop,-or-does-the-platform">Do you own the game loop, or does the platform?</a></h3>
+<h3><a href="#do-you-own-the-game-loop,-or-does-the-platform?" name="do-you-own-the-game-loop,-or-does-the-platform?">Do you own the game loop, or does the platform?</a></h3>
 <p>This is less a choice you make and more one that&#8217;s made for you. If you&#8217;re making a game that runs in a web browser, you pretty much <em>can&#8217;t</em> write your own classic game loop. The browser&#8217;s event-based nature precludes it. Likewise, if you&#8217;re using an existing game engine, you will probably rely on its game loop instead of rolling your own.</p>
 <ul>
 <li>
@@ -373,7 +343,7 @@ point of updating. Look at the third render time. It&#8217;s right between two u
 </ul>
 </li>
 </ul>
-<h3><a href="#how-do-you-manage-power-consumption" name="how-do-you-manage-power-consumption">How do you manage power consumption?</a></h3>
+<h3><a href="#how-do-you-manage-power-consumption?" name="how-do-you-manage-power-consumption?">How do you manage power consumption?</a></h3>
 <p>This wasn&#8217;t an issue five years ago. Games ran on things plugged into walls or dedicated handheld devices. But with the advent of smart phones, laptops, and mobile gaming, the odds are good you do care about this now. A game that runs beautifully but turns their phone into a space heater before running out of juice thirty minutes later is not a game that makes people happy.</p>
 <p>Now, you may need to think about making your game look great, but also use as little CPU as possible. There will likely be an <em>upper</em> bound to performance where you let the CPU sleep if you&#8217;ve done all the work you need to do in a frame.</p>
 <ul>
@@ -390,19 +360,17 @@ maximizing the detail of the graphics. Many of these games will set an upper lim
 <p>This gives the player a &#8220;good enough&#8221; experience and then goes easy on their battery beyond that.</p>
 </li>
 </ul>
-<h3><a href="#how-do-you-control-gameplay-speed" name="how-do-you-control-gameplay-speed">How do you control gameplay speed?</a></h3>
+<h3><a href="#how-do-you-control-gameplay-speed?" name="how-do-you-control-gameplay-speed?">How do you control gameplay speed?</a></h3>
 <p>A game loop has two key pieces: non-blocking user input, and adapting to the
 passage of time. Input is straightforward. The magic is in how you deal with
 time. There are a near <span name="platform">infinite</span> number of platforms that games can run on and
 any single game may run on quite a few. How it accommodates that variation is
 key.</p>
 <aside name="platform">
-
 <p>Game-making seems to be part of human nature, because every time we&#8217;ve built a
 machine that can do computing, one of the first things we&#8217;ve done is made games
 on it. The PDP-1 was a 2 kHz machine with only 4,096 words of memory yet Steve Russell and co. managed to create Spacewar! on it.</p>
 </aside>
-
 <ul>
 <li>
 <p><strong>Fixed time step with no synchronization:</strong></p>
@@ -504,7 +472,7 @@ the most adaptable. It updates with a fixed time step, but can drop
 </li>
 </ul>
 <nav>
-  <span class="prev">&larr; <a href="double-buffer.html">Previous Chapter</a></span>
+  <span class="prev">&larr; <a href="double-buffer.html">Предыдущая глава</a></span>
   <span class="next"><a href="update-method.html">Next Chapter</a> &rarr;</span>
   <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
 </nav>

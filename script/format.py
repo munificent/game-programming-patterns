@@ -9,6 +9,8 @@ import subprocess
 import sys
 import time
 from datetime import datetime
+import codecs
+import re
 
 import markdown
 import smartypants
@@ -43,12 +45,18 @@ CHAPTERS = [
   "Component",
   "Event Queue",
   "Service Locator",
-  "Optimization Patterns",
+  u'Паттерны оптимизации', # "Optimization Patterns",
   "Data Locality",
   "Dirty Flag",
   "Object Pool",
   "Spatial Partition"
 ]
+
+STRINGS = {
+		'Previous Chapter': u'Предыдущая глава',
+		'Next Chapter': u'Следующая глава',
+    'Navigation': u'Навигация'
+}
 
 num_chapters = 0
 empty_chapters = 0
@@ -65,11 +73,11 @@ def cpppath(pattern):
 
 def pretty(text):
   '''Use nicer HTML entities and special characters.'''
-  text = text.replace(" -- ", "&thinsp;&mdash;&thinsp;")
-  text = text.replace("à", "&agrave;")
-  text = text.replace("ï", "&iuml;")
-  text = text.replace("ø", "&oslash;")
-  text = text.replace("æ", "&aelig;")
+  text = text.replace(u" -- ", u"&thinsp;&mdash;&thinsp;")
+  text = text.replace(u"à", u"&agrave;")
+  text = text.replace(u"ï", u"&iuml;")
+  text = text.replace(u"ø", u"&oslash;")
+  text = text.replace(u"æ", u"&aelig;")
   return text
 
 
@@ -97,8 +105,8 @@ def formatfile(path, nav, skip_up_to_date):
   navigation = []
 
   # Read the markdown file and preprocess it.
-  contents = ''
-  with open(path, 'r') as input:
+  contents = u''
+  with codecs.open(path, encoding='utf-8') as input:
     # Read each line, preprocessing the special codes.
     for line in input:
       stripped = line.lstrip()
@@ -124,8 +132,8 @@ def formatfile(path, nav, skip_up_to_date):
         index = stripped.find(" ")
         headertype = stripped[:index]
         header = pretty(stripped[index:].strip())
-        anchor = header.lower().replace(' ', '-')
-        anchor = anchor.translate(None, '.?!:/')
+        anchor = header.lower().replace(u' ', u'-')
+        anchor = re.sub(re.escape(u'.?!:/') , u'', anchor)
 
         # Add an anchor to the header.
         contents += indentation + headertype
@@ -141,27 +149,27 @@ def formatfile(path, nav, skip_up_to_date):
   modified = datetime.fromtimestamp(os.path.getmtime(path))
   mod_str = modified.strftime('%B %d, %Y')
 
-  with open("asset/template.html") as f:
+  with codecs.open("asset/template.html", encoding='utf-8') as f:
     template = f.read()
 
   # Write the HTML output.
-  with open(htmlpath(basename), 'w') as out:
+  with codecs.open(htmlpath(basename), mode='w', encoding='utf-8') as out:
     title_text = title
-    section_header = ""
+    section_header = u""
 
     if section != "":
       title_text = title + " &middot; " + section
       section_href = section.lower().replace(" ", "-")
-      section_header = '<span class="section"><a href="{}.html">{}</a></span>'.format(
+      section_header = u'<span class="section"><a href="{}.html">{}</a></span>'.format(
         section_href, section)
 
     prev_link, next_link = make_prev_next(title)
 
-    contents = contents.replace('<aside', '<aside markdown="1"')
+    contents = contents.replace(u'<aside', u'<aside markdown="1"')
 
     body = markdown.markdown(contents,
             extensions=['extra', 'def_list', 'codehilite'])
-    body = body.replace('<aside markdown="1"', '<aside')
+    body = body.replace(u'<aside markdown="1"', u'<aside')
 
     body = smartypants.smartypants(body)
 
@@ -218,40 +226,40 @@ def make_prev_next(title):
   next_link = ""
   if chapter_index > 0:
     prev_href = title_to_file(CHAPTERS[chapter_index - 1])
-    prev_link = '<span class="prev">&larr; <a href="{}.html">Previous Chapter</a></span>'.format(
-      prev_href, CHAPTERS[chapter_index - 1])
+    prev_link = u'<span class="prev">&larr; <a href="{}.html">{}</a></span>'.format(
+      prev_href, STRINGS['Previous Chapter'], CHAPTERS[chapter_index - 1])
 
   if chapter_index < len(CHAPTERS) - 1:
     next_href = title_to_file(CHAPTERS[chapter_index + 1])
-    next_link = '<span class="next"><a href="{}.html">Next Chapter</a> &rarr;</span>'.format(
-      next_href, CHAPTERS[chapter_index + 1])
+    next_link = u'<span class="next"><a href="{}.html">Next Chapter</a> &rarr;</span>'.format(
+      next_href, STRINGS['Next Chapter'], CHAPTERS[chapter_index + 1])
 
   return (prev_link, next_link)
 
 
 def navigationtohtml(chapter, headers):
-  nav = ''
+  nav = u''
 
   # Section headers start two levels deep.
   currentdepth = 1
   for depth, header, anchor in headers:
     if currentdepth == depth:
-      nav += '</li><li>\n'
+      nav += u'</li><li>\n'
 
     while currentdepth < depth:
-      nav += '<ul><li>\n'
+      nav += u'<ul><li>\n'
       currentdepth += 1
 
     while currentdepth > depth:
-      nav += '</li></ul>\n'
+      nav += u'</li></ul>\n'
       currentdepth -= 1
 
-    nav += '<a href="#' + anchor + '">' + header + '</a>'
+    nav += u'<a href="#' + anchor + '">' + header + u'</a>'
 
 
   # Close the lists.
   while currentdepth > 1:
-    nav += '</li></ul>\n'
+    nav += u'</li></ul>\n'
     currentdepth -= 1
 
   return nav
@@ -305,7 +313,7 @@ def includecode(pattern, index, indentation):
 
 def buildnav(searchpath):
   nav = '<div class="nav">\n'
-  nav = nav + '<h1><a href="/">Navigation</a></h1>\n'
+  nav = nav + '<h1><a href="/">' + STRINGS['Navigation'] + '</a></h1>\n'
 
   # Read the chapter outline from the index page.
   with open('html/index.html', 'r') as source:

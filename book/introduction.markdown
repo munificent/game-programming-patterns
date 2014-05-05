@@ -192,7 +192,7 @@ The book is broken into three broad parts. The first introduces and frames the b
 
 The second part, ["Design Patterns Revisited"](design-patterns-revisited.html), goes through a handful of patterns from the Gang of Four book. With each one, I give my spin on it and how I think it relates to game programming.
 
-Finally, the last part is the real meat of the book. It presents thirteen new design patterns that I've found in games. They're grouped into four sections: [Sequencing Patterns](sequencing-patterns.html), [Behavioral Patterns](behavioral-patterns.html), [Decoupling Patterns](decoupling-patterns.html), and [Optimization Patterns](optimization-patterns.html).
+Finally, the last part is the real meat of the book. It presents thirteen new design patterns that I've found in games. They're grouped into four sections: [Sequencing Patterns](sequencing-patterns.html), [Behavioral Patterns](behavioral-patterns.html), [Decoupling Patterns](decoupling-patterns.html), and [Паттерны оптимизации](optimization-patterns.html).
 
 Each pattern within these sections is described using a consistent
 structure so that you can use this book as a reference and quickly

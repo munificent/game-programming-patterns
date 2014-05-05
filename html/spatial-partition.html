@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 
-<title>Spatial Partition &middot; Optimization Patterns &middot; Game Programming Patterns</title>
+<title>Spatial Partition &middot; Паттерны оптимизации &middot; Game Programming Patterns</title>
 
 <!-- Tell mobile browsers we're optimized for them and they don't need to crop
      the viewport. -->
@@ -26,7 +26,7 @@
 <div class="page sidebar">
 <div class="content">
 <h1>Spatial Partition</h1>
-<h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="optimization-patterns.html">Optimization Patterns</a></span></h1>
+<h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="паттерны-оптимизации.html">Паттерны оптимизации</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Efficiently locate nearby objects by storing them in a data structure organized by their positions.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
@@ -59,20 +59,16 @@ a performance bottleneck.</p>
 
 <p>Here we have a doubly-nested loop where each loop is walking <span name="all">all</span> of the units on the battlefield. That means the number of pairwise tests we have to perform each frame increases with the <em>square</em> of the number of units. Each additional unit we add has to be compared to <em>all</em> of the previous ones. With a large number of units, that can spiral out of control.</p>
 <aside name="all">
-
 <p>The inner loop doesn&#8217;t actually walk all of the units. It only walks the ones the outer loop hasn&#8217;t already visited. This avoids comparing each pair of units <em>twice</em>, once in each order. If we&#8217;ve already handled a collision between A and B, we don&#8217;t need to check it again for B and A.</p>
 <p>In Big-O terms, though, this is still <em>O(n&sup2;)</em>.</p>
 </aside>
-
 <h3><a href="#drawing-battle-lines" name="drawing-battle-lines">Drawing battle lines</a></h3>
 <p>The problem we&#8217;re running into is that there&#8217;s no underlying order to the array of units. To find a unit near some location, we have to walk the entire array. Now imagine we simplify our game a bit. Instead of a 2D battle<em>field</em>, imagine it&#8217;s a 1D battle<em>line</em>.</p>
 <p><img src="images/spatial-partition-battle-line.png" /></p>
 <p>In that case, we could make things easier on ourselves by <em>sorting</em> the array of units by their position on the battleline. Once we do that, we can use something <span name="array">like</span> a <a href="http://en.wikipedia.org/wiki/Binary_search">binary search</a> to find nearby units without having to scan the entire array.</p>
 <aside name="array">
-
 <p>A binary search has <em>O(log n)</em> complexity, which means find all battling units goes from <em>O(n&sup2;)</em> to <em>O(n log n)</em>. Something like a <a href="http://en.wikipedia.org/wiki/Pigeonhole_sort"><em>pigeonhole sort</em></a> could get that down to <em>O(n)</em>.</p>
 </aside>
-
 <p>The lesson is pretty obvious: if we store our objects in a data structure organized by their locations, we can find them much more quickly. This pattern is about applying that idea to spaces that have more than one dimension.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>For a set of <strong>objects</strong>, each has a <strong>position in space</strong>. Store them in a <strong>spatial data structure</strong> that organizes the objects by their positions. This data structure lets you <strong>efficiently query for objects at or near a location</strong>. When an object&#8217;s position changes, <strong>update the spatial data structure</strong> so that it can continue to find it.</p>
@@ -83,18 +79,14 @@ a performance bottleneck.</p>
 <p>Spatial partitions exist to knock an <em>O(n)</em> or <em>O(n&sup2;)</em> operation down to something more manageable. The <em>more</em> objects you have, the more valuable that becomes. Conversely, if your <em>n</em> is small enough, it may not be worth the bother.</p>
 <p>Since this pattern involves organizing objects by their positions, objects that <em>change</em> position are harder to deal with. You&#8217;ll have to <span name="hash-change">reorganize</span> the data structure to keep track of an object at a new location, and that adds code complexity <em>and</em> spends CPU cycles. Make sure the trade-off is worth it.</p>
 <aside name="hash-change">
-
 <p>Imagine a hash table where the keys of the hashed objects can change spontaneously, and you&#8217;ll have a good feel for why it&#8217;s tricky.</p>
 </aside>
-
 <p>A spatial partition also uses additional memory for its bookkeeping data structures. Like many optimizations, it trades memory for speed. If you&#8217;re shorter on memory than you are on clock cycles, that may be a losing proposition.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>The nature of patterns is that they <em>vary</em>: each implementation will be a bit different and spatial partitions are no exception. Unlike other patterns, though, many of these <span name="variations">variations</span> are well-documented. Academia likes publishing papers that prove performance gains. Since I just care about the concept behind the pattern, I&#8217;m going to show you the simplest spatial partition: a <em>fixed grid</em>.</p>
 <aside name="variations">
-
 <p>See the last section of this chapter for a list of some of the most common spatial partitions used in games.</p>
 </aside>
-
 <h3><a href="#a-sheet-of-graph-paper" name="a-sheet-of-graph-paper">A sheet of graph paper</a></h3>
 <p>Here&#8217;s the basic idea: imagine the entire field of battle. Now superimpose a grid of fixed-size squares onto it like a sheet of graph paper. Instead of storing our units in a single array, we put them in the cells of this grid. Each cell stores the list of units whose positions are within that cell&#8217;s boundary.</p>
 <p><img src="images/spatial-partition-grid.png" /></p>
@@ -161,11 +153,9 @@ a performance bottleneck.</p>
 <p><img src="images/spatial-partition-linked-list.png" /></p>
 <p>Each cell in the grid points to the first unit in the list of units within that cell, and each unit has pointers to the units before it and after it in the list. We&#8217;ll see why soon.</p>
 <aside name="stl">
-
 <p>Throughout this book, I&#8217;ve avoided using any of the built-in collection types in the C++ standard library. I want to require as little external knowledge as possible to understand the example, and, like a magician&#8217;s &#8220;nothing up my sleeve&#8221;, I want to make it clear <em>exactly</em> what&#8217;s going on in the code. Details are important, especially with performance-related patterns.</p>
 <p>But this is my choice for <em>explaining</em> patterns. If you&#8217;re <em>using</em> them in real code, spare yourself the headache and use the fine collections built into pretty much every programming language today. Life&#8217;s too short to code linked lists from scratch.</p>
 </aside>
-
 <h3><a href="#entering-the-field-of-battle" name="entering-the-field-of-battle">Entering the field of battle</a></h3>
 <p>The first thing we need to do is make sure new units are actually placed into the grid when they are created. We&#8217;ll make <code>Unit</code> handle this in its constructor:</p>
 <div class="codehilite"><pre><span class="n">Unit</span><span class="p">(</span><span class="n">Grid</span><span class="o">*</span> <span class="n">grid</span><span class="p">,</span> <span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">)</span>
@@ -202,10 +192,8 @@ a performance bottleneck.</p>
 
 
 <aside name="floor">
-
 <p>Dividing by the cell size maps world coordinates to cell space. Then, casting to an <code>int</code> truncates the fractional part so we get the cell index.</p>
 </aside>
-
 <p>It&#8217;s a little finicky like linked list code always is, but the basic idea is pretty simple. We find the cell that the unit is sitting in and then add it to the front of that list. If there is already a list of units there, we link it in after the new unit.</p>
 <h3><a href="#a-clash-of-swords" name="a-clash-of-swords">A clash of swords</a></h3>
 <p>Once all of the units are nestled in their cells, we can let them start hacking at each other. With this new grid, the main method for handling combat look like this:</p>
@@ -247,11 +235,9 @@ a performance bottleneck.</p>
 <p>Aside from the pointer shenanigans to deal with walking a linked list, note that this is exactly <span name="nested">like</span> our original na&iuml;ve method for handling combat: it compares each pair of units to see if they&#8217;re in the same position.</p>
 <p>The only difference is that we no longer have to compare <em>all</em> of the units in the battle to each other, just the ones close enough to be in the same cell. That&#8217;s the heart of the optimization.</p>
 <aside name="nested">
-
 <p>From a simple analysis, it looks like we&#8217;ve actually made the performance <em>worse</em>. We&#8217;ve gone from a doubly-nested loop over the units to a <em>triply</em>-nested loop over the cells and then the units. The trick here is that the two inner loops are now over a smaller number of units, which is enough to cancel out the cost of the outer loop over the cells.</p>
 <p>However, that does depend a bit on the granularity of our cells: make them too small and that outer loop can start to matter.</p>
 </aside>
-
 <h3><a href="#charging-forward" name="charging-forward">Charging forward</a></h3>
 <p>We&#8217;ve solved our performance problem, but we&#8217;ve created a new problem in its stead. Units are now stuck in their cells. If we move a unit past the boundary of the cell that contains it, units in the cell won&#8217;t see it anymore, but neither will anyone else. Our battlefield is a little <em>too</em> partitioned.</p>
 <p>To fix that, we&#8217;ll need to do a little work each time a unit moves. If it crosses a cell&#8217;s boundary lines, we need to remove it from that cell and add it to the new one. First, we&#8217;ll give <code>Unit</code> a method for changing its position:</p>
@@ -374,11 +360,9 @@ a performance bottleneck.</p>
 
 <p>Those additional <code>handleUnit()</code> calls look for hits between the current unit and units in <span name="neighbor">four</span> of the eight neighboring cells. If any unit in those neighboring cells is close enough to the edge to be within the unit&#8217;s attack radius, it will find the hit.</p>
 <aside name="neighbor">
-
 <p>The cell with the unit is <code>U</code>, and the neighboring cells it looks at are <code>X</code>.</p>
 <p><img src="images/spatial-partition-neighbors.png" width="240" /></p>
 </aside>
-
 <p>We only look at <em>half</em> of the neighbors for the same reason that the inner loop starts <em>after</em> the current unit: to avoid comparing each pair of units twice. Consider what would happen if we did check all eight neighboring cells.</p>
 <p>Let&#8217;s say we have two units in adjacent cells close enough to hit each other, like the previous example. If, for each unit, we looked at all eight cells surrounding it, here&#8217;s what would happen:</p>
 <ol>
@@ -389,13 +373,11 @@ a performance bottleneck.</p>
 <p>There&#8217;s another corner case we may need to consider too. Here, we&#8217;re assuming the maximum attack distance is smaller than a cell. If we have small cells and large attack distances, we may need to scan a bunch of neighboring cells several rows out.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>There&#8217;s a relatively short list of well-defined spatial partitioning data structures, and one option would be to go through them one at a time here. Instead, I tried to organize this by their essential characteristics. My hope is that once you do learn about quadtrees and BSPs and the like, this will help you understand <em>how</em> and <em>why</em> they work and why you might choose one over the other.</p>
-<h3><a href="#is-the-partition-hierarchical-or-flat" name="is-the-partition-hierarchical-or-flat">Is the partition hierarchical or flat?</a></h3>
+<h3><a href="#is-the-partition-hierarchical-or-flat?" name="is-the-partition-hierarchical-or-flat?">Is the partition hierarchical or flat?</a></h3>
 <p>Our grid example partitioned space into a single flat set of cells. In contrast, hierarchical spatial partitions divide the space into just a <span name="couple">couple</span> of regions. Then, if one of these regions still contains many objects, it&#8217;s subdivided. This process continues recursively until every region has fewer than some maximum number of objects in it.</p>
 <aside name="couple">
-
 <p>They usually split it in two, four, or eight&thinsp;&mdash;&thinsp;nice round numbers to a programmer.</p>
 </aside>
-
 <ul>
 <li>
 <p><strong>If it&#8217;s a flat partition:</strong></p>
@@ -429,7 +411,7 @@ a performance bottleneck.</p>
 </ul>
 </li>
 </ul>
-<h3><a href="#does-the-partitioning-depend-on-the-set-of-objects" name="does-the-partitioning-depend-on-the-set-of-objects">Does the partitioning depend on the set of objects?</a></h3>
+<h3><a href="#does-the-partitioning-depend-on-the-set-of-objects?" name="does-the-partitioning-depend-on-the-set-of-objects?">Does the partitioning depend on the set of objects?</a></h3>
 <p>In our sample code, the grid spacing was fixed beforehand and we slotted units into cells. Other partitioning schemes are adaptable: they pick partition boundaries based on the actual set of objects and where they are in the world.</p>
 <p>The goal is have a <em>balanced</em> partitioning where each region has roughly the same number of objects in order to get the best performance. Consider in our grid example if all of the units were clustered in one corner of the battlefield. They&#8217;d all be in the same cell, and our code for finding attacks would regress right back to the original <em>O(n&sup2;)</em> problem that we&#8217;re trying to solve.</p>
 <ul>
@@ -491,7 +473,7 @@ dimension, it works the same as its flatter sibling.</p>
 </ul>
 </li>
 </ul>
-<h3><a href="#are-objects-only-stored-in-the-partition" name="are-objects-only-stored-in-the-partition">Are objects only stored in the partition?</a></h3>
+<h3><a href="#are-objects-only-stored-in-the-partition?" name="are-objects-only-stored-in-the-partition?">Are objects only stored in the partition?</a></h3>
 <p>You can treat your spatial partition as <em>the</em> place where the objects in your game live, or you can consider it just a secondary cache to make look-up faster while also having another collection that holds the list of objects directly.</p>
 <ul>
 <li>
@@ -532,7 +514,7 @@ dimension, it works the same as its flatter sibling.</p>
 </li>
 </ul>
 <nav>
-  <span class="prev">&larr; <a href="object-pool.html">Previous Chapter</a></span>
+  <span class="prev">&larr; <a href="object-pool.html">Предыдущая глава</a></span>
   
   <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
 </nav>
