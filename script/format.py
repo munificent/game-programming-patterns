@@ -45,7 +45,7 @@ CHAPTERS = [
   "Component",
   "Event Queue",
   "Service Locator",
-  u'Паттерны оптимизации', # "Optimization Patterns",
+  u'Низкоуровневая оптимизация', # "Optimization Patterns",
   "Data Locality",
   "Dirty Flag",
   "Object Pool",

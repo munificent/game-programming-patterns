@@ -1,5 +1,5 @@
 ^title Dirty Flag
-^section Паттерны оптимизации
+^section Низкоуровневая оптимизация
 
 ## Intent
 

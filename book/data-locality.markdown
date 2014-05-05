@@ -1,5 +1,5 @@
 ^title Data Locality
-^section Паттерны оптимизации
+^section Низкоуровневая оптимизация
 
 ## Intent
 

@@ -1,5 +1,5 @@
 ^title Object Pool
-^section Паттерны оптимизации
+^section Низкоуровневая оптимизация
 
 ## Intent
 

@@ -1,4 +1,4 @@
-^title Паттерны оптимизации
+^title Низкоуровневая оптимизация
 
 While the rising tide of faster and faster hardware has lifted most software above worrying about performance, games are one of the few remaining exceptions. Players always want richer, more realistic and exciting experiences. Screens are crowded with games vying for a player's attention -- and cash! -- and the game that pushes the hardware the farthest often wins.
 
