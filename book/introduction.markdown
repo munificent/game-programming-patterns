@@ -1,9 +1,6 @@
 ^title Introduction
 
-In fifth grade, my friends and I were given access to a little unused
-classroom housing a couple of very beat up TRS-80s. Hoping to inspire
-us, a teacher found a printout of some simple BASIC programs for us
-to tinker with.
+Допустим тут есть немного русского текста. Вот эта строка!
 
 The audiocasette drives on the computers were broken, so any time we
 wanted to run one of these programs we'd have to carefully type it in
