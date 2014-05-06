@@ -29,7 +29,7 @@
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="низкоуровневая-оптимизация.html">Низкоуровневая оптимизация</a></span></h1>
 <h2><a href="#общая-мысль" name="общая-мысль">Общая мысль</a></h2>
 <p><em>Если расположить данные в памяти специальным образом, то это поможет кешам процессора.</em></p>
-<h2><a href="#motivation" name="motivation">Motivation</a></h2>
+<h2><a href="#предыстория" name="предыстория">Предыстория</a></h2>
 <p>Нас обманули. Нам показывают графики, на которых скорость процессоров растёт все выше и выше, как будто закон Мура - это не просто историческое наблюдение, а какое-то непререкаемое правило. Не отрывая задниц от кресла, мы, программисты, наблюдаем, как наши программы волшебным образом ускоряются благодаря апгрейду.</p>
 <p>Процессоры <em>ускорялись</em> (сейчас график больше похож на плато), но главные по железу забыли нам кое-что сказать. Конечно, мы можем <em>обработать</em> данные быстрее чем раньше, но мы не можем <em>получить</em> их быстрее.</p>
 <p><span name="legend"></span></p>
@@ -45,35 +45,32 @@
 <p>Она называется RAM (&#8220;Random access memory&#8221;) потому что можно получить доступ к любому участку памяти одинаково быстро (это в теории). То есть не нужно считывать все байты по очереди, чтоб добраться до нужного места.</p>
 <p>Ну, <em>обычно</em> не нужно. Как будет видно дальше, RAM не всегда настолько гибка, как кажется.</p>
 </aside>
-<h3><a href="#a-data-warehouse" name="a-data-warehouse">A data warehouse</a></h3>
-<p>Imagine you&#8217;re an accountant in a tiny little office. Your job is to request a box of papers then do some <span name="accountant">accountant</span>-y stuff with them&thinsp;&mdash;&thinsp;add up a bunch of numbers or something. You must do this for specific labeled boxes according to some arcane logic that only makes sense to other accountants.</p>
+<h3><a href="#хранилище-данных" name="хранилище-данных">Хранилище данных</a></h3>
+<p>Представьте, что вы&thinsp;&mdash;&thinsp;бухгалтер в маленьком офисе. Ваша работа: получить коробку документов и сделать с ними что-нибудь бухгалтерское. Например, сложить какие-то числа. Это нужно сделать только с документами из некоторых коробок, в соответствии с какими-то тайными правилами, которые понятны только другим бухгалтерам.</p>
 <aside name="accountant">
-<p>I probably shouldn&#8217;t have used a job I know absolutely nothing about in this analogy.</p>
+<p>Наверное, не стоило здесь использовать бухгалтерию&thinsp;&mdash;&thinsp;я ничего в ней не понимаю.</p>
 </aside>
-<p>Thanks to a mixture of hard work, natural aptitude, and stimulants, you can finish an entire box in, say, a minute. There&#8217;s a little problem, though. All of those boxes are stored in a warehouse in a separate building. To get a box, you have to ask the warehouse guy to bring it to you. He goes and gets a forklift and drives around the aisles until he finds the box you want.</p>
-<p>It takes him, seriously, an entire day to do this. Unlike you, he&#8217;s not getting employee of the month any time soon. This means that no matter how fast you are, you only get one box a day. The rest of the time, you just sit there and question the life decisions that led to this soul-sucking job.</p>
-<p>One day, a group of industrial designers show up. Their job is to improve the efficiency of operations&thinsp;&mdash;&thinsp;things like making assembly lines go faster. After watching you work for a few days, they notice a few things:</p>
+<p>Благодаря тяжелой работе, природной упорности и стимуляторам, можно обработать всю коробку, скажем, за минуту. Но есть одна проблема - все эти коробки хранятся на складе в отдельном здании. Чтобы получить коробку, вам нужно попросить парня со склада принести её вам. Он идет, берет подъемник и ездит вдоль стеллажей, пока не найдет коробку, которая вам нужна.</p>
+<p>Все это займет целый день, без шуток. В отличие от вас, парень со склада ещё не скоро станет работников месяца. Это значит, что неважно насколько вы быстры&thinsp;&mdash;&thinsp;вы все рано получите не больше одной коробки в день. Все остальное время вы будете просто сидеть и думать о жизни, которая привела вас к такой бессмысленной работе.</p>
+<p>И вот однажды, появилась группа специалистов. Их работа&thinsp;&mdash;&thinsp;увеличивать эффективность работы. Придумывать маленькие хаки, которые позволяют сборочной линии двигаться быстрее. Они понаблюдали за вами несколько дней, и сделали несколько замечаний:</p>
 <ul>
 <li>
-<p>Pretty often, when you&#8217;re done with one box, the next box you request is right
-  <span name="next">next</span> to it on the same shelf in the warehouse.</p>
+<p>Довольно часто, следущая коробка, которую вы попросите, находится <span name="next">на одной полке</span> с предыдущей.</p>
 </li>
 <li>
-<p>Using a forklift to carry a single box of papers is pretty dumb.</p>
+<p>Использовать подъемник, чтобы снять маленькую коробку с полки&thinsp;&mdash;&thinsp;довольно неэффективная идея.</p>
 </li>
 <li>
-<p>There&#8217;s actually a little bit of spare room in the corner of your office.</p>
+<p>И в вашем офисе есть немного места в углу.</p>
 </li>
 </ul>
 <aside name="next">
-<p>The technical term for using something near the thing you just used is <em>locality of reference</em>.</p>
+<p>Эта ситуация (когда вы используете вещь, которая лежала рядом с той, которую вы только что использовали) в техническом мире называется <em>компактность ссылок</em>.</p>
 </aside>
-<p>They come up with a clever fix. Whenever you request a box from the warehouse guy, he&#8217;ll
-grab an entire pallet of them. He gets the box you want and then
-some more boxes that are next to it. He doesn&#8217;t know if you want those (and, given his work ethic, clearly doesn&#8217;t care); he just takes as many as he can fit on the pallet.</p>
-<p>He loads the whole pallet and brings it to you. Disregarding concerns for workplace safety, he drives the forklift right in and drops the pallet in the corner of your office.</p>
-<p>When you need a new box, now, the first thing you do is see if it&#8217;s already on the pallet in your office. If it is, great! It just takes you a second to grab it and you&#8217;re back to crunching numbers. If a pallet holds fifty boxes and you got lucky and <em>all</em> of the boxes you need happen to be on it, you can churn through fifty times more work than you could before.</p>
-<p>But, if you need a box that&#8217;s <em>not</em> on the pallet, you&#8217;re back to square one. Since you can only fit one pallet in your office, your warehouse friend will have to take that one back and then bring you an entirely new one.</p>
+<p>Это дельный совет. Теперь, когда вы запрашиваете коробку у парня со склада, он приносит вам целую палету. Не только коробку, которая вам нужна, но и несколько соседних&thinsp;&mdash;&thinsp;тоже. Он не знает, понадобятся ли они вам (вообще говоря, ему просто по барабану)&thinsp;&mdash;&thinsp;он просто берет столько коробок, сколько может унести.</p>
+<p>Итак, он загружает целую палету и несет её вам. Игнорируя правила безопасности, он въезжает на подъемнике прямо к вам в офис и сгружает все это прямо у вас в углу.</p>
+<p>Когда вам нужна будет новая коробка, вы первым делом смотрите в углу&thinsp;&mdash;&thinsp;возможно следущая коробка уже там. Если она действительно там, то вам повезло! Вам нужна всего секунда, чтобы взять новую коробку и занятся магией чисел. Если в куче 50 коробок, и вам так повезло, что <em>все</em> следующие коробки находятся в куче, то вы можете сделать в 50 раз больше работы чем раньше.</p>
+<p>Но, если коробка, которая вам нужна, в куче <em>отсутствует</em>, вам все-таки придется её заказать. Поскольку в угол влезает только одна палета, то парень со склада приедет, заберет старую кучу и затем привезет вам совершенно новую кучу.</p>
 <h3><a href="#a-pallet-for-your-cpu" name="a-pallet-for-your-cpu">A pallet for your CPU</a></h3>
 <p>Strangely enough, this is similar to how CPUs in modern computers work. In case it isn&#8217;t obvious, you play the role of the CPU. Your desk is the CPU&#8217;s registers, and the box of papers is the data you can fit in them. The warehouse is your machine&#8217;s RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.</p>
 <p>If I were writing this chapter thirty years ago, the analogy would stop there. But as chips got faster and RAM, well, <em>didn&#8217;t</em>, hardware engineers started looking for solutions. What they came up with was <em>CPU caching</em>.</p>

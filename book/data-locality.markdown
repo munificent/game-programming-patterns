@@ -5,7 +5,7 @@
 
 *Если расположить данные в памяти специальным образом, то это поможет кешам процессора.*
 
-## Motivation
+## Предыстория
 
 Нас обманули. Нам показывают графики, на которых скорость процессоров растёт все выше и выше, как будто закон Мура - это не просто историческое наблюдение, а какое-то непререкаемое правило. Не отрывая задниц от кресла, мы, программисты, наблюдаем, как наши программы волшебным образом ускоряются благодаря апгрейду.
 
@@ -37,44 +37,41 @@
 
 </aside>
 
-### A data warehouse
+### Хранилище данных
 
-Imagine you're an accountant in a tiny little office. Your job is to request a box of papers then do some <span name="accountant">accountant</span>-y stuff with them -- add up a bunch of numbers or something. You must do this for specific labeled boxes according to some arcane logic that only makes sense to other accountants.
+Представьте, что вы -- бухгалтер в маленьком офисе. Ваша работа: получить коробку документов и сделать с ними что-нибудь бухгалтерское. Например, сложить какие-то числа. Это нужно сделать только с документами из некоторых коробок, в соответствии с какими-то тайными правилами, которые понятны только другим бухгалтерам.
 
 <aside name="accountant">
 
-I probably shouldn't have used a job I know absolutely nothing about in this analogy.
+Наверное, не стоило здесь использовать бухгалтерию -- я ничего в ней не понимаю.
 
 </aside>
 
-Thanks to a mixture of hard work, natural aptitude, and stimulants, you can finish an entire box in, say, a minute. There's a little problem, though. All of those boxes are stored in a warehouse in a separate building. To get a box, you have to ask the warehouse guy to bring it to you. He goes and gets a forklift and drives around the aisles until he finds the box you want.
+Благодаря тяжелой работе, природной упорности и стимуляторам, можно обработать всю коробку, скажем, за минуту. Но есть одна проблема - все эти коробки хранятся на складе в отдельном здании. Чтобы получить коробку, вам нужно попросить парня со склада принести её вам. Он идет, берет подъемник и ездит вдоль стеллажей, пока не найдет коробку, которая вам нужна.
 
-It takes him, seriously, an entire day to do this. Unlike you, he's not getting employee of the month any time soon. This means that no matter how fast you are, you only get one box a day. The rest of the time, you just sit there and question the life decisions that led to this soul-sucking job.
+Все это займет целый день, без шуток. В отличие от вас, парень со склада ещё не скоро станет работников месяца. Это значит, что неважно насколько вы быстры -- вы все рано получите не больше одной коробки в день. Все остальное время вы будете просто сидеть и думать о жизни, которая привела вас к такой бессмысленной работе.
 
-One day, a group of industrial designers show up. Their job is to improve the efficiency of operations -- things like making assembly lines go faster. After watching you work for a few days, they notice a few things:
+И вот однажды, появилась группа специалистов. Их работа -- увеличивать эффективность работы. Придумывать маленькие хаки, которые позволяют сборочной линии двигаться быстрее. Они понаблюдали за вами несколько дней, и сделали несколько замечаний:
 
-* Pretty often, when you're done with one box, the next box you request is right
-  <span name="next">next</span> to it on the same shelf in the warehouse.
+* Довольно часто, следущая коробка, которую вы попросите, находится <span name="next">на одной полке</span> с предыдущей.
 
-* Using a forklift to carry a single box of papers is pretty dumb.
+* Использовать подъемник, чтобы снять маленькую коробку с полки -- довольно неэффективная идея.
 
-* There's actually a little bit of spare room in the corner of your office.
+* И в вашем офисе есть немного места в углу.
 
 <aside name="next">
 
-The technical term for using something near the thing you just used is *locality of reference*.
+Эта ситуация (когда вы используете вещь, которая лежала рядом с той, которую вы только что использовали) в техническом мире называется *компактность ссылок*.
 
 </aside>
 
-They come up with a clever fix. Whenever you request a box from the warehouse guy, he'll
-grab an entire pallet of them. He gets the box you want and then
-some more boxes that are next to it. He doesn't know if you want those (and, given his work ethic, clearly doesn't care); he just takes as many as he can fit on the pallet.
+Это дельный совет. Теперь, когда вы запрашиваете коробку у парня со склада, он приносит вам целую палету. Не только коробку, которая вам нужна, но и несколько соседних -- тоже. Он не знает, понадобятся ли они вам (вообще говоря, ему просто по барабану) -- он просто берет столько коробок, сколько может унести.
 
-He loads the whole pallet and brings it to you. Disregarding concerns for workplace safety, he drives the forklift right in and drops the pallet in the corner of your office.
+Итак, он загружает целую палету и несет её вам. Игнорируя правила безопасности, он въезжает на подъемнике прямо к вам в офис и сгружает все это прямо у вас в углу.
 
-When you need a new box, now, the first thing you do is see if it's already on the pallet in your office. If it is, great! It just takes you a second to grab it and you're back to crunching numbers. If a pallet holds fifty boxes and you got lucky and *all* of the boxes you need happen to be on it, you can churn through fifty times more work than you could before.
+Когда вам нужна будет новая коробка, вы первым делом смотрите в углу -- возможно следущая коробка уже там. Если она действительно там, то вам повезло! Вам нужна всего секунда, чтобы взять новую коробку и занятся магией чисел. Если в куче 50 коробок, и вам так повезло, что *все* следующие коробки находятся в куче, то вы можете сделать в 50 раз больше работы чем раньше.
 
-But, if you need a box that's *not* on the pallet, you're back to square one. Since you can only fit one pallet in your office, your warehouse friend will have to take that one back and then bring you an entirely new one.
+Но, если коробка, которая вам нужна, в куче *отсутствует*, вам все-таки придется её заказать. Поскольку в угол влезает только одна палета, то парень со склада приедет, заберет старую кучу и затем привезет вам совершенно новую кучу.
 
 ### A pallet for your CPU
 
