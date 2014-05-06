@@ -32,7 +32,7 @@
 <blockquote>
 <p>Encapsulate a request as an object, thereby letting users parameterize clients with different requests, queue or log requests, and support undoable operations.</p>
 </blockquote>
-<p>Can we agree that that&#8217;s a terrible sentence? First of all, it mangles whatever metaphor it&#8217;s trying to establish. Outside of the weird world of software where words can mean anything, a &#8220;client&#8221; is a <em>person</em>&thinsp;&mdash;&thinsp;someone you do business with. Last I checked, people can&#8217;t be &#8220;parameterized&#8221;.</p>
+<p>Can we agree that that&#8217;s a terrible sentence? First of all, it mangles whatever metaphor it&#8217;s trying to establish. Outside of the weird world of software where words can mean anything, a &#8220;client&#8221; is a <em>person</em>&#8202;&mdash;&#8202;someone you do business with. Last I checked, people can&#8217;t be &#8220;parameterized&#8221;.</p>
 <p>Then, the rest of that sentence is just a list of stuff you could maybe possibly use the pattern for. Not very illuminating unless your use case happens to be in that list. <em>My</em> pithy tagline the command pattern is:</p>
 <p><strong>A command is a <em><span name="latin">reified</span> method call</em>.</strong></p>
 <aside name="latin">
@@ -41,7 +41,7 @@
 </aside>
 
 <p>Of course, &#8220;pithy&#8221; often means &#8220;impenetrably terse&#8221;, so this may not be much of an improvement. Let me unpack that a bit. &#8220;Reify&#8221;, in case you&#8217;ve never heard it, means &#8220;make real&#8221;.</p>
-<p>Another term for reifying is making something <span name="reflection">&#8220;first class&#8221;</span>. Both mean taking some <em>concept</em> and turning it into a piece of data&thinsp;&mdash;&thinsp;an object&thinsp;&mdash;&thinsp;that you can stick in a variable, pass to a function, etc. So by saying the command pattern is a &#8220;reified method call&#8221;, what I mean is that it&#8217;s a method call wrapped in an object.</p>
+<p>Another term for reifying is making something <span name="reflection">&#8220;first class&#8221;</span>. Both mean taking some <em>concept</em> and turning it into a piece of data&#8202;&mdash;&#8202;an object&#8202;&mdash;&#8202;that you can stick in a variable, pass to a function, etc. So by saying the command pattern is a &#8220;reified method call&#8221;, what I mean is that it&#8217;s a method call wrapped in an object.</p>
 <p>That sounds a lot like a &#8220;callback&#8221;, &#8220;first class function&#8221;, &#8220;function pointer&#8221;, &#8220;closure&#8221;, or &#8220;partially applied function&#8221;, depending on which language you&#8217;re coming from, and indeed those are all in the same ballpark. The Gang of Four later says:</p>
 <blockquote>
 <p>Commands are an object-oriented replacement for callbacks.</p>
@@ -54,7 +54,7 @@
 </aside>
 
 <h2><a href="#configuring-input" name="configuring-input">Configuring Input</a></h2>
-<p>Somewhere in every game is a chunk of code that reads in raw user input&thinsp;&mdash;&thinsp;button presses, keyboard events, mouse clicks, whatever. It takes each input and translates it to a meaningful action in the game.</p>
+<p>Somewhere in every game is a chunk of code that reads in raw user input&#8202;&mdash;&#8202;button presses, keyboard events, mouse clicks, whatever. It takes each input and translates it to a meaningful action in the game.</p>
 <p><img src="images/command-buttons-one.png" /></p>
 <p>A dead simple implementation looks like:</p>
 <p><span name="lurch"></span></p>

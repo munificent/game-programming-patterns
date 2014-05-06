@@ -1,3 +1,5 @@
+2014-05-05 - 1 bug, revise architecture chapter
+2014-05-04 - 7 bugs
 2014-05-03 - 6 bugs
 2014-05-02 - 5 bugs, 3 emails, make design sections consistent
 2014-05-01 - 3 bugs, work on style guide for chapter structure, work on making

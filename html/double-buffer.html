@@ -58,7 +58,7 @@ graphics.</p>
 sweeps across each row of pixels from left to right, and then moves
 down to the next row. When it reaches the bottom right corner, it
 scans back up to the top left and starts all over again. It does this
-so fast&thinsp;&mdash;&thinsp;around sixty times a second&thinsp;&mdash;&thinsp;that our eyes can&#8217;t
+so fast&#8202;&mdash;&#8202;around sixty times a second&#8202;&mdash;&#8202;that our eyes can&#8217;t
 see the scanning. To us, it&#8217;s a single static field of colored pixels,
 an image.</p>
 <aside name="scan">
@@ -119,7 +119,7 @@ doesn&#8217;t catch those new pixels.</p>
 
 <p>This is why we need this pattern. Our program renders the pixels one
 at a time, but we need the display driver to see them all at
-once&thinsp;&mdash;&thinsp;one refresh the face isn&#8217;t there, the next one it is.
+once&#8202;&mdash;&#8202;one refresh the face isn&#8217;t there, the next one it is.
 Double buffering solves this. I&#8217;ll explain how by analogy.</p>
 <h3><a href="#act-1,-scene-1" name="act-1,-scene-1">Act 1, Scene 1</a></h3>
 <p>Imagine our users are watching a play, produced by ourselves. As scene
@@ -212,11 +212,11 @@ on. More specifically, this pattern is appropriate when all of these are true:</
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <p>Unlike larger architectural patterns, double buffering exists at a
 lower implementation level. Because of this, it has fewer consequences
-for the rest of the codebase&thinsp;&mdash;&thinsp;most of the game won&#8217;t even be
+for the rest of the codebase&#8202;&mdash;&#8202;most of the game won&#8217;t even be
 aware of the difference. There are a couple of caveats, though.</p>
 <h3><a href="#the-swap-itself-takes-time" name="the-swap-itself-takes-time">The swap itself takes time</a></h3>
 <p>Double-buffering requires a <em>swap</em> step once the state is done being
-modified. That operation must be atomic&thinsp;&mdash;&thinsp;no code can access
+modified. That operation must be atomic&#8202;&mdash;&#8202;no code can access
 either state while they are being swapped. Often, the swap is as quick
 as assigning a pointer, but if it takes longer than it does to modify
 the state to begin with, then we haven&#8217;t helped ourselves at all.</p>
@@ -454,7 +454,7 @@ cleared immediately after updating. This is so that an actor only
 responds to a given slap once.</p>
 <p>Now, to get things going, let&#8217;s define a concrete actor subclass. Our
 comedian here is pretty simple. He faces a single actor. Whenever he
-gets slapped&thinsp;&mdash;&thinsp;by anyone&thinsp;&mdash;&thinsp;he responds by slapping the
+gets slapped&#8202;&mdash;&#8202;by anyone&#8202;&mdash;&#8202;he responds by slapping the
 actor he faces.</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Comedian</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Actor</span>
 <span class="p">{</span>
@@ -669,7 +669,7 @@ Frame 3 drawn on buffer A
 
 <p>You&#8217;ll note that when we go to draw the third frame, the data
 already on the buffer is from frame <em>one</em>, not the more
-recent second frame. In most cases, this isn&#8217;t an issue&thinsp;&mdash;&thinsp;we
+recent second frame. In most cases, this isn&#8217;t an issue&#8202;&mdash;&#8202;we
 usually just clear the whole buffer right before drawing.
 But, if we intend to <span name="blur">reuse</span> some of the existing data on the
 buffer, it&#8217;s important to take into account that that data
@@ -690,8 +690,8 @@ captures.</p>
 <p>If we can&#8217;t just repoint users to the other buffer, the only other
 option is to actually copy the data from the next frame to the
 current frame. This is how our slapstick comedians work. In that
-case, we chose this way because the state&thinsp;&mdash;&thinsp;a single boolean
-flag&thinsp;&mdash;&thinsp;doesn&#8217;t take any longer to copy than a pointer to the
+case, we chose this way because the state&#8202;&mdash;&#8202;a single boolean
+flag&#8202;&mdash;&#8202;doesn&#8217;t take any longer to copy than a pointer to the
 buffer would.</p>
 <ul>
 <li>
@@ -739,7 +739,7 @@ that they all reference into by their index.</p>
     through the entire collection of objects, telling each one
     to swap.</p>
 <p>In our comedian example, that was OK since we needed to clear
-the next slap state anyway&thinsp;&mdash;&thinsp;every piece of buffered
+the next slap state anyway&#8202;&mdash;&#8202;every piece of buffered
 state needed to be touched each frame. If we don&#8217;t need to
 otherwise touch the old buffer, there&#8217;s a simple optimization
 we can do to get the same performance of a monolithic buffer

@@ -115,7 +115,7 @@ classes in the game.</p>
 <aside name="wide">
 
 <p>Lately, you find a lot of people criticizing inheritance in object-oriented
-languages. Inheritance <em>is</em> problematic&thinsp;&mdash;&thinsp;there&#8217;s really no deeper
+languages. Inheritance <em>is</em> problematic&#8202;&mdash;&#8202;there&#8217;s really no deeper
 coupling in a codebase than the one between a base class and its subclass &#8212;
 but I find <em>wide</em> inheritance trees to be easier to work with than <em>deep</em> ones.</p>
 </aside>
@@ -155,7 +155,7 @@ is particularly susceptible to that.</p>
 the base class ends up coupled to every system any derived class needs to talk
 to. Of course, the subclasses are also intimately tied to their base
 class. That spiderweb of coupling makes it very hard to change the base class
-without breaking something&thinsp;&mdash;&thinsp;you&#8217;ve got the <a href="http://en.wikipedia.org/wiki/Fragile_base_class">brittle base class problem</a>.</p>
+without breaking something&#8202;&mdash;&#8202;you&#8217;ve got the <a href="http://en.wikipedia.org/wiki/Fragile_base_class">brittle base class problem</a>.</p>
 <p>The flip side of the coin is that since most of your coupling has been pushed
 up to the base class, the derived classes are now much more cleanly separated
 from the rest of the world. Ideally, most of your behavior will be in those
@@ -167,7 +167,7 @@ separate classes that the base class can dole out responsibility to. The <a
 class="pattern" href="component.html">Component</a> pattern can help here.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>Because this is such a simple pattern, there isn&#8217;t much to the sample code.
-That doesn&#8217;t mean it isn&#8217;t useful&thinsp;&mdash;&thinsp;the pattern is about the <em>intent</em>, and
+That doesn&#8217;t mean it isn&#8217;t useful&#8202;&mdash;&#8202;the pattern is about the <em>intent</em>, and
 not the complexity of its implementation.</p>
 <p>We&#8217;ll start with our <code>Superpower</code> base class:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
@@ -232,7 +232,7 @@ things basic here.</p>
 
 <p>This power springs the superhero into the air, playing an appropriate sound and
 kicking up a little cloud of dust. If all of the superpowers were this
-simple&thinsp;&mdash;&thinsp;just combination of a sound, particle affect, and motion &#8212;
+simple&#8202;&mdash;&#8202;just combination of a sound, particle affect, and motion &#8212;
 then we wouldn&#8217;t need this pattern at all. Instead, <code>Superpower</code> could just
 have a baked-in implementation of <code>activate()</code> that accesses fields for the
 sound ID, particle type, and movement. But that only works when every power

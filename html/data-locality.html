@@ -51,7 +51,7 @@ by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony
 </aside>
 
 <h3><a href="#a-data-warehouse" name="a-data-warehouse">A data warehouse</a></h3>
-<p>Imagine you&#8217;re an accountant in a tiny little office. Your job is to request a box of papers then do some <span name="accountant">accountant</span>-y stuff with them&thinsp;&mdash;&thinsp;add up a bunch of numbers or something. You must do this for specific labeled boxes according to some arcane logic that only makes sense to other accountants.</p>
+<p>Imagine you&#8217;re an accountant in a tiny little office. Your job is to request a box of papers then do some <span name="accountant">accountant</span>-y stuff with them&#8202;&mdash;&#8202;add up a bunch of numbers or something. You must do this for specific labeled boxes according to some arcane logic that only makes sense to other accountants.</p>
 <aside name="accountant">
 
 <p>I probably shouldn&#8217;t have used a job I know absolutely nothing about in this analogy.</p>
@@ -59,7 +59,7 @@ by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony
 
 <p>Thanks to a mixture of hard work, natural aptitude, and stimulants, you can finish an entire box in, say, a minute. There&#8217;s a little problem, though. All of those boxes are stored in a warehouse in a separate building. To get a box, you have to ask the warehouse guy to bring it to you. He goes and gets a forklift and drives around the aisles until he finds the box you want.</p>
 <p>It takes him, seriously, an entire day to do this. Unlike you, he&#8217;s not getting employee of the month any time soon. This means that no matter how fast you are, you only get one box a day. The rest of the time, you just sit there and question the life decisions that led to this soul-sucking job.</p>
-<p>One day, a group of industrial designers show up. Their job is to improve the efficiency of operations&thinsp;&mdash;&thinsp;things like making assembly lines go faster. After watching you work for a few days, they notice a few things:</p>
+<p>One day, a group of industrial designers show up. Their job is to improve the efficiency of operations&#8202;&mdash;&#8202;things like making assembly lines go faster. After watching you work for a few days, they notice a few things:</p>
 <ul>
 <li>
 <p>Pretty often, when you&#8217;re done with one box, the next box you request is right
@@ -92,7 +92,7 @@ some more boxes that are next to it. He doesn&#8217;t know if you want those (an
 <p>Modern hardware actually has multiple levels of caching, which is what they mean when you hear &#8220;L1&#8221;, &#8220;L2&#8221;, &#8220;L3&#8221;, etc. Each level is larger but slower than the previous. For this chapter, we won&#8217;t worry about the fact that memory is actually a <a href="http://en.wikipedia.org/wiki/Memory_hierarchy">hierarchy</a>, but it&#8217;s important to know.</p>
 </aside>
 
-<p>This little chunk of memory is called a <em>cache</em> (in particular, the chunk on the chip is your <em>L1 cache</em>) and in my belabored analogy, its part was played by the pallet of boxes. Whenever your chip needs a byte of data from RAM, it automatically grabs a whole chunk of contiguous memory&thinsp;&mdash;&thinsp;usually around 64 to 128 bytes&thinsp;&mdash;&thinsp;and puts it in the cache. This dollop of memory is called a <em>cache line</em>.</p>
+<p>This little chunk of memory is called a <em>cache</em> (in particular, the chunk on the chip is your <em>L1 cache</em>) and in my belabored analogy, its part was played by the pallet of boxes. Whenever your chip needs a byte of data from RAM, it automatically grabs a whole chunk of contiguous memory&#8202;&mdash;&#8202;usually around 64 to 128 bytes&#8202;&mdash;&#8202;and puts it in the cache. This dollop of memory is called a <em>cache line</em>.</p>
 <p><img src="images/data-locality-cache-line.png" /></p>
 <p>If the <span name="pallet">next byte</span> of data you need happens to be in that chunk, the CPU reads it straight from the cache, which is <em>much</em> faster than hitting RAM. Successfully finding a piece of data in the cache is called a <em>cache hit</em>. If it can&#8217;t find it in there and has to go to main memory, that&#8217;s a <em>cache miss</em>.</p>
 <aside name="pallet">
@@ -137,7 +137,7 @@ some more boxes that are next to it. He doesn&#8217;t know if you want those (an
 <p><img src="images/data-locality-things.png" /></p>
 <p>Note, these aren&#8217;t <em>pointers</em> to <code>Thing</code>, <code>Another</code>, and <code>Also</code>. This is the actual data for them, in place, lined up one after the other. As soon as the CPU reads in <code>Thing</code>, it will start to get <code>Another</code> and <code>Also</code> too (depending on how big they are and how big a cache line is). When you start working on them next, they&#8217;ll already be cached. Your chip is happy and you&#8217;re happy.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
-<p>Modern CPUs have <strong>caches to speed up memory access.</strong> These can access memory <strong>adjacent to recently accessed memory much quicker</strong>. Take advantage of that to improve performance by <strong>increasing data locality</strong>&thinsp;&mdash;&thinsp;keeping data in <strong>contiguous memory in the order that you process it.</strong></p>
+<p>Modern CPUs have <strong>caches to speed up memory access.</strong> These can access memory <strong>adjacent to recently accessed memory much quicker</strong>. Take advantage of that to improve performance by <strong>increasing data locality</strong>&#8202;&mdash;&#8202;keeping data in <strong>contiguous memory in the order that you process it.</strong></p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>Like most optimizations, the first guideline for using it is <em>when you have a performance problem.</em> Don&#8217;t waste time applying this to some infrequently executed corner of your codebase. Optimizing code that doesn&#8217;t need it just makes your life harder since the result is almost always more complex and less flexible.</p>
 <p>With this pattern specifically, you&#8217;ll also want to be sure your performance problems <em>are caused by cache misses</em>. If your code is slow for other reasons, this won&#8217;t help.</p>
@@ -162,7 +162,7 @@ some more boxes that are next to it. He doesn&#8217;t know if you want those (an
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>If you really go down the rathole of optimizing for data locality, you&#8217;ll discover countless ways to slice and dice your data structures into pieces your CPU can most easily digest. To get you started, I&#8217;ll show an example for each of a few of the most common ways to organize your data. We&#8217;ll cover them in the context of some specific part of a game engine, but (as with other patterns), keep in mind that the general technique can be applied anywhere it fits.</p>
 <h3><a href="#contiguous-arrays" name="contiguous-arrays">Contiguous arrays</a></h3>
-<p>Let&#8217;s start with a <a href="game-loop.html" class="pattern">Game Loop</a> that processes a bunch of game entities. Those entities are decomposed into different domains&thinsp;&mdash;&thinsp;AI, physics, and rendering&thinsp;&mdash;&thinsp;using the <a href="component.html" class="pattern">Component</a> pattern. Here&#8217;s the game entity class:</p>
+<p>Let&#8217;s start with a <a href="game-loop.html" class="pattern">Game Loop</a> that processes a bunch of game entities. Those entities are decomposed into different domains&#8202;&mdash;&#8202;AI, physics, and rendering&#8202;&mdash;&#8202;using the <a href="component.html" class="pattern">Component</a> pattern. Here&#8217;s the game entity class:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">GameEntity</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -412,7 +412,7 @@ some more boxes that are next to it. He doesn&#8217;t know if you want those (an
 
 <p>Now we aren&#8217;t skipping over <em>any</em> data. Every byte that gets sucked into the cache is a piece of an active particle that we actually need to process.</p>
 <p>Of course, I&#8217;m not saying you should actually quicksort the entire collection of particles every frame. That would more than eliminate the gains here. What we want to do is <em>keep</em> the array sorted.</p>
-<p>Assuming the array is already sorted&thinsp;&mdash;&thinsp;and it is at first when all particles are inactive&thinsp;&mdash;&thinsp;the only time it can become <em>un</em>sorted is when a particle has been activated or deactivated. We can handle those two cases pretty easily. When a particle gets activated, we move it up to the end of the active particles by swapping it with the first <em>in</em>active one:</p>
+<p>Assuming the array is already sorted&#8202;&mdash;&#8202;and it is at first when all particles are inactive&#8202;&mdash;&#8202;the only time it can become <em>un</em>sorted is when a particle has been activated or deactivated. We can handle those two cases pretty easily. When a particle gets activated, we move it up to the end of the active particles by swapping it with the first <em>in</em>active one:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticleSystem</span><span class="o">::</span><span class="n">activateParticle</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Shouldn&#39;t already be active!</span>
@@ -458,7 +458,7 @@ some more boxes that are next to it. He doesn&#8217;t know if you want those (an
 <p>It&#8217;s not all rosy, though. As you can see from the API, we&#8217;ve lost a bit of object-orientation here. The <code>Particle</code> class no longer controls its own active state. You can&#8217;t just call some <code>activate()</code> method on it since it doesn&#8217;t know it&#8217;s index. Instead, any code that wants to activate particles needs access to the particle <em>system</em>.</p>
 <p>In this case, I&#8217;m OK with <code>ParticleSystem</code> and <code>Particle</code> being tightly tied like this. I think of them as a single <em>concept</em> spread across two physical <em>classes</em>. It just means accepting the idea that particles are <em>only</em> meaningful in the context of some particle system. Also, in this case it&#8217;s likely to be the particle system that will be spawning and killing particles anyway.</p>
 <h3><a href="#hotcold-splitting" name="hotcold-splitting">Hot/cold splitting</a></h3>
-<p>OK, this is the last example of a simple technique for making your cache happier. Say we&#8217;ve got an AI component for some game entity. It has some state in it: the animation it&#8217;s currently playing, a goal position its heading towards, energy level, etc.&thinsp;&mdash;&thinsp;stuff it checks and tweaks every single frame. Something like:</p>
+<p>OK, this is the last example of a simple technique for making your cache happier. Say we&#8217;ve got an AI component for some game entity. It has some state in it: the animation it&#8217;s currently playing, a goal position its heading towards, energy level, etc.&#8202;&mdash;&#8202;stuff it checks and tweaks every single frame. Something like:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">AIComponent</span>
 <span class="p">{</span>
 <span class="nl">public:</span>

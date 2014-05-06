@@ -164,11 +164,11 @@
 
 <p>Bug hunting time again. Find it?</p>
 <p>We check that you can&#8217;t air jump while jumping, but not while diving. Yet another field&#8230;</p>
-<p>Something is clearly <span name="se">wrong</span> with our approach. Every time we touch this handful of code we break something. We need to add a bunch more moves&thinsp;&mdash;&thinsp;we haven&#8217;t even added <em>walking</em> yet&thinsp;&mdash;&thinsp;but at this rate it will collapse into a heap of bugs before we&#8217;re done with it.</p>
+<p>Something is clearly <span name="se">wrong</span> with our approach. Every time we touch this handful of code we break something. We need to add a bunch more moves&#8202;&mdash;&#8202;we haven&#8217;t even added <em>walking</em> yet&#8202;&mdash;&#8202;but at this rate it will collapse into a heap of bugs before we&#8217;re done with it.</p>
 <aside name="se">
 
 <p>Those coders you idolize who always seem to create flawless code aren&#8217;t simply superhuman programmers. Instead, they have an intuition about which <em>kinds</em> of code are error-prone, and they steer away from that.</p>
-<p>Complex branching and mutable state&thinsp;&mdash;&thinsp;fields that change over time&thinsp;&mdash;&thinsp;are two of those error-prone kinds of code and this has both.</p>
+<p>Complex branching and mutable state&#8202;&mdash;&#8202;fields that change over time&#8202;&mdash;&#8202;are two of those error-prone kinds of code and this has both.</p>
 </aside>
 
 <h2><a href="#finite-state-machines-to-the-rescue" name="finite-state-machines-to-the-rescue">Finite State Machines to the Rescue</a></h2>
@@ -312,7 +312,7 @@
 </blockquote>
 <p>That doesn&#8217;t tell us much. Heck, our <code>switch</code> does that. The concrete pattern they describe, applied to our heroine looks like this:</p>
 <h3><a href="#a-state-interface" name="a-state-interface">A state interface</a></h3>
-<p>First, we define an interface for the state. Every bit of behavior that is state-dependent&thinsp;&mdash;&thinsp;every place we had a <code>switch</code> before&thinsp;&mdash;&thinsp;becomes a virtual method in that interface. For us, that&#8217;s <code>handleInput()</code> and <code>update()</code>:</p>
+<p>First, we define an interface for the state. Every bit of behavior that is state-dependent&#8202;&mdash;&#8202;every place we had a <code>switch</code> before&#8202;&mdash;&#8202;becomes a virtual method in that interface. For us, that&#8217;s <code>handleInput()</code> and <code>update()</code>:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">HeroineState</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -401,7 +401,7 @@
 <p>If the state object doesn&#8217;t have any other <span name="fn">fields</span>, then the only data it stores is a pointer to the internal virtual method table so that its methods can be called. In that case, there&#8217;s no reason to ever have more than one instance of it: every instance would be identical anyway.</p>
 <aside name="fn">
 
-<p>If your state has no fields and only <em>one</em> virtual method in it, you can simplify this pattern even more. Replace each state <em>class</em> with a state <em>function</em>&thinsp;&mdash;&thinsp;just a plain vanilla top-level function. Then the <code>state_</code> field in your main class becomes a simple function pointer.</p>
+<p>If your state has no fields and only <em>one</em> virtual method in it, you can simplify this pattern even more. Replace each state <em>class</em> with a state <em>function</em>&#8202;&mdash;&#8202;just a plain vanilla top-level function. Then the <code>state_</code> field in your main class becomes a simple function pointer.</p>
 </aside>
 
 <p>In that case, you can just make a single <em>static</em> instance. Even if you have a bunch of FSMs all going at the same time in that same state, they can all point to the <span name="flyweight">same instance</span> since it has nothing machine-specific about it.</p>
@@ -514,7 +514,7 @@
 <p>We&#8217;ve decided to give our heroine the ability to carry a gun. When she&#8217;s packing heat, she can still do everything she could before: run, jump, duck, etc. But she also needs to be able to fire her weapon while doing it.</p>
 <p>If we want to stick to the confines of an FSM, we have to <em>double</em> the number of states we have. For each existing state, we&#8217;ll need another one for doing the same thing while she&#8217;s armed: standing, standing with gun, jumping, jumping with gun, you get the idea.</p>
 <p>Add a couple of more weapons and the number of states explodes combinatorially. Not only is it a huge number of states, it&#8217;s a huge amount of redundancy: the unarmed and armed states are almost identical except for the little bit of code to handle firing.</p>
-<p>The problem is that we&#8217;ve <span name="combination">jammed</span> two pieces of state&thinsp;&mdash;&thinsp;what she&#8217;s <em>doing</em> and what she&#8217;s <em>carrying</em>&thinsp;&mdash;&thinsp;into a single machine. To model all possible combinations, we would need a state for each <em>pair</em>. The fix is obvious: have two separate state machines.</p>
+<p>The problem is that we&#8217;ve <span name="combination">jammed</span> two pieces of state&#8202;&mdash;&#8202;what she&#8217;s <em>doing</em> and what she&#8217;s <em>carrying</em>&#8202;&mdash;&#8202;into a single machine. To model all possible combinations, we would need a state for each <em>pair</em>. The fix is obvious: have two separate state machines.</p>
 <aside name="combination">
 
 <p>If we want to cram <em>n</em> states for what she&#8217;s doing and <em>m</em> states for what she&#8217;s carrying into a single machine, we need <em>n &times; m</em> states. With two machines, it&#8217;s just <em>n + m</em>.</p>
@@ -616,7 +616,7 @@
 </aside>
 
 <p>The tricky part is what state she transitions to <em>after</em> firing. She can pop off a round while standing, running, jumping, and ducking. When the firing sequence is complete, she should transition back to what she was doing before.</p>
-<p>If we&#8217;re sticking with a vanilla FSM, we&#8217;ve already forgotten what state she was in. To keep track of it, we&#8217;d have to define a slew of nearly identical states&thinsp;&mdash;&thinsp;firing while standing, firing while running, firing while jumping, and so on&thinsp;&mdash;&thinsp;just so that each one can have a hardcoded transition that goes back to the right state when it&#8217;s done.</p>
+<p>If we&#8217;re sticking with a vanilla FSM, we&#8217;ve already forgotten what state she was in. To keep track of it, we&#8217;d have to define a slew of nearly identical states&#8202;&mdash;&#8202;firing while standing, firing while running, firing while jumping, and so on&#8202;&mdash;&#8202;just so that each one can have a hardcoded transition that goes back to the right state when it&#8217;s done.</p>
 <p>What we&#8217;d really like is a way to <em>store</em> the state she was in before firing and then <em>recall</em> it later. Again, automata theory is here to help. The relevant data structure is called a <a href="http://en.wikipedia.org/wiki/Pushdown_automaton"><em>pushdown automaton</em></a>.</p>
 <p>Where a finite state machine has a <em>single</em> pointer to a state, a pushdown automaton has a <em>stack</em> of them. In an FSM, transitioning to a new state <em>replaces</em> the previous one. A pushdown automaton lets you do that, but also gives you two additional operations:</p>
 <ol>

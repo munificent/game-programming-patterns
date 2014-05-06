@@ -167,7 +167,7 @@ through it quickly.</p>
 
 <p>That allows outside code to control who receives notifications. The subject communicates with the observers, but isn&#8217;t <em>coupled</em> to them. In our example, no line of physics code will mention achievements. Yet, it can still notify the achievements system. That&#8217;s the clever part about this pattern.</p>
 <p>It&#8217;s also important that the subject has a <em>list</em> of observers instead of a single one. It makes sure that observers aren&#8217;t implicitly coupled to <em>each other</em>. For example, say the audio engine also observes the fall event so that it can play an appropriate sound. If the subject only supported one observer, when the audio engine registered itself, that would <em>un</em>register the achievements system.</p>
-<p>That means those two systems would be interfering with each other&thinsp;&mdash;&thinsp;and in a particularly nasty way, since one would effectively disable the other. Supporting a list of observers ensures that each observer is treated independently from the others. As far as they know, each is the only thing in the world with eyes on the subject.</p>
+<p>That means those two systems would be interfering with each other&#8202;&mdash;&#8202;and in a particularly nasty way, since one would effectively disable the other. Supporting a list of observers ensures that each observer is treated independently from the others. As far as they know, each is the only thing in the world with eyes on the subject.</p>
 <p>The other job of the subject is sending notifications:</p>
 <p><span name="concurrent"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Subject</span>
@@ -230,11 +230,11 @@ through it quickly.</p>
 <p>I find this pattern fits best outside of hot code paths anyway, so you can usually afford the dynamic dispatch. Aside from that, there&#8217;s virtually no overhead. We aren&#8217;t allocating objects for messages. There&#8217;s no queueing. It&#8217;s just an indirection over a synchronous method call.</p>
 <h3><a href="#it's-too-*fast*" name="it's-too-*fast*">It&#8217;s too <em>fast?</em></a></h3>
 <p>In fact, you have to be careful because the Observer pattern <em>is</em> synchronous. The subject invokes its observers directly, which means it doesn&#8217;t resume its own work until all of the observers have returned from their notification methods. A slow observer can block a subject.</p>
-<p>This sounds scary, but in practice it&#8217;s not the end of the world. It&#8217;s just something you have to be aware of. UI programmers&thinsp;&mdash;&thinsp;who&#8217;ve been doing event-based programming like this for ages&thinsp;&mdash;&thinsp;have an established motto for this: &#8220;stay off the UI thread&#8221;.</p>
+<p>This sounds scary, but in practice it&#8217;s not the end of the world. It&#8217;s just something you have to be aware of. UI programmers&#8202;&mdash;&#8202;who&#8217;ve been doing event-based programming like this for ages&#8202;&mdash;&#8202;have an established motto for this: &#8220;stay off the UI thread&#8221;.</p>
 <p>If you&#8217;re responding to a event synchronously, you need to finish and return control as quickly as possible so that the UI doesn&#8217;t lock up. When you have slow work to do, push it onto another thread or a work queue.</p>
 <p>You do have to be careful mixing observers with threads and explicit locks, though. If an observer tries to grab a lock that the subject has, you can deadlock the game. In a highly threaded engine, you may be better off with asynchronous communication using an <a href="event-queue.html" class="pattern">Event Queue</a>.</p>
 <h2><a href="#"it-does-too-much-dynamic-allocation"" name=""it-does-too-much-dynamic-allocation"">&#8220;It Does Too Much Dynamic Allocation&#8221;</a></h2>
-<p>Whole tribes of the programmer clan&thinsp;&mdash;&thinsp;including many game developers&thinsp;&mdash;&thinsp;have moved
+<p>Whole tribes of the programmer clan&#8202;&mdash;&#8202;including many game developers&#8202;&mdash;&#8202;have moved
 onto garbage collected languages, and dynamic allocation isn&#8217;t the boogie man
 that it used to be. But for performance critical software like
 games, memory allocation still matters, even in managed languages. <span name="fragment">Dynamic</span> allocation takes time, as does reclaiming memory, even if it happens automatically.</p>
@@ -248,7 +248,7 @@ games, memory allocation still matters, even in managed languages. <span name="f
 things dead simple. In real implementations, the observer list is almost always
 a dynamically allocated collection that grows and shrinks as observers are
 added and removed. That memory churn spooks some people.</p>
-<p>Of course, the first thing to notice is that it only allocates memory when observers are being wired up. <em>Sending</em> a notification requires no memory allocation whatsoever&thinsp;&mdash;&thinsp;it&#8217;s just a method call. If you wire up your observers at the start of the game and don&#8217;t mess with them much, the amount of allocation is minimal.</p>
+<p>Of course, the first thing to notice is that it only allocates memory when observers are being wired up. <em>Sending</em> a notification requires no memory allocation whatsoever&#8202;&mdash;&#8202;it&#8217;s just a method call. If you wire up your observers at the start of the game and don&#8217;t mess with them much, the amount of allocation is minimal.</p>
 <p>If it&#8217;s still a problem, though, I&#8217;ll walk through a way to implement adding and removing observers without any dynamic allocation at all.</p>
 <h3><a href="#linked-observers" name="linked-observers">Linked observers</a></h3>
 <p>In the code we&#8217;ve seen so far, <code>Subject</code> owns a list of pointers to each <code>Observer</code> watching it. The <code>Observer</code> class itself has no reference to this list. It&#8217;s just a pure virtual interface. Interfaces are preferred over concrete, stateful classes, so that&#8217;s generally a good thing.</p>
@@ -407,7 +407,7 @@ option and insert it at the front:</p>
 
 <h3><a href="#what's-going-on" name="what's-going-on">What&#8217;s going on?</a></h3>
 <p>The other, deeper issue with the Observer pattern is a direct consequence of its intended purpose. We use it because it helps us loosen the coupling between two pieces of code. It lets a subject indirectly communicate with some observer without being statically bound to it.</p>
-<p>This is a real win when you&#8217;re trying to reason about the subject&#8217;s behavior, and any hangers-on would be an annoying distraction. If you&#8217;re poking at the physics engine, you really don&#8217;t want your editor&thinsp;&mdash;&thinsp;or your mind&thinsp;&mdash;&thinsp;cluttered up with a bunch of stuff about achievements.</p>
+<p>This is a real win when you&#8217;re trying to reason about the subject&#8217;s behavior, and any hangers-on would be an annoying distraction. If you&#8217;re poking at the physics engine, you really don&#8217;t want your editor&#8202;&mdash;&#8202;or your mind&#8202;&mdash;&#8202;cluttered up with a bunch of stuff about achievements.</p>
 <p>On the other hand, if your program isn&#8217;t working and the bug spans some chain of observers, reasoning about that communication flow is much more difficult. With an explicit coupling, it&#8217;s as easy as looking up the method being called. Child&#8217;s play for your average IDE, since the coupling is static.</p>
 <p>But if that coupling happens through an observer list, the only way to tell who will get notified is by seeing which observers happen to be in that list <em>at runtime</em>. Instead of being able to <em>statically</em> reason about the communication structure of the program, you have to reason about its <em>imperative, dynamic</em> behavior.</p>
 <p>My guideline for how to cope with this is pretty simple. If you often need to think about <em>both</em> sides of some communication in order to understand a part of the program, don&#8217;t use the Observer pattern to express that linkage. Prefer something more explicit.</p>
