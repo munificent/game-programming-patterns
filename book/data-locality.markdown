@@ -3,7 +3,7 @@
 
 ## Общая мысль
 
-*Если расположить данные в памяти специальным образом, то это поможет кешам процессора.*
+*Если расположить данные в памяти специальным образом, то это поможет кэшам процессора.*
 
 ## Предыстория
 
@@ -39,7 +39,7 @@
 
 ### Хранилище данных
 
-Представьте, что вы -- бухгалтер в маленьком офисе. Ваша работа: получить коробку документов и сделать с ними что-нибудь бухгалтерское. Например, сложить какие-то числа. Это нужно сделать только с документами из некоторых коробок, в соответствии с какими-то тайными правилами, которые понятны только другим бухгалтерам.
+Представьте, что вы -- бухгалтер в маленьком офисе. Ваша работа: получить коробку документов и сделать с ними что-нибудь <span name="accountant">бухгалтерское</span>. Например, сложить какие-то числа. Это нужно сделать только с документами из некоторых коробок, в соответствии с какими-то тайными правилами, которые понятны только другим бухгалтерам.
 
 <aside name="accountant">
 
@@ -65,7 +65,7 @@
 
 </aside>
 
-Это дельный совет. Теперь, когда вы запрашиваете коробку у парня со склада, он приносит вам целую палету. Не только коробку, которая вам нужна, но и несколько соседних -- тоже. Он не знает, понадобятся ли они вам (вообще говоря, ему просто по барабану) -- он просто берет столько коробок, сколько может унести.
+Это дельный совет. Теперь, когда вы запрашиваете коробку у парня со склада, он приносит вам целую палету. Не только коробку, которая вам нужна, но и несколько соседних тоже. Он не знает, понадобятся ли они вам (вообще говоря, ему просто по барабану) -- он просто берет столько коробок, сколько может унести.
 
 Итак, он загружает целую палету и несет её вам. Игнорируя правила безопасности, он въезжает на подъемнике прямо к вам в офис и сгружает все это прямо у вас в углу.
 
@@ -73,115 +73,115 @@
 
 Но, если коробка, которая вам нужна, в куче *отсутствует*, вам все-таки придется её заказать. Поскольку в угол влезает только одна палета, то парень со склада приедет, заберет старую кучу и затем привезет вам совершенно новую кучу.
 
-### A pallet for your CPU
+### Куча для процессора
 
-Strangely enough, this is similar to how CPUs in modern computers work. In case it isn't obvious, you play the role of the CPU. Your desk is the CPU's registers, and the box of papers is the data you can fit in them. The warehouse is your machine's RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.
+Может показаться странным, но в современных компьютерах процессоры работают точно также. Офисный стол бухгалтера - это регистры процессора, а коробка с документами -- данные, которые можно положить в регистры. Склад -- это RAM вашего компьютера, а тот надоедливый парень со склада -- шина, которая наполняет регистры данными из памяти.
 
-If I were writing this chapter thirty years ago, the analogy would stop there. But as chips got faster and RAM, well, *didn't*, hardware engineers started looking for solutions. What they came up with was *CPU caching*.
+Если бы эта книга писалась тридцать лет назад, здесь история бы и закончилась. Но так как процессоры становятся быстрее, а RAM, грубо говоря, *нет*, инженеры начали искать решение. И они пришли к тому, что называется *кэшем процессора*.
 
-Modern computers have a <span name="caches">little chunk</span> of memory right inside the chip. The CPU can pull data from this much faster than it can from main memory. It's small because it has to fit in the chip and because the faster type of memory it uses (static RAM or "SRAM") is way more expensive.
+В современных компьютеры если  <span name="caches">маленький объем</span> памяти прямо внутри процессора. Он может достать оттуда данные быстрее, чем из основной памяти. Этот объем достаточно мал, чтобы уместиться в процессоре, и довольно дорог, потому что используется особый, быстрый тип памяти (static RAM или "SRAM").
 
 <aside name="caches">
 
-Modern hardware actually has multiple levels of caching, which is what they mean when you hear "L1", "L2", "L3", etc. Each level is larger but slower than the previous. For this chapter, we won't worry about the fact that memory is actually a [hierarchy](http://en.wikipedia.org/wiki/Memory_hierarchy), but it's important to know.
+Вообще, кэшей несколько. В зависимости от уровня они называются по-разному -- "L1", "L2", "L3" и так далее. Каждый уровень больше и медленнее предыдущего. В этой главе мы не будем углубляться в детали [иерархии памяти](http://ru.wikipedia.org/wiki/Иерархия_памяти), но это полезно знать.
 
-</aside>
+ </aside>
 
-This little chunk of memory is called a *cache* (in particular, the chunk on the chip is your *L1 cache*) and in my belabored analogy, its part was played by the pallet of boxes. Whenever your chip needs a byte of data from RAM, it automatically grabs a whole chunk of contiguous memory -- usually around 64 to 128 bytes -- and puts it in the cache. This dollop of memory is called a *cache line*.
+Этот маленький кусочек памяти называется *кэшем* (в частности, этот можно назвать *кэш L1*), и в нашей истории он эквивалентен куче коробок. Как только процессору понадобится байт памяти из RAM, он автоматически забирает целый кусок непрерывных данных -- обычно от 64 до 128 байт -- и кладет их в кэш. Эта порция памяти называется *кэш-линией*.
 
 <img src="images/data-locality-cache-line.png" />
 
-If the <span name="pallet">next byte</span> of data you need happens to be in that chunk, the CPU reads it straight from the cache, which is *much* faster than hitting RAM. Successfully finding a piece of data in the cache is called a *cache hit*. If it can't find it in there and has to go to main memory, that's a *cache miss*.
+Если <span name="pallet">следующий байт</span> данных, который вам нужен, случайно окажется к этой линии, процессор прочитает его прямо из кэша, что *гораздо* быстрее чем обращение к RAM. Эту ситуацию, когда данные в кеше, называют *попаданием в кэш*. Если данных нет в кеше и приходится запрашивать главную память -- это *кэш-промах*.
 
 <aside name="pallet">
 
-I glossed over (at least) one detail in the analogy. In your office, there was only room for one pallet, or one cache line. A real cache contains a number of cache lines. The details about how those work is out of scope here, but search for "cache associativity" to feed your brain.
+Я приукрасил одну (по крайней мере) деталь в нашей истории. В офисе можно положить только одну кучу, то есть одну кэш-линию. Кэш процессора содержит несколько кэш-линий. Вы сможете утолить свое любопытство, поискав по слову "ассоциативность кэша".
 
 </aside>
 
-When a cache miss occurs, the CPU *stalls*: it can't process the next instruction because it needs data. It sits there, bored out of its mind for a few hundred cycles until the fetch completes. Our mission is to avoid that. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
+Когда случается кэш-промах, процессор *замирает*: он не может выполнить инструкцию, потому что ему нужны данные. Он просто стоит и скучает следующие несколько сотен тактов пока данные не появятся. Наша задача -- избежать этого. Допустим, мы хотит увеличить производительность важной части кода, который выглядит вот так:
 
 ^code do-nothing
 
-What's the first change you're going to make to that code? Right. Take out that pointless, expensive function call. That call is equivalent to the performance cost of a cache miss. Every time you bounce to main memory, it's like you put a delay in your code.
+Какой бы был ваш первый шаг? Правильно! Уберем этот бессмысленный и дорогой вызов функции. Вызов функции по стоимости эквивалентен кэш-промаху. Каждый раз вы выскакиваете в основную память -- это как вставить задержку в код.
 
-### Wait, data is performance?
+### Разве данные -- это производительность?
 
-When I started working on this chapter, I spent some time putting together little game-like programs that would trigger best case and worst case cache usage. I wanted benchmarks that would thrash the cache so I could see first-hand how much bloodshed it causes.
+Когда я начал работать над этой главой, я потратил время на примеры , которые показали бы хороший и плохой вариант использования кэша. Мне нужны были тесты, которые гоняли бы кэш, чтобы непосредственно увидеть все эффекты.
 
-When I got some stuff working, I was surprised. I knew it was a big deal, but there's nothing quite like seeing it with your own eyes. <span name="ymmv">I wrote two programs</span> that did the *exact same* computation. The only difference was how many cache misses they caused. The slow one was fifty *times* slower than the other.
+И когда я сделал часть работы, я был удивлен. Я знал, что кэш важен, но увидеть это своими глазами -- это нечто. <span name="ymmv">Я написал две программы</span>, которые делали *совершенно одинаковые* вещи. Единственное отличие было в том, как много кэш-промахов они получали. И худший вариант был в 50 *раз* медленнее, чем лучший.
 
 <aside name="ymmv">
 
-There's a lot of caveats here. In particular, different computers have different cache setups so my machine may be different from yours, and dedicated game consoles are very different from PCs which are quite different from mobile devices.
+Здесь есть тонкости. В частности, разные компьютеры имеют разный кэш, поэтому мой комьютер может отличаться от вашего. А игровые консоли совсем отличны от дескторов, которые имеют много разного с мобильными устройствами.
 
-Your mileage will vary.
+Ваши результаты могут отличаться.
 
 </aside>
 
-This was a real eye-opener to me. I'm used to thinking of performance being an aspect of *code* not *data*. A byte isn't slow or fast, it's just some static thing sitting there. But, because of caching, *the way you organize data directly impacts performance.*
+Это по-настоящему открыло мне глаза. Я думал, на быстродействие влияет *код*, а не *данные*. Байт не бывает быстрым или медленным, он просто есть. Но из-за кэширования, *способ управления памятью прямо влияет на производительность*.
 
-The challenge now is to wrap that up into something that fits into a chapter here. Optimization for cache usage is a huge topic. I haven't even touched on *instruction caching*. Remember, code is in memory too and has to be loaded onto the CPU before it can be executed. Someone more versed on the subject could write an entire <span name="book">book</span> on it.
+Теперь нужно все это применить к нашей теме. Оптимизация использования кэша -- довольно объемная тема. Я даже не упомянул о *кэшировании инструкций*. Вспомните -- код находится в памяти тоже, и его тоже нужно загрузить в процессор перед тем как выполнить. Кто-то более осведомленный может написать целую <span name="book">книгу</span> об этом.
 
 <aside name="book">
 
-In fact, someone *did* write a book on it: [*Data-Oriented Design*](http://www.dataorienteddesign.com/dodmain/) by Richard Fabian.
+На самом деле, кто-то *уже* написал книгу об этом:  [*Data-Oriented Design*](http://www.dataorienteddesign.com/dodmain/) от Ричарда Фабиана.
 
 </aside>
 
-Since you're already reading *this* book right now, though, I have a few basic techniques that will get you started along the path of thinking about how data structures impact your performance.
+Так как вы всё-таки читаете *эту* книгу, то я опишу несколько базовых вещей. Вместе с ними уже можно начать думать о том, как структуры данных влияют на производительность.
 
-It all boils down to something pretty simple: whenever the chip reads some memory, it gets a whole cache line. The more you can use stuff in that <span name="line">cache line, the faster you go</span>. So the goal then is to *organize your data structures so that the things you're processing are next to each other in memory*.
+Все довольно просто: когда процессор считывать данные из памяти, он требует целую кэш-линию. Чем больше данных удасться <span name="line">положить в эту линию, тем быстрее все выполнится</span>. Так что надо *организовать ваши структуры так, чтобы вычисления оперировали с близко расположенными в памяти данными*.
 
 <aside name="line">
 
-There's a key assumption here, though: one thread. If you are modifying nearby data on multiple threads, it's faster to have it on *different* cache lines. If two threads try to tweak data on the same cache line, both cores have to do some costly synchronization of their caches.
+Здесь есть ключевой момент:  контекст одного потока. Если вы модифицируете данные, используя несколько потоков, то лучше им находится в разных *кэш-линиях*. Если два потока попытаются изменить данные в одной и той же кэш-линии, обоим процессорам использовать синхронизацию кэшей, что довольно дорого.
 
 </aside>
 
-In other words, if your code is crunching on `Thing` then `Another` then `Also`, you want them laid out in memory like this:
+Другими словами, если ваш код использует `одно`, затем `другое`, потом `третье`, вам лучше расположить это в памяти как-то так:
 
 <img src="images/data-locality-things.png" />
 
-Note, these aren't *pointers* to `Thing`, `Another`, and `Also`. This is the actual data for them, in place, lined up one after the other. As soon as the CPU reads in `Thing`, it will start to get `Another` and `Also` too (depending on how big they are and how big a cache line is). When you start working on them next, they'll already be cached. Your chip is happy and you're happy.
+Заметьте, это не *указатели* на `одно`, `другое` и `третье`. Это настоящие данные, расположенные в одну линию. Как только процессор потребует `одно`, он сразу же получит и `другое`, и `третье` (вообще это зависит от того, насколько эти штуки большие, и от размера кэш-линии). Когда начнуться вычисления, данные уже будут в кэше. Ваш процессор счастлив, значит -- и вы счастливы.
 
-## The Pattern
+## Общий подход
 
-Modern CPUs have **caches to speed up memory access.** These can access memory **adjacent to recently accessed memory much quicker**. Take advantage of that to improve performance by **increasing data locality** -- keeping data in **contiguous memory in the order that you process it.**
+Современные **процессоры имеют кэш для ускорения доступа к памяти**. Доступ к соседним участкам памяти **осуществляется намного быстрее**. Этим можно воспользоваться **увеличивая компактность данных** -- хранить данные **непрерывно, в соответствии с порядком их обработки**.
 
-## When to Use It
+## Когда этим пользоваться
 
-Like most optimizations, the first guideline for using it is *when you have a performance problem.* Don't waste time applying this to some infrequently executed corner of your codebase. Optimizing code that doesn't need it just makes your life harder since the result is almost always more complex and less flexible.
+Как и при большинстве оптимизаций, первым делом нужно убедится что *есть проблема с быстродействием*. Не тратьте время, пытаясь ускорить редко используемый участок кода. Преждевременная оптимизация усложнит вашу жизнь, так как результат почти всегда сложен и менее гибок.
 
-With this pattern specifically, you'll also want to be sure your performance problems *are caused by cache misses*. If your code is slow for other reasons, this won't help.
+Применительно к нашей теме, нужно убедиться, что быстродействие *действительно страдает от кэш-промахов*. Если код медленный по другим причинам, то лекарство не поможет.
 
-The cheap way to profile is to manually add a bit of instrumentation that checks how much time has elapsed between two points in the code, hopefully using a precise timer. To catch cache misses, you'll want something a little more sophisticated. You really want to see how many cache misses are occurring and where.
+В простом случае выследить проблему поможет инструментация. Она измерит время выполнения кода между двумя точками с использованием точного таймера. Для отлова кэш-промахов понадобиться что-то посложнее. Нужно увидеть, как много случилось промахов, и в каком месте.
 
-Fortunately, there are <span name="cachegrind">profilers</span> out there that report it. It's worth spending the time to get one of these working and make sure you understand the (surprisingly complex) numbers it throws at you before you do major surgery on your data structures.
+К счастью, есть <span name="cachegrind">профайлеры</span>, которые могут помочь. Придется потратить время на настройку такого профайлера и научится воспринимать его (часто непростые) отчеты, перед тем как приступить к главному действу по оптимизации структур с данными.
 
 <aside name="cachegrind">
 
-Unfortunately, most of those tools aren't cheap. If you're on a console dev team, you probably already have licenses for them.
+К сожалению, такие профайлеры недешевы. Если вы в команде, которая работает с консолями, у вас скорее всего уже есть какая-нибудь лицензия.
 
-If not, an excellent free option is [cachegrind](http://valgrind.org/docs/manual/cg-manual.html). It runs your program on top of a simulated CPU and cache hierarchy and then reports all of the cache interactions.
+Если нет, то если бесплатный [cachegrind](http://valgrind.org/docs/manual/cg-manual.html). Он выполняет программу в эмуляторе процессора и показывает все операции с кэшем.
 
 </aside>
 
-That being said, cache misses *will* affect the performance of your game. While you shouldn't spend a ton of time pre-emptively optimizing for cache usage, do think about how cache-friendly your data structures are throughout the design process.
+Как уже говорилось, кэш-промахи *повлияют* на быстродействие вашей игры. И все же не увлекайтесь тратой времени на преждевременную оптимизацию кэша. Просто помните при разработке архитектуры -- организовать структуры стоит так, чтобы они хорошо работали в кэше.
 
-## Keep in Mind
+## Особенности
 
-One of the hallmarks of software architecture is *abstraction*. A large chunk of this book is about patterns to decouple pieces of code from each other so that they can be changed more easily. In object-oriented languages, this almost always means interfaces.
+Отличительный признак архитектуры программы -- *абстрация*. Большая часть это книги рассказывает о том, как отвязать куски кода друг от друга так, чтобы они были легко изменяемы. В языках ООП это почти всегда означает интерфейсы.
 
-In C++, using interfaces implies accessing objects through <span name="virtual">pointers or references</span>. But going through a pointer means hopping across memory, which leads to the cache misses this pattern works to avoid.
+В C++ использование интерфейсов предполагает доступ к объектам через <span name="virtual">указатели или ссылки</span>. Доступ через указатель означает прыжки в памяти, которые ведут к кэш-промахам -- а мы стараемся их избежать.
 
 <aside name="virtual">
 
-The other half of interfaces is *virtual method calls*. Those require the CPU to look up an object's vtable, and then find the pointer to the actual method to call there. So, again, you're chasing pointers which can cause cache misses.
+Другая особенность интерфейсов -- *виртуальные методы*. Для того чтобы вызвать такой метод, необходимо получить доступ к виртуальной таблице объекта и найти там указатель на функцию, которую необходимо вызвать. То есть, игра в указатели опять приводит к кэш-промахам.
 
 </aside>
 
-In order to please this pattern, you will have to sacrifice some of your precious abstractions. The more you design your program around data locality, the more you will have to give up inheritance and interfaces, and the benefits those tools can provide. There's no silver bullet here, just challenging trade-offs. That's what makes it fun!
+Для того, чтобы воспользоваться оптимизацией, придется пожертвовать частью абстракций. Чем больше вы концентрируете архитектуру программы вокруг компактности данных, тем меньше применения находится наследованию и интерфейсам -- и всем их сильным сторонам. Серебрянной пули здесь нет, угодить всем не удасться. Тем веселее!
 
 ## Sample Code
 
