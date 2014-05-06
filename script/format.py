@@ -24,32 +24,32 @@ PINK = '\033[91m'
 YELLOW = '\033[33m'
 
 CHAPTERS = [
-  "Introduction",
-  "Architecture, Performance, and Games",
-  "Design Patterns Revisited",
-  "Command",
-  "Flyweight",
-  "Observer",
-  "Prototype",
-  "Singleton",
-  "State",
-  "Sequencing Patterns",
-  "Double Buffer",
-  "Game Loop",
-  "Update Method",
-  "Behavioral Patterns",
-  "Bytecode",
-  "Subclass Sandbox",
-  "Type Object",
-  "Decoupling Patterns",
-  "Component",
-  "Event Queue",
-  "Service Locator",
-  u'Низкоуровневая оптимизация', # "Optimization Patterns",
-  "Data Locality",
-  "Dirty Flag",
-  "Object Pool",
-  "Spatial Partition"
+  (u"Introduction", u"Introduction"),
+  (u"Architecture, Performance, and Games", u"Architecture, Performance, and Games"),
+  (u"Design Patterns Revisited", u"Design Patterns Revisited"),
+  (u"Command", u"Command"),
+  (u"Flyweight", u"Flyweight"),
+  (u"Observer", u"Observer"),
+  (u"Prototype", u"Prototype"),
+  (u"Singleton", u"Singleton"),
+  (u"State", u"State"),
+  (u"Sequencing Patterns", u"Sequencing Patterns"),
+  (u"Double Buffer", u"Double Buffer"),
+  (u"Game Loop", u"Game Loop"),
+  (u"Update Method", u"Update Method"),
+  (u"Behavioral Patterns", u"Behavioral Patterns"),
+  (u"Bytecode", u"Bytecode"),
+  (u"Subclass Sandbox", u"Subclass Sandbox"),
+  (u"Type Object", u"Type Object"),
+  (u"Decoupling Patterns", u"Decoupling Patterns"),
+  (u"Component", u"Component"),
+  (u"Event Queue", u"Event Queue"),
+  (u"Service Locator", u"Service Locator"),
+  (u"Optimization Patterns", u'Низкоуровневая оптимизация'),
+  (u"Data Locality", u"Data Locality"),
+  (u"Dirty Flag", u"Dirty Flag"),
+  (u"Object Pool", u"Object Pool"),
+  (u"Spatial Partition", u"Spatial Partition")
 ]
 
 STRINGS = {
@@ -159,7 +159,7 @@ def formatfile(path, nav, skip_up_to_date):
 
     if section != "":
       title_text = title + " &middot; " + section
-      section_href = section.lower().replace(" ", "-")
+      section_href = next(value for index,value in enumerate(CHAPTERS) if value[1] == section)[0].lower().replace(" ", "-")
       section_header = u'<span class="section"><a href="{}.html">{}</a></span>'.format(
         section_href, section)
 
@@ -209,11 +209,11 @@ def formatfile(path, nav, skip_up_to_date):
       GREEN, DEFAULT, basename, word_count)
 
 
-def title_to_file(title):
+def chapter_to_file(chapter):
   """Given a title like "Event Queue", converts it to the corresponding file
   name like "event-queue"."""
 
-  return (title.lower()
+  return (chapter[0].lower()
     .replace(" ", "-")
     .replace(",", ""))
 
@@ -221,16 +221,16 @@ def title_to_file(title):
 def make_prev_next(title):
   """Generate the links that thread through the chapters."""
 
-  chapter_index = CHAPTERS.index(title)
+  chapter_index = next(index for index,value in enumerate(CHAPTERS) if value[1] == title)
   prev_link = ""
   next_link = ""
   if chapter_index > 0:
-    prev_href = title_to_file(CHAPTERS[chapter_index - 1])
+    prev_href = chapter_to_file(CHAPTERS[chapter_index - 1])
     prev_link = u'<span class="prev">&larr; <a href="{}.html">{}</a></span>'.format(
       prev_href, STRINGS['Previous Chapter'], CHAPTERS[chapter_index - 1])
 
   if chapter_index < len(CHAPTERS) - 1:
-    next_href = title_to_file(CHAPTERS[chapter_index + 1])
+    next_href = chapter_to_file(CHAPTERS[chapter_index + 1])
     next_link = u'<span class="next"><a href="{}.html">Next Chapter</a> &rarr;</span>'.format(
       next_href, STRINGS['Next Chapter'], CHAPTERS[chapter_index + 1])
 
