@@ -133,34 +133,35 @@
 <p>Другая особенность интерфейсов&thinsp;&mdash;&thinsp;<em>виртуальные методы</em>. Для того чтобы вызвать такой метод, необходимо получить доступ к виртуальной таблице объекта и найти там указатель на функцию, которую необходимо вызвать. То есть, игра в указатели опять приводит к кэш-промахам.</p>
 </aside>
 <p>Для того, чтобы воспользоваться оптимизацией, придется пожертвовать частью абстракций. Чем больше вы концентрируете архитектуру программы вокруг компактности данных, тем меньше применения находится наследованию и интерфейсам&thinsp;&mdash;&thinsp;и всем их сильным сторонам. Серебрянной пули здесь нет, угодить всем не удасться. Тем веселее!</p>
-<h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
-<p>If you really go down the rathole of optimizing for data locality, you&#8217;ll discover countless ways to slice and dice your data structures into pieces your CPU can most easily digest. To get you started, I&#8217;ll show an example for each of a few of the most common ways to organize your data. We&#8217;ll cover them in the context of some specific part of a game engine, but (as with other patterns), keep in mind that the general technique can be applied anywhere it fits.</p>
-<h3><a href="#contiguous-arrays" name="contiguous-arrays">Contiguous arrays</a></h3>
-<p>Let&#8217;s start with a <a href="game-loop.html" class="pattern">Game Loop</a> that processes a bunch of game entities. Those entities are decomposed into different domains&thinsp;&mdash;&thinsp;AI, physics, and rendering&thinsp;&mdash;&thinsp;using the <a href="component.html" class="pattern">Component</a> pattern. Here&#8217;s the game entity class:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">GameEntity</span>
-<span class="p">{</span>
-<span class="nl">public:</span>
-  <span class="n">GameEntity</span><span class="p">(</span><span class="n">AIComponent</span><span class="o">*</span> <span class="n">ai</span><span class="p">,</span>
-             <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics</span><span class="p">,</span>
-             <span class="n">RenderComponent</span><span class="o">*</span> <span class="n">render</span><span class="p">)</span>
-  <span class="o">:</span> <span class="n">ai_</span><span class="p">(</span><span class="n">ai</span><span class="p">),</span> <span class="n">physics_</span><span class="p">(</span><span class="n">physics</span><span class="p">),</span> <span class="n">render_</span><span class="p">(</span><span class="n">render</span><span class="p">)</span>
-  <span class="p">{}</span>
+<h2><a href="#примеры" name="примеры">Примеры</a></h2>
+<p>Если заняться оптимизацией локальности данных, то можно придумать бесконечно много способов разложения ваши структур на кусочки, с которыми процессору будет удобно работать. Для общего понимания я покажу примеры основных реализаций этих идей. Мы рассмотрим их в контексте части игрового кода, но это общая техника, поэтому применить её возможно везде (как и все остальные паттерны).</p>
+<h3><a href="#непрерывные-массивы" name="непрерывные-массивы">Непрерывные массивы</a></h3>
+<p>Начнем мы с <a href="game-loop.html" class="pattern">Game Loop</a>, который обрабатывает набор внутренних объектов. Эти объекты разделены на несколько областей&thinsp;&mdash;&thinsp;AI, физика и рендеринг&thinsp;&mdash;&thinsp;с использованием паттерна <a href="component.html" class="pattern">Component</a>. Вот класс объекта:</p>
+<div class="codehilite"><pre> <span class="o">:::</span><span class="n">cpp</span>
+ <span class="n">class</span> <span class="n">GameEntity</span>
+ <span class="p">{</span>
+ <span class="nl">public:</span>
+   <span class="n">GameEntity</span><span class="p">(</span><span class="n">AIComponent</span><span class="o">*</span> <span class="n">ai</span><span class="p">,</span>
+              <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics</span><span class="p">,</span>
+              <span class="n">RenderComponent</span><span class="o">*</span> <span class="n">render</span><span class="p">)</span>
+   <span class="o">:</span> <span class="n">ai_</span><span class="p">(</span><span class="n">ai</span><span class="p">),</span> <span class="n">physics_</span><span class="p">(</span><span class="n">physics</span><span class="p">),</span> <span class="n">render_</span><span class="p">(</span><span class="n">render</span><span class="p">)</span>
+   <span class="p">{}</span>
 
-  <span class="n">AIComponent</span><span class="o">*</span>      <span class="n">ai</span><span class="p">()</span>      <span class="p">{</span> <span class="k">return</span> <span class="n">ai_</span><span class="p">;</span> <span class="p">}</span>
-  <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">physics_</span><span class="p">;</span> <span class="p">}</span>
-  <span class="n">RenderComponent</span><span class="o">*</span>  <span class="n">render</span><span class="p">()</span>  <span class="p">{</span> <span class="k">return</span> <span class="n">render_</span><span class="p">;</span> <span class="p">}</span>
+   <span class="n">AIComponent</span><span class="o">*</span>      <span class="n">ai</span><span class="p">()</span>      <span class="p">{</span> <span class="k">return</span> <span class="n">ai_</span><span class="p">;</span> <span class="p">}</span>
+   <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">physics_</span><span class="p">;</span> <span class="p">}</span>
+   <span class="n">RenderComponent</span><span class="o">*</span>  <span class="n">render</span><span class="p">()</span>  <span class="p">{</span> <span class="k">return</span> <span class="n">render_</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
-  <span class="n">AIComponent</span><span class="o">*</span>      <span class="n">ai_</span><span class="p">;</span>
-  <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics_</span><span class="p">;</span>
-  <span class="n">RenderComponent</span><span class="o">*</span>  <span class="n">render_</span><span class="p">;</span>
-<span class="p">};</span>
+ <span class="nl">private:</span>
+   <span class="n">AIComponent</span><span class="o">*</span>      <span class="n">ai_</span><span class="p">;</span>
+   <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics_</span><span class="p">;</span>
+   <span class="n">RenderComponent</span><span class="o">*</span>  <span class="n">render_</span><span class="p">;</span>
+ <span class="p">};</span>
 </pre></div>
 
 
-<p>Each component has a relatively small amount of state, maybe little more than a few vectors or a matrix, and then a method to <span name="update">update</span> it. The details aren&#8217;t important here, but imagine something roughly along the lines of:</p>
+<p>Каждый компонент имеет относительный малый набор аттрибутов (не больше пары векторов или одной матрицы) и метод <span name="update">update</span>, который их обновляет. Детали не так важны здесь, просто представьте что-то вроде следующего:</p>
 <aside name="update">
-<p>As the name implies, these are examples of the <a href="update-method.html" class="pattern">Update Method</a> pattern. Even <code>render()</code> is this pattern, just by another name.</p>
+<p>Метод update&thinsp;&mdash;&thinsp;это пример паттерна <a href="update-method.html" class="pattern">Update Method</a>.  Как и <code>render()</code>, просто с другим именем.</p>
 </aside>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">AIComponent</span>
 <span class="p">{</span>
@@ -191,19 +192,19 @@
 </pre></div>
 
 
-<p>The game maintains a big array of pointers to all of the entities in the world. Each spin of the game loop, we need to run the following, in this order:</p>
+<p>Игра оперирует с большим массивом указателей на эти объекты. В каждой игровой итерации происходит следующее:</p>
 <ol>
 <li>
-<p>Update the AI components for all of the entities.</p>
+<p>Обновляем AI для всех объектов.</p>
 </li>
 <li>
-<p>Update the physics components for them.</p>
+<p>Применяем к ним физику.</p>
 </li>
 <li>
-<p>Render them using their render components.</p>
+<p>И отображаем все объекты с помощью рендера.</p>
 </li>
 </ol>
-<p>Lots of game engines implement that like so:</p>
+<p>Большинство игр прямо так и делают:</p>
 <div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">gameOver</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Process AI.</span>
@@ -229,34 +230,34 @@
 </pre></div>
 
 
-<p>Before you ever heard of a CPU cache, this looked totally innocuous. But by now you&#8217;ve got an inkling that something isn&#8217;t right here. This code isn&#8217;t just thrashing the cache, it&#8217;s taking it around back and beating it to a pulp. Watch what it&#8217;s doing:</p>
+<p>До того как вы узнали про кэш процессора, все выглядело абсолютно невинно. Но сейчас у вас возникло подозрение, что то-то делается неправильно. Код не использует кэш по полной, вместо этого он просто убивает его. Смотрите, что происходит:</p>
 <ol>
 <li>
-<p>The array of game entities is <em>pointers</em> to them, so for each element in the array, we have to traverse that pointer. That&#8217;s a cache miss.</p>
+<p>Массив объектов&thinsp;&mdash;&thinsp;это <em>указатели</em> на объекты. Когда мы образаемся к объекту, мы достаем данные по указателю. Это кэш-промах.</p>
 </li>
 <li>
-<p>Then the game entity has a pointer to the component. Another cache miss.</p>
+<p>Затем мы достаем компонент из указателя в объекте. Ещё кэш-промах.</p>
 </li>
 <li>
-<p>Then we update the component.</p>
+<p>Затем мы вызываем метод компонента.</p>
 </li>
 <li>
-<p>Now we go back to step one for <em>every component of every entity in the game</em>.</p>
+<p>И возвращаемся к шагу 1, чтобы повторить его для <em>каждого компонента каждого игрового объекта</em>.</p>
 </li>
 </ol>
-<p>The scary part is we have no idea how any of these objects are laid out in memory. We&#8217;re completely at the mercy of the memory manager. As entities get allocated and freed over time, the heap is likely to become increasingly randomly organized.</p>
+<p>Страшная правда в том, что мы понятия не имеем как все эти объекты раскиданы по памяти. Этим распоряжается менеджер памяти. Если все время создавать и уничтожать объекты, то постепенно память заполнится данными в произвольном порядке.</p>
 <p><span name="lines"></span></p>
 <p><img src="images/data-locality-pointer-chasing.png" /></p>
 <aside name="lines">
-<p>Every frame, the game loop has to follow all of those arrows to get to the data it cares about.</p>
+<p>Движку приходится бегать по этим стрелками каждый игровой ход, чтобы достать данные.</p>
 </aside>
-<p>If our goal was to take a whirlwind tour around the game&#8217;s address space like some &#8220;256MB of RAM in Four Nights!&#8221; cheap vacation package, this would be a fantastic deal. But our goal is to run the game quickly, and <span name="chase">traipsing</span> all over main memory is <em>not</em> the way to do that. Remember that <code>sleepFor500Cycles()</code> function? Well this code is effectively calling that <em>all the time</em>.</p>
+<p>Это было бы здорово, если бы мы хотели &#8220;объехать всю память за 80 дней&#8221;! Но нам нужно сделать цикл быстро и <span name="chase">бродить</span> по всей памяти не наш метод. Помните функцию <code>sleepFor500Cycles()</code>? Ну так вот&thinsp;&mdash;&thinsp;этот код использует её <em>постоянно</em>.</p>
 <aside name="chase">
-<p>The term for wasting a bunch of time traversing pointers is &#8220;pointer chasing&#8221;, which it turns out is nowhere near as fun as it sounds.</p>
+<p>Трата времени на разыменование указателей называется &#8220;блуждание по указателям&#8221;, и это не так весело как кажется.</p>
 </aside>
-<p>Let&#8217;s do something better. Our first observation is that the only reason we follow a pointer to get to the game entity is so we can immediately follow <em>another</em> pointer to get to a component. <code>GameEntity</code> itself has no interesting state and no useful methods. The <em>components</em> are what the game loop cares about.</p>
-<p>Instead of a giant constellation of game entities and components scattered across the inky darkness of address space, we&#8217;re going to get back down to Earth. We&#8217;ll have a big array for each type of component: a flat array of AI components, another for physics, and another for rendering.</p>
-<p>Like this:</p>
+<p>Придумаем что-нибудь получше. С первого взгляда ясно, что указатель на объект нам нужен только для доступа к <em>другому</em> указателю на его компонент. Сам <code>GameEntity</code>нам не интересен и дает нам ничего полезного. <em>Компоненты</em>&thinsp;&mdash;&thinsp;вот что нужно циклу.</p>
+<p>Срубим под корень раскидистое дерево указателей на объекты! Нам нужно оформить по массиву на каждый тип компонента: один плоский массив для AI, один для физики и ещё один для рендера.</p>
+<p>Как-то так:</p>
 <p><span name="long-name"></span></p>
 <div class="codehilite"><pre><span class="n">AIComponent</span><span class="o">*</span> <span class="n">aiComponents</span> <span class="o">=</span>
     <span class="k">new</span> <span class="n">AIComponent</span><span class="p">[</span><span class="n">MAX_ENTITIES</span><span class="p">];</span>
@@ -268,9 +269,9 @@
 
 
 <aside name="long-name">
-<p>My least favorite part about using components is how long the word &#8220;component&#8221; is.</p>
+<p>Меньше всего в компонентах мне нравится длина самого слова &#8220;компонент&#8221;.</p>
 </aside>
-<p>Let me just stress that these are arrays of <em>components</em> and not <em>pointers to components</em>. The data is all there, one byte after the other. The game loop can then walk these directly:</p>
+<p>Подчеркну, что это массив <em>компонентов</em>, а не <em>указателей на компонент</em>. Все данные прямо здесь, один за другим. Игровой цикл может оперировать прямо с ними:</p>
 <p><span name="arrow"></span></p>
 <div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">gameOver</span><span class="p">)</span>
 <span class="p">{</span>
@@ -298,17 +299,17 @@
 
 
 <aside name="arrow">
-<p>One hint that we&#8217;re doing better here is how few <code>-&gt;</code> operators there are in the new code. If you want to improve data locality, look for indirection operators you can get rid of.</p>
+<p>Показатель того, что мы движемся в правильном направлении, это уменьшение количества &#8220;<code>-&gt;</code>&#8221; в коде. Если вам нужно улучшить компактность данных, ищите эти операторы и избавляйтесь от них.</p>
 </aside>
-<p>We&#8217;ve ditched all of that pointer chasing. Instead of skipping around in memory, we&#8217;re doing a straight crawl through three contiguous arrays.</p>
+<p>Итак, мы выбросили блуждание по указателям. Вместо метания по памяти, мы перебираем три непрерывных массива с прямыми данными.</p>
 <p><img src="images/data-locality-component-arrays.png" /></p>
-<p>This pumps a solid stream of bytes right into the hungry maw of the CPU. In my testing, this change made the update loop fifty <em>times</em> faster than the previous version.</p>
-<p>Interestingly, we haven&#8217;t lost much encapsulation here. Sure, the game loop is updating the components directly instead of going through the game entities, but it was doing that before to ensure they were processed in the right order. Even so, each component itself is still nicely encapsulated. It owns its own data and methods. We just changed the way it&#8217;s used.</p>
-<p>This doesn&#8217;t mean we need to get rid of <code>GameEntity</code> either. We can leave it just as it is with pointers to its components. They&#8217;ll just point into those arrays. This is still useful for other parts of the game where you want to pass around a conceptual &#8220;game entity&#8221; and everything that goes with it. The important part is that the performance critical game loop sidesteps that and goes straight to the data.</p>
-<h3><a href="#packed-data" name="packed-data">Packed data</a></h3>
-<p>Say we&#8217;re doing a particle system. Following the advice of the previous section, we&#8217;ve got all of our particles in a nice big contiguous array. Let&#8217;s wrap it in a little <span name="pool">manager class</span> too:</p>
+<p>Теперь плотный поток байтов загружается прямо в жадное горло процессора. По результатам тестов, это изменение ускоряет цикл в тридцать раз по сравнению с предыдущим вариантом.</p>
+<p>Интересно, что мы почти не потеряли в инкапсуляции. Конечно, игровой цикл оперирует с компонентами напрямую, не доставая их из объектов. Но мы можем достать их заранее, чтобы убедиться что мы все делаем правильно. Более того, каждый компонент все ещё надежно инкапсулирован. Мы просто изменили способ доступа к ним.</p>
+<p>Это не значит, что <code>GameEntity</code> больше не нужен. Мы оставим его, так как он все ещё держит указатели на свои компоненты. Они просто будут указывать на элементы наших массивов. Сам концепт &#8220;игрового объекта&#8221; может пригодиться в других частях кода. Важно, что для производительности игровой цикл обходит этот момент и использует данные напрямую.</p>
+<h3><a href="#упаковка" name="упаковка">Упаковка</a></h3>
+<p>Допустим, мы делаем систему частиц. Следуя совету из предыдущей секции, мы загрузили все частици в один большой непрерывный массив. Придумаем маленькую <span name="pool">систему частиц</span>:</p>
 <aside name="pool">
-<p>The <code>ParticleSystem</code> class is an example of an <a href="object-pool.html" class="pattern">Object Pool</a> custom built for a single type of object.</p>
+<p>Класс <code>ParticleSystem</code> является примером паттерна <a href="object-pool.html" class="pattern">Object Pool</a> для одного типа объекта.</p>
 </aside>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
@@ -330,7 +331,7 @@
 </pre></div>
 
 
-<p>A rudimentary update method for the system just looks like this:</p>
+<p>Его метод <code>update</code> выглядит следующим образом:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticleSystem</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numParticles_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
@@ -341,7 +342,7 @@
 </pre></div>
 
 
-<p>But it turns out that we don&#8217;t actually need to process <em>all</em> of the particles all the time. The particle system has a fixed-size pool of objects, but they aren&#8217;t usually all actively twinkling across the screen. The easy answer is something like this:</p>
+<p>Но реальность показала, что нам не нужно обрабатывать <em>все</em> частицы каждый раз. Система содержит фиксированный набор частиц, но не все они активны на экране:</p>
 <div class="codehilite"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numParticles_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">particles_</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">isActive</span><span class="p">())</span>
@@ -352,17 +353,17 @@
 </pre></div>
 
 
-<p>We give <code>Particle</code> a flag to track whether its in use or not. In the update loop, we <span name="branch">check</span> that for each particle. That loads the flag into the cache, along with all of that particle&#8217;s other data. If the particle <em>isn&#8217;t</em> active, then we just skip over that to the next one. The rest of the particle&#8217;s data that we loaded into the cache is a waste.</p>
-<p>The fewer active particles there are, the more we&#8217;re skipping across memory. The more we do that, the more cache misses there are between actually doing useful work updating active particles. If the array is large and has <em>lots</em> of inactive particles in it, we&#8217;re back to just thrashing the cache again.</p>
-<p>Having objects in a contiguous array doesn&#8217;t solve much if the objects we&#8217;re actually processing aren&#8217;t contiguous in it. If it&#8217;s littered with inactive objects we have to dance around, we&#8217;re right back to the original problem.</p>
+<p>Мы дали <code>Particle</code> флажок, по которому определяем активна она или нет. В цикле мы <span name="branch">проверяем</span> его для каждой частицы. Флажок загружается в кэш вместе с целым объектом. И если частица <em>не активна</em>, мы просто переходим к следующей. Остальные аттрибуты частицы бесполезно загружаются в кэш.</p>
+<p>Чем меньше активных частиц, тем больше частиц загружается в кэш вхолостую. Если массив большой и <em>большинство</em> частиц неактивно, то мы просто насилуем кэш без пользы.</p>
+<p>Идея хранения объектов в непрерывном массиве не сильно помогает, так как набор частиц, с которым мы реально будем работать, не непрерывен. Массив замусорен неактивными частицами, которые нам надо пропускать, и мы возвращаемся к первоначальной проблеме.</p>
 <aside name="branch">
-<p>Savvy low-level coders can see another problem here. Doing an <code>if</code> check for every particle can cause a <em>branch misprediction</em> and a <em>pipeline stall</em>. In modern CPUs a single &#8220;instruction&#8221; actually takes several clock cycles. To keep the CPU busy, instructions are <em>pipelined</em> so that the subsequent instructions start processing before the first one finishes.</p>
-<p>To do that, the CPU has to guess which instructions it will be executing next. In straight line code, that&#8217;s easy, but with flow control, it&#8217;s harder. While it&#8217;s executing the instructions for that <code>if</code>, does it guess that the particle is active and start executing the code for the <code>update()</code> call, or does it guess that it isn&#8217;t?</p>
-<p>To answer that, the chip does <em>branch prediction:</em> it sees which branches your code previously took and guesses that it will do that again. But when the loop is constantly toggling between particles that are and aren&#8217;t active, that prediction fails.</p>
-<p>When it does, the CPU has to ditch the instructions it had started speculatively processing (a <em>pipeline flush</em>) and start over. The performance impact of this varies widely by machine, but this is why you sometimes see developers avoid flow control in hot code.</p>
+<p>Смышленные программисты увидят здесь и другую проблему. Выполнение условия <code>if</code> для каждой частицы может привести к <em>сбою предсказания переходов</em> и <em>простою конвейера</em>.  В процессорах одна &#8220;инструкция&#8221; может занять несколько тактов. Чтобы процессор не простаивал, инструкции <em>распараллеливают</em>, чтобы следующая инструкция начала обрабатываться, не дожидаясь конца предыдущей.</p>
+<p>Процессор пытается угадать, какая инструкция выполнится следующей. В линейном коде это просто, но условные переходы усложняют жизнь. Пока выполняется условие для <code>if</code>, какую часть кода брать следующей&thinsp;&mdash;&thinsp; <code>update()</code> или ничего не делать?</p>
+<p>Для ответа на этот вопрос процессор использует <em>предсказание переходов</em>: он видит, по какому пути пошел в прошлый раз и предполагает, что пойдет по нему опять. И когда флажок постоянно переключается, это предсказание терпит сбой.</p>
+<p>Когда происходит сбой, процессор выкидывает инструкции, которые он уже начал выполнять (<em>сброс конвейера</em>) и начинает заново. Влияние этого на производительность зависит от характеристик машины, но это та причина, по которой некоторые программисты пытаются избежать ветвлений в критических местах.</p>
 </aside>
-<p>Given the title of this section, you can probably guess the answer. Instead of <em>checking</em> the active flag, we&#8217;ll <em>sort</em> by it. We&#8217;ll keep all of the active particles in the front of the list. If we know all of those particles are active, we don&#8217;t have to check the flag at all.</p>
-<p>We can also easily keep track of how many active particles there are. With this, our update loop turns into this thing of beauty:</p>
+<p>Из названия секции, вы можете догадаться о решении этого вопроса. Вместо проверки <em>флага</em>, мы отсортируем по нему. Поместим все активные частицы в начало списка. Если мы будем знать, что эти частицы активны, проверка флага нам просто не нужна.</p>
+<p>Мы можем хранить количество активных частиц. Тогда код превратится в следующую прекрасную штуку:</p>
 <div class="codehilite"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numActive_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">update</span><span class="p">();</span>
@@ -370,9 +371,9 @@
 </pre></div>
 
 
-<p>Now we aren&#8217;t skipping over <em>any</em> data. Every byte that gets sucked into the cache is a piece of an active particle that we actually need to process.</p>
-<p>Of course, I&#8217;m not saying you should actually quicksort the entire collection of particles every frame. That would more than eliminate the gains here. What we want to do is <em>keep</em> the array sorted.</p>
-<p>Assuming the array is already sorted&thinsp;&mdash;&thinsp;and it is at first when all particles are inactive&thinsp;&mdash;&thinsp;the only time it can become <em>un</em>sorted is when a particle has been activated or deactivated. We can handle those two cases pretty easily. When a particle gets activated, we move it up to the end of the active particles by swapping it with the first <em>in</em>active one:</p>
+<p>Теперь мы не пропускаем <em>ни одного</em> лишнего байта. Каждый загружается в кэш для реальной работы с частицей.</p>
+<p>Конечно, я не говорю, что вам нужно использовать быструю сортировку (quicksort) всего массива каждый раз. Это уничтожит все наши победы. Нам просто нужно <em>поддерживать</em> сортировку.</p>
+<p>Предположим, что массив уже отсортирован&thinsp;&mdash;&thinsp;и это действительно для случая, когда все частицы неактивны. Сортировка <em>теряется</em>, когда частица переходит из неактивного состояния в активное и обратно. Это легко можно отследить. Как только частица становится активной, мы передвинем её на место первой <em>неактивной</em> частицы:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticleSystem</span><span class="o">::</span><span class="n">activateParticle</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Shouldn&#39;t already be active!</span>
@@ -390,7 +391,7 @@
 </pre></div>
 
 
-<p>To deactivate a particle, we just do the opposite:</p>
+<p>При деактивации частицы, сделаем обратный ход:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticleSystem</span><span class="o">::</span><span class="n">deactivateParticle</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Shouldn&#39;t already be inactive!</span>
@@ -408,13 +409,13 @@
 </pre></div>
 
 
-<p>Lots of programmers (myself included) have developed allergies to moving things around in memory. Schlepping a bunch of bytes around <em>feels</em> heavyweight , compared to just assigning a pointer. But when you add in the cost of <em>traversing</em> that pointer, it turns out that our intuition is sometimes wrong. In <span name="profile">some cases</span>, it&#8217;s cheaper to push things around in memory if it helps you keep the cache full.</p>
+<p>Большинство (включая меня) выработали аллергию на копирование памяти. Перекидывание кучи байтов <em>выглядит</em> тяжелой операцией по сравнению с перемещением указателя. Но если вы прибавите к этому <em>разыменование</em> этого указателя, выяснится, что интуиция иногда обманывает. В <span name="profile">некоторых случаях</span>, дешевле перекинуть данные в памяти, если это поможет операциям с кэшем.</p>
 <aside name="profile">
-<p>This is your friendly reminder to <em>profile</em> when making these kinds of decisions.</p>
+<p>Это тонкий намек на пользу <em>профайлера</em> при принятии решений подобного рода.</p>
 </aside>
-<p>There&#8217;s a neat consequence of keeping the particles <em>sorted</em> by their active state: We don&#8217;t need to store an active flag in each particle at all. It can be inferred by its position in the array and the <code>numActive_</code> counter. This makes our particle objects smaller, which means we can pack more in our cache lines, and that makes them even faster.</p>
-<p>It&#8217;s not all rosy, though. As you can see from the API, we&#8217;ve lost a bit of object-orientation here. The <code>Particle</code> class no longer controls its own active state. You can&#8217;t just call some <code>activate()</code> method on it since it doesn&#8217;t know it&#8217;s index. Instead, any code that wants to activate particles needs access to the particle <em>system</em>.</p>
-<p>In this case, I&#8217;m OK with <code>ParticleSystem</code> and <code>Particle</code> being tightly tied like this. I think of them as a single <em>concept</em> spread across two physical <em>classes</em>. It just means accepting the idea that particles are <em>only</em> meaningful in the context of some particle system. Also, in this case it&#8217;s likely to be the particle system that will be spawning and killing particles anyway.</p>
+<p>Есть очевидное преимущество от хранения частиц <em>отсортированными</em> по активности: теперь не нужен флаг. Он заменяется позицией частицы в массиве и счетчиком <code>numActive_</code>. Из-за этого класс частицы становиться чуточку меньше, значит их больше поместится в кэш-линию, и все завертится ещё быстрее.</p>
+<p>Ести и минусы, конечно. Мы потеряли немного объектно-ориентированности здесь. Класс <code>Particle</code> больше не управляет своим состоянием активности. Вы не сможете сделать у частицы метод <code>activate()</code>, так как она просто не знает свой индекс. Вместо этого придется иметь доступ к <em>системе частиц</em>.</p>
+<p>В данном случае, я считаю нормальным, что <code>ParticleSystem</code> и <code>Particle</code> так жестко связаны между собой. Решая нашу главную задачу, пришлось вылезти за границы одного класса. И, скорее всего, именно система будет решать когда создавать частицы и когда их убивать.</p>
 <h3><a href="#hot/cold-splitting" name="hot/cold-splitting">Hot/cold splitting</a></h3>
 <p>OK, this is the last example of a simple technique for making your cache happier. Say we&#8217;ve got an AI component for some game entity. It has some state in it: the animation it&#8217;s currently playing, a goal position its heading towards, energy level, etc.&thinsp;&mdash;&thinsp;stuff it checks and tweaks every single frame. Something like:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">AIComponent</span>
