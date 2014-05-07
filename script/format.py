@@ -73,7 +73,7 @@ def cpppath(pattern):
 
 def pretty(text):
   '''Use nicer HTML entities and special characters.'''
-  text = text.replace(u" -- ", u"&thinsp;&mdash;&thinsp;")
+  text = text.replace(u" -- ", u"&#8202;&mdash;&#8202;")
   text = text.replace(u"à", u"&agrave;")
   text = text.replace(u"ï", u"&iuml;")
   text = text.replace(u"ø", u"&oslash;")

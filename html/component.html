@@ -245,8 +245,8 @@ feel for it without seeing some code for each of the domains that it
 decouples, so I&#8217;ll have to sketch in a bit more of Bj&oslash;rn&#8217;s code
 than I&#8217;d like to. The pattern is really just the component <em>classes</em>
 themselves, but the code in them should help clarify what the classes
-are for. It&#8217;s fake code&thinsp;&mdash;&thinsp;it calls into other classes that aren&#8217;t
-presented here&thinsp;&mdash;&thinsp;but it should give you an idea of what we&#8217;re
+are for. It&#8217;s fake code&#8202;&mdash;&#8202;it calls into other classes that aren&#8217;t
+presented here&#8202;&mdash;&#8202;but it should give you an idea of what we&#8217;re
 going for.</p>
 <h3><a href="#a-monolithic-class" name="a-monolithic-class">A monolithic class</a></h3>
 <p>To get a clearer picture of how this pattern is applied, we&#8217;ll start by showing a monolithic <span name="cat"><code>Bjorn</code></span> class that does everything we need but <em>doesn&#8217;t</em> use this pattern:</p>
@@ -572,7 +572,7 @@ component:</p>
 
 <p>And now, just by swapping out a component, we&#8217;ve got a fully
 functioning computer-controlled player for demo mode. We&#8217;re able to
-reuse all of the other code for Bj&oslash;rn&thinsp;&mdash;&thinsp;physics and
+reuse all of the other code for Bj&oslash;rn&#8202;&mdash;&#8202;physics and
 graphics don&#8217;t even know there&#8217;s a difference. Maybe I&#8217;m a bit
 strange, but it&#8217;s stuff like this that gets me up in the <span name="coffee">morning</span>.</p>
 <aside name="coffee">
@@ -580,13 +580,13 @@ strange, but it&#8217;s stuff like this that gets me up in the <span name="coffe
 </aside>
 <h3><a href="#no-bj&oslash;rn-at-all?" name="no-bj&oslash;rn-at-all?">No Bj&oslash;rn at all?</a></h3>
 <p>If you look at our <code>Bjorn</code> class now, you&#8217;ll notice there&#8217;s nothing
-really &#8220;Bj&oslash;rn&#8221; about it&thinsp;&mdash;&thinsp;it&#8217;s just a
+really &#8220;Bj&oslash;rn&#8221; about it&#8202;&mdash;&#8202;it&#8217;s just a
 component bag. In fact, it looks like a pretty good candidate for a
 base &#8220;game object&#8221; class that we can use for <em>every</em>
 object in the game. All we need to do is pass in <em>all</em> the components,
 and we can build any kind of object just by picking and choosing parts
 like Dr. Frankenstein.</p>
-<p>Let&#8217;s take our two remaining concrete components&thinsp;&mdash;&thinsp;physics and graphics&thinsp;&mdash;&thinsp;and hide them behind interfaces like we did with input:</p>
+<p>Let&#8217;s take our two remaining concrete components&#8202;&mdash;&#8202;physics and graphics&#8202;&mdash;&#8202;and hide them behind interfaces like we did with input:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">PhysicsComponent</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -939,7 +939,7 @@ this case, the container object itself is the mediator.</p>
 <p>Unsurprisingly, there&#8217;s no one best answer here. What you&#8217;ll likely
 end up doing is using a bit of all of them. Shared state is useful for
 the really basic stuff that you can take for granted that every object
-has&thinsp;&mdash;&thinsp;things like position and size.</p>
+has&#8202;&mdash;&#8202;things like position and size.</p>
 <p>Some domains are distinct but still closely related. Things like
 animation and rendering, user input and AI, physics and collision. If
 you have separate components for each half of those pairs, you may
@@ -976,7 +976,7 @@ communication paths if you need them.</p>
     pattern. Both patterns are about taking part of an object&#8217;s
     behavior and delegating it to a separate subordinate object. The
     difference is that with the strategy pattern, the separate
-    &#8220;strategy&#8221; object is usually stateless&thinsp;&mdash;&thinsp;it
+    &#8220;strategy&#8221; object is usually stateless&#8202;&mdash;&#8202;it
     encapsulates an algorithm but no data. It defines <em>how</em> an object
     behaves but not <em>what</em> it is.</p>
 <p>Components are a bit more self-important. They often hold state

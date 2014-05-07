@@ -218,7 +218,7 @@
 <aside name="type-obj">
 <p>In some ways, the <a href="type-object.html" class="pattern">Type Object</a> pattern is another workaround for the lack of first-class types. That pattern can still be useful even in languages with them, though, because it lets <em>you</em> define what a &#8220;type&#8221; is. You may want different semantics than what the language&#8217;s built-in classes provide.</p>
 </aside>
-<p>When you make a spawner, just pass in the class of monster that it should construct&thinsp;&mdash;&thinsp;literally the actual runtime object that represents the monster&#8217;s class. Easy as pie.</p>
+<p>When you make a spawner, just pass in the class of monster that it should construct&#8202;&mdash;&#8202;literally the actual runtime object that represents the monster&#8217;s class. Easy as pie.</p>
 <p>With all of these options, I honestly can&#8217;t say I&#8217;ve found a case where I felt the prototype <em>design pattern</em> was the best answer. Maybe your experience will be different, but for now let&#8217;s put that away and talk about something else: prototypes as a <em>language paradigm</em>.</p>
 <h2><a href="#the-prototype-language-paradigm" name="the-prototype-language-paradigm">The Prototype Language Paradigm</a></h2>
 <p>Many people think &#8220;object-oriented programming&#8221; is synonymous with &#8220;classes&#8221;. Definitions of OOP tend to feel like credos of opposing religious denominations, but a fairly non-contentious take on it is that <em>OOP lets you define &#8220;objects&#8221; which bundle data and behavior together.</em> Compared to structured languages like C and functional languages like Scheme, the defining characteristic of OOP is that it tightly binds state and behavior together.</p>
@@ -259,7 +259,7 @@
 <p>I was super excited to play with a pure prototype-based language, but once I had mine up and running, I <span name="no-fun">discovered</span> an unpleasant fact: it just wasn&#8217;t that fun to program in.</p>
 <aside name="no-fun">
 <p>I&#8217;ve since heard through the grapevine that many of the Self programmers came to the same conclusion. The project was far from a loss, though. Self was so dynamic that it needed all sorts of virtual machine innovations in order to run fast enough.</p>
-<p>The ideas they invented for just-in-time compilation, garbage collection, and optimizing method dispatch are the exact same techniques&thinsp;&mdash;&thinsp;often implemented by the same people!&thinsp;&mdash;&thinsp;that now make many of the world&#8217;s dynamically-typed languages fast enough to use for massively popular applications.</p>
+<p>The ideas they invented for just-in-time compilation, garbage collection, and optimizing method dispatch are the exact same techniques&#8202;&mdash;&#8202;often implemented by the same people!&#8202;&mdash;&#8202;that now make many of the world&#8217;s dynamically-typed languages fast enough to use for massively popular applications.</p>
 </aside>
 <p>Sure, the language was simple to implement, but that was because it punted the complexity onto the user. As soon as I started trying to use it, I found myself missing the structure that classes give. I ended up trying to recapitulate it at the library level since the language didn&#8217;t have it.</p>
 <p>Maybe this is just because my prior experience is in class-based languages, so my mind has been tainted by that paradigm. But my hunch is that most people just like well-defined &#8220;kinds of things&#8221;.</p>
@@ -306,13 +306,13 @@
 <p>Let&#8217;s review:</p>
 <ul>
 <li>
-<p>The way you create objects is by a &#8220;new&#8221; operation that you invoke using an object that represents the type&thinsp;&mdash;&thinsp;the constructor function.</p>
+<p>The way you create objects is by a &#8220;new&#8221; operation that you invoke using an object that represents the type&#8202;&mdash;&#8202;the constructor function.</p>
 </li>
 <li>
 <p>State is stored on the instance itself.</p>
 </li>
 <li>
-<p>Behavior goes through a level of indirection&thinsp;&mdash;&thinsp;delegating to the prototype&thinsp;&mdash;&thinsp;and is stored on a separate object that represents the set of methods shared by all objects of a certain type.</p>
+<p>Behavior goes through a level of indirection&#8202;&mdash;&#8202;delegating to the prototype&#8202;&mdash;&#8202;and is stored on a separate object that represents the set of methods shared by all objects of a certain type.</p>
 </li>
 </ul>
 <p>Call me crazy, but that sounds a lot like my description of classes earlier. You <em>can</em> write prototype-style code in JavaScript (<em>sans</em> cloning), but the syntax and idioms of the language encourage a class-based approach.</p>
@@ -392,7 +392,7 @@
 </pre></div>
 
 
-<p>Since the archer and wizard have the grunt as their prototype, we don&#8217;t have to repeat the health, resists and weaknesses in each of them. The logic we&#8217;ve added to our data model is super simple&thinsp;&mdash;&thinsp;just basic single delegation&thinsp;&mdash;&thinsp;but we&#8217;ve already gotten rid of a bunch of duplication.</p>
+<p>Since the archer and wizard have the grunt as their prototype, we don&#8217;t have to repeat the health, resists and weaknesses in each of them. The logic we&#8217;ve added to our data model is super simple&#8202;&mdash;&#8202;just basic single delegation&#8202;&mdash;&#8202;but we&#8217;ve already gotten rid of a bunch of duplication.</p>
 <p>One interesting thing to note here is that we didn&#8217;t set up a fourth &#8220;base goblin&#8221; <em>abstract</em> prototype for the three concrete goblin types to delegate to. Instead, we just picked one of the goblins who was the simplest and delegated to it.</p>
 <p>That feels natural in a prototype-based system where any object can be used as a clone to create new refined objects, and I think it&#8217;s equally natural here too. It&#8217;s a particularly good fit for data in games where you often have one-off special entities in the game world.</p>
 <p>Think about bosses and unique items. These are often refinements of a more common object in the game, and prototypal delegation is a good fit for defining those. The magic Sword of Head-Detaching, which is really just a longsword with some bonuses, can be expressed as that directly:</p>

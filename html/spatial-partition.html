@@ -34,8 +34,8 @@
 basic physics and tangibility of our world. This is why they can feel real despite being crafted of mere bits and pixels.</p>
 <p>One bit of fake reality that we&#8217;ll focus on here is <em>location</em>. Game
 worlds have a sense of <em>space</em>, and objects are somewhere in that space.
-This manifests itself in a bunch of ways. The obvious one is physics&thinsp;&mdash;&thinsp;objects
-move, collide, and interact&thinsp;&mdash;&thinsp;but there are other examples. The audio engine may take into account where
+This manifests itself in a bunch of ways. The obvious one is physics&#8202;&mdash;&#8202;objects
+move, collide, and interact&#8202;&mdash;&#8202;but there are other examples. The audio engine may take into account where
 sound sources are relative to the player so that distant sounds are quieter. Online chat may be restricted to nearby players.</p>
 <p>This means your game engine often needs to answer to the question, &#8220;What objects are near this location?&#8221; If it has to answer this enough times each frame, it can start to be
 a performance bottleneck.</p>
@@ -376,7 +376,7 @@ a performance bottleneck.</p>
 <h3><a href="#is-the-partition-hierarchical-or-flat?" name="is-the-partition-hierarchical-or-flat?">Is the partition hierarchical or flat?</a></h3>
 <p>Our grid example partitioned space into a single flat set of cells. In contrast, hierarchical spatial partitions divide the space into just a <span name="couple">couple</span> of regions. Then, if one of these regions still contains many objects, it&#8217;s subdivided. This process continues recursively until every region has fewer than some maximum number of objects in it.</p>
 <aside name="couple">
-<p>They usually split it in two, four, or eight&thinsp;&mdash;&thinsp;nice round numbers to a programmer.</p>
+<p>They usually split it in two, four, or eight&#8202;&mdash;&#8202;nice round numbers to a programmer.</p>
 </aside>
 <ul>
 <li>

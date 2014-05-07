@@ -54,7 +54,7 @@ system, with something like one of these:</p>
 <p>Either gets us where we&#8217;re trying to go, but we stumbled into some
 sticky coupling along the way. Every place in the game calling into
 our audio system directly references the concrete AudioSystem class
-and the mechanism for accessing it&thinsp;&mdash;&thinsp;either as a static class or
+and the mechanism for accessing it&#8202;&mdash;&#8202;either as a static class or
 a <a class="gof-pattern" href="singleton.html">singleton</a>.</p>
 <p>These callsites, of course, have to be coupled to <em>something</em> in order
 to make a sound play, but letting them poke directly at the concrete
@@ -104,8 +104,8 @@ is adding needless complexity to your code.</p>
 as a more flexible, more configurable cousin of the singleton. When used
 well, it can make your codebase more flexible with little runtime cost.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
-<p>The core difficulty with a service locator is that it takes a dependency&thinsp;&mdash;&thinsp;a
-bit of coupling between two pieces of code&thinsp;&mdash;&thinsp;and defers wiring it up until
+<p>The core difficulty with a service locator is that it takes a dependency&#8202;&mdash;&#8202;a
+bit of coupling between two pieces of code&#8202;&mdash;&#8202;and defers wiring it up until
 runtime. This gives you flexibility, but the price you pay is that it&#8217;s harder
 to understand what your dependencies are just by reading the code.</p>
 <h3><a href="#the-service-actually-has-to-be-located" name="the-service-actually-has-to-be-located">The service actually has to be located</a></h3>
@@ -120,7 +120,7 @@ strategy later to address this and guarantee that we&#8217;ll always get
 requesting a service and then poking at it. This means that service must
 be able to work correctly in any circumstance. For example, a class that
 expects to only be used during the simulation portion of the game loop
-and not during rendering may not work as a service&thinsp;&mdash;&thinsp;it wouldn&#8217;t be able
+and not during rendering may not work as a service&#8202;&mdash;&#8202;it wouldn&#8217;t be able
 to ensure that it&#8217;s being used at the right time. So, if a class
 expects to only be used in a certain context, it&#8217;s safest to
 avoid exposing it to the entire world with this pattern.</p>
@@ -171,7 +171,7 @@ the bodies of these functions, but you get the idea:</p>
 
 
 <p>Now we have an interface and an implementation. The remaining piece is
-the service locator&thinsp;&mdash;&thinsp;the class that ties the two together.</p>
+the service locator&#8202;&mdash;&#8202;the class that ties the two together.</p>
 <h3><a href="#a-simple-locator" name="a-simple-locator">A simple locator</a></h3>
 <p>The implementation here is about the simplest kind of service locator
 you can define:</p>
@@ -201,7 +201,7 @@ responsible for constructing that itself. Dependency injection
 instead says that outside code is responsible for <em>injecting</em> that
 dependency into the object that needs it.</p>
 </aside>
-<p>The static <code>getAudio()</code> function does the locating&thinsp;&mdash;&thinsp;we can call
+<p>The static <code>getAudio()</code> function does the locating&#8202;&mdash;&#8202;we can call
 it from anywhere in the codebase and it will give us back an instance
 of our <code>Audio</code> service to use:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="nf">someGameCode</span><span class="p">()</span>
