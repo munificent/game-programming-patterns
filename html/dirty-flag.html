@@ -38,7 +38,7 @@
 <p>Many games have something called a <em>scene graph</em>. This is a big data structure that contains all of the objects in the world. The rendering engine uses this to determine where on screen to draw stuff.</p>
 <p>At its simplest, a scene graph is just a flat list of objects. Each object has a model or some other graphic primitive, and a <span name="transform"><em>transform</em></span>. The transform describes the object&#8217;s position, rotation, and scale in the world. To move or turn an object, we just change its transform.</p>
 <aside name="transform">
-<p>The mechanics of <em>how</em> this transform is stored and manipulated is unfortunately out of scope here. The comically abbreviated summary is that it&#8217;s a 4x4 matrix. You can make a single transform that combines two transforms&thinsp;&mdash;&thinsp;for example translating and then rotating an object&thinsp;&mdash;&thinsp;by multiplying the two matrices.</p>
+<p>The mechanics of <em>how</em> this transform is stored and manipulated is unfortunately out of scope here. The comically abbreviated summary is that it&#8217;s a 4x4 matrix. You can make a single transform that combines two transforms&#8202;&mdash;&#8202;for example translating and then rotating an object&#8202;&mdash;&#8202;by multiplying the two matrices.</p>
 <p>How and why that works is left as an exercise for the reader.</p>
 </aside>
 <p>When the renderer draws an object, it takes the object&#8217;s model, applies the transform to it, and then renders it there in the world. If we just had a scene <em>bag</em> and not a scene <em>graph</em> that would be it and life would be simple.</p>
@@ -95,7 +95,7 @@ world transform <em>four</em> times when we only need the result of the final on
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>Compared to some other patterns in this book, this one solves a pretty specific problem. Also, like most optimizations, you should only reach for it when you have a performance problem big enough to justify the added code complexity.</p>
 <p>Dirty flags are applied to two kinds of work: <em>calculation</em> and <em>synchronization</em>. In both cases, the process of going from the primary data to the derived data is time-consuming or otherwise costly.</p>
-<p>In our scene graph example, the process is slow because of the amount of math to perform. When using this pattern for synchronization on the other hand, it&#8217;s more often that the derived data is <em>somewhere else</em>&thinsp;&mdash;&thinsp;either on disk or over the network on another machine&thinsp;&mdash;&thinsp;and simply getting it from point A to point B is what&#8217;s expensive.</p>
+<p>In our scene graph example, the process is slow because of the amount of math to perform. When using this pattern for synchronization on the other hand, it&#8217;s more often that the derived data is <em>somewhere else</em>&#8202;&mdash;&#8202;either on disk or over the network on another machine&#8202;&mdash;&#8202;and simply getting it from point A to point B is what&#8217;s expensive.</p>
 <p>There are a couple of other requirements too:</p>
 <ul>
 <li>
@@ -143,7 +143,7 @@ turn up uses of this pattern.</p>
 <p>In between the two are more complex systems like deferred ref-counting and incremental GC that reclaim memory less eagerly than pure ref-counting but more eagerly than stop-the-world collectors.</p>
 </aside>
 <h3><a href="#you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes" name="you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes">You have to make sure to set the flag <em>every</em> time the state changes</a></h3>
-<p>Since the derived data is calculated from the primary data, it&#8217;s essentially a cache. Whenever you have cached data, the trickiest aspect of it is <span name="cache"><em>cache invalidation</em></span>&thinsp;&mdash;&thinsp;correctly noting when the cache is out of sync with its source data. In this pattern, that means setting the dirty flag when <em>any</em> primary data changes.</p>
+<p>Since the derived data is calculated from the primary data, it&#8217;s essentially a cache. Whenever you have cached data, the trickiest aspect of it is <span name="cache"><em>cache invalidation</em></span>&#8202;&mdash;&#8202;correctly noting when the cache is out of sync with its source data. In this pattern, that means setting the dirty flag when <em>any</em> primary data changes.</p>
 <aside name="cache">
 <p>Phil Karlton famously said, &#8220;There are only two hard things in Computer Science: cache invalidation and naming things.&#8221;</p>
 </aside>
@@ -172,7 +172,7 @@ turn up uses of this pattern.</p>
 </pre></div>
 
 
-<p>The only operation we need here is <code>combine()</code> so that we can get an object&#8217;s world transform by combining all of the local transforms along its parent chain. It also has a method to get an &#8220;origin&#8221; transform&thinsp;&mdash;&thinsp;basically an identity matrix that means no translation, rotation, or scaling at all.</p>
+<p>The only operation we need here is <code>combine()</code> so that we can get an object&#8217;s world transform by combining all of the local transforms along its parent chain. It also has a method to get an &#8220;origin&#8221; transform&#8202;&mdash;&#8202;basically an identity matrix that means no translation, rotation, or scaling at all.</p>
 <p>Next, we&#8217;ll sketch out the class for an object in the scene graph. This is the bare minimum we need <em>before</em> applying this pattern:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">GraphNode</span>
 <span class="p">{</span>
@@ -227,7 +227,7 @@ turn up uses of this pattern.</p>
 
 
 <h3><a href="#let's-get-dirty" name="let's-get-dirty">Let&#8217;s get dirty</a></h3>
-<p>So this code does the right thing&thinsp;&mdash;&thinsp;renders all the meshes in the right place&thinsp;&mdash;&thinsp;but it doesn&#8217;t do it efficiently. It&#8217;s calling <code>local_.combine(parentWorld)</code> on every node in the graph, every frame. Let&#8217;s see how this pattern fixes that. First, we need to add two fields to <code>GraphNode</code>:</p>
+<p>So this code does the right thing&#8202;&mdash;&#8202;renders all the meshes in the right place&#8202;&mdash;&#8202;but it doesn&#8217;t do it efficiently. It&#8217;s calling <code>local_.combine(parentWorld)</code> on every node in the graph, every frame. Let&#8217;s see how this pattern fixes that. First, we need to add two fields to <code>GraphNode</code>:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">GraphNode</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -277,7 +277,7 @@ turn up uses of this pattern.</p>
 
 <aside name="branch">
 <p>There&#8217;s a subtle assumption here that the <code>if</code> check is faster than a matrix multiply. Intuitively, you would think it is: surely testing a single bit is faster than a bunch of floating point arithmetic.</p>
-<p>However, modern CPUs are fantastically complex. They rely heavily on <em>pipelining</em>&thinsp;&mdash;&thinsp;queueing up a series of sequential instructions. A branch like our <code>if</code> here can cause a <em>branch misprediction</em> and force the CPU lose cycles refilling the pipeline.</p>
+<p>However, modern CPUs are fantastically complex. They rely heavily on <em>pipelining</em>&#8202;&mdash;&#8202;queueing up a series of sequential instructions. A branch like our <code>if</code> here can cause a <em>branch misprediction</em> and force the CPU lose cycles refilling the pipeline.</p>
 <p>The <a href="data-locality.html" class="pattern">Data Locality</a> chapter has more about how modern CPUs try to go faster and how you can avoid tripping them up like this.</p>
 </aside>
 <p>This is similar to the original na&iuml;ve implementation. The key changes are that we check to see if the node is dirty before calculating the world transform, and we store the result in a field instead of a local variable. When the node is clean, we skip <code>combine()</code> completely and use the old but still correct <code>world_</code> value.</p>

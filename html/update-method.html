@@ -35,7 +35,7 @@
 <aside name="win">
 <p>Who knows? Maybe there is a market for games with no challenge. &#8220;Click 10 Ten Times To Win!&#8221; could be the next smash hit.</p>
 </aside>
-<p>This crypt needs some guards&thinsp;&mdash;&thinsp;some enemies our brave heroine can grapple with. First up, we want a re-animated <span name="brains">skeleton guard</span> to patrol back and forth in front of the door. Ignoring everything you probably already know about game programming, the simplest possible code to make that skeleton lurch back and forth is something like:</p>
+<p>This crypt needs some guards&#8202;&mdash;&#8202;some enemies our brave heroine can grapple with. First up, we want a re-animated <span name="brains">skeleton guard</span> to patrol back and forth in front of the door. Ignoring everything you probably already know about game programming, the simplest possible code to make that skeleton lurch back and forth is something like:</p>
 <aside name="brains">
 <p>If the sorcerer-king wanted more intelligent behavior, he should have re-animated something that still had brain tissue.</p>
 </aside>
@@ -127,7 +127,7 @@
 <aside name="simultaneously">
 <p>Since some stickler will call me on this, yes, they don&#8217;t behave <em>truly concurrently</em>. While one object is updating, none of the others are. We&#8217;ll get into this more in a bit.</p>
 </aside>
-<p>The game loop has a dynamic collection of objects, so adding and removing them from the level is easy&thinsp;&mdash;&thinsp;just add and remove them from the collection. Nothing is hardcoded anymore, and we can even populate the level using some kind of data file, which is exactly what our level designers want.</p>
+<p>The game loop has a dynamic collection of objects, so adding and removing them from the level is easy&#8202;&mdash;&#8202;just add and remove them from the collection. Nothing is hardcoded anymore, and we can even populate the level using some kind of data file, which is exactly what our level designers want.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>The <strong>game world</strong> maintains a <strong>collection of objects</strong>. Each object implements an <strong>update method</strong> that simulates one frame of the object&#8217;s behavior. Each frame, the game updates every object in the collection.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>

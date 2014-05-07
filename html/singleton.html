@@ -150,7 +150,7 @@ nice features too:</p>
     is called. This means they can&#8217;t use information known only once
     the program is up and running (for example, configuration
     information loaded from a file). It also means they can&#8217;t reliably
-    depend on each other&thinsp;&mdash;&thinsp;the compiler does not guarantee the
+    depend on each other&#8202;&mdash;&#8202;the compiler does not guarantee the
     order in which statics are initialized relative to each other.</p>
 <p>Lazy initialization solves both of those problems. The singleton
 will be initialized as late as possible, so by that time any
@@ -694,7 +694,7 @@ still better than a giant pile of singletons.</p>
 
 <p>If, later, the architecture is changed to support multiple <code>World</code>
 instances (perhaps for streaming or testing purposes), <code>Log</code>,
-<code>FileSystem</code>, and <code>AudioPlayer</code> are all unaffected&thinsp;&mdash;&thinsp;they won&#8217;t
+<code>FileSystem</code>, and <code>AudioPlayer</code> are all unaffected&#8202;&mdash;&#8202;they won&#8217;t
 even know the difference. The downside with this, of course, is that
 more code ends up coupled to World itself. If a class just needs to
 play sound, our example still requires it to know about World in order
