@@ -429,8 +429,8 @@ functional paradigm is for many problems.
     some cases, especially where your object model is hierarchical, it may not
     be so cut-and-dried. An object may respond to a command, or it may decide to
     pawn it off on some subordinate object. If you do that, you've got yourself
-    a <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Chain-of-
-    responsibility_pattern">Chain of Responsibility</a>.
+    a <a class="gof-pattern" href="
+    http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">Chain of Responsibility</a>.
 
  *  Some commands are stateless chunks of pure behavior like the `JumpCommand`
     in the first example. In cases like that, having <span
