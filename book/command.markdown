@@ -235,9 +235,9 @@ making a networked multi-player game.
 ## Undo and Redo
 
 The last example is the most well-known use of this pattern. If a command object
-can *do* things, it's a small step for it be able to *undo* them. Undo is used
-in some strategy games where you can roll back moves that you didn't like. It's
-*de rigueur* in tools that people use to *create* games. The <span
+can *do* things, it's a small step for it to be able to *undo* them. Undo is
+used in some strategy games where you can roll back moves that you didn't like.
+It's *de rigueur* in tools that people use to *create* games. The <span
 name="hate">surest way</span> to make your game designers hate you is giving
 them a level editor that can't undo their fat-fingered mistakes.
 
