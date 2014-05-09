@@ -147,7 +147,7 @@ There are a couple of other requirements too:
     But a simpler solution is to just *keep a running total*. When we add or
     remove an item, just add or remove its weight from the current total. If
     we can "pay as we go" like this and keep the derived data updated, then
-    that's often a better choice than using this pattern and calculated the
+    that's often a better choice than using this pattern and calculating the
     derived data from scratch when needed.
 
 All of this makes it sound like dirty flags are never appropriate, but
