@@ -346,7 +346,7 @@ the data for the unused particles themselves.
 When a particle isn't in use, most of its state is irrelevant. Its position and
 velocity aren't being used. The only state it needs is the stuff required to
 tell if it's dead. In our example, that's the `_framesLeft` member. All those
-other bits can reused. Here's a revised particle:
+other bits can be reused. Here's a revised particle:
 
 ^code 4
 

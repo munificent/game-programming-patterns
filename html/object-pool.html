@@ -384,7 +384,7 @@ the data for the unused particles themselves.</p>
 <p>When a particle isn&#8217;t in use, most of its state is irrelevant. Its position and
 velocity aren&#8217;t being used. The only state it needs is the stuff required to
 tell if it&#8217;s dead. In our example, that&#8217;s the <code>_framesLeft</code> member. All those
-other bits can reused. Here&#8217;s a revised particle:</p>
+other bits can be reused. Here&#8217;s a revised particle:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
