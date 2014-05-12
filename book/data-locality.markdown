@@ -351,103 +351,103 @@
 
 Ести и минусы, конечно. Мы потеряли немного объектно-ориентированности здесь. Класс `Particle` больше не управляет своим состоянием активности. Вы не сможете сделать у частицы метод `activate()`, так как она просто не знает свой индекс. Вместо этого придется иметь доступ к *системе частиц*.
 
-В данном случае, я считаю нормальным, что `ParticleSystem` и `Particle` так жестко связаны между собой. Решая нашу главную задачу, пришлось вылезти за границы одного класса. И, скорее всего, именно система будет решать когда создавать частицы и когда их убивать.
+В данном случае, я считаю нормальным, что `ParticleSystem` и `Particle` так жестко связаны между собой. Решая нашу главную задачу, пришлось вылезти за границы одного класса. Ничего страшного -- скорее всего, именно система будет решать когда создавать частицы и когда их убивать.
 
 ### Hot/cold splitting
 
-OK, this is the last example of a simple technique for making your cache happier. Say we've got an AI component for some game entity. It has some state in it: the animation it's currently playing, a goal position its heading towards, energy level, etc. -- stuff it checks and tweaks every single frame. Something like:
+Это последний пример простой техники, которая может улучшить работу с кэшем. Допустим, у нас есть AI компонент для какого-то объекта. И он имеет какое-то состояние: анимация, которая сейчас запущена, точка, к которой он двигается, уровень энерги, и так далее -- все это проверяется и меняется каждый цикл игры. В общем, что-то вида:
 
 ^code ai-component
 
-But it also has some state for rarer eventualities. It stores some data describing what loot it drops when it has an unfortunate encounter with the noisy end of a shotgun. That drop data is only used once in the entity's lifetime, right at its bitter end.
+Но кроме этого есть ещё редкие события. Например, какие шмотки выпадут, если придется неудачно встретиться с шотганом лицом к лицу. Этот дроп используется только один раз, чаще всего в самом конце.
 
 ^code loot-drop
 
-Assuming we followed the earlier patterns, when we update these AI components, we walk through a nice packed, contiguous array of data. But that data includes all of the loot drop information. That makes each component bigger, which reduces the number of them we can fit in a cache line. We get more cache misses because the total memory we walk over is larger. The loot data gets pulled into the cache for every component, every frame, even though we aren't even touching it.
+Если все паттерны, которые мы рассмотрели ранее, уже были применены, то при работе со всеми AI компонентами, мы будем работать с упакованным, непрерывным массивом данных. В этом массив будет включена и информацию о дропе. И как мы уже знаем, чем толще объект, тем меньше их будет загружаться в кэш-линию. Будет больше кэш-промахов, потому что память пухнет от данных, которые мы не используем.
 
-The solution for this is called "hot/cold splitting". The idea is to break our data structure into two separate pieces. The first holds the "hot" data: the state we need to touch every frame. The other piece is the "cold" data: everything else that gets used less frequently.
+То, что мы будем делать, называется "разделение на горячее и холодное". Идея в том, чтобы разбить структуру на два отдельных куска. Первый кусок содержит "горячие" данные: аттрибуты, которые нам нужны каждый раз. Другой кусок -- "холодные" данные: все, что используется более или менее редко.
 
-The hot piece is the *main* AI component. It's the one we need to use the most, so we don't want to chase a pointer to find it. The cold component can be off to the side, but we still need to get to it, so we give the hot component a pointer to it, like so:
+Горячая часть -- это *сам* AI компонент. Он нам нужен каждый раз, поэтому указатель из него мы делать не будем, чтобы лишний раз по нему не бегать. А за холодными аттрибутами можно сбегать, поэтому мы будем получать их через указатель. Вот так:
 
 ^code hot-cold
 
-Now when we're walking the AI components every frame, the only data that gets loaded into the cache is stuff we are actually processing (with the <span name="parallel">exception</span> of that one little pointer to the cold data).
+Теперь, когда мы проходим по всем AI в цикле, в кэш будут загружаться только данные, который мы чаще всего используем (за <span name="parallel">исключением</span> одного маленького указателя на холодные аттрибуты).
 
 <aside name="parallel">
 
-We could conceivably ditch the pointer too by having parallel arrays for the hot and cold components. Then we can find the cold AI data for a component since both pieces will be at the same index in their respective arrays.
+В принципе, мы можем избавиться и от указателя тоже, если взять два параллельных массива с холодными и горячими аттрибутами. Используя один индекс, можно получить данные и из одного, и из другого массива.
 
 </aside>
 
-You can see how this starts to get fuzzy, though. In my example here, it's pretty obvious which data should be hot and cold, but it's rarely so clear cut. What if you have fields that are used when an entity is in a certain mode but not in others? What if entities use a certain chunk of data only when they're in certain parts of the level?
+Заметьте, все это становится слегка запутанным. В данном примере, все очевидно: какие данные горячие, какие -- холодные. Но так бывает не всегда. Что, если у вас есть аттрибуты, которые используются часто в одном режиме игры, и редко -- в другом? Или, если у объекта есть аттрибуты, которые проявляются только на каком-нибудь уровне?
 
-Doing this kind of optimization is somewhere between a black art and a rathole. It's easy to get sucked in and spend endless time pushing data around to see what speed difference it makes. It will take practice to get a handle on where to spend your effort.
+Подобная оптимизация похожа на игру в угадайку. Очень легко втянуться и бесконечно перекидывать данные из одного места в другое, выясняя, какая комбинация даст лучший эффект. Практикуйтесь, и научитесь понимать, где нужно применить свои знания в первую очередь.
 
-## Design Decisions
+## Архитектурные решения
 
-This pattern is really about a mindset: it's getting you to think about your data's arrangement in memory as a key part of your game's performance story. The actual concrete design space is wide open. You can let <span name="dod">data locality</span> affect your whole architecture, or maybe it's just a localized pattern you apply to a few core data structures.
+Помните: ключевой момент в оптимизации -- это думать о том, как устроены ваши данные. Пространство решений велико. Техники <span name="dod">компактности данных</span> могут повлиять на всю архитектуру кода, или просто на какие-то критические куски.
 
-The biggest question you'll need to answer is when and where you apply this pattern, but here are a couple of others that may come up.
+Главный вопрос, на который вы будете искать ответ -- это где и когда применить свои знания. Но по пути встретятся и другие моменты.
 
 <aside name="dod">
 
-Noel Llopis' [famous article](http://gamesfromwithin.com/data-oriented-design) that got a lot more people thinking about designing games around cache usage calls this "data-oriented design".
+В [известной статье](http://gamesfromwithin.com/data-oriented-design) Ноэля Лописа (с которой знакомятся люди, учитывающие работу с кэшем при разработке игр) это называется "дизайн, ориентрированный на данные" (data-oriented design).
 
 </aside>
 
-### How do you handle polymorphism?
+### Как дела с полиморфизмом?
 
-Up to this point, we've avoided subclassing and virtual methods. We assumed we have nice packed arrays of *homogenous* objects. That way, we know they're all the exact same size. But polymorphism and dynamic dispatch are useful tools, too. How do we reconcile this?
+До этого момента, мы избегали наследования и виртуальных методов. Мы предполагали, что имеем массивы *однородных* данных. Таким образом, мы были уверены, что они все -- одинакового размера. Но полиморфизм и виртуальность -- весьма полезные штуки. Как подружить эти противоположности?
 
- *  **Don't:**
+ *  **Просто не используйте:**
 
-    The <span name="type">simplest</span> answer is to just avoid subclassing, or at least avoid it in places where you're optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.
+    <span name="type">Очевидным</span> решением будет просто избегать наследования везде. Или по крайней мере там, где вы печетесь об оптимизации работы с кэшем. Но вообще культура прораммирования медленно движется в сторону от широкого использования наследования.
 
     <aside name="type">
 
-    One way to keep much of the flexibility of polymorphism without using subclassing is through the <a href="type-object.html" class="pattern">Type Object</a> pattern.
+    Одним из способов заменить гибкость полиморфизма без наследования  является паттерн <a href="type-object.html" class="pattern">Type Object</a>.
 
     </aside>
 
-    * *It's safe and easy.* You know exactly what class you're dealing with and all objects are obviously the same size.
+    * *Это безопасно и просто.* Вы всегда знаете с каким классом имеете дело, и все объекты имеют предсказуемо одинаковый размер.
 
-    * *It's faster.* Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. While the cost of this varies widely across different hardware, there is <span name="cpp">*some*</span> cost to dynamic dispatch.
+    * *Это быстро.* Вызов динамического метода делаем много лишних телодвижений, включая разбор таблицы виртуальных методов. Хотя эта цена зависит от аппаратного обеспечения, тем не менее всегда есть <span name="cpp">*некоторое*</span> проседание по производительности.
 
     <aside name="cpp">
 
-    As usual, the only absolute is that there are no absolutes. In most cases, a C++ compiler will require an indirection for a virtual method call. But in *some* cases, the compiler may be able to do *devirtualization* and statically call the right method if it knows what concrete type the receiver is. Devirtualization is more common in just-in-time compilers for languages like Java and JavaScript.
+    Как водится, "всегда" есть не всегда. Чаще всего, С++ компилятору потребуется затраты на вызов виртуального метода. Но в *некоторых* случаях, компилятор сможет "развиртуализировать" вызов и превратить его в статический, если он будет точно знать, с каким типом он имеет дело. Часто девиртуализация встречается в JIT компиляторах, таких как Java и JavaScript.
 
     </aside>
 
-    * *It's inflexible.* Of course, the reason we use dynamic dispatch is because it gives us a powerful way to vary behavior between objects. If you want different entities in your game to have their own rendering styles, or their own special moves and attacks, virtual methods are a proven way to model that. Having to instead stuff all of that code into a single non-virtual method that does something like a big `switch` gets messy quickly.
+    * *Это не так гибко.* Конечно, главная причина использования динамики в том, что легко менять поведение объектов. Если вам нужно, чтобы разные объекты в вашей игре рисовались по-разному, или у них были специфическое движение или атака, то виртуальные методы честно позволят вам реализовать это.  Можно заменить это на какой-нибудь, не виртуальный, метод, внутри которого будет огромный `switch`, но это будет макаронный монстр.
 
- *  **Use separate arrays for each type:**
+ *  **Отдельные массивы для каждого типа:**
 
-    We use polymorphism so that we can invoke behavior on an object whose type we don't know. In other words, we have a mixed bag of stuff and we want each object in there to do its own thing when we tell it to go.
+    Полиморфизм нам нужен, чтобы регулировать поведение объекта, чей тип мы не знаем. Другими словами, у нас есть набор разных объектов, которые должны что-то делать, когда мы этого потребуем.
 
-    But that just raises the question of why mix the bag to begin with? Instead, why not just maintain separate homogenous collections for each type?
+    Но все приводит к вопросу - а откуда вообще взялся этот набор? Почему бы просто не разделить его на несколько однородных коллекций, по одной на каждый тип?
 
-    * *It keeps objects tightly packed.* Since each array only contains objects of one class, there's no padding or other weirdness.
+    * *Объекты будут плотно расположены.* Поскольку элементы массива имеют одинаковый тип, там не нужно использовать промежутки для выравнивания или другие странности.
 
-    * *You can statically dispatch.* Once you've got objects partitioned by type, you don't actually need polymorphism at all any more. You can use regular non-virtual method calls.
+    * *Можно будет вызывать методы статически.* Так как тип объектов известен, то полиморфизм теряет смысл. Можно использовать обычные статические вызовы.
 
-    * *You have to keep track of a bunch of collections.* If you have a lot of different object types, the overhead and complexity of maintaining separate arrays for each can be a chore.
+    * *Придется поддерживать несколько коллекций.* Если типов много, то сложности при работе с несколькими массивами могут перевесить плюсы.
 
-    * *You have to be aware of every type*. Since you have to maintain separate collections for each type, you can't be decoupled from the *set* of classes. Part of the magic of polymorphism is that it's *open-ended*: code that works with an interface can be completely decoupled from the potentially large set of types that implement that interface.
+    * *Нужно будет знать о каждом типе*. Вам понадобиться *полная* информация о типах, с которыми вы работаете. Полиморфизм отличается тем, что там вам нужно только описание интерфейса -- это достаточно для работы. А описание конкретных типов, которые его реализуют, при этом не требуется.
 
- *  **Use a collection of pointers:**
+ *  **Коллекция указателей:**
 
-    If you weren't worried about caching, this is the natural solution. Just have an array of pointers to some base class or interface type. All the polymorphism you could want, and objects can be whatever size they want.
+    Если вы не очень волнуетесь о работе с кэшем, то это естественное решение. Просто заведите себе массив указателей на базовый класс или интерфейс. Весь полиморфизм будет к вашим услугам, и волноваться о размере объектов тоже не понадобится.
 
-    * *It's flexible.* The code that consumes the collection can work with objects of any type as long as it supports the interface you care about. It's completely open-ended.
+    * *Это гибко.* Код, который работает с коллекцией, сможет работать с любыми типами. Достаточно только реализовать требуемый интерфейс. Это легко расширяемое решение.
 
-    * *It's less cache-friendly.* Of course, the whole reason we're discussing other options here is because this means cache-unfriendly pointer indirection. But, remember, if this code isn't performance critical, that's probably OK.
+    * *Кэш не дружит с такими вещами.* Вообще, весь наш разговор начался с темы, что кэш плохо работает с указателями. Но если производительность не критична, то не стоит волноваться раньше времени.
 
-### How are game entities defined?
+### Как описать игровой объект?
 
-If you use this pattern in tandem with the <a href="component.html" class="pattern">Component</a> pattern, you'll have nice contiguous arrays for all of the components that make up your game entities. The game loop will be iterating over those directly, so the object for the game entity itself is less important, but it's still useful in other parts of the codebase where you want to work with a single conceptual "entity".
+Если вы используете паттерн <a href="component.html" class="pattern">Component</a>,  то у вас будет массивы компонентов, из которых складываются игровые объекты. Игровой цикл будет пробегать прямо по ним, так что сам игровой объект, в принципе, не нужен. Но он может использоваться в некоторых местах. Там, где вы хотите иметь дело с принципиально единой структурой.
 
-The question then is how should it be represented? How does it keep track of its components?
+Как тогда его представить? Как ему следить за своими компонентами?
 
  * **If game entities are classes with pointers to their components:**
 
