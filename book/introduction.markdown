@@ -5,8 +5,8 @@ classroom housing a couple of very beat up TRS-80s. Hoping to inspire
 us, a teacher found a printout of some simple BASIC programs for us
 to tinker with.
 
-The audiocasette drives on the computers were broken, so any time we wanted to
-run one some code, we'd have to carefully type it in from scratch. This led us
+The audio casette drives on the computers were broken, so any time we wanted to
+run some code, we'd have to carefully type it in from scratch. This led us
 to prefer programs that were only a few lines long:
 
 <span name="radical"></span>
