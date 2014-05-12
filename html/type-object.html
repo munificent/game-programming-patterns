@@ -413,7 +413,7 @@ on the class object itself.</p>
 &#8220;constructor&#8221; factory method. With our original implementation, creating a monster looked like:</p>
 <aside name="friend">
 <p>There&#8217;s another minor difference here. Because the sample code is in C++, we can use a handy little feature: <em>friend classes.</em></p>
-<p>We&#8217;ve made <code>Monster</code>&#8216;s constructor private which prevents anyone from calling it directly. Friend classes sidestep that restriction so <code>Breed</code> can still access it. This means the <em>only</em> way to create monsters by going through <code>newMonster()</code>.</p>
+<p>We&#8217;ve made <code>Monster</code>&#8216;s constructor private which prevents anyone from calling it directly. Friend classes sidestep that restriction so <code>Breed</code> can still access it. This means the <em>only</em> way to create monsters is by going through <code>newMonster()</code>.</p>
 </aside>
 <div class="codehilite"><pre><span class="n">Monster</span><span class="o">*</span> <span class="n">monster</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Monster</span><span class="p">(</span><span class="n">someBreed</span><span class="p">);</span>
 </pre></div>

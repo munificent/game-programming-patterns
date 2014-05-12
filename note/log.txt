@@ -1,3 +1,5 @@
+2014-05-09 - catch up on email, 1 bug
+2014-05-08 - 8 bugs, photoshop illustration
 2014-05-07 - revise design patterns revisited and command
 2014-05-06 - redo illustration
 2014-05-05 - 1 bug, revise architecture chapter

@@ -370,7 +370,7 @@ The key <span name="friend">difference</span> is the `newMonster()` function in 
 
 There's another minor difference here. Because the sample code is in C++, we can use a handy little feature: *friend classes.*
 
-We've made `Monster`'s constructor private which prevents anyone from calling it directly. Friend classes sidestep that restriction so `Breed` can still access it. This means the *only* way to create monsters by going through `newMonster()`.
+We've made `Monster`'s constructor private which prevents anyone from calling it directly. Friend classes sidestep that restriction so `Breed` can still access it. This means the *only* way to create monsters is by going through `newMonster()`.
 
 </aside>
 

@@ -235,9 +235,9 @@ making a networked multi-player game.
 ## Undo and Redo
 
 The last example is the most well-known use of this pattern. If a command object
-can *do* things, it's a small step for it be able to *undo* them. Undo is used
-in some strategy games where you can roll back moves that you didn't like. It's
-*de rigueur* in tools that people use to *create* games. The <span
+can *do* things, it's a small step for it to be able to *undo* them. Undo is
+used in some strategy games where you can roll back moves that you didn't like.
+It's *de rigueur* in tools that people use to *create* games. The <span
 name="hate">surest way</span> to make your game designers hate you is giving
 them a level editor that can't undo their fat-fingered mistakes.
 
@@ -424,8 +424,8 @@ functional paradigm is for many problems.
     some cases, especially where your object model is hierarchical, it may not
     be so cut-and-dried. An object may respond to a command, or it may decide to
     pawn it off on some subordinate object. If you do that, you've got yourself
-    a <a class="gof-pattern" href="http://en.wikipedia.org/wiki/Chain-of-
-    responsibility_pattern">Chain of Responsibility</a>.
+    a <a class="gof-pattern" href="
+    http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">Chain of Responsibility</a>.
 
  *  Some commands are stateless chunks of pure behavior like the `JumpCommand`
     in the first example. In cases like that, having <span
