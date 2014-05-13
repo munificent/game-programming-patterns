@@ -221,7 +221,8 @@ namespace Components
     void update(Bjorn& bjorn, World& world)
     {
       bjorn.x += bjorn.velocity;
-      world.resolveCollision(volume_, bjorn.x, bjorn.y, bjorn.velocity);
+      world.resolveCollision(volume_,
+          bjorn.x, bjorn.y, bjorn.velocity);
     }
 
   private:
