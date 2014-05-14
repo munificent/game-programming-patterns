@@ -3,9 +3,9 @@
 
 ## Общая мысль
 
-*Если расположить данные в памяти специальным образом, то это поможет кешам процессора.*
+*Если расположить данные в памяти специальным образом, то это поможет кэшам процессора.*
 
-## Motivation
+## Предыстория
 
 Нас обманули. Нам показывают графики, на которых скорость процессоров растёт все выше и выше, как будто закон Мура - это не просто историческое наблюдение, а какое-то непререкаемое правило. Не отрывая задниц от кресла, мы, программисты, наблюдаем, как наши программы волшебным образом ускоряются благодаря апгрейду.
 
@@ -25,210 +25,207 @@
 
 Для того, чтобы сверхбыстрый процессор провернул свои вычисления, ему, вообще-то, нужно выгрузить данные из главной памяти в свои регистры. И как видите, память не так быстра, как скорость процессора. Даже близко не так.
 
-С современным уровнем развития железа, может понадобиться *сотни* тактов, чтобы вытащить байт из <span name="ram">памяти</span>. Если большинство операций связано с данными, и нужно сотни тактов, чтобы их получить - как так получается, что наши процессоры не бездельничают 99% времени, ожидая поступления данных?
+С современным уровнем развития железа, может понадобиться *сотни* тактов, чтобы вытащить байт из <span name="ram">RAM</span>. Если большинство операций связано с данными, и нужно сотни тактов, чтобы их получить - как так получается, что наши процессоры не бездельничают 99% времени, ожидая поступления данных?
 
-На самом деле, они *действительно* ждут памать удивительно большую часть своего времени, но все не так плохо, как это могло бы быть. Чтобы объяснить почему, давайте совершим путешествие в Царство Длинных Лирических Отступлений...
+На самом деле, они *действительно* ждут памать удивительно большую часть своего времени, но все не так плохо, как это могло бы быть. Чтобы объяснить почему, давайте совершим сделаем длинное лирическое отступление...
 
 <aside name="ram">
 
-Она называется RAM ("Random access memory") потому что, в отличие от дисковых накопителей, можно получить доступ к любому участку памяти одинаково быстро (это в теории). То есть не нужно считывать всю память по порядку, чтоб добраться до нужного места.
+Она называется RAM ("Random access memory") потому что можно получить доступ к любому участку памяти одинаково быстро (это в теории). То есть не нужно считывать все байты по очереди, чтоб добраться до нужного места.
 
-Или, по крайней мере, в обычном случае не нужно. Как будет видно дальше, RAM не всегда настолько рандомна, как кажется.
+Ну, *обычно* не нужно. Как будет видно дальше, RAM не всегда настолько гибка, как кажется.
 
 </aside>
 
-### A data warehouse
+### Хранилище данных
 
-Imagine you're an accountant in a tiny little office. Your job is to request a box of papers then do some <span name="accountant">accountant</span>-y stuff with them -- add up a bunch of numbers or something. You must do this for specific labeled boxes according to some arcane logic that only makes sense to other accountants.
+Представьте, что вы -- бухгалтер в маленьком офисе. Ваша работа: получить коробку документов и сделать с ними что-нибудь <span name="accountant">бухгалтерское</span>. Например, сложить какие-то числа. Это нужно сделать только с документами из некоторых коробок, в соответствии с какими-то тайными правилами, которые понятны только другим бухгалтерам.
 
 <aside name="accountant">
 
-I probably shouldn't have used a job I know absolutely nothing about in this analogy.
+Наверное, не стоило здесь использовать бухгалтерию -- я ничего в ней не понимаю.
 
 </aside>
 
-Thanks to a mixture of hard work, natural aptitude, and stimulants, you can finish an entire box in, say, a minute. There's a little problem, though. All of those boxes are stored in a warehouse in a separate building. To get a box, you have to ask the warehouse guy to bring it to you. He goes and gets a forklift and drives around the aisles until he finds the box you want.
+Благодаря тяжелой работе, природной упорности и стимуляторам, можно обработать всю коробку, скажем, за минуту. Но есть одна проблема - все эти коробки хранятся на складе в отдельном здании. Чтобы получить коробку, вам нужно попросить парня со склада принести её вам. Он идет, берет подъемник и ездит вдоль стеллажей, пока не найдет коробку, которая вам нужна.
 
-It takes him, seriously, an entire day to do this. Unlike you, he's not getting employee of the month any time soon. This means that no matter how fast you are, you only get one box a day. The rest of the time, you just sit there and question the life decisions that led to this soul-sucking job.
+Все это займет целый день, без шуток. В отличие от вас, парень со склада ещё не скоро станет работников месяца. Это значит, что неважно насколько вы быстры -- вы все рано получите не больше одной коробки в день. Все остальное время вы будете просто сидеть и думать о жизни, которая привела вас к такой бессмысленной работе.
 
-One day, a group of industrial designers show up. Their job is to improve the efficiency of operations -- things like making assembly lines go faster. After watching you work for a few days, they notice a few things:
+И вот однажды, появилась группа специалистов. Их работа -- увеличивать эффективность работы. Придумывать маленькие хаки, которые позволяют сборочной линии двигаться быстрее. Они понаблюдали за вами несколько дней, и сделали несколько замечаний:
 
-* Pretty often, when you're done with one box, the next box you request is right
-  <span name="next">next</span> to it on the same shelf in the warehouse.
+* Довольно часто, следущая коробка, которую вы попросите, находится <span name="next">на одной полке</span> с предыдущей.
 
-* Using a forklift to carry a single box of papers is pretty dumb.
+* Использовать подъемник, чтобы снять маленькую коробку с полки -- довольно неэффективная идея.
 
-* There's actually a little bit of spare room in the corner of your office.
+* И в вашем офисе есть немного места в углу.
 
 <aside name="next">
 
-The technical term for using something near the thing you just used is *locality of reference*.
+Эта ситуация (когда вы используете вещь, которая лежала рядом с той, которую вы только что использовали) в техническом мире называется *компактность ссылок*.
 
 </aside>
 
-They come up with a clever fix. Whenever you request a box from the warehouse guy, he'll
-grab an entire pallet of them. He gets the box you want and then
-some more boxes that are next to it. He doesn't know if you want those (and, given his work ethic, clearly doesn't care); he just takes as many as he can fit on the pallet.
+Это дельный совет. Теперь, когда вы запрашиваете коробку у парня со склада, он приносит вам целую палету. Не только коробку, которая вам нужна, но и несколько соседних тоже. Он не знает, понадобятся ли они вам (вообще говоря, ему просто по барабану) -- он просто берет столько коробок, сколько может унести.
 
-He loads the whole pallet and brings it to you. Disregarding concerns for workplace safety, he drives the forklift right in and drops the pallet in the corner of your office.
+Итак, он загружает целую палету и несет её вам. Игнорируя правила безопасности, он въезжает на подъемнике прямо к вам в офис и сгружает все это прямо у вас в углу.
 
-When you need a new box, now, the first thing you do is see if it's already on the pallet in your office. If it is, great! It just takes you a second to grab it and you're back to crunching numbers. If a pallet holds fifty boxes and you got lucky and *all* of the boxes you need happen to be on it, you can churn through fifty times more work than you could before.
+Когда вам нужна будет новая коробка, вы первым делом смотрите в углу -- возможно следущая коробка уже там. Если она действительно там, то вам повезло! Вам нужна всего секунда, чтобы взять новую коробку и занятся магией чисел. Если в куче 50 коробок, и вам так повезло, что *все* следующие коробки находятся в куче, то вы можете сделать в 50 раз больше работы чем раньше.
 
-But, if you need a box that's *not* on the pallet, you're back to square one. Since you can only fit one pallet in your office, your warehouse friend will have to take that one back and then bring you an entirely new one.
+Но, если коробка, которая вам нужна, в куче *отсутствует*, вам все-таки придется её заказать. Поскольку в угол влезает только одна палета, то парень со склада приедет, заберет старую кучу и затем привезет вам совершенно новую кучу.
 
-### A pallet for your CPU
+### Куча для процессора
 
-Strangely enough, this is similar to how CPUs in modern computers work. In case it isn't obvious, you play the role of the CPU. Your desk is the CPU's registers, and the box of papers is the data you can fit in them. The warehouse is your machine's RAM, and that annoying warehouse guy is the bus that pulls data from main memory into registers.
+Может показаться странным, но в современных компьютерах процессоры работают точно также. Офисный стол бухгалтера - это регистры процессора, а коробка с документами -- данные, которые можно положить в регистры. Склад -- это RAM вашего компьютера, а тот надоедливый парень со склада -- шина, которая наполняет регистры данными из памяти.
 
-If I were writing this chapter thirty years ago, the analogy would stop there. But as chips got faster and RAM, well, *didn't*, hardware engineers started looking for solutions. What they came up with was *CPU caching*.
+Если бы эта книга писалась тридцать лет назад, здесь история бы и закончилась. Но так как процессоры становятся быстрее, а RAM, грубо говоря, *нет*, инженеры начали искать решение. И они пришли к тому, что называется *кэшем процессора*.
 
-Modern computers have a <span name="caches">little chunk</span> of memory right inside the chip. The CPU can pull data from this much faster than it can from main memory. It's small because it has to fit in the chip and because the faster type of memory it uses (static RAM or "SRAM") is way more expensive.
+В современных компьютеры если  <span name="caches">маленький объем</span> памяти прямо внутри процессора. Он может достать оттуда данные быстрее, чем из основной памяти. Этот объем достаточно мал, чтобы уместиться в процессоре, и довольно дорог, потому что используется особый, быстрый тип памяти (static RAM или "SRAM").
 
 <aside name="caches">
 
-Modern hardware actually has multiple levels of caching, which is what they mean when you hear "L1", "L2", "L3", etc. Each level is larger but slower than the previous. For this chapter, we won't worry about the fact that memory is actually a [hierarchy](http://en.wikipedia.org/wiki/Memory_hierarchy), but it's important to know.
+Вообще, кэшей несколько. В зависимости от уровня они называются по-разному -- "L1", "L2", "L3" и так далее. Каждый уровень больше и медленнее предыдущего. В этой главе мы не будем углубляться в детали [иерархии памяти](http://ru.wikipedia.org/wiki/Иерархия_памяти), но это полезно знать.
 
 </aside>
 
-This little chunk of memory is called a *cache* (in particular, the chunk on the chip is your *L1 cache*) and in my belabored analogy, its part was played by the pallet of boxes. Whenever your chip needs a byte of data from RAM, it automatically grabs a whole chunk of contiguous memory -- usually around 64 to 128 bytes -- and puts it in the cache. This dollop of memory is called a *cache line*.
+Этот маленький кусочек памяти называется *кэшем* (в частности, этот можно назвать *кэш L1*), и в нашей истории он эквивалентен куче коробок. Как только процессору понадобится байт памяти из RAM, он автоматически забирает целый кусок непрерывных данных -- обычно от 64 до 128 байт -- и кладет их в кэш. Эта порция памяти называется *кэш-линией*.
 
 <img src="images/data-locality-cache-line.png" />
 
-If the <span name="pallet">next byte</span> of data you need happens to be in that chunk, the CPU reads it straight from the cache, which is *much* faster than hitting RAM. Successfully finding a piece of data in the cache is called a *cache hit*. If it can't find it in there and has to go to main memory, that's a *cache miss*.
+Если <span name="pallet">следующий байт</span> данных, который вам нужен, случайно окажется к этой линии, процессор прочитает его прямо из кэша, что *гораздо* быстрее чем обращение к RAM. Эту ситуацию, когда данные в кеше, называют *попаданием в кэш*. Если данных нет в кеше и приходится запрашивать главную память -- это *кэш-промах*.
 
 <aside name="pallet">
 
-I glossed over (at least) one detail in the analogy. In your office, there was only room for one pallet, or one cache line. A real cache contains a number of cache lines. The details about how those work is out of scope here, but search for "cache associativity" to feed your brain.
+Я приукрасил одну (по крайней мере) деталь в нашей истории. В офисе можно положить только одну кучу, то есть одну кэш-линию. Кэш процессора содержит несколько кэш-линий. Вы сможете утолить свое любопытство, поискав по слову "ассоциативность кэша".
 
 </aside>
 
-When a cache miss occurs, the CPU *stalls*: it can't process the next instruction because it needs data. It sits there, bored out of its mind for a few hundred cycles until the fetch completes. Our mission is to avoid that. Imagine you're trying to optimize some performance critical piece of game code and it looks like this:
+Когда случается кэш-промах, процессор *замирает*: он не может выполнить инструкцию, потому что ему нужны данные. Он просто стоит и скучает следующие несколько сотен тактов пока данные не появятся. Наша задача -- избежать этого. Допустим, мы хотит увеличить производительность важной части кода, который выглядит вот так:
 
 ^code do-nothing
 
-What's the first change you're going to make to that code? Right. Take out that pointless, expensive function call. That call is equivalent to the performance cost of a cache miss. Every time you bounce to main memory, it's like you put a delay in your code.
+Какой бы был ваш первый шаг? Правильно! Уберем этот бессмысленный и дорогой вызов функции. Вызов функции по стоимости эквивалентен кэш-промаху. Каждый раз вы выскакиваете в основную память -- это как вставить задержку в код.
 
-### Wait, data is performance?
+### Разве данные -- это производительность?
 
-When I started working on this chapter, I spent some time putting together little game-like programs that would trigger best case and worst case cache usage. I wanted benchmarks that would thrash the cache so I could see first-hand how much bloodshed it causes.
+Когда я начал работать над этой главой, я потратил время на примеры , которые показали бы хороший и плохой вариант использования кэша. Мне нужны были тесты, которые гоняли бы кэш, чтобы непосредственно увидеть все эффекты.
 
-When I got some stuff working, I was surprised. I knew it was a big deal, but there's nothing quite like seeing it with your own eyes. <span name="ymmv">I wrote two programs</span> that did the *exact same* computation. The only difference was how many cache misses they caused. The slow one was fifty *times* slower than the other.
+И когда я сделал часть работы, я был удивлен. Я знал, что кэш важен, но увидеть это своими глазами -- это нечто. <span name="ymmv">Я написал две программы</span>, которые делали *совершенно одинаковые* вещи. Единственное отличие было в том, как много кэш-промахов они получали. И худший вариант был в 50 *раз* медленнее, чем лучший.
 
 <aside name="ymmv">
 
-There's a lot of caveats here. In particular, different computers have different cache setups so my machine may be different from yours, and dedicated game consoles are very different from PCs which are quite different from mobile devices.
+Здесь есть тонкости. В частности, разные компьютеры имеют разный кэш, поэтому мой комьютер может отличаться от вашего. А игровые консоли совсем отличны от дескторов, которые имеют много разного с мобильными устройствами.
 
-Your mileage will vary.
+Ваши результаты могут отличаться.
 
 </aside>
 
-This was a real eye-opener to me. I'm used to thinking of performance being an aspect of *code* not *data*. A byte isn't slow or fast, it's just some static thing sitting there. But, because of caching, *the way you organize data directly impacts performance.*
+Это по-настоящему открыло мне глаза. Я думал, на быстродействие влияет *код*, а не *данные*. Байт не бывает быстрым или медленным, он просто есть. Но из-за кэширования, *способ управления памятью прямо влияет на производительность*.
 
-The challenge now is to wrap that up into something that fits into a chapter here. Optimization for cache usage is a huge topic. I haven't even touched on *instruction caching*. Remember, code is in memory too and has to be loaded onto the CPU before it can be executed. Someone more versed on the subject could write an entire <span name="book">book</span> on it.
+Теперь нужно все это применить к нашей теме. Оптимизация использования кэша -- довольно объемная тема. Я даже не упомянул о *кэшировании инструкций*. Вспомните -- код находится в памяти тоже, и его тоже нужно загрузить в процессор перед тем как выполнить. Кто-то более осведомленный может написать целую <span name="book">книгу</span> об этом.
 
 <aside name="book">
 
-In fact, someone *did* write a book on it: [*Data-Oriented Design*](http://www.dataorienteddesign.com/dodmain/) by Richard Fabian.
+На самом деле, кто-то *уже* написал книгу об этом:  [*Data-Oriented Design*](http://www.dataorienteddesign.com/dodmain/) от Ричарда Фабиана.
 
 </aside>
 
-Since you're already reading *this* book right now, though, I have a few basic techniques that will get you started along the path of thinking about how data structures impact your performance.
+Так как вы всё-таки читаете *эту* книгу, то я опишу несколько базовых вещей. Вместе с ними уже можно начать думать о том, как структуры данных влияют на производительность.
 
-It all boils down to something pretty simple: whenever the chip reads some memory, it gets a whole cache line. The more you can use stuff in that <span name="line">cache line, the faster you go</span>. So the goal then is to *organize your data structures so that the things you're processing are next to each other in memory*.
+Все довольно просто: когда процессор считывать данные из памяти, он требует целую кэш-линию. Чем больше данных удасться <span name="line">положить в эту линию, тем быстрее все выполнится</span>. Так что надо *организовать ваши структуры так, чтобы вычисления оперировали с близко расположенными в памяти данными*.
 
 <aside name="line">
 
-There's a key assumption here, though: one thread. If you are modifying nearby data on multiple threads, it's faster to have it on *different* cache lines. If two threads try to tweak data on the same cache line, both cores have to do some costly synchronization of their caches.
+Здесь есть ключевой момент:  контекст одного потока. Если вы модифицируете данные, используя несколько потоков, то лучше им находится в разных *кэш-линиях*. Если два потока попытаются изменить данные в одной и той же кэш-линии, обоим процессорам использовать синхронизацию кэшей, что довольно дорого.
 
 </aside>
 
-In other words, if your code is crunching on `Thing` then `Another` then `Also`, you want them laid out in memory like this:
+Другими словами, если ваш код использует `одно`, затем `другое`, потом `третье`, вам лучше расположить это в памяти как-то так:
 
 <img src="images/data-locality-things.png" />
 
-Note, these aren't *pointers* to `Thing`, `Another`, and `Also`. This is the actual data for them, in place, lined up one after the other. As soon as the CPU reads in `Thing`, it will start to get `Another` and `Also` too (depending on how big they are and how big a cache line is). When you start working on them next, they'll already be cached. Your chip is happy and you're happy.
+Заметьте, это не *указатели* на `одно`, `другое` и `третье`. Это настоящие данные, расположенные в одну линию. Как только процессор потребует `одно`, он сразу же получит и `другое`, и `третье` (вообще это зависит от того, насколько эти штуки большие, и от размера кэш-линии). Когда начнуться вычисления, данные уже будут в кэше. Ваш процессор счастлив, значит -- и вы счастливы.
 
-## The Pattern
+## Общий подход
 
-Modern CPUs have **caches to speed up memory access.** These can access memory **adjacent to recently accessed memory much quicker**. Take advantage of that to improve performance by **increasing data locality** -- keeping data in **contiguous memory in the order that you process it.**
+Современные **процессоры имеют кэш для ускорения доступа к памяти**. Доступ к соседним участкам памяти **осуществляется намного быстрее**. Этим можно воспользоваться **увеличивая компактность данных** -- хранить данные **непрерывно, в соответствии с порядком их обработки**.
 
-## When to Use It
+## Когда этим пользоваться
 
-Like most optimizations, the first guideline for using it is *when you have a performance problem.* Don't waste time applying this to some infrequently executed corner of your codebase. Optimizing code that doesn't need it just makes your life harder since the result is almost always more complex and less flexible.
+Как и при большинстве оптимизаций, первым делом нужно убедится что *есть проблема с быстродействием*. Не тратьте время, пытаясь ускорить редко используемый участок кода. Преждевременная оптимизация усложнит вашу жизнь, так как результат почти всегда сложен и менее гибок.
 
-With this pattern specifically, you'll also want to be sure your performance problems *are caused by cache misses*. If your code is slow for other reasons, this won't help.
+Применительно к нашей теме, нужно убедиться, что быстродействие *действительно страдает от кэш-промахов*. Если код медленный по другим причинам, то лекарство не поможет.
 
-The cheap way to profile is to manually add a bit of instrumentation that checks how much time has elapsed between two points in the code, hopefully using a precise timer. To catch cache misses, you'll want something a little more sophisticated. You really want to see how many cache misses are occurring and where.
+В простом случае выследить проблему поможет инструментация. Она измерит время выполнения кода между двумя точками с использованием точного таймера. Для отлова кэш-промахов понадобиться что-то посложнее. Нужно увидеть, как много случилось промахов, и в каком месте.
 
-Fortunately, there are <span name="cachegrind">profilers</span> out there that report it. It's worth spending the time to get one of these working and make sure you understand the (surprisingly complex) numbers it throws at you before you do major surgery on your data structures.
+К счастью, есть <span name="cachegrind">профайлеры</span>, которые могут помочь. Придется потратить время на настройку такого профайлера и научится воспринимать его (часто непростые) отчеты, перед тем как приступить к главному действу по оптимизации структур с данными.
 
 <aside name="cachegrind">
 
-Unfortunately, most of those tools aren't cheap. If you're on a console dev team, you probably already have licenses for them.
+К сожалению, такие профайлеры недешевы. Если вы в команде, которая работает с консолями, у вас скорее всего уже есть какая-нибудь лицензия.
 
-If not, an excellent free option is [cachegrind](http://valgrind.org/docs/manual/cg-manual.html). It runs your program on top of a simulated CPU and cache hierarchy and then reports all of the cache interactions.
+Если нет, то если бесплатный [cachegrind](http://valgrind.org/docs/manual/cg-manual.html). Он выполняет программу в эмуляторе процессора и показывает все операции с кэшем.
 
 </aside>
 
-That being said, cache misses *will* affect the performance of your game. While you shouldn't spend a ton of time pre-emptively optimizing for cache usage, do think about how cache-friendly your data structures are throughout the design process.
+Как уже говорилось, кэш-промахи *повлияют* на быстродействие вашей игры. И все же не увлекайтесь тратой времени на преждевременную оптимизацию кэша. Просто помните при разработке архитектуры -- организовать структуры стоит так, чтобы они хорошо работали в кэше.
 
-## Keep in Mind
+## Особенности
 
-One of the hallmarks of software architecture is *abstraction*. A large chunk of this book is about patterns to decouple pieces of code from each other so that they can be changed more easily. In object-oriented languages, this almost always means interfaces.
+Отличительный признак архитектуры программы -- *абстрация*. Большая часть это книги рассказывает о том, как отвязать куски кода друг от друга так, чтобы они были легко изменяемы. В языках ООП это почти всегда означает интерфейсы.
 
-In C++, using interfaces implies accessing objects through <span name="virtual">pointers or references</span>. But going through a pointer means hopping across memory, which leads to the cache misses this pattern works to avoid.
+В C++ использование интерфейсов предполагает доступ к объектам через <span name="virtual">указатели или ссылки</span>. Доступ через указатель означает прыжки в памяти, которые ведут к кэш-промахам -- а мы стараемся их избежать.
 
 <aside name="virtual">
 
-The other half of interfaces is *virtual method calls*. Those require the CPU to look up an object's vtable, and then find the pointer to the actual method to call there. So, again, you're chasing pointers which can cause cache misses.
+Другая особенность интерфейсов -- *виртуальные методы*. Для того чтобы вызвать такой метод, необходимо получить доступ к виртуальной таблице объекта и найти там указатель на функцию, которую необходимо вызвать. То есть, игра в указатели опять приводит к кэш-промахам.
 
 </aside>
 
-In order to please this pattern, you will have to sacrifice some of your precious abstractions. The more you design your program around data locality, the more you will have to give up inheritance and interfaces, and the benefits those tools can provide. There's no silver bullet here, just challenging trade-offs. That's what makes it fun!
+Для того, чтобы воспользоваться оптимизацией, придется пожертвовать частью абстракций. Чем больше вы концентрируете архитектуру программы вокруг компактности данных, тем меньше применения находится наследованию и интерфейсам -- и всем их сильным сторонам. Серебрянной пули здесь нет, угодить всем не удасться. Тем веселее!
 
-## Sample Code
+## Примеры
 
-If you really go down the rathole of optimizing for data locality, you'll discover countless ways to slice and dice your data structures into pieces your CPU can most easily digest. To get you started, I'll show an example for each of a few of the most common ways to organize your data. We'll cover them in the context of some specific part of a game engine, but (as with other patterns), keep in mind that the general technique can be applied anywhere it fits.
+Если заняться оптимизацией локальности данных, то можно придумать бесконечно много способов разложения ваши структур на кусочки, с которыми процессору будет удобно работать. Для общего понимания я покажу примеры основных реализаций этих идей. Мы рассмотрим их в контексте части игрового кода, но это общая техника, поэтому применить её возможно везде (как и все остальные паттерны).
 
-### Contiguous arrays
+### Непрерывные массивы
 
-Let's start with a <a href="game-loop.html" class="pattern">Game Loop</a> that processes a bunch of game entities. Those entities are decomposed into different domains -- AI, physics, and rendering -- using the <a href="component.html" class="pattern">Component</a> pattern. Here's the game entity class:
+Начнем мы с <a href="game-loop.html" class="pattern">Game Loop</a>, который обрабатывает набор внутренних объектов. Эти объекты разделены на несколько областей -- AI, физика и рендеринг -- с использованием паттерна <a href="component.html" class="pattern">Component</a>. Вот класс объекта:
 
-^code game-entity
+ ^code game-entity
 
-Each component has a relatively small amount of state, maybe little more than a few vectors or a matrix, and then a method to <span name="update">update</span> it. The details aren't important here, but imagine something roughly along the lines of:
+Каждый компонент имеет относительный малый набор аттрибутов (не больше пары векторов или одной матрицы) и метод <span name="update">update</span>, который их обновляет. Детали не так важны здесь, просто представьте что-то вроде следующего:
 
 <aside name="update">
 
-As the name implies, these are examples of the <a href="update-method.html" class="pattern">Update Method</a> pattern. Even `render()` is this pattern, just by another name.
+Метод update -- это пример паттерна <a href="update-method.html" class="pattern">Update Method</a>.  Как и `render()`, просто с другим именем.
 
 </aside>
 
 ^code components
 
-The game maintains a big array of pointers to all of the entities in the world. Each spin of the game loop, we need to run the following, in this order:
+Игра оперирует с большим массивом указателей на эти объекты. В каждой игровой итерации происходит следующее:
 
-1. Update the AI components for all of the entities.
+1. Обновляем AI для всех объектов.
 
-2. Update the physics components for them.
+2. Применяем к ним физику.
 
-3. Render them using their render components.
+3. И отображаем все объекты с помощью рендера.
 
-Lots of game engines implement that like so:
+Большинство игр прямо так и делают:
 
 ^code game-loop
 
-Before you ever heard of a CPU cache, this looked totally innocuous. But by now you've got an inkling that something isn't right here. This code isn't just thrashing the cache, it's taking it around back and beating it to a pulp. Watch what it's doing:
+До того как вы узнали про кэш процессора, все выглядело абсолютно невинно. Но сейчас у вас возникло подозрение, что то-то делается неправильно. Код не использует кэш по полной, вместо этого он просто убивает его. Смотрите, что происходит:
 
-1. The array of game entities is *pointers* to them, so for each element in the array, we have to traverse that pointer. That's a cache miss.
+1. Массив объектов -- это *указатели* на объекты. Когда мы образаемся к объекту, мы достаем данные по указателю. Это кэш-промах.
 
-2. Then the game entity has a pointer to the component. Another cache miss.
+2. Затем мы достаем компонент из указателя в объекте. Ещё кэш-промах.
 
-3. Then we update the component.
+3. Затем мы вызываем метод компонента.
 
-4. Now we go back to step one for *every component of every entity in the game*.
+4. И возвращаемся к шагу 1, чтобы повторить его для *каждого компонента каждого игрового объекта*.
 
-The scary part is we have no idea how any of these objects are laid out in memory. We're completely at the mercy of the memory manager. As entities get allocated and freed over time, the heap is likely to become increasingly randomly organized.
+Страшная правда в том, что мы понятия не имеем как все эти объекты раскиданы по памяти. Этим распоряжается менеджер памяти. Если все время создавать и уничтожать объекты, то постепенно память заполнится данными в произвольном порядке.
 
 <span name="lines"></span>
 
@@ -236,23 +233,23 @@ The scary part is we have no idea how any of these objects are laid out in memor
 
 <aside name="lines">
 
-Every frame, the game loop has to follow all of those arrows to get to the data it cares about.
+Движку приходится бегать по этим стрелками каждый игровой ход, чтобы достать данные.
 
 </aside>
 
-If our goal was to take a whirlwind tour around the game's address space like some "256MB of RAM in Four Nights!" cheap vacation package, this would be a fantastic deal. But our goal is to run the game quickly, and <span name="chase">traipsing</span> all over main memory is *not* the way to do that. Remember that `sleepFor500Cycles()` function? Well this code is effectively calling that *all the time*.
+Это было бы здорово, если бы мы хотели "объехать всю память за 80 дней"! Но нам нужно сделать цикл быстро и <span name="chase">бродить</span> по всей памяти не наш метод. Помните функцию `sleepFor500Cycles()`? Ну так вот -- этот код использует её *постоянно*.
 
 <aside name="chase">
 
-The term for wasting a bunch of time traversing pointers is "pointer chasing", which it turns out is nowhere near as fun as it sounds.
+Трата времени на разыменование указателей называется "блуждание по указателям", и это не так весело как кажется.
 
 </aside>
 
-Let's do something better. Our first observation is that the only reason we follow a pointer to get to the game entity is so we can immediately follow *another* pointer to get to a component. `GameEntity` itself has no interesting state and no useful methods. The *components* are what the game loop cares about.
+Придумаем что-нибудь получше. С первого взгляда ясно, что указатель на объект нам нужен только для доступа к *другому* указателю на его компонент. Сам `GameEntity`нам не интересен и дает нам ничего полезного. *Компоненты* -- вот что нужно циклу.
 
-Instead of a giant constellation of game entities and components scattered across the inky darkness of address space, we're going to get back down to Earth. We'll have a big array for each type of component: a flat array of AI components, another for physics, and another for rendering.
+Срубим под корень раскидистое дерево указателей на объекты! Нам нужно оформить по массиву на каждый тип компонента: один плоский массив для AI, один для физики и ещё один для рендера.
 
-Like this:
+Как-то так:
 
 <span name="long-name"></span>
 
@@ -260,11 +257,11 @@ Like this:
 
 <aside name="long-name">
 
-My least favorite part about using components is how long the word "component" is.
+Меньше всего в компонентах мне нравится длина самого слова "компонент".
 
 </aside>
 
-Let me just stress that these are arrays of *components* and not *pointers to components*. The data is all there, one byte after the other. The game loop can then walk these directly:
+Подчеркну, что это массив *компонентов*, а не *указателей на компонент*. Все данные прямо здесь, один за другим. Игровой цикл может оперировать прямо с ними:
 
 <span name="arrow"></span>
 
@@ -272,251 +269,250 @@ Let me just stress that these are arrays of *components* and not *pointers to co
 
 <aside name="arrow">
 
-One hint that we're doing better here is how few `->` operators there are in the new code. If you want to improve data locality, look for indirection operators you can get rid of.
+Показатель того, что мы движемся в правильном направлении, это уменьшение количества "`->`" в коде. Если вам нужно улучшить компактность данных, ищите эти операторы и избавляйтесь от них.
 
 </aside>
 
-We've ditched all of that pointer chasing. Instead of skipping around in memory, we're doing a straight crawl through three contiguous arrays.
+Итак, мы выбросили блуждание по указателям. Вместо метания по памяти, мы перебираем три непрерывных массива с прямыми данными.
 
 <img src="images/data-locality-component-arrays.png" />
 
-This pumps a solid stream of bytes right into the hungry maw of the CPU. In my testing, this change made the update loop fifty *times* faster than the previous version.
+Теперь плотный поток байтов загружается прямо в жадное горло процессора. По результатам тестов, это изменение ускоряет цикл в тридцать раз по сравнению с предыдущим вариантом.
 
-Interestingly, we haven't lost much encapsulation here. Sure, the game loop is updating the components directly instead of going through the game entities, but it was doing that before to ensure they were processed in the right order. Even so, each component itself is still nicely encapsulated. It owns its own data and methods. We just changed the way it's used.
+Интересно, что мы почти не потеряли в инкапсуляции. Конечно, игровой цикл оперирует с компонентами напрямую, не доставая их из объектов. Но мы можем достать их заранее, чтобы убедиться что мы все делаем правильно. Более того, каждый компонент все ещё надежно инкапсулирован. Мы просто изменили способ доступа к ним.
 
-This doesn't mean we need to get rid of `GameEntity` either. We can leave it just as it is with pointers to its components. They'll just point into those arrays. This is still useful for other parts of the game where you want to pass around a conceptual "game entity" and everything that goes with it. The important part is that the performance critical game loop sidesteps that and goes straight to the data.
+Это не значит, что `GameEntity` больше не нужен. Мы оставим его, так как он все ещё держит указатели на свои компоненты. Они просто будут указывать на элементы наших массивов. Сам концепт "игрового объекта" может пригодиться в других частях кода. Важно, что для производительности игровой цикл обходит этот момент и использует данные напрямую.
 
-### Packed data
+### Упаковка
 
-Say we're doing a particle system. Following the advice of the previous section, we've got all of our particles in a nice big contiguous array. Let's wrap it in a little <span name="pool">manager class</span> too:
+Допустим, мы делаем систему частиц. Следуя совету из предыдущей секции, мы загрузили все частици в один большой непрерывный массив. Придумаем маленькую <span name="pool">систему частиц</span>:
 
 <aside name="pool">
 
-The `ParticleSystem` class is an example of an <a href="object-pool.html" class="pattern">Object Pool</a> custom built for a single type of object.
+Класс `ParticleSystem` является примером паттерна <a href="object-pool.html" class="pattern">Object Pool</a> для одного типа объекта.
 
 </aside>
 
 ^code particle-system
 
-A rudimentary update method for the system just looks like this:
+Его метод <code>update</code> выглядит следующим образом:
 
 ^code update-particle-system
 
-But it turns out that we don't actually need to process *all* of the particles all the time. The particle system has a fixed-size pool of objects, but they aren't usually all actively twinkling across the screen. The easy answer is something like this:
+Но реальность показала, что нам не нужно обрабатывать *все* частицы каждый раз. Система содержит фиксированный набор частиц, но не все они активны на экране:
 
 ^code particles-is-active
 
-We give `Particle` a flag to track whether its in use or not. In the update loop, we <span name="branch">check</span> that for each particle. That loads the flag into the cache, along with all of that particle's other data. If the particle *isn't* active, then we just skip over that to the next one. The rest of the particle's data that we loaded into the cache is a waste.
+Мы дали `Particle` флажок, по которому определяем активна она или нет. В цикле мы <span name="branch">проверяем</span> его для каждой частицы. Флажок загружается в кэш вместе с целым объектом. И если частица *не активна*, мы просто переходим к следующей. Остальные аттрибуты частицы бесполезно загружаются в кэш.
 
-The fewer active particles there are, the more we're skipping across memory. The more we do that, the more cache misses there are between actually doing useful work updating active particles. If the array is large and has *lots* of inactive particles in it, we're back to just thrashing the cache again.
+Чем меньше активных частиц, тем больше частиц загружается в кэш вхолостую. Если массив большой и *большинство* частиц неактивно, то мы просто насилуем кэш без пользы.
 
-Having objects in a contiguous array doesn't solve much if the objects we're actually processing aren't contiguous in it. If it's littered with inactive objects we have to dance around, we're right back to the original problem.
+Идея хранения объектов в непрерывном массиве не сильно помогает, так как набор частиц, с которым мы реально будем работать, не непрерывен. Массив замусорен неактивными частицами, которые нам надо пропускать, и мы возвращаемся к первоначальной проблеме.
 
 <aside name="branch">
 
-Savvy low-level coders can see another problem here. Doing an `if` check for every particle can cause a *branch misprediction* and a *pipeline stall*. In modern CPUs a single "instruction" actually takes several clock cycles. To keep the CPU busy, instructions are *pipelined* so that the subsequent instructions start processing before the first one finishes.
+Смышленные программисты увидят здесь и другую проблему. Выполнение условия `if` для каждой частицы может привести к *сбою предсказания переходов* и *простою конвейера*.  В процессорах одна "инструкция" может занять несколько тактов. Чтобы процессор не простаивал, инструкции *распараллеливают*, чтобы следующая инструкция начала обрабатываться, не дожидаясь конца предыдущей.
 
-To do that, the CPU has to guess which instructions it will be executing next. In straight line code, that's easy, but with flow control, it's harder. While it's executing the instructions for that `if`, does it guess that the particle is active and start executing the code for the `update()` call, or does it guess that it isn't?
+Процессор пытается угадать, какая инструкция выполнится следующей. В линейном коде это просто, но условные переходы усложняют жизнь. Пока выполняется условие для `if`, какую часть кода брать следующей --  `update()` или ничего не делать?
 
-To answer that, the chip does *branch prediction:* it sees which branches your code previously took and guesses that it will do that again. But when the loop is constantly toggling between particles that are and aren't active, that prediction fails.
+ Для ответа на этот вопрос процессор использует *предсказание переходов*: он видит, по какому пути пошел в прошлый раз и предполагает, что пойдет по нему опять. И когда флажок постоянно переключается, это предсказание терпит сбой.
 
-When it does, the CPU has to ditch the instructions it had started speculatively processing (a *pipeline flush*) and start over. The performance impact of this varies widely by machine, but this is why you sometimes see developers avoid flow control in hot code.
+Когда происходит сбой, процессор выкидывает инструкции, которые он уже начал выполнять (*сброс конвейера*) и начинает заново. Влияние этого на производительность зависит от характеристик машины, но это та причина, по которой некоторые программисты пытаются избежать ветвлений в критических местах.
 
 </aside>
 
-Given the title of this section, you can probably guess the answer. Instead of *checking* the active flag, we'll *sort* by it. We'll keep all of the active particles in the front of the list. If we know all of those particles are active, we don't have to check the flag at all.
+Из названия секции, вы можете догадаться о решении этого вопроса. Вместо проверки *флага*, мы отсортируем по нему. Поместим все активные частицы в начало списка. Если мы будем знать, что эти частицы активны, проверка флага нам просто не нужна.
 
-We can also easily keep track of how many active particles there are. With this, our update loop turns into this thing of beauty:
+Мы можем хранить количество активных частиц. Тогда код превратится в следующую прекрасную штуку:
 
 ^code update-particles
 
-Now we aren't skipping over *any* data. Every byte that gets sucked into the cache is a piece of an active particle that we actually need to process.
+Теперь мы не пропускаем *ни одного* лишнего байта. Каждый загружается в кэш для реальной работы с частицей.
 
-Of course, I'm not saying you should actually quicksort the entire collection of particles every frame. That would more than eliminate the gains here. What we want to do is *keep* the array sorted.
+Конечно, я не говорю, что вам нужно использовать быструю сортировку (quicksort) всего массива каждый раз. Это уничтожит все наши победы. Нам просто нужно *поддерживать* сортировку.
 
-Assuming the array is already sorted -- and it is at first when all particles are inactive -- the only time it can become *un*sorted is when a particle has been activated or deactivated. We can handle those two cases pretty easily. When a particle gets activated, we move it up to the end of the active particles by swapping it with the first *in*active one:
+Предположим, что массив уже отсортирован -- и это действительно для случая, когда все частицы неактивны. Сортировка *теряется*, когда частица переходит из неактивного состояния в активное и обратно. Это легко можно отследить. Как только частица становится активной, мы передвинем её на место первой *неактивной* частицы:
 
 ^code activate-particle
 
-To deactivate a particle, we just do the opposite:
+При деактивации частицы, сделаем обратный ход:
 
 ^code deactivate-particle
 
-Lots of programmers (myself included) have developed allergies to moving things around in memory. Schlepping a bunch of bytes around *feels* heavyweight , compared to just assigning a pointer. But when you add in the cost of *traversing* that pointer, it turns out that our intuition is sometimes wrong. In <span name="profile">some cases</span>, it's cheaper to push things around in memory if it helps you keep the cache full.
+Большинство (включая меня) выработали аллергию на копирование памяти. Перекидывание кучи байтов *выглядит* тяжелой операцией по сравнению с перемещением указателя. Но если вы прибавите к этому *разыменование* этого указателя, выяснится, что интуиция иногда обманывает. В <span name="profile">некоторых случаях</span>, дешевле перекинуть данные в памяти, если это поможет операциям с кэшем.
 
 <aside name="profile">
 
-This is your friendly reminder to *profile* when making these kinds of decisions.
+Это тонкий намек на пользу *профайлера* при принятии решений подобного рода.
 
 </aside>
 
-There's a neat consequence of keeping the particles *sorted* by their active state: We don't need to store an active flag in each particle at all. It can be inferred by its position in the array and the `numActive_` counter. This makes our particle objects smaller, which means we can pack more in our cache lines, and that makes them even faster.
+Есть очевидное преимущество от хранения частиц *отсортированными* по активности: теперь не нужен флаг. Он заменяется позицией частицы в массиве и счетчиком `numActive_`. Из-за этого класс частицы становиться чуточку меньше, значит их больше поместится в кэш-линию, и все завертится ещё быстрее.
 
-It's not all rosy, though. As you can see from the API, we've lost a bit of object-orientation here. The `Particle` class no longer controls its own active state. You can't just call some `activate()` method on it since it doesn't know it's index. Instead, any code that wants to activate particles needs access to the particle *system*.
+Ести и минусы, конечно. Мы потеряли немного объектно-ориентированности здесь. Класс `Particle` больше не управляет своим состоянием активности. Вы не сможете сделать у частицы метод `activate()`, так как она просто не знает свой индекс. Вместо этого придется иметь доступ к *системе частиц*.
 
-In this case, I'm OK with `ParticleSystem` and `Particle` being tightly tied like this. I think of them as a single *concept* spread across two physical *classes*. It just means accepting the idea that particles are *only* meaningful in the context of some particle system. Also, in this case it's likely to be the particle system that will be spawning and killing particles anyway.
+В данном случае, я считаю нормальным, что `ParticleSystem` и `Particle` так жестко связаны между собой. Решая нашу главную задачу, пришлось вылезти за границы одного класса. Ничего страшного -- скорее всего, именно система будет решать когда создавать частицы и когда их убивать.
 
 ### Hot/cold splitting
 
-OK, this is the last example of a simple technique for making your cache happier. Say we've got an AI component for some game entity. It has some state in it: the animation it's currently playing, a goal position its heading towards, energy level, etc. -- stuff it checks and tweaks every single frame. Something like:
+Это последний пример простой техники, которая может улучшить работу с кэшем. Допустим, у нас есть AI компонент для какого-то объекта. И он имеет какое-то состояние: анимация, которая сейчас запущена, точка, к которой он двигается, уровень энерги, и так далее -- все это проверяется и меняется каждый цикл игры. В общем, что-то вида:
 
 ^code ai-component
 
-But it also has some state for rarer eventualities. It stores some data describing what loot it drops when it has an unfortunate encounter with the noisy end of a shotgun. That drop data is only used once in the entity's lifetime, right at its bitter end.
+Но кроме этого есть ещё редкие события. Например, какие шмотки выпадут, если придется неудачно встретиться с шотганом лицом к лицу. Этот дроп используется только один раз, чаще всего в самом конце.
 
 ^code loot-drop
 
-Assuming we followed the earlier patterns, when we update these AI components, we walk through a nice packed, contiguous array of data. But that data includes all of the loot drop information. That makes each component bigger, which reduces the number of them we can fit in a cache line. We get more cache misses because the total memory we walk over is larger. The loot data gets pulled into the cache for every component, every frame, even though we aren't even touching it.
+Если все паттерны, которые мы рассмотрели ранее, уже были применены, то при работе со всеми AI компонентами, мы будем работать с упакованным, непрерывным массивом данных. В этом массив будет включена и информацию о дропе. И как мы уже знаем, чем толще объект, тем меньше их будет загружаться в кэш-линию. Будет больше кэш-промахов, потому что память пухнет от данных, которые мы не используем.
 
-The solution for this is called "hot/cold splitting". The idea is to break our data structure into two separate pieces. The first holds the "hot" data: the state we need to touch every frame. The other piece is the "cold" data: everything else that gets used less frequently.
+То, что мы будем делать, называется "разделение на горячее и холодное". Идея в том, чтобы разбить структуру на два отдельных куска. Первый кусок содержит "горячие" данные: аттрибуты, которые нам нужны каждый раз. Другой кусок -- "холодные" данные: все, что используется более или менее редко.
 
-The hot piece is the *main* AI component. It's the one we need to use the most, so we don't want to chase a pointer to find it. The cold component can be off to the side, but we still need to get to it, so we give the hot component a pointer to it, like so:
+Горячая часть -- это *сам* AI компонент. Он нам нужен каждый раз, поэтому указатель из него мы делать не будем, чтобы лишний раз по нему не бегать. А за холодными аттрибутами можно сбегать, поэтому мы будем получать их через указатель. Вот так:
 
 ^code hot-cold
 
-Now when we're walking the AI components every frame, the only data that gets loaded into the cache is stuff we are actually processing (with the <span name="parallel">exception</span> of that one little pointer to the cold data).
+Теперь, когда мы проходим по всем AI в цикле, в кэш будут загружаться только данные, который мы чаще всего используем (за <span name="parallel">исключением</span> одного маленького указателя на холодные аттрибуты).
 
 <aside name="parallel">
 
-We could conceivably ditch the pointer too by having parallel arrays for the hot and cold components. Then we can find the cold AI data for a component since both pieces will be at the same index in their respective arrays.
+В принципе, мы можем избавиться и от указателя тоже, если взять два параллельных массива с холодными и горячими аттрибутами. Используя один индекс, можно получить данные и из одного, и из другого массива.
 
 </aside>
 
-You can see how this starts to get fuzzy, though. In my example here, it's pretty obvious which data should be hot and cold, but it's rarely so clear cut. What if you have fields that are used when an entity is in a certain mode but not in others? What if entities use a certain chunk of data only when they're in certain parts of the level?
+Заметьте, все это становится слегка запутанным. В данном примере, все очевидно: какие данные горячие, какие -- холодные. Но так бывает не всегда. Что, если у вас есть аттрибуты, которые используются часто в одном режиме игры, и редко -- в другом? Или, если у объекта есть аттрибуты, которые проявляются только на каком-нибудь уровне?
 
-Doing this kind of optimization is somewhere between a black art and a rathole. It's easy to get sucked in and spend endless time pushing data around to see what speed difference it makes. It will take practice to get a handle on where to spend your effort.
+Подобная оптимизация похожа на игру в угадайку. Очень легко втянуться и бесконечно перекидывать данные из одного места в другое, выясняя, какая комбинация даст лучший эффект. Практикуйтесь, и научитесь понимать, где нужно применить свои знания в первую очередь.
 
-## Design Decisions
+## Архитектурные решения
 
-This pattern is really about a mindset: it's getting you to think about your data's arrangement in memory as a key part of your game's performance story. The actual concrete design space is wide open. You can let <span name="dod">data locality</span> affect your whole architecture, or maybe it's just a localized pattern you apply to a few core data structures.
+Помните: ключевой момент в оптимизации -- это думать о том, как устроены ваши данные. Пространство решений велико. Техники <span name="dod">компактности данных</span> могут повлиять на всю архитектуру кода, или просто на какие-то критические куски.
 
-The biggest question you'll need to answer is when and where you apply this pattern, but here are a couple of others that may come up.
+Главный вопрос, на который вы будете искать ответ -- это где и когда применить свои знания. Но по пути встретятся и другие моменты.
 
 <aside name="dod">
 
-Noel Llopis' [famous article](http://gamesfromwithin.com/data-oriented-design) that got a lot more people thinking about designing games around cache usage calls this "data-oriented design".
+В [известной статье](http://gamesfromwithin.com/data-oriented-design) Ноэля Лописа (с которой знакомятся люди, учитывающие работу с кэшем при разработке игр) это называется "дизайн, ориентрированный на данные" (data-oriented design).
 
 </aside>
 
-### How do you handle polymorphism?
+### Как дела с полиморфизмом?
 
-Up to this point, we've avoided subclassing and virtual methods. We assumed we have nice packed arrays of *homogenous* objects. That way, we know they're all the exact same size. But polymorphism and dynamic dispatch are useful tools, too. How do we reconcile this?
+До этого момента, мы избегали наследования и виртуальных методов. Мы предполагали, что имеем массивы *однородных* данных. Таким образом, мы были уверены, что они все -- одинакового размера. Но полиморфизм и виртуальность -- весьма полезные штуки. Как подружить эти противоположности?
 
- *  **Don't:**
+ *  **Просто не используйте:**
 
-    The <span name="type">simplest</span> answer is to just avoid subclassing, or at least avoid it in places where you're optimizing for cache usage. Software engineer culture is drifting away from heavy use of inheritance anyway.
+    <span name="type">Очевидным</span> решением будет просто избегать наследования везде. Или по крайней мере там, где вы печетесь об оптимизации работы с кэшем. Но вообще культура прораммирования медленно движется в сторону от широкого использования наследования.
 
     <aside name="type">
 
-    One way to keep much of the flexibility of polymorphism without using subclassing is through the <a href="type-object.html" class="pattern">Type Object</a> pattern.
+    Одним из способов заменить гибкость полиморфизма без наследования  является паттерн <a href="type-object.html" class="pattern">Type Object</a>.
 
     </aside>
 
-    * *It's safe and easy.* You know exactly what class you're dealing with and all objects are obviously the same size.
+    * *Это безопасно и просто.* Вы всегда знаете с каким классом имеете дело, и все объекты имеют предсказуемо одинаковый размер.
 
-    * *It's faster.* Dynamic dispatch means looking up the method in the vtable and then traversing that pointer to get to the actual code. While the cost of this varies widely across different hardware, there is <span name="cpp">*some*</span> cost to dynamic dispatch.
+    * *Это быстро.* Вызов динамического метода делаем много лишних телодвижений, включая разбор таблицы виртуальных методов. Хотя эта цена зависит от аппаратного обеспечения, тем не менее всегда есть <span name="cpp">*некоторое*</span> проседание по производительности.
 
     <aside name="cpp">
 
-    As usual, the only absolute is that there are no absolutes. In most cases, a C++ compiler will require an indirection for a virtual method call. But in *some* cases, the compiler may be able to do *devirtualization* and statically call the right method if it knows what concrete type the receiver is. Devirtualization is more common in just-in-time compilers for languages like Java and JavaScript.
+    Как водится, "всегда" есть не всегда. Чаще всего, С++ компилятору потребуется затраты на вызов виртуального метода. Но в *некоторых* случаях, компилятор сможет "развиртуализировать" вызов и превратить его в статический, если он будет точно знать, с каким типом он имеет дело. Часто девиртуализация встречается в JIT компиляторах, таких как Java и JavaScript.
 
     </aside>
 
-    * *It's inflexible.* Of course, the reason we use dynamic dispatch is because it gives us a powerful way to vary behavior between objects. If you want different entities in your game to have their own rendering styles, or their own special moves and attacks, virtual methods are a proven way to model that. Having to instead stuff all of that code into a single non-virtual method that does something like a big `switch` gets messy quickly.
+    * *Это не так гибко.* Конечно, главная причина использования динамики в том, что легко менять поведение объектов. Если вам нужно, чтобы разные объекты в вашей игре рисовались по-разному, или у них были специфическое движение или атака, то виртуальные методы честно позволят вам реализовать это.  Можно заменить это на какой-нибудь, не виртуальный, метод, внутри которого будет огромный `switch`, но это будет макаронный монстр.
 
- *  **Use separate arrays for each type:**
+ *  **Отдельные массивы для каждого типа:**
 
-    We use polymorphism so that we can invoke behavior on an object whose type we don't know. In other words, we have a mixed bag of stuff and we want each object in there to do its own thing when we tell it to go.
+    Полиморфизм нам нужен, чтобы регулировать поведение объекта, чей тип мы не знаем. Другими словами, у нас есть набор разных объектов, которые должны что-то делать, когда мы этого потребуем.
 
-    But that just raises the question of why mix the bag to begin with? Instead, why not just maintain separate homogenous collections for each type?
+    Но все приводит к вопросу - а откуда вообще взялся этот набор? Почему бы просто не разделить его на несколько однородных коллекций, по одной на каждый тип?
 
-    * *It keeps objects tightly packed.* Since each array only contains objects of one class, there's no padding or other weirdness.
+    * *Объекты будут плотно расположены.* Поскольку элементы массива имеют одинаковый тип, там не нужно использовать промежутки для выравнивания или другие странности.
 
-    * *You can statically dispatch.* Once you've got objects partitioned by type, you don't actually need polymorphism at all any more. You can use regular non-virtual method calls.
+    * *Можно будет вызывать методы статически.* Так как тип объектов известен, то полиморфизм теряет смысл. Можно использовать обычные статические вызовы.
 
-    * *You have to keep track of a bunch of collections.* If you have a lot of different object types, the overhead and complexity of maintaining separate arrays for each can be a chore.
+    * *Придется поддерживать несколько коллекций.* Если типов много, то сложности при работе с несколькими массивами могут перевесить плюсы.
 
-    * *You have to be aware of every type*. Since you have to maintain separate collections for each type, you can't be decoupled from the *set* of classes. Part of the magic of polymorphism is that it's *open-ended*: code that works with an interface can be completely decoupled from the potentially large set of types that implement that interface.
+    * *Нужно будет знать о каждом типе*. Вам понадобиться *полная* информация о типах, с которыми вы работаете. Полиморфизм отличается тем, что там вам нужно только описание интерфейса -- это достаточно для работы. А описание конкретных типов, которые его реализуют, при этом не требуется.
 
- *  **Use a collection of pointers:**
+ *  **Коллекция указателей:**
 
-    If you weren't worried about caching, this is the natural solution. Just have an array of pointers to some base class or interface type. All the polymorphism you could want, and objects can be whatever size they want.
+    Если вы не очень волнуетесь о работе с кэшем, то это естественное решение. Просто заведите себе массив указателей на базовый класс или интерфейс. Весь полиморфизм будет к вашим услугам, и волноваться о размере объектов тоже не понадобится.
 
-    * *It's flexible.* The code that consumes the collection can work with objects of any type as long as it supports the interface you care about. It's completely open-ended.
+    * *Это гибко.* Код, который работает с коллекцией, сможет работать с любыми типами. Достаточно только реализовать требуемый интерфейс. Это легко расширяемое решение.
 
-    * *It's less cache-friendly.* Of course, the whole reason we're discussing other options here is because this means cache-unfriendly pointer indirection. But, remember, if this code isn't performance critical, that's probably OK.
+    * *Кэш не дружит с такими вещами.* Вообще, весь наш разговор начался с темы, что кэш плохо работает с указателями. Но если производительность не критична, то не стоит волноваться раньше времени.
 
-### How are game entities defined?
+### Как описать игровой объект?
 
-If you use this pattern in tandem with the <a href="component.html" class="pattern">Component</a> pattern, you'll have nice contiguous arrays for all of the components that make up your game entities. The game loop will be iterating over those directly, so the object for the game entity itself is less important, but it's still useful in other parts of the codebase where you want to work with a single conceptual "entity".
+Если вы используете паттерн <a href="component.html" class="pattern">Component</a>,  то у вас будет массивы компонентов, из которых складываются игровые объекты. Игровой цикл будет пробегать прямо по ним, так что сам игровой объект, в принципе, не нужен. Но он может использоваться в некоторых местах. Там, где вы хотите иметь дело с принципиально единой структурой.
 
-The question then is how should it be represented? How does it keep track of its components?
+Как тогда его представить? Как ему следить за своими компонентами?
 
- * **If game entities are classes with pointers to their components:**
+ * **Если объект содержит указатели на компоненты:**
 
-    This is what our first example looked like. It's sort of the vanilla OOP solution. You've got a class for `GameEntity`, and it has pointers to the components it owns. Since they're just pointers, it's agnostic about where and how those components are actually organized in memory.
+    Это то, как что мы взяли в качестве первого примера. Кошерный вариант ООП решения. У вас есть класс `GameEntity`, и в нем есть указатели на компоненты, которыми он владеет. Поскольку это просто указатели, легко понять как и где расположить сами компоненты.
 
-    * *You can store components in contiguous arrays.* Since the game entity doesn't care where its components are, you can organize them in a nice packed array to optimize iterating over them.
+    * *Можно хранить компоненты в линейных массивах.* Поскольку объекту все равно, где физически будут находиться его компоненты, вы можете положить их в массив, весьма удобный для итераций.
 
-    * *Given an entity, you can easily get to its components.* They're just a pointer indirection away.
+    * *Получая объект, вы легко получите его компоненты.* Они просто будут лежать в самом объекте как указатели.
 
-    * *Moving components in memory is hard.* When components get enabled or disabled, you may want to move them around in the array to keep the active ones up front and contiguous. If you move a component while the entity has a raw pointer to it, though, that pointer gets broken if you aren't careful. You'll have to make sure to update the entity's pointer at the same time.
+    * *Будет тяжело копировать компоненты.* Если компонент включается и выключается, вам может понадобиться передвинуть его в другое место, если вы хотите держать в массиве только рабочие компоненты. Когда вы скопируете компонент, указатель в объекте становиться невалидным. Нужно быть уверенным, что вы в это же время обновите объект, положив в него указатель на новое место.
 
- *  **If game entities are classes with IDs for their components:**
+ *  **Если в объекте лежат ID компонентов:**
 
-    The challenge with raw pointers to components is that it makes it harder to move them around in memory. You can address that by using something more abstract: an ID or index that can be used to *look up* a component.
+    Указатели в объекте тяжело поддерживать в случае, если вы копируете компоненты с места на место. В этом случае можно адресоваться более абстрактным индексом, который может использоваться чтобы *найти* конкретный компонент.
 
-    The actual semantics of the ID and lookup process are up to you. It could be as simple as storing a unique ID in each component and walking the array, or more complex like a hash table that maps IDs to their current index in the component array.
+    Как реализовать индекс и поиск по ним -- зависит от вас. Можно хранить уникальное число и потом бегать по массиву в поисках компонента с таким индексом. Можно сделать что-то вроде хэш-таблицы, которая по этому числу даст в ответ индекс в массиве компонентов.
 
-    * *It's more complex.* Your ID system doesn't have to be rocket science, but it's still more work than a basic pointer. You'll have to implement and debug it, and there will be memory overhead for bookkeeping.
+    * *Это сложнее.* Построить систему индексов проще, чем запустить шатл в космос. Но все-таки сложнее, чем простой указатель. Придется придумать как реализовать и отлаживать такую систему. Вдобавок, это потребует некоторое количество дополнительной памяти.
 
-    * *It's slower*. It's hard to beat traversing a raw pointer. There may be some actual searching or hashing involved to get from an entity to one of its components.
+    * *Это медленнее*. Тяжело сделать что-то быстрее, чем разыменование указателя. Добавится дополнительная работа для получения реального компонента по его индексу.
 
-    * *You'll need access to the component "manager".* The basic idea is that you have some abstract ID that identifies a component. You can use it to get a reference to the actual component object. But to do that, you need to hand that ID to something that can actually find the component. That will be the class that wraps your raw contiguous array of component objects.
+    * *Появится "менеджер компонентов".* Общая идея -- это иметь некий абстрактный индекс, который однозначно указывает на компонент. Каким-то образом надо будет индекс превратить в компонент. Этим, скорее всего, будет заниматься отдельный класс-менеджер, который обернет ваш массив с компонентами.
 
-        With raw pointers, if you have a game entity, you can find its components. With this, you <span name="singleton">need</span> the game entity *and the component registry too*.
+        В случае простых указателей, если у вас есть объект, вы сразу получаете его компоненты. В случае индексов, при работе вам <span name="singleton">необходимо</span> иметь и объект, и *менеджер компонентов тоже*.
 
         <aside name="singleton">
 
-        You may be thinking, "I'll just make it a singleton! Problem solved!" Well, sort of. You might want to check out <a href="singleton.html">the chapter</a> on those first.
+        Первый вариант, который приходит в голову: "Да я просто сделаю синглтон, и все -- проблема решена!". Ну, возможно. Все же, лучше сначала перечитать главу про <a href="singleton.html">синглтоны</a>.
 
         </aside>
 
- *  **If the game entity is *itself* just an ID:**
+ *  **Если игровой объект сам является ID:**
 
-    This is a newer style that some game engines use. Once you've moved all of your entity's behavior and state out of the main class and into components, what's left? It turns out, not much. The only thing an entity does is bind a set of components together. It exists just to say *this* AI component and *this* physics component and *this* render component define one living entity in the world.
+    Это новое веяние, которое используют некоторые движки. Если выбросить всё состояние и поведение из объекта в компоненты, то что остается? Да, в принципе, не очень много. Единственная функция объекта в этом случае -- это связать все компоненты между собой. То есть, он говорит, что вот *этот* AI, вот *эта* физика и вот *эта* рисовалка описывают одну какую-то сущность в игровом мире.
 
-    That's important because components interact. The render component needs to know where the entity is, which may be a property of the physics component. The AI component wants to move the entity, so it needs to apply a force to the physics component. Each component needs a way to get the other sibling components of the entity it's a part of.
+    Это важно, поскольку компоненты взаимодействуют между собой. Отрисовщик должен знать, где находится объект, а это свойство компонента физики. Когда AI захочет передвинуть объект, ему нужна будет физика, чтобы применить силу. Каждый компонент должен иметь способ узнать своего соседа по объекту.
 
-    Some smart people realized all you need for that is an ID. Instead of the entity knowing its components, the components know their entity. Each component knows the ID of the entity that owns it. When the AI component needs the physics component for its entity, it just asks for the physics component with the same entity ID that it holds.
+    Тогда умные люди поняли, все что для этого нужно - это наш ID. Вместо того, чтобы хранить объекты в компоненте, пусто компоненты знают про свой объект. Когда AI компонент знает ID объекта, которому он принадлежит, то ему нужно просто найти физику для такого же ID.
 
-    Your entity *classes* disappear entirely, replaced by a glorified wrapper around a number.
+    При этом игровой *объект* исчезает полностью, заменяясь на обертку вокруг простого числа-индекса.
 
-    * *Entities are tiny.* When you want to pass around a reference to a game entity, it's just a single value.
+    * *Объекты уменьшаются в размере.* Когда вам нужно передать объект, вы отдаете просто число.
 
-    * *Entities are empty.* Of course, the downside of moving everything out of entities is that you *have* to move everything out of entities. You no longer have a place to put non-component-specific state or behavior. This style
-    doubles down on the component pattern.
+    * *Объект ничего не содержит в себе.* Конечно, если вы убираете все из объекта, то он становится пустым. Не надо туда ничего класть -- все, что нужно знать о свойствах объекта, знают его компоненты.
 
-    * *You don't have to manage their lifetime.* Since entities are just dumb value types, they don't need to be explicitly allocated and freed. An entity implicitly "dies" when all of its components are destroyed.
+    * *Не нужно следить на временем жизни объекта.* Поскольку объекты стали типом, который можно передать по значению, то нет смысла выделять и освобождать под них память. Объект умрет сам, когда его компоненты будут уничтожены.
 
-    * *Looking up a component for an entity may be slow.* This is the same problem as the previous answer, but in the opposite direction. To find a component for some entity, you have to map an ID to an object. That process may be costly.
+    * *Поиск компонента по объекту может оказаться дорогим.* Это та же проблема, что и в прыдущем варианте. Чтоб найти соседний компонент, придется использовать поиск по индексу. Это может стоить каких-то ресурсов.
 
-        This time, though, it *is* performance critical. Components often interact with their siblings during update, so you will need to find components frequently. One solution is to make the "ID" of an entity just the index of the component in its array.
+        Но здесь потери производительности *станут* критическими. Компоненты часто взаимодействуют между собой во врему игры, поэтому искать придется часто. Как решение, можно в качестве ID использовать индекс массива.
 
-        If every entity has the same set of components, then your component arrays are completely parallel. The component in slot three of the AI component array will be for the same entity that the physics component in slot three of *its* array is associated with.
+        Если каждый объект имеет одинаковый набор компонент, то массивы с компонентами будут наполняться параллельно. Например, если взять третий компонент в массиве AI и третий компонент в массиве с физикой -- они будут описывать один и тот же объект.
 
-        Keep in mind, though, that this *forces* you to keep those arrays in parallel. That's hard if you want to start sorting or packing them by different criteria. You may have some entities with disabled physics and others that are invisible. There's no way to sort the physics and render component arrays optimally for both cases if they have to stay in sync with each other.
+        Это выливается в требование *параллельности* массивов. Это не просто, если появится мысль сделать сортировку или упаковку массивов по какому-то критерию. Например, будут объекты с включенной физикой и остальные, с выключенной. Невозможно будет содержать несколько массивов, отсортированных по разным критериям.
 
-## See Also
+## Что ещё почитать
 
-* Much of this chapter revolves around the <a href="component.html" class="pattern">Component</a> pattern, and those are definitely one of the most common data structures that get optimized for cache usage. In fact, using the component pattern makes this optimization easier. Since entities are updated one "domain" (AI, physics, etc.) at a time, splitting them out into components lets you slice a bunch of entities into just the right pieces to be cache-friendly.
+* Большая часть этой главы крутиться вокруг паттерна <a href="component.html" class="pattern">Component</a>. Компоненты -- это определенно наиболее используемая цель для оптимизации работы с кэшем. На самом деле, используя подход с компонентами, можно облегчить себе задачу. Объекты обновляют одно состояние за другим, поэтому легкие, изолированные компоненты будут очень хорошо ложиться в кэш.
 
-    But that doesn't mean you can *only* use this pattern with components! Any time you have performance critical code that touches a lot of data, it's important to think about locality.
+    Это не значит, что *только* при работе с компонентами можно заняться компактностью данных! Каждый раз, когда множество данных начинают обрабатываться в критически важных местах, имеет смысл подумать об улучшении работы с кэшем.
 
-* Tony Albrecht's <a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf" class="pdf">"Pitfalls of Object-Oriented Programming"</a> is probably the most widely-read introduction to designing your game's data structures for cache-friendliness. It made a lot more people (including me!) aware of how big a deal this is for performance.
+* Презентация Тони Альбрехта <a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf" class="pdf">"Pitfalls of Object-Oriented Programming"</a> чаще других используется как входная точка в идею о компактности данных. Она открыла глаза многим людям (включая меня!) и заставила понять как важно это для производительности.
 
-* Around the same time, Noel Llopis wrote a [very influential blog post](http://gamesfromwithin.com/data-oriented-design) on the same topic.
+* Примерно в это же время, Ноэль Лопис написал [интересный пост](http://gamesfromwithin.com/data-oriented-design) на ту же тему.
 
-* This pattern almost invariably takes advantage of a contiguous array of homogenous objects. Over time, you'll very likely be adding and removing objects from that array. The <a href="object-pool.html" class="pattern">Object Pool</a> pattern is about exactly that.
+* Данный подход широко использует премущества непрерывных массивов однородных данных. Вполне вероятно, что понадобиться добавлять и удалять из него объекты. Глава <a href="object-pool.html" class="pattern">Object Pool</a> рассказывает как раз об этом.
 
-* The [Artemis](http://gamadu.com/artemis/) game engine is one of the first and better-known frameworks that uses simple IDs for game entities.
+* [Artemis](http://gamadu.com/artemis/) стал первым широко известным игровым движком, который использует ID в качестве игрового объекта.
