@@ -399,7 +399,8 @@ and graphics code. Here&#8217;s our new <code>PhysicsComponent</code>:</p>
   <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Bjorn</span><span class="o">&amp;</span> <span class="n">bjorn</span><span class="p">,</span> <span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">bjorn</span><span class="p">.</span><span class="n">x</span> <span class="o">+=</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span><span class="p">;</span>
-    <span class="n">world</span><span class="p">.</span><span class="n">resolveCollision</span><span class="p">(</span><span class="n">volume_</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span><span class="p">);</span>
+    <span class="n">world</span><span class="p">.</span><span class="n">resolveCollision</span><span class="p">(</span><span class="n">volume_</span><span class="p">,</span>
+        <span class="n">bjorn</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span><span class="p">);</span>
   <span class="p">}</span>
 
 <span class="nl">private:</span>

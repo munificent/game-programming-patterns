@@ -67,7 +67,7 @@ def htmlpath(pattern):
   return 'html/' + pattern + '.html'
 
 
-def cpppath(pattern):
+def cpp_path(pattern):
   return 'code/cpp/' + pattern + '.h'
 
 
@@ -88,8 +88,8 @@ def formatfile(path, nav, skip_up_to_date):
   # See if the HTML is up to date.
   sourcemod = os.path.getmtime(path)
   sourcemod = max(sourcemod, os.path.getmtime('asset/template.html'))
-  if os.path.exists(cpppath(basename)):
-    sourcemod = max(sourcemod, os.path.getmtime(cpppath(basename)))
+  if os.path.exists(cpp_path(basename)):
+    sourcemod = max(sourcemod, os.path.getmtime(cpp_path(basename)))
 
   destmod = 0
   if os.path.exists(htmlpath(basename)):
@@ -121,7 +121,7 @@ def formatfile(path, nav, skip_up_to_date):
         elif command == 'section':
           section = args
         elif command == 'code':
-          contents = contents + includecode(basename, args, indentation)
+          contents = contents + include_code(basename, args, indentation)
         elif command == 'outline':
           isoutline = True
         else:
@@ -265,48 +265,59 @@ def navigationtohtml(chapter, headers):
   return nav
 
 
-def includecode(pattern, index, indentation):
+# A cache of previously read code files for each pattern.
+source_files = {}
+
+def include_code(pattern, index, indentation):
+  # Only read the file once.
+  if not pattern in source_files:
+    with open(cpp_path(pattern), 'r') as source:
+      source_files[pattern] = source.readlines()
+
   code = indentation + '    :::cpp\n'
-  with open(cpppath(pattern), 'r') as source:
-    inblock = False
-    omitting = False
-    omitting_name = False
-    blockindent = 0
+  inblock = False
+  omitting = False
+  omitting_name = False
+  blockindent = 0
 
-    for line in source:
-      stripped = line.strip()
+  for line in source_files[pattern]:
+    stripped = line.strip()
 
-      if inblock:
-        if stripped == '//^' + index:
-          # End of our block.
-          break
+    if inblock:
+      if stripped == '//^' + index:
+        # End of our block.
+        break
 
-        elif stripped == '//^omit':
-          omitting = not omitting
+      elif stripped == '//^omit':
+        omitting = not omitting
 
-        elif stripped == '//^omit ' + index:
-          # Omitting a section just for this block. Other blocks that
-          # Contain this code may not omit it.
-          omitting_name = not omitting_name
+      elif stripped == '//^omit ' + index:
+        # Omitting a section just for this block. Other blocks that
+        # Contain this code may not omit it.
+        omitting_name = not omitting_name
 
-        elif stripped.startswith('//^'):
-          # A code block comment for another block,
-          # so just ignore it. This can occur with
-          # nested code blocks.
-          pass
+      elif stripped.startswith('//^'):
+        # A code block comment for another block,
+        # so just ignore it. This can occur with
+        # nested code blocks.
+        pass
 
-        elif not omitting and not omitting_name:
-          # Hackish. Can't strip the leading indent off of blank
-          # lines.
-          if stripped == '':
-            code += '\n'
-          else:
-            code += indentation + '    ' + line[blockindent:]
+      elif not omitting and not omitting_name:
+        # Hackish. Can't strip the leading indent off of blank
+        # lines.
+        if stripped == '':
+          code += '\n'
+        else:
+          code_line = line[blockindent:]
+          if len(code_line) > 64:
+            print "Warning long source line ({} chars):\n{}".format(
+                len(code_line), code_line)
+          code += indentation + '    ' + code_line
 
-      else:
-        if stripped == '//^' + index:
-          inblock = True
-          blockindent = len(line) - len(line.lstrip())
+    else:
+      if stripped == '//^' + index:
+        inblock = True
+        blockindent = len(line) - len(line.lstrip())
 
   return code
 
