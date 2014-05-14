@@ -257,14 +257,9 @@ def navigationtohtml(chapter, headers):
   return nav
 
 
-# A cache of previously read code files for each pattern.
-source_files = {}
-
 def include_code(pattern, index, indentation):
-  # Only read the file once.
-  if not pattern in source_files:
-    with open(cpp_path(pattern), 'r') as source:
-      source_files[pattern] = source.readlines()
+  with open(cpp_path(pattern), 'r') as source:
+    lines = source.readlines()
 
   code = indentation + '    :::cpp\n'
   inblock = False
@@ -272,7 +267,7 @@ def include_code(pattern, index, indentation):
   omitting_name = False
   blockindent = 0
 
-  for line in source_files[pattern]:
+  for line in lines:
     stripped = line.strip()
 
     if inblock:
