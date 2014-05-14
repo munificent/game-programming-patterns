@@ -449,71 +449,70 @@
 
 Как тогда его представить? Как ему следить за своими компонентами?
 
- * **If game entities are classes with pointers to their components:**
+ * **Если объект содержит указатели на компоненты:**
 
-    This is what our first example looked like. It's sort of the vanilla OOP solution. You've got a class for `GameEntity`, and it has pointers to the components it owns. Since they're just pointers, it's agnostic about where and how those components are actually organized in memory.
+    Это то, как что мы взяли в качестве первого примера. Кошерный вариант ООП решения. У вас есть класс `GameEntity`, и в нем есть указатели на компоненты, которыми он владеет. Поскольку это просто указатели, легко понять как и где расположить сами компоненты.
 
-    * *You can store components in contiguous arrays.* Since the game entity doesn't care where its components are, you can organize them in a nice packed array to optimize iterating over them.
+    * *Можно хранить компоненты в линейных массивах.* Поскольку объекту все равно, где физически будут находиться его компоненты, вы можете положить их в массив, весьма удобный для итераций.
 
-    * *Given an entity, you can easily get to its components.* They're just a pointer indirection away.
+    * *Получая объект, вы легко получите его компоненты.* Они просто будут лежать в самом объекте как указатели.
 
-    * *Moving components in memory is hard.* When components get enabled or disabled, you may want to move them around in the array to keep the active ones up front and contiguous. If you move a component while the entity has a raw pointer to it, though, that pointer gets broken if you aren't careful. You'll have to make sure to update the entity's pointer at the same time.
+    * *Будет тяжело копировать компоненты.* Если компонент включается и выключается, вам может понадобиться передвинуть его в другое место, если вы хотите держать в массиве только рабочие компоненты. Когда вы скопируете компонент, указатель в объекте становиться невалидным. Нужно быть уверенным, что вы в это же время обновите объект, положив в него указатель на новое место.
 
- *  **If game entities are classes with IDs for their components:**
+ *  **Если в объекте лежат ID компонентов:**
 
-    The challenge with raw pointers to components is that it makes it harder to move them around in memory. You can address that by using something more abstract: an ID or index that can be used to *look up* a component.
+    Указатели в объекте тяжело поддерживать в случае, если вы копируете компоненты с места на место. В этом случае можно адресоваться более абстрактным индексом, который может использоваться чтобы *найти* конкретный компонент.
 
-    The actual semantics of the ID and lookup process are up to you. It could be as simple as storing a unique ID in each component and walking the array, or more complex like a hash table that maps IDs to their current index in the component array.
+    Как реализовать индекс и поиск по ним -- зависит от вас. Можно хранить уникальное число и потом бегать по массиву в поисках компонента с таким индексом. Можно сделать что-то вроде хэш-таблицы, которая по этому числу даст в ответ индекс в массиве компонентов.
 
-    * *It's more complex.* Your ID system doesn't have to be rocket science, but it's still more work than a basic pointer. You'll have to implement and debug it, and there will be memory overhead for bookkeeping.
+    * *Это сложнее.* Построить систему индексов проще, чем запустить шатл в космос. Но все-таки сложнее, чем простой указатель. Придется придумать как реализовать и отлаживать такую систему. Вдобавок, это потребует некоторое количество дополнительной памяти.
 
-    * *It's slower*. It's hard to beat traversing a raw pointer. There may be some actual searching or hashing involved to get from an entity to one of its components.
+    * *Это медленнее*. Тяжело сделать что-то быстрее, чем разыменование указателя. Добавится дополнительная работа для получения реального компонента по его индексу.
 
-    * *You'll need access to the component "manager".* The basic idea is that you have some abstract ID that identifies a component. You can use it to get a reference to the actual component object. But to do that, you need to hand that ID to something that can actually find the component. That will be the class that wraps your raw contiguous array of component objects.
+    * *Появится "менеджер компонентов".* Общая идея -- это иметь некий абстрактный индекс, который однозначно указывает на компонент. Каким-то образом надо будет индекс превратить в компонент. Этим, скорее всего, будет заниматься отдельный класс-менеджер, который обернет ваш массив с компонентами.
 
-        With raw pointers, if you have a game entity, you can find its components. With this, you <span name="singleton">need</span> the game entity *and the component registry too*.
+        В случае простых указателей, если у вас есть объект, вы сразу получаете его компоненты. В случае индексов, при работе вам <span name="singleton">необходимо</span> иметь и объект, и *менеджер компонентов тоже*.
 
         <aside name="singleton">
 
-        You may be thinking, "I'll just make it a singleton! Problem solved!" Well, sort of. You might want to check out <a href="singleton.html">the chapter</a> on those first.
+        Первый вариант, который приходит в голову: "Да я просто сделаю синглтон, и все -- проблема решена!". Ну, возможно. Все же, лучше сначала перечитать главу про <a href="singleton.html">синглтоны</a>.
 
         </aside>
 
- *  **If the game entity is *itself* just an ID:**
+ *  **Если игровой объект сам является ID:**
 
-    This is a newer style that some game engines use. Once you've moved all of your entity's behavior and state out of the main class and into components, what's left? It turns out, not much. The only thing an entity does is bind a set of components together. It exists just to say *this* AI component and *this* physics component and *this* render component define one living entity in the world.
+    Это новое веяние, которое используют некоторые движки. Если выбросить всё состояние и поведение из объекта в компоненты, то что остается? Да, в принципе, не очень много. Единственная функция объекта в этом случае -- это связать все компоненты между собой. То есть, он говорит, что вот *этот* AI, вот *эта* физика и вот *эта* рисовалка описывают одну какую-то сущность в игровом мире.
 
-    That's important because components interact. The render component needs to know where the entity is, which may be a property of the physics component. The AI component wants to move the entity, so it needs to apply a force to the physics component. Each component needs a way to get the other sibling components of the entity it's a part of.
+    Это важно, поскольку компоненты взаимодействуют между собой. Отрисовщик должен знать, где находится объект, а это свойство компонента физики. Когда AI захочет передвинуть объект, ему нужна будет физика, чтобы применить силу. Каждый компонент должен иметь способ узнать своего соседа по объекту.
 
-    Some smart people realized all you need for that is an ID. Instead of the entity knowing its components, the components know their entity. Each component knows the ID of the entity that owns it. When the AI component needs the physics component for its entity, it just asks for the physics component with the same entity ID that it holds.
+    Тогда умные люди поняли, все что для этого нужно - это наш ID. Вместо того, чтобы хранить объекты в компоненте, пусто компоненты знают про свой объект. Когда AI компонент знает ID объекта, которому он принадлежит, то ему нужно просто найти физику для такого же ID.
 
-    Your entity *classes* disappear entirely, replaced by a glorified wrapper around a number.
+    При этом игровой *объект* исчезает полностью, заменяясь на обертку вокруг простого числа-индекса.
 
-    * *Entities are tiny.* When you want to pass around a reference to a game entity, it's just a single value.
+    * *Объекты уменьшаются в размере.* Когда вам нужно передать объект, вы отдаете просто число.
 
-    * *Entities are empty.* Of course, the downside of moving everything out of entities is that you *have* to move everything out of entities. You no longer have a place to put non-component-specific state or behavior. This style
-    doubles down on the component pattern.
+    * *Объект ничего не содержит в себе.* Конечно, если вы убираете все из объекта, то он становится пустым. Не надо туда ничего класть -- все, что нужно знать о свойствах объекта, знают его компоненты.
 
-    * *You don't have to manage their lifetime.* Since entities are just dumb value types, they don't need to be explicitly allocated and freed. An entity implicitly "dies" when all of its components are destroyed.
+    * *Не нужно следить на временем жизни объекта.* Поскольку объекты стали типом, который можно передать по значению, то нет смысла выделять и освобождать под них память. Объект умрет сам, когда его компоненты будут уничтожены.
 
-    * *Looking up a component for an entity may be slow.* This is the same problem as the previous answer, but in the opposite direction. To find a component for some entity, you have to map an ID to an object. That process may be costly.
+    * *Поиск компонента по объекту может оказаться дорогим.* Это та же проблема, что и в прыдущем варианте. Чтоб найти соседний компонент, придется использовать поиск по индексу. Это может стоить каких-то ресурсов.
 
-        This time, though, it *is* performance critical. Components often interact with their siblings during update, so you will need to find components frequently. One solution is to make the "ID" of an entity just the index of the component in its array.
+        Но здесь потери производительности *станут* критическими. Компоненты часто взаимодействуют между собой во врему игры, поэтому искать придется часто. Как решение, можно в качестве ID использовать индекс массива.
 
-        If every entity has the same set of components, then your component arrays are completely parallel. The component in slot three of the AI component array will be for the same entity that the physics component in slot three of *its* array is associated with.
+        Если каждый объект имеет одинаковый набор компонент, то массивы с компонентами будут наполняться параллельно. Например, если взять третий компонент в массиве AI и третий компонент в массиве с физикой -- они будут описывать один и тот же объект.
 
-        Keep in mind, though, that this *forces* you to keep those arrays in parallel. That's hard if you want to start sorting or packing them by different criteria. You may have some entities with disabled physics and others that are invisible. There's no way to sort the physics and render component arrays optimally for both cases if they have to stay in sync with each other.
+        Это выливается в требование *параллельности* массивов. Это не просто, если появится мысль сделать сортировку или упаковку массивов по какому-то критерию. Например, будут объекты с включенной физикой и остальные, с выключенной. Невозможно будет содержать несколько массивов, отсортированных по разным критериям.
 
-## See Also
+## Что ещё почитать
 
-* Much of this chapter revolves around the <a href="component.html" class="pattern">Component</a> pattern, and those are definitely one of the most common data structures that get optimized for cache usage. In fact, using the component pattern makes this optimization easier. Since entities are updated one "domain" (AI, physics, etc.) at a time, splitting them out into components lets you slice a bunch of entities into just the right pieces to be cache-friendly.
+* Большая часть этой главы крутиться вокруг паттерна <a href="component.html" class="pattern">Component</a>. Компоненты -- это определенно наиболее используемая цель для оптимизации работы с кэшем. На самом деле, используя подход с компонентами, можно облегчить себе задачу. Объекты обновляют одно состояние за другим, поэтому легкие, изолированные компоненты будут очень хорошо ложиться в кэш.
 
-    But that doesn't mean you can *only* use this pattern with components! Any time you have performance critical code that touches a lot of data, it's important to think about locality.
+    Это не значит, что *только* при работе с компонентами можно заняться компактностью данных! Каждый раз, когда множество данных начинают обрабатываться в критически важных местах, имеет смысл подумать об улучшении работы с кэшем.
 
-* Tony Albrecht's <a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf" class="pdf">"Pitfalls of Object-Oriented Programming"</a> is probably the most widely-read introduction to designing your game's data structures for cache-friendliness. It made a lot more people (including me!) aware of how big a deal this is for performance.
+* Презентация Тони Альбрехта <a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf" class="pdf">"Pitfalls of Object-Oriented Programming"</a> чаще других используется как входная точка в идею о компактности данных. Она открыла глаза многим людям (включая меня!) и заставила понять как важно это для производительности.
 
-* Around the same time, Noel Llopis wrote a [very influential blog post](http://gamesfromwithin.com/data-oriented-design) on the same topic.
+* Примерно в это же время, Ноэль Лопис написал [интересный пост](http://gamesfromwithin.com/data-oriented-design) на ту же тему.
 
-* This pattern almost invariably takes advantage of a contiguous array of homogenous objects. Over time, you'll very likely be adding and removing objects from that array. The <a href="object-pool.html" class="pattern">Object Pool</a> pattern is about exactly that.
+* Данный подход широко использует премущества непрерывных массивов однородных данных. Вполне вероятно, что понадобиться добавлять и удалять из него объекты. Глава <a href="object-pool.html" class="pattern">Object Pool</a> рассказывает как раз об этом.
 
-* The [Artemis](http://gamadu.com/artemis/) game engine is one of the first and better-known frameworks that uses simple IDs for game entities.
+* [Artemis](http://gamadu.com/artemis/) стал первым широко известным игровым движком, который использует ID в качестве игрового объекта.
