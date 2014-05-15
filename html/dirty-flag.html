@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 
-<title>Dirty Flag &middot; Низкоуровневая оптимизация &middot; Game Programming Patterns</title>
+<title>Грязный флаг &middot; Низкоуровневая оптимизация &middot; Game Programming Patterns</title>
 
 <!-- Tell mobile browsers we're optimized for them and they don't need to crop
      the viewport. -->
@@ -25,45 +25,45 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
-<h1>Dirty Flag</h1>
+<h1>Грязный флаг</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="optimization-patterns.html">Низкоуровневая оптимизация</a></span></h1>
-<h2><a href="#intent" name="intent">Intent</a></h2>
-<p><em>Avoid unnecessary work by deferring it until the result is needed.</em></p>
-<h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>&#8220;Flag&#8221; and &#8220;bit&#8221; are synonymous in programming: they both mean a single micron of data that can be in one of two states. We call those &#8220;true&#8221; and &#8220;false&#8221;, or sometimes &#8220;set&#8221; and &#8220;cleared&#8221;. I&#8217;ll use all of these interchangeably. &#8220;Dirty bit&#8221; is an equally <span name="specific">common</span> name for this pattern, but I figured I&#8217;d stick with the name that didn&#8217;t seem as prurient.</p>
+<h2><a href="#общая-мысль" name="общая-мысль">Общая мысль</a></h2>
+<p><em>Избегайте ненужной работы. Когда понадобиться&#8202;&mdash;&#8202;тогда и выполните.</em></p>
+<h2><a href="#предыстория" name="предыстория">Предыстория</a></h2>
+<p>&#8220;Флаг&#8221; и &#8220;бит&#8221; являются практически синонимами в программировании: они оба могут находится только в оодном и двух состояний. Можно назвать их &#8220;правда&#8221; или &#8220;ложь&#8221;, иногда &#8220;установлен&#8221; и &#8220;очищен&#8221;. Я буду использовать оба варианта. Так что текущую главу можно было назвать &#8220;Грязный бит&#8221;, но я решил использовать более нейтральный вариант.</p>
 <aside name="specific">
-<p>Wikipedia&#8217;s editors don&#8217;t have my level of self-control and went with <a href="http://en.wikipedia.org/wiki/Dirty_bit">dirty bit</a>.</p>
+<p>Авторы википедии менее щепетильны, чем я, и выбрали <a href="http://en.wikipedia.org/wiki/Dirty_bit">грязный бит</a>.</p>
 </aside>
-<h3><a href="#locating-a-ship-at-sea" name="locating-a-ship-at-sea">Locating a ship at sea</a></h3>
-<p>Many games have something called a <em>scene graph</em>. This is a big data structure that contains all of the objects in the world. The rendering engine uses this to determine where on screen to draw stuff.</p>
-<p>At its simplest, a scene graph is just a flat list of objects. Each object has a model or some other graphic primitive, and a <span name="transform"><em>transform</em></span>. The transform describes the object&#8217;s position, rotation, and scale in the world. To move or turn an object, we just change its transform.</p>
+<h3><a href="#как-найти-лодку-в-море" name="как-найти-лодку-в-море">Как найти лодку в море</a></h3>
+<p>Множество игр занимаются построение <em>графа сцены</em>. Это такая большая структура, в которой находятся все объекты игры. Рендерер использует его, чтобы определить что где рисовать.</p>
+<p>В простом случае, граф&#8202;&mdash;&#8202;это плоский список объектов. У каждого объекта есть модель или другой графический примитив, и <span name="transform"><em>матрицу трансформации</em></span>. Трансформация описывает координаты объекта, поворот и масштабирование. Чтобы передвинуть или повернуть объект, мы просто меняем его трансформацию.</p>
 <aside name="transform">
-<p>The mechanics of <em>how</em> this transform is stored and manipulated is unfortunately out of scope here. The comically abbreviated summary is that it&#8217;s a 4x4 matrix. You can make a single transform that combines two transforms&#8202;&mdash;&#8202;for example translating and then rotating an object&#8202;&mdash;&#8202;by multiplying the two matrices.</p>
-<p>How and why that works is left as an exercise for the reader.</p>
+<p>Детали того, <em>как</em> хранить трансформацию, и как ей манипулировать, выходят за рамки разговора, к сожалению. Смешно сказать, но это действительно матрица 4 на 4. Чтобы применить две трансформации к объекту&#8202;&mdash;&#8202;например, передвинуть и потом повернуть&#8202;&mdash;&#8202;достаточно перемножить две матрицы. </p>
+<p>Почему и как это работает&#8202;&mdash;&#8202;домашнее задание для читателей.</p>
 </aside>
-<p>When the renderer draws an object, it takes the object&#8217;s model, applies the transform to it, and then renders it there in the world. If we just had a scene <em>bag</em> and not a scene <em>graph</em> that would be it and life would be simple.</p>
-<p>However, most scene graphs are <span name="hierarchical"><em>hierarchical</em></span>. An object in the graph may have a parent object that it is anchored to. In that case, its transform is relative to the <em>parent&#8217;s</em> position, and isn&#8217;t its absolute position in the world.</p>
-<p>For example, imagine our game world has a pirate ship at sea. Atop the ship&#8217;s mast is a crow&#8217;s nest. Hunched in that crow&#8217;s nest is a pirate. Clutching the pirate&#8217;s shoulder is a parrot. The ship&#8217;s local transform will position it in the sea. The crow&#8217;s nest&#8217;s transform positions it on the ship, and so on.</p>
+<p>Когда рендерер рисует объект, он берет модель объекта, накладывает на него транформацию, и затем рисует эту модель. И если не вспоминать про <em>граф</em> сцены, то на этом все заканчивается и жизнь становится проста, как два пальца.  </p>
+<p>К сожалению, большинство графов будут иметь <span name="hierarchical"><em>иерарархию</em></span>. У объекта в графе есть родитель, к котором он прикреплен. В этом случае, на трансформацию объекта надо ещё наложить трансформацию родителя, чтобы получить правильные координаты при рисовании.</p>
+<p>Допустим, мы рисуем пиратский корабль в море. Пусть на верху мачты есть бочка, в ней сидит пират, и на плече у него&#8202;&mdash;&#8202;попугай. Трансформация корабля описывает его положение в море. Трансформация бочки описывает её положение на корабле, и так далее. </p>
 <p><span name="pirate"></span>
 <img src="images/dirty-flag-pirate.png" /></p>
 <aside name="pirate">
-<p>Programmer art!</p>
+<p>Осторожно, рисовал программист!</p>
 </aside>
-<p>This way, when a parent object moves, its children move with it automatically. If we change the local transform of the ship, the crow&#8217;s nest, pirate, and parrot go along for the ride. It would be a total <span name="slide">headache</span> if, when the ship moved, we had to manually adjust the transforms of everything on it to keep them from sliding off.</p>
+<p>Когда родительский объект двигается, автоматически двигаются и все его дети. И если мы поменяем локальную трансформацию корабля, то бочка, старый пират и попугай должны передвинуться вместе с ним. И было бы <span name="slide">глупо</span>, если бы мы вручную меняли трансформации всех объектов, которые находятся на корабле, чтобы ничего не разъехалось.    </p>
 <aside name="slide">
-<p>To be honest, when you are at sea you <em>do</em> have to keep manually adjusting your position to keep from sliding off. Maybe I should have chosen a drier example.</p>
+<p>Честно говоря, когда вы в море, то <em>приходится</em> самому двигаться, чтобы не вывалится за борт. Может быть стоит придумать более честный пример.</p>
 </aside>
-<p>But to actually draw the parrot on screen, we need to know its absolute position in the world. I&#8217;ll call the parent-relative transform the object&#8217;s <em>local transform</em>. To render an object, we need to know its <em>world transform</em>.</p>
-<h3><a href="#local-and-world-transforms" name="local-and-world-transforms">Local and world transforms</a></h3>
-<p>Calculating an object&#8217;s world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other words, the parrot&#8217;s world transform is:</p>
+<p>Но когда мы непосредственно приступили к рисованию попугая, нам нужны его абсолютные координаты. Будем называть <em>локальной трансформацией</em> трансформацию относительно родительского объекта. А для того чтобы рисовать, будем вычислять абсолютную, или <em>мировую трансформацию</em>.</p>
+<h3><a href="#локальная-и-мировая-трансформация" name="локальная-и-мировая-трансформация">Локальная и мировая трансформация</a></h3>
+<p>Сделать это несложно: надо подниматься по цепочке родителей вверх до самого конца, а затем спускаться обратно, накладывая трансформации друг на друга поочередно. Тогда мировая трансформация попугая будет:</p>
 <p><span name="degenerate"></span>
 <img src="images/dirty-flag-multiply.png" /></p>
 <aside name="degenerate">
-<p>In the degenerate case where the object has no parent, its local and world transforms are equivalent.</p>
+<p>В частном случае, когда у объекта нет родителя, его локальная и мировая трансформация&#8202;&mdash;&#8202;совпадают.</p>
 </aside>
-<p>We need the world transform for every object in the world every frame, so even though it&#8217;s just a handful of matrix multiplications per model, it&#8217;s on the hot code path where performance is critical. Keeping them up-to-date is tricky because when a parent object moves, that affects the world transform of itself and all of its children, recursively.</p>
-<p>The simplest approach is to just calculate transforms on the fly while rendering. Each frame, we recursively traverse the scene graph starting at the top of the hierarchy. For each object, we calculate its world transform right then and draw it.</p>
-<p>But this is terribly wasteful of our precious CPU juice! Many objects in the world are <em>not</em> moving every frame. Think of all of the static geometry that makes up the level. Recalculating their world transforms each frame even though they haven&#8217;t changed is a waste.</p>
+<p>Нам нужна эта мировая трансформация каждую отрисовку, так что операции с матрицами могут стать занозой в заднице. Поддерживать их в актуальном состоянии непросто, потому что когда родительский объект двигается, это влияет и на него, и на всех его детей рекурсивно. </p>
+<p>Очевидный вариант&#8202;&mdash;&#8202;это вычислять трансформации прямо при рисовании. Каждую отрисовку мы будем спускаться по графу, начиная с самого верха, и вычислять мировую трансформацию для каждого объекта. А потом рисовать его.</p>
+<p>Этот вариант ужасен до невозможности. На практике, большинство объектов не передвигаются&#8202;&mdash;&#8202;вспомните про статические объекты, из которых состоит уровень. Нет необходимости делать лишнюю работу и вычислять их координаты каждый раз.</p>
 <h3><a href="#cached-world-transforms" name="cached-world-transforms">Cached world transforms</a></h3>
 <p>The obvious answer is to <em>cache</em> it. In each object, we store its local transform and its derived world transform. When we render, we just use the precalculated world transform. If the object never moves, that&#8217;s always up to date and everything&#8217;s happy.</p>
 <p>When an object <em>does</em> move, the simple approach is to refresh its world transform right then. But don&#8217;t forget the hierarchy! When a parent moves, we have to recalculate its world transform <em>and all of its children&#8217;s, recursively</em>.</p>
