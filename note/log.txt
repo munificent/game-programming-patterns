@@ -1,3 +1,6 @@
+2014-05-17 - finish revising double buffer
+2014-05-16 - revise 2526 words of double buffer
+2014-05-15 - revise state
 2014-05-14 - revise singleton
 2014-05-13 - revise prototype
 2014-05-12 - revise last 2700 words of observer
