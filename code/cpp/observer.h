@@ -11,6 +11,9 @@ namespace ObserverPattern
   public:
     bool isHero() const { return false; }
     bool isStandingOn(int surface) const { return false; }
+    bool isOnSurface() { return true; }
+    void accelerate(int force) {}
+    void update() {}
   };
 
   enum Event
@@ -23,14 +26,6 @@ namespace ObserverPattern
     ACHIEVEMENT_FELL_OFF_BRIDGE
   };
 
-  class PhysicsBody
-  {
-  public:
-    bool isOnSurface() { return true; }
-    void accelerate(int force) {}
-    void update() {}
-  };
-
   static const int GRAVITY = 1;
   static const int EVENT_START_FALL = 1;
 
@@ -39,19 +34,19 @@ namespace ObserverPattern
     class Physics
     {
     public:
-      void updateBody(PhysicsBody& body);
-      void notify(PhysicsBody& body, int event) {}
+      void updateEntity(Entity& entity);
+      void notify(Entity& entity, int event) {}
     };
 
     //^physics-update
-    void Physics::updateBody(PhysicsBody& body)
+    void Physics::updateEntity(Entity& entity)
     {
-      bool wasOnSurface = body.isOnSurface();
-      body.accelerate(GRAVITY);
-      body.update();
-      if (wasOnSurface && !body.isOnSurface())
+      bool wasOnSurface = entity.isOnSurface();
+      entity.accelerate(GRAVITY);
+      entity.update();
+      if (wasOnSurface && !entity.isOnSurface())
       {
-        notify(body, EVENT_START_FALL);
+        notify(entity, EVENT_START_FALL);
       }
     }
     //^physics-update
@@ -168,7 +163,7 @@ namespace ObserverPattern
     class Physics : public Subject
     {
     public:
-      void updateBody(PhysicsBody& body);
+      void updateEntity(Entity& entity);
     };
     //^physics-inherit
 

@@ -74,14 +74,14 @@ notification</em>.</p>
 bodies are relaxing on nice flat surfaces and which are plummeting towards sure
 demise. To implement the &#8220;Fall off a Bridge&#8221; badge, we could just jam the
 achievement code right in there, but that&#8217;s a mess. Instead, we can just do:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Physics</span><span class="o">::</span><span class="n">updateBody</span><span class="p">(</span><span class="n">PhysicsBody</span><span class="o">&amp;</span> <span class="n">body</span><span class="p">)</span>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Physics</span><span class="o">::</span><span class="n">updateEntity</span><span class="p">(</span><span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="kt">bool</span> <span class="n">wasOnSurface</span> <span class="o">=</span> <span class="n">body</span><span class="p">.</span><span class="n">isOnSurface</span><span class="p">();</span>
-  <span class="n">body</span><span class="p">.</span><span class="n">accelerate</span><span class="p">(</span><span class="n">GRAVITY</span><span class="p">);</span>
-  <span class="n">body</span><span class="p">.</span><span class="n">update</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">wasOnSurface</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">body</span><span class="p">.</span><span class="n">isOnSurface</span><span class="p">())</span>
+  <span class="kt">bool</span> <span class="n">wasOnSurface</span> <span class="o">=</span> <span class="n">entity</span><span class="p">.</span><span class="n">isOnSurface</span><span class="p">();</span>
+  <span class="n">entity</span><span class="p">.</span><span class="n">accelerate</span><span class="p">(</span><span class="n">GRAVITY</span><span class="p">);</span>
+  <span class="n">entity</span><span class="p">.</span><span class="n">update</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">wasOnSurface</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">entity</span><span class="p">.</span><span class="n">isOnSurface</span><span class="p">())</span>
   <span class="p">{</span>
-    <span class="n">notify</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">EVENT_START_FALL</span><span class="p">);</span>
+    <span class="n">notify</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">EVENT_START_FALL</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -253,7 +253,7 @@ name="event">inherit</span> <code>Subject</code>:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Physics</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Subject</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="kt">void</span> <span class="n">updateBody</span><span class="p">(</span><span class="n">PhysicsBody</span><span class="o">&amp;</span> <span class="n">body</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="n">updateEntity</span><span class="p">(</span><span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">);</span>
 <span class="p">};</span>
 </pre></div>
 

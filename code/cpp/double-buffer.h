@@ -142,7 +142,10 @@ namespace UnbufferedSlapstick
   class Stage
   {
   public:
-    void add(Actor* actor, int index) { actors_[index] = actor; }
+    void add(Actor* actor, int index)
+    {
+      actors_[index] = actor;
+    }
 
     void update()
     {
