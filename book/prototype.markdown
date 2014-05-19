@@ -443,8 +443,9 @@ specifically *delegation*, can be useful.
 If you were to count all the bytes in a game that are code compared to the ones
 that are data, you'd see the fraction of data has been increasing steadily since
 the dawn of programming. Early games procedurally generated almost everything so
-they could fit on floppies and old game cartidges. In many games today, the code
-is just an "engine" that drives the game, which is defined entirely in data.
+they could fit on floppies and old game cartridges. In many games today, the
+code is just an "engine" that drives the game, which is defined entirely in
+data.
 
 That's great, but pushing piles of content into data files doesn't magically
 solve the organizational challenges of a large project. If anything, it makes it
