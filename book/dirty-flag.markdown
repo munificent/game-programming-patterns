@@ -73,51 +73,50 @@
 
 Этот вариант ужасен до невозможности. На практике, большинство объектов не передвигаются -- вспомните про статические объекты, из которых состоит уровень. Нет необходимости делать лишнюю работу и вычислять их координаты каждый раз.
 
-### Cached world transforms
+### Используем кэш
 
-The obvious answer is to *cache* it. In each object, we store its local transform and its derived world transform. When we render, we just use the precalculated world transform. If the object never moves, that's always up to date and everything's happy.
+Очевидный подход -- кэшировать трансформации. В каждом объекте мы будем хранить локальную и мировую трансформацию. При отрисовке мы используем мировую трансформацию, которая уже вычислена. И если объект не двигается, то она всегда актуальна -- и все довольны.
 
-When an object *does* move, the simple approach is to refresh its world transform right then. But don't forget the hierarchy! When a parent moves, we have to recalculate its world transform *and all of its children's, recursively*.
+Что делать, если объект *передвинули*? Можно сразу же пересчитать мировую трансофрмацию. Только у нас же иерархия! Когда двигается родитель, нужно пересчитать его трансформацию и *всех его детей, рекурсивно*.
 
-Imagine some busy gameplay. In a single frame, the ship gets tossed on the ocean, the crow's nest rocks in the wind, the pirate leans to the edge, and the parrot hops onto his head. We changed four local transforms. If we recalculate world transforms eagerly whenever a local transform changes, what ends up happening?
+Представьте, что у нас довольно сложная игра. В каждом цикле корабль толкают волны, бочка раскачивается на ветру, пирата постоянно тошнит, а попугай прыгает через голову. И тут мы меняем четыре локальных трансформации. Если мы сразу же начнем пересчитывать мировые, то во что это выльется?
 
 <span name="stars"></span>
 <img src="images/dirty-flag-update-bad.png" />
 
 <aside name="stars">
 
-You can see on the lines marked &#x2605; that we're recalculating the parrot's
-world transform *four* times when we only need the result of the final one.
+Если посмотреть на линии, отмеченные &#x2605;, то можно увидеть, что мы *четыре* раза пересчитывали попугая, хотя будем использовать только результаты последнего пересчета.
 
 </aside>
 
-We only moved four objects, but we did *ten* world transform calculations. That's six pointless calculations that get thrown out before they are ever used by the renderer. We calculated the parrot's world transform *four* times, but it only got rendered once.
+Мы всего лишь передвинули четыре объекта, а пришлось пересчитать *десять* мировых трансформаций. Шесть бесполезных вычислений будут выкинуты, потому что их результат нам не интересен. Мы четыре раза пересчитали попугая, хотя он был нарисован всего один раз.
 
-The problem is that a world transform may depend on several local transforms. Since we recalculate immediately each time *one* of those changes, we end up recalculating the same transform multiple times when more than one of the local transforms it depends on changes in the same frame.
+Проблемы в том, что мировая трансформация зависит от нескольких локальных. Мы начинали перерасчет сразу после того, как изменилась хотя бы одна из них. В результат пришлось пересчитать мировую трансформацию для одного и того же объекта столько раз, сколько локальных трансформаций родителей изменилось.
 
-### Deferred recalculation
+### Отложенные вычисления
 
-We'll solve this by <span name="decoupling">decoupling</span> changing local transforms from updating the world transforms. This lets us change a bunch of local transforms in a single batch and *then* recalculate the affected world transform once after all of those modifications are done, right before we need it to render.
+Мы можем решить эту проблему, если <span name="decoupling">разделим</span> обновление локальной и мировой трансформации. Это позволит изменять набор локальных трансформаций одних махом, и *затем* пересчитать те мировые трансформации, которые это затронуло, прямо перед отрисовкой.
 
 <aside name="decoupling">
 
-It's interesting how much of software architecture is just intentionally engineering a little slippage.
+Занимательно -- столько архитектур основано на маленьких хитростях!
 
 </aside>
 
-To do this, we add a flag to each object in the graph. When the local transform changes, we set it. When we need the object's world transform, we check the flag. If it's set, we calculate the world transform then and clear the flag. The flag represents, "Is the world transform out of date?" For reasons that aren't entirely clear, the traditional name for this "out-of-date-ness" is "dirty". Hence: *a dirty flag*.
+Мы добавим флажок к каждому объекту в графе. Когда будет менятся локальная трансформация, мы его выставим. И когда нам понадобиться мировая, мы будем проверять этот флаг. Если он выставлен, то мы пересчитаем мировую трансформацию и очистим флаг. Этот флаг как бы говорит нам "нужно обновлять матрицы?" По причинам, которые не совсем ясны, обычное название для таких "уже неточных" данных -- это "грязные" (dirty). Вот и получился *грязный флаг*.
 
-If we apply this pattern and then move all of the objects in our previous example, the game ends up doing:
+Если мы применим этот подход, и повторим пример с четырьмя объектами, то в результате увидим:
 
 <img src="images/dirty-flag-update-good.png" />
 
-That's the best you could hope to do: the world transform for each affected object is calculated exactly once. With just a single bit of data, this pattern does a few things for us:
+Это лучшее, на что можно было бы надется: мировая трансформация для каждого тронутого объекта вычисляется только один раз. С помощью одного бита, это паттерн сделал несколько вещей:
 
-1. It collapses modifications to multiple local transforms along an object's parent chain into a single recalculation on the object.
-2. It avoids recalculation on objects that didn't move.
-3. And a minor bonus: if an object gets removed before it's rendered, it doesn't calculate its world transform at all.
+1. Множество изменений локальных трансформаций он превратил в одно вычисление для каждого объекта.
+2. Избавляет от необходимости пересчитывать статические объекты.
+3. И мини-бонус: если объект удалили до того, как он был нарисован, то у него ничего не вычисляется вообще.
 
-## The Pattern
+## Общий подход
 
 A set of **primary data** changes over time. A set of **derived data** is determined from this using some **expensive process**. A **"dirty" flag** tracks when the derived data is out of sync with the primary data. It is **set when the primary data changes**. When the derived data is requested, if the flag is set **it is processed then and the flag is cleared.** Otherwise, the previous **cached derived data** is used.
 
