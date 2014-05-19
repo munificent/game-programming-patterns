@@ -451,5 +451,5 @@ particle system object, how would it get one?
     operations are implemented by the *derived* class.
 
 *   You can also consider this a variation on the <a class="gof-pattern"
-    href="http://en.wikipedia.org/wiki/Template_method_pattern">Facade
+    href="http://en.wikipedia.org/wiki/Facade_Pattern">Facade
     Pattern</a>. That pattern hides a number of different systems behind a single simplified API. With Subclass Sandbox, the base class acts as a facade thats hides the entire game engine from the subclasses.

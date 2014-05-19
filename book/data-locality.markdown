@@ -225,7 +225,10 @@
 
 4. И возвращаемся к шагу 1, чтобы повторить его для *каждого компонента каждого игрового объекта*.
 
-Страшная правда в том, что мы понятия не имеем как все эти объекты раскиданы по памяти. Этим распоряжается менеджер памяти. Если все время создавать и уничтожать объекты, то постепенно память заполнится данными в произвольном порядке.
+The scary part is we have no idea how these objects are laid out in memory.
+We're completely at the mercy of the memory manager. As entities get allocated
+and freed over time, the heap is likely to become increasingly randomly
+organized.
 
 <span name="lines"></span>
 
