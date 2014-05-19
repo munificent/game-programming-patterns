@@ -229,7 +229,10 @@ Before you ever heard of a CPU cache, this looked totally innocuous. But by now 
 
 4. Now we go back to step one for *every component of every entity in the game*.
 
-The scary part is we have no idea how any of these objects are laid out in memory. We're completely at the mercy of the memory manager. As entities get allocated and freed over time, the heap is likely to become increasingly randomly organized.
+The scary part is we have no idea how these objects are laid out in memory.
+We're completely at the mercy of the memory manager. As entities get allocated
+and freed over time, the heap is likely to become increasingly randomly
+organized.
 
 <span name="lines"></span>
 
