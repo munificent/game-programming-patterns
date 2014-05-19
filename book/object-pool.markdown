@@ -184,8 +184,8 @@ this.
 
 ### Memory size for each object is fixed
 
-Most pool implementations store the objects in an array of in-
-place objects. If all of your objects are of the same type, this is
+Most pool implementations store the objects in an array of in-place
+objects. If all of your objects are of the same type, this is
 fine. However, if you want to store objects of different types in the
 pool, or instances of subclasses that may add fields, you need to
 ensure that each slot in the pool has enough memory for the *largest*
