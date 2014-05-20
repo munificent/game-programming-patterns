@@ -30,7 +30,7 @@
 <h2><a href="#общая-мысль" name="общая-мысль">Общая мысль</a></h2>
 <p><em>Избегайте ненужной работы. Когда понадобиться&#8202;&mdash;&#8202;тогда и выполните.</em></p>
 <h2><a href="#предыстория" name="предыстория">Предыстория</a></h2>
-<p>&#8220;Флаг&#8221; и &#8220;бит&#8221; являются практически синонимами в программировании: они оба могут находится только в оодном и двух состояний. Можно назвать их &#8220;правда&#8221; или &#8220;ложь&#8221;, иногда &#8220;установлен&#8221; и &#8220;очищен&#8221;. Я буду использовать оба варианта. Так что текущую главу можно было назвать &#8220;Грязный бит&#8221;, но я решил использовать более нейтральный вариант.</p>
+<p>&#8220;Флаг&#8221; и &#8220;бит&#8221; являются практически синонимами в программировании: они оба могут находится только в оодном и двух состояний. Можно назвать их &#8220;правда&#8221; или &#8220;ложь&#8221;, иногда &#8220;установлен&#8221; и &#8220;очищен&#8221;. Я буду использовать оба варианта. Так что текущую главу можно было назвать <span name="specific">&#8220;Грязный бит&#8221;</span>, но я решил использовать более нейтральный вариант.</p>
 <aside name="specific">
 <p>Авторы википедии менее щепетильны, чем я, и выбрали <a href="http://en.wikipedia.org/wiki/Dirty_bit">грязный бит</a>.</p>
 </aside>
@@ -90,76 +90,61 @@
 <li>И мини-бонус: если объект удалили до того, как он был нарисован, то у него ничего не вычисляется вообще.</li>
 </ol>
 <h2><a href="#общий-подход" name="общий-подход">Общий подход</a></h2>
-<p>A set of <strong>primary data</strong> changes over time. A set of <strong>derived data</strong> is determined from this using some <strong>expensive process</strong>. A <strong>&#8220;dirty&#8221; flag</strong> tracks when the derived data is out of sync with the primary data. It is <strong>set when the primary data changes</strong>. When the derived data is requested, if the flag is set <strong>it is processed then and the flag is cleared.</strong> Otherwise, the previous <strong>cached derived data</strong> is used.</p>
-<h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
-<p>Compared to some other patterns in this book, this one solves a pretty specific problem. Also, like most optimizations, you should only reach for it when you have a performance problem big enough to justify the added code complexity.</p>
-<p>Dirty flags are applied to two kinds of work: <em>calculation</em> and <em>synchronization</em>. In both cases, the process of going from the primary data to the derived data is time-consuming or otherwise costly.</p>
-<p>In our scene graph example, the process is slow because of the amount of math to perform. When using this pattern for synchronization on the other hand, it&#8217;s more often that the derived data is <em>somewhere else</em>&#8202;&mdash;&#8202;either on disk or over the network on another machine&#8202;&mdash;&#8202;and simply getting it from point A to point B is what&#8217;s expensive.</p>
-<p>There are a couple of other requirements too:</p>
+<p>Есть набор <strong>основных данных</strong>, который меняется постоянно. И есть <strong>вторичные данные</strong>, которые вычисляются из основных с помощью некоторого <strong>дорогого процесса</strong>. <strong>Грязный флаг</strong> обозначает актуальность вторичных данных и <strong>их соответствие основным</strong>. Когда запрашиваются вторичные данные&#8202;&mdash;&#8202;проверяется флаг.  Если флаг поднят, необходимо <strong>рассчитать вторичные данные заново и очистить флаг</strong>. Если опущен&#8202;&mdash;&#8202;можно использовать закэшированные вторичные данные, рассчитаные ранее.</p>
+<h2><a href="#когда-это-использовать" name="когда-это-использовать">Когда это использовать</a></h2>
+<p>По сравнению с другими паттернами в этой книге, этот решает довольно специфическую задачу. Нужно понимать, что любая борьба за производительность выливается в усложнение кода. Так что проблема должна быть достаточно большой, чтобы компенсировать выросшую сложность.</p>
+<p>&#8220;Грязный флаг&#8221; применим к двум процессам: <em>вычисления</em> и <em>синхронизация</em>. В обоих случаях, процесс перевод первичных данных во вторичные выполняется долго или дорог по другим причинам .</p>
+<p>В нашем примере с графом сцены вычисления медленные, потому что там много математики. При задаче синхронизации проблема чаще заключается в том, что вторичные данные находятся <em>где-то далеко</em>&#8202;&mdash;&#8202;на диске или в сети на другой машине&#8202;&mdash;&#8202;и дорога сама доставка данных из пункта A в пункт B.</p>
+<p>Вот ещё пара требований:</p>
 <ul>
 <li>
-<p><strong>The primary data has to change more often than the derived data is used.</strong>
-    This pattern works by avoiding processing derived data when a subsequent
-    primary data change would invalidate it before it gets used. If you find
-    yourself always needing that derived data after every single modification
-    to the primary data, this pattern can&#8217;t help.</p>
+<p><strong>Первичные данные изменяются чаще, чем ипользуются вторичные.</strong>
+    Паттерн работает за счет избегания работы с вторичными данными до того как они понадобятся, если изменились первичные. Если есть жесткая необходимость обновить вторичные данные сразу же после изменения основных&#8202;&mdash;&#8202;этот паттерн не для вас. </p>
 </li>
 <li>
-<p><strong>It should be hard to incrementally update.</strong> Let&#8217;s say the
-    pirate ship in our game can only carry so much booty. We need to
-    know the total weight of everything in the hold. We
-    <em>could</em> use this pattern and have a dirty flag for the total weight. Every
-    time we add or remove some loot, we set the flag. When we need the
-    total, we add up all of the booty and clear the flag.</p>
-<p>But a simpler solution is to just <em>keep a running total</em>. When we add or
-remove an item, just add or remove its weight from the current total. If
-we can &#8220;pay as we go&#8221; like this and keep the derived data updated, then
-that&#8217;s often a better choice than using this pattern and calculating the
-derived data from scratch when needed.</p>
+<p><strong>Трудно реализовать инкрементальное обновление.</strong> 
+    Допустим, наш пиратский корабль может только возить товары. И нам нужно знать вес груза в трюмах. Мы <em>можем</em> использовать этот паттерн и указать флагом на общий вес. Каждый раз, когда мы добавляем или убираем сундук, мы поднимаем флажок. Когда нам нужен общий вес, мы складываем все сундуки вместе и опускаем флаг.</p>
+<p>Есть решение проще&#8202;&mdash;&#8202;просто <em>обновлять сумму</em>. Когда мы добавляем или убираем вес, можно просто прибавлять или вычитать это число из общего веса. Если мы можем пренебречь затратами на подобную работу, и при этом поддержать актуальность первичных данных, то это выгодное решение. </p>
 </li>
 </ul>
-<p>All of this makes it sound like dirty flags are never appropriate, but
-you&#8217;ll find a place here or there where they help.
-<span name="hacks">Searching</span> your
-average game codebase for the word &#8220;dirty&#8221; will often
-turn up uses of this pattern.</p>
+<p>Из всего этого кажется, что техникой грязного флага тяжело воспользоваться. Но можно найти место, где её применить. Если <span name="hacks">поискать</span> слово &#8220;dirty&#8221; в коде  игры средней сложности, то подобные примеры легко найдутся.      </p>
 <aside name="hacks">
-<p>From my research, it also turns up a lot of comments apologizing for &#8220;dirty&#8221; hacks.</p>
+<p>По опыту, там найдутся и комментарии с извинениями за &#8220;грязный&#8221; хак.</p>
 </aside>
-<h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
-<p>Even after you&#8217;ve convinced yourself this pattern is a good fit, there are a few wrinkles that can cause you some discomfort.</p>
-<h3><a href="#there-is-a-cost-to-deferring-too-long" name="there-is-a-cost-to-deferring-too-long">There is a cost to deferring too long</a></h3>
-<p>This pattern defers some slow work until the result is actually needed, but when it is, it&#8217;s often needed <em>right now</em>. But the reason we&#8217;re using this pattern to begin with is because calculating that result is slow!</p>
-<p>This isn&#8217;t a problem in our example because we can still calculate world coordinates fast enough to fit within a frame, but you can imagine other cases where the work you&#8217;re doing is a big chunk that takes noticeable time to chew through. If the game doesn&#8217;t <em>start</em> chewing until right when the player expects to see the result, that can cause an unpleasant visible <span name="gc">pause</span>.</p>
-<p>Another problem with deferring is that if something goes wrong, you may fail to do the work at all. This can be particularly problematic when you&#8217;re using this pattern to save some state to a more persistent form.</p>
-<p>For example, text editors know if your document has &#8220;unsaved changes&#8221;. That little bullet or star in your file&#8217;s title bar is literally the dirty flag visualized. The primary data is the open document in memory, and the derived data is the file on disk.</p>
+<h2><a href="#особенности" name="особенности">Особенности</a></h2>
+<p>Даже если вы решились на использование этого паттерна, надо быть готовым к моментам, который доставят некоторый дискомфорт.  </p>
+<h3><a href="#затраты-на-чрезмерно-отложенные-вычисления" name="затраты-на-чрезмерно-отложенные-вычисления">Затраты на чрезмерно отложенные вычисления</a></h3>
+<p>Мы откладываем затратные вычисления до момента, когда результаты действительно понадобятся. А когда они становяться нужными, они нужны <em>практически сразу</em>. Но ведь из-за этого всё и завертелось&#8202;&mdash;&#8202;потому что вычисления медленные!</p>
+<p>В нашем примере, это не проблема, потому что перевод локальной трансформации в мировую быстр достаточно, чтобы не задерживать отрисовку. Однако, легко представить другие ситуации, когда вычисления вызовут паузу, заметную невооруженным взглядом. И если игрок не получит результат этих вычислений сразу же, это будет весьма неприятная <span name="gc">пауза</span>. </p>
+<p>Ещё одна трудность&#8202;&mdash;&#8202;если что-то пойдет не так в процессе вычислений, то восстановиться после такой ошибки тяжело. В случае, если вы используете отложенные вычисления, чтобы сохранить состояние куда-нибудь, то это может добавить головной боли. </p>
+<p>Например, текстовые редакторы не сразу сохраняют файл на диск. Как правило, маленькая звездочка в заголовке окна наглядно показывает &#8220;грязный флаг&#8221;. Здесь первичные данные&#8202;&mdash;&#8202;это открытый в редакторе документ, а вторичные&#8202;&mdash;&#8202;байты на диске.</p>
 <p><img src="images/dirty-flag-title-bar.png" /></p>
-<p>Many programs don&#8217;t save to disk until either the document is closed or the application is exited. That&#8217;s fine most of the time, but if you accidentally kick the power cable out, there goes your masterpiece.</p>
-<p>Editors that auto-save a backup in the background are compensating specifically for this shortcoming. The frequency that it auto-saves is the point it chose on the continuum between not losing too much work when a crash occurs and not thrashing the file system too much by saving all the time.</p>
+<p>Часть программ не сохраняют изменения на диск до тех пор, пока приложение или документ не закроются. Это нормально, но если неожиданно выдернуть питание, то шедевр не увидит своих фанатов. </p>
+<p>Функция автоматического бэкапа в редакторах компенсирует этот недостаток. Частота автосохранения&#8202;&mdash;&#8202;это выбранный компромисс между &#8220;не потерять слишком много, если все накроется&#8221; и &#8220;экономить время и не утруждать винчестер лишней работой&#8221;.  </p>
 <aside name="gc">
-<p>This mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting frees memory the second it&#8217;s no longer needed, but burns CPU time updating ref counts eagerly every time references are changed.</p>
-<p>Simple garbage collectors defer reclaiming memory until it&#8217;s really needed, but the cost is the dreaded &#8220;GC pause&#8221; that can freeze your entire game until the collector is done scouring the heap.</p>
-<p>In between the two are more complex systems like deferred ref-counting and incremental GC that reclaim memory less eagerly than pure ref-counting but more eagerly than stop-the-world collectors.</p>
+<p>Это похоже на трудности, с которыми сталкиваются стратегии сборки мусора в системах с автоматическим управлением памятью. Счетчик ссылок поможет освободить память сразу же, как только она становиться не нужна, но тратит время на собственное обновление. </p>
+<p>Простейшие сборщики откладывают освобождение памяти до тех пор, пока она реально не понадобится. Но эта пауза на уборку может повесить всю игру, пока мусорщик не закончит ревизию памяти. </p>
+<p>Есть ещё варианты между этими крайностями. Например, отложенный подсчет ссылок или инкрементальный сборщик, который не ставит весь процесс на паузу, хотя собирает память менее интенсивно, чем прямые счетчики.</p>
 </aside>
-<h3><a href="#you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes" name="you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes">You have to make sure to set the flag <em>every</em> time the state changes</a></h3>
-<p>Since the derived data is calculated from the primary data, it&#8217;s essentially a cache. Whenever you have cached data, the trickiest aspect of it is <span name="cache"><em>cache invalidation</em></span>&#8202;&mdash;&#8202;correctly noting when the cache is out of sync with its source data. In this pattern, that means setting the dirty flag when <em>any</em> primary data changes.</p>
+<h3><a href="#не-забывайте-выставлять-флажок-*каждый-раз*,-когда-состояние-изменилось" name="не-забывайте-выставлять-флажок-*каждый-раз*,-когда-состояние-изменилось">Не забывайте выставлять флажок <em>каждый раз</em>, когда состояние изменилось</a></h3>
+<p>Так как вторичные данные вычисляются из основных, это практически кэш. А где появляется кэш, то там появляется и <span name="cache"><em>инвалидация кэша</em></span>&#8202;&mdash;&#8202;внимательное слежение за актуальнойстью данных в кэше. В текущем паттерне, это означает своевременное выставление флажка сразу же, как <em>что-то</em> поменялось в основных данных.</p>
 <aside name="cache">
-<p>Phil Karlton famously said, &#8220;There are only two hard things in Computer Science: cache invalidation and naming things.&#8221;</p>
+<p>Фил Карлтон верно подметил, что &#8220;есть только два трудных момента в компьютерном искусстве: инвалидация кэша и придумывание имен&#8221;.</p>
 </aside>
-<p>Miss it in one place, and your program will incorrectly use stale derived data. This leads to confused players and very hard to track down bugs. When you use this pattern, you&#8217;ll have to take care that any code that modifies the primary state also sets the dirty flag.</p>
-<p>One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes through a single narrow API, you can set the dirty bit there and rest assured that it won&#8217;t be missed.</p>
-<h3><a href="#you-have-to-keep-the-previous-derived-data-in-memory" name="you-have-to-keep-the-previous-derived-data-in-memory">You have to keep the previous derived data in memory</a></h3>
+<p>Стоит пропустить всего одно место, и программа начнет использовать устаревшие данные. Это ведет к конфузу у игроков и трудно отслеживаемым ошибкам. Когда используете этот паттерн, убедитесь, что грязный флаг выставляется после любого изменения в первичных данных. </p>
+<p>Одним из способов следить за этой моментом является применение интерфейса для модификаций первичных данных. Если все изменения проходят через одну и ту же точку, то можно выставлять этот флаг там и забыть об этой проблеме на долгое время.</p>
+<h3><a href="#на-хранение-вторичных-данных-требуется-память" name="на-хранение-вторичных-данных-требуется-память">На хранение вторичных данных требуется память</a></h3>
 <p><span name="sync"></span></p>
-<p>When the derived data is needed and the dirty flag <em>isn&#8217;t</em> set, it uses the previously calculated data. This is obvious, but that does imply that you have to keep that derived data around in memory in case you end up needing it later.</p>
+<p>Когда вторичные данные понадобятся, и грязный флаг <em>не</em> поднят, то используются уже вычисленные результаты. Это очевидно, но это вынуждает хранить эти рузельтаты в памяти постоянно, так как они могут понадобиться позже.</p>
 <aside name="sync">
-<p>This isn&#8217;t much of an issue when you&#8217;re using this pattern to synchronize the primary state to some other place. In that case, the derived data isn&#8217;t usually in memory at all.</p>
+<p>Это не относится к ситуации, когда вы синхронизируете данные в какое-то другое место. В этом случае, вторичные данные могут быть вообще не в памяти.</p>
 </aside>
-<p>If you weren&#8217;t using this pattern, you could calculate the derived data on the fly whenever you needed it, then discard it when you were done. That avoids the expense of keeping it cached in memory at the cost of having to do that calculation every time you need the result.</p>
-<p>Like many optimizations, then, this pattern <span name="trade">trades</span> memory for speed. In return for keeping the previously calculated data in memory, you avoid having to recalculate it when it hasn&#8217;t changed. This trade-off makes sense when the calculation is slow and memory is cheap. When you&#8217;ve got more time than memory on your hands, it&#8217;s better to just calculate it as needed.</p>
+<p>Если бы мы не использовали грязный флаг, то просто вычисляли бы вторичные данные каждый раз, когда они понадобятся, и уничтожали сразу после использования. Это помогает избежать затрат на хранение их в памяти ценой постоянных вычислений.</p>
+<p>Тут, как и везде, мы <span name="trade">платим</span> памятью за скорость. В обмен за хранение вычисленных результатов в памяти, вы получаете возможность не тратить время на повторые вычисления, если ничего не изменилось. Этот обмен имеет смысл, если вычисления дороги, а память&#8202;&mdash;&#8202;дешева. Если у вас времени больше, чем памяти, то выгоднее  каждый раз пересчитывать. </p>
 <aside name="trade">
-<p>Conversely, compression algorithms make the opposite trade-off: they optimize <em>space</em> at the expense of the processing time needed to decompress.</p>
+<p>Алгоритмы сжатия предлагают противоположный обмен: они оптимизируют <em>место</em> для хранения данных, цена&#8202;&mdash;&#8202;время на их распаковку.   </p>
 </aside>
-<h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
+<h2><a href="#примеры" name="примеры">Примеры</a></h2>
 <p>Let&#8217;s assume we&#8217;ve met the surprisingly long list of requirements, and see how the pattern looks in code. As I mentioned before, the actual math behind transform matrices is beyond the humble aims of this book, so I&#8217;ll just encapsulate that in a class whose implementation you can presume exists somewhere out in the &aelig;ther:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Transform</span>
 <span class="p">{</span>
