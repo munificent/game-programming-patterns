@@ -1,3 +1,6 @@
+2014-05-20 - revise game loop
+2014-05-19 - BROKE CHAIN
+2014-05-18 - 4 emails, 6 bugs
 2014-05-17 - finish revising double buffer
 2014-05-16 - revise 2526 words of double buffer
 2014-05-15 - revise state
