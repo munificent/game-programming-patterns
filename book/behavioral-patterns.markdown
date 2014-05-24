@@ -1,13 +1,14 @@
 ^title Behavioral Patterns
 
-Once you've built your game's stage and decorated it with actors and props, all
-that remains is to start the scene. For this, you need behavior -- the script
-that tells each entity in your game what to do.
+Once you've built your game's set and festooned it with actors and props, all
+that remains is to start the scene. For this, you need behavior -- the
+screenplay that tells each entity in your game what to do.
 
 Of course all code is "behavior", and all software is defining behavior, but
 what's different about games is often the *breadth* of it that you have to
 implement. While your word processor may have a long list of features, it pales
-next to the number of inhabitants, items, and quests in your average MMORPG.
+next to the number of inhabitants, items, and quests in your average
+role-playing game.
 
 The patterns in this chapter help you define and refine a large quantity of
 behavior quickly, and maintainably. [Type Objects](type-object.html) create
