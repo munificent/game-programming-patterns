@@ -137,7 +137,7 @@ Requests can be **handled directly**, or **routed to interested parties**. This 
 
 ## When to Use It
 
-If you just want to decouple *who* receives a message from its sender, patterns like <href="observer.html" class="pattern">Observer</a> and <a href="command.html">Command</a> will take care of you with less <span name="simple">complexity</span>. You only need a queue when you want to decouple something *in time*.
+If you just want to decouple *who* receives a message from its sender, patterns like <a href="observer.html">Observer</a> and <a href="command.html">Command</a> will take care of you with less <span name="simple">complexity</span>. You only need a queue when you want to decouple something *in time*.
 
 <aside name="simple">
 
