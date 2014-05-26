@@ -95,8 +95,14 @@ namespace Monolithic
 
       // Draw the appropriate sprite.
       Sprite* sprite = &spriteStand_;
-      if (velocity_ < 0) sprite = &spriteWalkLeft_;
-      else if (velocity_ > 0) sprite = &spriteWalkRight_;
+      if (velocity_ < 0)
+      {
+        sprite = &spriteWalkLeft_;
+      }
+      else if (velocity_ > 0)
+      {
+        sprite = &spriteWalkRight_;
+      }
 
       graphics.draw(*sprite, x_, y_);
     }
@@ -181,8 +187,14 @@ namespace SplitAIComponent
 
       // Draw the appropriate sprite.
       Sprite* sprite = &spriteStand_;
-      if (velocity < 0) sprite = &spriteWalkLeft_;
-      else if (velocity > 0) sprite = &spriteWalkRight_;
+      if (velocity < 0)
+      {
+        sprite = &spriteWalkLeft_;
+      }
+      else if (velocity > 0)
+      {
+        sprite = &spriteWalkRight_;
+      }
 
       graphics.draw(*sprite, x, y);
     }
@@ -237,8 +249,14 @@ namespace Components
     void update(Bjorn& bjorn, Graphics& graphics)
     {
       Sprite* sprite = &spriteStand_;
-      if (bjorn.velocity < 0) sprite = &spriteWalkLeft_;
-      else if (bjorn.velocity > 0) sprite = &spriteWalkRight_;
+      if (bjorn.velocity < 0)
+      {
+        sprite = &spriteWalkLeft_;
+      }
+      else if (bjorn.velocity > 0)
+      {
+        sprite = &spriteWalkRight_;
+      }
 
       graphics.draw(*sprite, bjorn.x, bjorn.y);
     }
@@ -544,7 +562,10 @@ namespace DirectComponentRef
     void Update(Bjorn& bjorn, Graphics& graphics)
     {
       Sprite* sprite;
-      if (!physics_->isOnGround()) sprite = &spriteJump_;
+      if (!physics_->isOnGround())
+      {
+        sprite = &spriteJump_;
+      }
       else
       {
         // Existing graphics code...
