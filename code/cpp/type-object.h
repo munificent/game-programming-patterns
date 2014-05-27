@@ -24,7 +24,9 @@ namespace Subclasses
   {
   public:
     Dragon() : Monster(230) {}
-    const char* getAttack() {
+
+    virtual const char* getAttack()
+    {
       return "The dragon breathes fire!";
     }
   };
@@ -33,7 +35,9 @@ namespace Subclasses
   {
   public:
     Troll() : Monster(48) {}
-    virtual const char* getAttack() {
+
+    virtual const char* getAttack()
+    {
       return "The troll clubs you!";
     }
   };
@@ -51,11 +55,11 @@ namespace NoInheritance
       attack_(attack)
     {}
 
-    int         getHealth() { return health_; }
+    int getHealth() { return health_; }
     const char* getAttack() { return attack_; }
 
   private:
-    int         health_; // Starting health.
+    int health_; // Starting health.
     const char* attack_;
   };
   //^3
@@ -69,7 +73,8 @@ namespace NoInheritance
       breed_(breed)
     {}
 
-    const char* getAttack() {
+    const char* getAttack()
+    {
       return breed_.getAttack();
     }
 
@@ -113,11 +118,11 @@ namespace BreedCtor
       attack_(attack)
     {}
 
-    int         getHealth() { return health_; }
+    int getHealth() { return health_; }
     const char* getAttack() { return attack_; }
 
   private:
-    int         health_; // Starting health.
+    int health_; // Starting health.
     const char* attack_;
     //^omit
   };
@@ -157,7 +162,7 @@ namespace BreedCtorMonster
       breed_(breed)
     {}
 
-    int    health_; // Current health.
+    int health_; // Current health.
     Breed& breed_;
   };
   //^6

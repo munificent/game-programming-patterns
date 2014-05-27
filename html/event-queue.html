@@ -151,7 +151,7 @@
 <p>A <strong>queue</strong> stores a series of <strong>notifications or requests</strong> in first-in, first-out order. Sending a notification <strong>enqueues the request and returns</strong>. The request processor then <strong>processes items from the queue</strong> at a later time.</p>
 <p>Requests can be <strong>handled directly</strong>, or <strong>routed to interested parties</strong>. This <strong>decouples the sender from the receiver</strong> both <strong>statically</strong> and <strong>in time</strong>.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
-<p>If you just want to decouple <em>who</em> receives a message from its sender, patterns like <href="observer.html" class="pattern">Observer</a> and <a href="command.html">Command</a> will take care of you with less <span name="simple">complexity</span>. You only need a queue when you want to decouple something <em>in time</em>.</p>
+<p>If you just want to decouple <em>who</em> receives a message from its sender, patterns like <a href="observer.html">Observer</a> and <a href="command.html">Command</a> will take care of you with less <span name="simple">complexity</span>. You only need a queue when you want to decouple something <em>in time</em>.</p>
 <aside name="simple">
 
 <p>I mention this in nearly every chapter, but it&#8217;s worth emphasizing. Complexity slows you down, so treat simplicity as a precious resource.</p>

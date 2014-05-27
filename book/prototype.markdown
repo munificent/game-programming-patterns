@@ -39,7 +39,16 @@ A spawner constructs instances of one particular monster type. To support every
 monster in the game, we *could* brute-force it by having a spawner class for
 each monster class, leading to a parallel class hierarchy:
 
+<span name="inherits-arrow"></span>
+
 <img src="images/prototype-hierarchies.png" />
+
+<aside name="inherits-arrow">
+
+I had to dig up a dusty UML book to make this diagram. The <img
+src="images/arrow-inherits.png" class="arrow" /> means "inherits from".
+
+</aside>
 
 Implementing it would look like this:
 
