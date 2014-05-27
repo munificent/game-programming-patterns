@@ -543,7 +543,7 @@ A safer answer is to make observers automatically unregister themselves from
 every subject when they get destroyed. If you implement the logic for that once
 in your base observer class, everyone using it doesn't have to remember to do it
 themselves. This does add some complexity, though. It means each *observer* will
-need a list of the *subjects* its observing. You end up with pointers going in
+need a list of the *subjects* it's observing. You end up with pointers going in
 both directions.
 
 ### Don't worry, I've got a GC
