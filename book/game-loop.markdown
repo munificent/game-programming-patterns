@@ -675,5 +675,5 @@ Russell and co. managed to create Spacewar! on it.
     runner-up.
 
  *  The [Unity](http://unity3d.com/) framework has a complex game loop, detailed
-    in a wonderful illustration [here](http://www.richardfine.co.uk/2012/10/unit
-    y3d-monobehaviour-lifecycle/).
+    in a wonderful illustration [here
+    ](http://www.richardfine.co.uk/2012/10/unity3d-monobehaviour-lifecycle/).
