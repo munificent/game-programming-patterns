@@ -450,7 +450,7 @@
 <ul>
 <li>
 <p><strong>If you queue events:</strong></p>
-<p>An &#8220;event&#8221; or &#8220;notification&#8221; describes something that <em>already</em> happened, like &#8220;monster died&#8221;. You queue it so that other objects can <em>respond</em> to the event, sort of like an asynchronous <a href="observer.html" class="gof-pattern">Observer pattern</a>.</p>
+<p>An &#8220;event&#8221; or &#8220;notification&#8221; describes something that <em>already</em> happened, like &#8220;monster died&#8221;. You queue it so that other objects can <em>respond</em> to the event, sort of like an asynchronous <a href="observer.html" class="gof-pattern">Observer</a> pattern.</p>
 <ul>
 <li>
 <p><em>You are likely to allow multiple listeners.</em> Since the queue contains things that already happened, the sender probably doesn&#8217;t care who receives it. From its perspective, the event is in the past and is already forgotten.</p>
@@ -465,7 +465,7 @@
 <p>A <span name="command">&#8220;message&#8221;</href="observer.html"> or &#8220;request&#8221; describes an action that we <em>want</em> to happen <em>in the future</em>, like &#8220;play sound&#8221;. You can think of this as an asynchronous API to a service.</p>
 <aside name="command">
 
-<p>Another word for &#8220;request&#8221; is &#8220;command&#8221;, as in the <a href="command.html" class="gof-pattern">Command pattern</a>, and queues can be used there too.</p>
+<p>Another word for &#8220;request&#8221; is &#8220;command&#8221;, as in the <a href="command.html" class="gof-pattern">Command</a> pattern, and queues can be used there too.</p>
 </aside>
 
 <ul>
@@ -589,14 +589,14 @@ When a listener gets an event, it doesn&#8217;t know who sent it, since it could
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
 <li>
-<p>I&#8217;ve mentioned this a few times already, but in many ways, this pattern is the asynchronous cousin to the well-known <a href="observer.html class="gif-pattern">Observer pattern</a>.</p>
+<p>I&#8217;ve mentioned this a few times already, but in many ways, this pattern is the asynchronous cousin to the well-known <a href="observer.html class="gif-pattern">Observer</a> pattern.</p>
 </li>
 <li>
 <p>Like many patterns, event queues go by a number of aliases. One established term is &#8220;message queue&#8221;. It&#8217;s usually referring to a higher level manifestation. Where our event queues are <em>within</em> an application, message queues are usually used for communicating <em>between</em> them.</p>
 <p>Another term is &#8220;publish/subscribe&#8221;, sometimes abbreviated to &#8220;pubsub&#8221;. Like &#8220;message queue&#8221;, it usually refers to larger distributed systems and less the humble coding pattern we&#8217;re focused on.</p>
 </li>
 <li>
-<p>A <a href="http://en.wikipedia.org/wiki/Finite-state_machine">finite state machine</a>, similar to the Gang of Four&#8217;s <a href="state.html" class="gof-pattern">State pattern</a>, requires a stream of inputs. If you want it to respond to those asynchronously, it makes sense to queue them.</p>
+<p>A <a href="http://en.wikipedia.org/wiki/Finite-state_machine">finite state machine</a>, similar to the Gang of Four&#8217;s <a href="state.html" class="gof-pattern">State</a> pattern, requires a stream of inputs. If you want it to respond to those asynchronously, it makes sense to queue them.</p>
 <p>When you have a bunch of state machines sending messages to each other, each with a little queue of pending inputs (called a <em>mailbox</em>) then you&#8217;ve re-invented the <a href="http://en.wikipedia.org/wiki/Actor_model">actor model</a> of computation.</p>
 </li>
 <li>

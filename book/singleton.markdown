@@ -6,7 +6,7 @@ you how to use a design pattern. This chapter shows you how *not* to use
 one.
 
 Despite noble intentions, the <a class="gof-pattern"
-href="http://c2.com/cgi/wiki?SingletonPattern">Singleton pattern</a> described
+href="http://c2.com/cgi/wiki?SingletonPattern">Singleton</a> pattern described
 by the Gang of Four usually does more harm than good. They stress that the
 pattern should be used sparingly, but that message was often lost in translation
 to the <span name="instance">game industry</span>.

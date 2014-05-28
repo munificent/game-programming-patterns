@@ -628,7 +628,7 @@ likely support more than one at the same time in your designs.
         <aside name="mediator">
 
         The Gang of Four call this the <a class="gof-pattern"
-        href="http://c2.com/cgi-bin/wiki?MediatorPattern">Mediator Pattern</a>:
+        href="http://c2.com/cgi-bin/wiki?MediatorPattern">Mediator</a> pattern:
         two or more objects communicate with each other indirectly by routing
         the message through an intermediate object. In this case, the container
         object itself is the mediator.

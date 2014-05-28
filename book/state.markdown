@@ -3,8 +3,8 @@
 
 Confession time: I went a little overboard and packed way too much into this
 chapter. It's ostensibly about the <a
-href="http://en.wikipedia.org/wiki/State_pattern" class="gof-pattern">State
-design pattern</a>, but I can't talk about that and games without going into the
+href="http://en.wikipedia.org/wiki/State_pattern" class="gof-pattern">State</a>
+design pattern, but I can't talk about that and games without going into the
 more fundamental concept of *finite state machines* (or "FSMs"). But then once I
 went there, I figured I might as well introduce *hierarchical state machines*
 and *pushdown automata*.
@@ -313,7 +313,7 @@ machine-specific about it.
 
 <aside name="flyweight">
 
-This is the <a href="flyweight.html" class="gof-pattern">Flyweight Pattern</a>.
+This is the <a href="flyweight.html" class="gof-pattern">Flyweight</a> pattern.
 
 </aside>
 

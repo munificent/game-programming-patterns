@@ -366,7 +366,7 @@ I've used "event" and "message" interchangeably so far because it mostly doesn't
 
 * **If you queue events:**
 
-    An "event" or "notification" describes something that *already* happened, like "monster died". You queue it so that other objects can *respond* to the event, sort of like an asynchronous <a href="observer.html" class="gof-pattern">Observer pattern</a>.
+    An "event" or "notification" describes something that *already* happened, like "monster died". You queue it so that other objects can *respond* to the event, sort of like an asynchronous <a href="observer.html" class="gof-pattern">Observer</a> pattern.
 
     * *You are likely to allow multiple listeners.* Since the queue contains things that already happened, the sender probably doesn't care who receives it. From its perspective, the event is in the past and is already forgotten.
 
@@ -378,7 +378,7 @@ I've used "event" and "message" interchangeably so far because it mostly doesn't
 
     <aside name="command">
 
-    Another word for "request" is "command", as in the <a href="command.html" class="gof-pattern">Command pattern</a>, and queues can be used there too.
+    Another word for "request" is "command", as in the <a href="command.html" class="gof-pattern">Command</a> pattern, and queues can be used there too.
 
     </aside>
 
@@ -487,13 +487,13 @@ If you're using a garbage collected language, you don't need to worry about this
 
 ## See Also
 
-* I've mentioned this a few times already, but in many ways, this pattern is the asynchronous cousin to the well-known <a href="observer.html class="gif-pattern">Observer pattern</a>.
+* I've mentioned this a few times already, but in many ways, this pattern is the asynchronous cousin to the well-known <a href="observer.html class="gif-pattern">Observer</a> pattern.
 
 * Like many patterns, event queues go by a number of aliases. One established term is "message queue". It's usually referring to a higher level manifestation. Where our event queues are *within* an application, message queues are usually used for communicating *between* them.
 
     Another term is "publish/subscribe", sometimes abbreviated to "pubsub". Like "message queue", it usually refers to larger distributed systems and less the humble coding pattern we're focused on.
 
-* A [finite state machine](http://en.wikipedia.org/wiki/Finite-state_machine), similar to the Gang of Four's <a href="state.html" class="gof-pattern">State pattern</a>, requires a stream of inputs. If you want it to respond to those asynchronously, it makes sense to queue them.
+* A [finite state machine](http://en.wikipedia.org/wiki/Finite-state_machine), similar to the Gang of Four's <a href="state.html" class="gof-pattern">State</a> pattern, requires a stream of inputs. If you want it to respond to those asynchronously, it makes sense to queue them.
 
     When you have a bunch of state machines sending messages to each other, each with a little queue of pending inputs (called a *mailbox*) then you've re-invented the [actor model](http://en.wikipedia.org/wiki/Actor_model) of computation.
 

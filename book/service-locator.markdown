@@ -85,9 +85,17 @@ that it can talk to. It is an ambient property of the environment, so plumbing
 it through ten layers of methods just so one deeply nested call can get to it
 is adding needless complexity to your code.
 
-In those kinds of cases, this pattern can help. As we'll see, it functions
-as a more flexible, more configurable cousin of the singleton. When used
-well, it can make your codebase more flexible with little runtime cost.
+In those kinds of cases, this pattern can help. As we'll see, it functions as a
+more flexible, more configurable cousin of the singleton. When used <span
+name="well">well</span>, it can make your codebase more flexible with little
+runtime cost.
+
+<aside name="well">
+
+Conversely, when used poorly, it carries with it all of the baggage of the
+Singleton pattern with worse runtime performance.
+
+</aside>
 
 ## Keep in Mind
 
@@ -619,7 +627,7 @@ be global.
     looking at both to see which is most appropriate for your needs.
 
 *   The [Unity](http://unity3d.com) framework uses this pattern in concert
-    with the <a href="component.html" class="pattern">Component pattern</a>
+    with the <a href="component.html" class="pattern">Component</a> pattern
     in its [`GetComponent()`](http://docs.unity3d.com/412/Documentation/ScriptReference/Component.GetComponent.html?from=index) method.
 
 *   Microsoft's <a  href="http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.services.aspx">XNA</a> framework for game development has this pattern

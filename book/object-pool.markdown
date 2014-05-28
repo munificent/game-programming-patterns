@@ -503,7 +503,7 @@ inside the pool class or outside.
 ## See Also
 
 *   This looks a lot like the <a class="gof-pattern" href="flyweight.html">
-    Flyweight pattern</a>. Both maintain a collection of reusable objects. The
+    Flyweight</a> pattern. Both maintain a collection of reusable objects. The
     difference is what "reuse" means. Flyweight objects are reused by sharing
     the same instance between multiple owners *simultaneously*. It avoids
     *duplicate* memory usage by using the same object in multiple contexts.
@@ -516,5 +516,5 @@ inside the pool class or outside.
 
 *   Packing a bunch of objects of the same type together in memory helps keep
     your CPU cache full as you iterate over those objects. The
-    <a class="pattern" href="data-locality.html">Data Locality pattern</a>
+    <a class="pattern" href="data-locality.html">Data Locality</a> pattern
     is all about that.

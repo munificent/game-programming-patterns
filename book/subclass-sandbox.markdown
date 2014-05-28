@@ -475,12 +475,15 @@ particle system object, how would it get one?
     method.
 
  *  This pattern is a role reversal of the <a class="gof-pattern"
-    href="http://en.wikipedia.org/wiki/Template_method_pattern">Template Method
-    Pattern</a>. In both patterns, you implement a method using a set of primitive operations. With Subclass Sandbox, the method is in
-    the derived class and the primitive operations are in the base class. With
-    Template Method, the *base* class has the method and the primitive
-    operations are implemented by the *derived* class.
+    href="http://en.wikipedia.org/wiki/Template_method_pattern">Template
+    Method</a> pattern. In both patterns, you implement a method using a set of
+    primitive operations. With Subclass Sandbox, the method is in the derived
+    class and the primitive operations are in the base class. With Template
+    Method, the *base* class has the method and the primitive operations are
+    implemented by the *derived* class.
 
  *  You can also consider this a variation on the <a class="gof-pattern"
-    href="http://en.wikipedia.org/wiki/Facade_Pattern">Facade
-    Pattern</a>. That pattern hides a number of different systems behind a single simplified API. With Subclass Sandbox, the base class acts as a facade thats hides the entire game engine from the subclasses.
+    href="http://en.wikipedia.org/wiki/Facade_Pattern">Facade</a> pattern. That
+    pattern hides a number of different systems behind a single simplified API.
+    With Subclass Sandbox, the base class acts as a facade thats hides the
+    entire game engine from the subclasses.

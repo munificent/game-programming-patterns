@@ -100,9 +100,16 @@ in nature. Your game probably only has one audio device or display system
 that it can talk to. It is an ambient property of the environment, so plumbing
 it through ten layers of methods just so one deeply nested call can get to it
 is adding needless complexity to your code.</p>
-<p>In those kinds of cases, this pattern can help. As we&#8217;ll see, it functions
-as a more flexible, more configurable cousin of the singleton. When used
-well, it can make your codebase more flexible with little runtime cost.</p>
+<p>In those kinds of cases, this pattern can help. As we&#8217;ll see, it functions as a
+more flexible, more configurable cousin of the singleton. When used <span
+name="well">well</span>, it can make your codebase more flexible with little
+runtime cost.</p>
+<aside name="well">
+
+<p>Conversely, when used poorly, it carries with it all of the baggage of the
+Singleton pattern with worse runtime performance.</p>
+</aside>
+
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <p>The core difficulty with a service locator is that it takes a dependency&#8202;&mdash;&#8202;a
 bit of coupling between two pieces of code&#8202;&mdash;&#8202;and defers wiring it up until
@@ -782,7 +789,7 @@ be global.</p>
 </li>
 <li>
 <p>The <a href="http://unity3d.com">Unity</a> framework uses this pattern in concert
-    with the <a href="component.html" class="pattern">Component pattern</a>
+    with the <a href="component.html" class="pattern">Component</a> pattern
     in its <a href="http://docs.unity3d.com/412/Documentation/ScriptReference/Component.GetComponent.html?from=index"><code>GetComponent()</code></a> method.</p>
 </li>
 <li>
