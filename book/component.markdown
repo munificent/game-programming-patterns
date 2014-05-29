@@ -83,7 +83,7 @@ monolithic `Bjorn` class and slice it into separate parts along domain
 boundaries. For example, we'll take all of the code for handling user input and
 move it into a separate `InputComponent` class. `Bjorn` will then own an
 instance of this component. We repeat this process for each of the domains that
-Bjørn touches.
+`Bjorn` touches.
 
 When we're done, we'll have moved almost everything out of `Bjorn`. All that
 remains is a thin shell that binds the components together. We've solved our
@@ -160,7 +160,7 @@ data it doesn't need and `Decoration` is doing the same with physics.
 Now, let's try it with components. Our <span name="menu">subclasses disappear
 completely. Instead, we have a single `GameObject` class and two component
 classes: `PhysicsComponent` and `GraphicsComponent`. A decoration is simply a
-`GameObject` with a `GraphicsComponent` but no `PhysicsComponent`, A zone is the
+`GameObject` with a `GraphicsComponent` but no `PhysicsComponent`. A zone is the
 opposite, and a prop has both components. No code duplication, no multiple
 inheritance, and only three classes instead of four.
 
@@ -303,8 +303,9 @@ velocity based on it. Let's move that logic out into a separate class:
 
 ^code 2
 
-Pretty simple. We've taken the first section of `Bjorn`'s `update()` method and
-put it into this class. The changes to `Bjorn` are also straightforward:
+Pretty simple. We've taken the first section of `Bjorn`&rsquo;s `update()`
+method and put it into this class. The changes to `Bjorn` are also
+straightforward:
 
 ^code 3
 
@@ -517,7 +518,7 @@ likely support more than one at the same time in your designs.
  *  **By modifying the container object's state:**
 
      *  *It keeps the components decoupled.* When our `InputComponent` set
-        Bjørn's velocity and the PhysicsComponent later used it, the two
+        Bjørn's velocity and the `PhysicsComponent` later used it, the two
         components had no idea that the other even existed. For all they knew,
         Bjørn's velocity could have changed through black magic.
 

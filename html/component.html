@@ -98,7 +98,7 @@ monolithic <code>Bjorn</code> class and slice it into separate parts along domai
 boundaries. For example, we&#8217;ll take all of the code for handling user input and
 move it into a separate <code>InputComponent</code> class. <code>Bjorn</code> will then own an
 instance of this component. We repeat this process for each of the domains that
-Bj&oslash;rn touches.</p>
+<code>Bjorn</code> touches.</p>
 <p>When we&#8217;re done, we&#8217;ll have moved almost everything out of <code>Bjorn</code>. All that
 remains is a thin shell that binds the components together. We&#8217;ve solved our
 huge class problem by simply dividing it up into multiple smaller classes, but
@@ -161,7 +161,7 @@ data it doesn&#8217;t need and <code>Decoration</code> is doing the same with ph
 <p>Now, let&#8217;s try it with components. Our <span name="menu">subclasses disappear
 completely. Instead, we have a single <code>GameObject</code> class and two component
 classes: <code>PhysicsComponent</code> and <code>GraphicsComponent</code>. A decoration is simply a
-<code>GameObject</code> with a <code>GraphicsComponent</code> but no <code>PhysicsComponent</code>, A zone is the
+<code>GameObject</code> with a <code>GraphicsComponent</code> but no <code>PhysicsComponent</code>. A zone is the
 opposite, and a prop has both components. No code duplication, no multiple
 inheritance, and only three classes instead of four.</p>
 <aside name="menu">
@@ -267,6 +267,11 @@ just &#8220;the next version of Photoshop.&#8221;</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Bjorn</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
+  <span class="n">Bjorn</span><span class="p">()</span>
+  <span class="o">:</span> <span class="n">velocity_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">x_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">y_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  <span class="p">{}</span>
+
   <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Apply user input to hero&#39;s velocity.</span>
@@ -352,8 +357,9 @@ velocity based on it. Let&#8217;s move that logic out into a separate class:</p>
 </pre></div>
 
 
-<p>Pretty simple. We&#8217;ve taken the first section of <code>Bjorn</code>&#8216;s <code>update()</code> method and
-put it into this class. The changes to <code>Bjorn</code> are also straightforward:</p>
+<p>Pretty simple. We&#8217;ve taken the first section of <code>Bjorn</code>&rsquo;s <code>update()</code>
+method and put it into this class. The changes to <code>Bjorn</code> are also
+straightforward:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Bjorn</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -468,8 +474,8 @@ Not much:</p>
   <span class="p">}</span>
 
 <span class="nl">private:</span>
-  <span class="n">InputComponent</span>    <span class="n">input_</span><span class="p">;</span>
-  <span class="n">PhysicsComponent</span>  <span class="n">physics_</span><span class="p">;</span>
+  <span class="n">InputComponent</span> <span class="n">input_</span><span class="p">;</span>
+  <span class="n">PhysicsComponent</span> <span class="n">physics_</span><span class="p">;</span>
   <span class="n">GraphicsComponent</span> <span class="n">graphics_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
@@ -544,8 +550,8 @@ an inline instance:</p>
   <span class="p">}</span>
 
 <span class="nl">private:</span>
-  <span class="n">InputComponent</span><span class="o">*</span>   <span class="n">input_</span><span class="p">;</span>
-  <span class="n">PhysicsComponent</span>  <span class="n">physics_</span><span class="p">;</span>
+  <span class="n">InputComponent</span><span class="o">*</span> <span class="n">input_</span><span class="p">;</span>
+  <span class="n">PhysicsComponent</span> <span class="n">physics_</span><span class="p">;</span>
   <span class="n">GraphicsComponent</span> <span class="n">graphics_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
@@ -643,8 +649,8 @@ class that uses those interfaces:</p>
   <span class="p">}</span>
 
 <span class="nl">private:</span>
-  <span class="n">InputComponent</span><span class="o">*</span>    <span class="n">input_</span><span class="p">;</span>
-  <span class="n">PhysicsComponent</span><span class="o">*</span>  <span class="n">physics_</span><span class="p">;</span>
+  <span class="n">InputComponent</span><span class="o">*</span> <span class="n">input_</span><span class="p">;</span>
+  <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics_</span><span class="p">;</span>
   <span class="n">GraphicsComponent</span><span class="o">*</span> <span class="n">graphics_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
@@ -767,7 +773,7 @@ likely support more than one at the same time in your designs.</p>
 <ul>
 <li>
 <p><em>It keeps the components decoupled.</em> When our <code>InputComponent</code> set
-    Bj&oslash;rn&#8217;s velocity and the PhysicsComponent later used it, the two
+    Bj&oslash;rn&#8217;s velocity and the <code>PhysicsComponent</code> later used it, the two
     components had no idea that the other even existed. For all they knew,
     Bj&oslash;rn&#8217;s velocity could have changed through black magic.</p>
 </li>
@@ -821,14 +827,14 @@ he should be drawn using a jump sprite or not. It can determine this by
 asking the physics engine if he&#8217;s currently on the ground. An easy way
 to do this is by letting the graphics component know about the physics
 component directly:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">GraphicsComponent</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">BjornGraphicsComponent</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="n">GraphicsComponent</span><span class="p">(</span><span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics</span><span class="p">)</span>
+  <span class="n">BjornGraphicsComponent</span><span class="p">(</span><span class="n">BjornPhysicsComponent</span><span class="o">*</span> <span class="n">physics</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">physics_</span><span class="p">(</span><span class="n">physics</span><span class="p">)</span>
   <span class="p">{}</span>
 
-  <span class="kt">void</span> <span class="n">Update</span><span class="p">(</span><span class="n">Bjorn</span><span class="o">&amp;</span> <span class="n">bjorn</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="n">Update</span><span class="p">(</span><span class="n">GameObject</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">Sprite</span><span class="o">*</span> <span class="n">sprite</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">physics_</span><span class="o">-&gt;</span><span class="n">isOnGround</span><span class="p">())</span>
@@ -840,11 +846,11 @@ component directly:</p>
       <span class="c1">// Existing graphics code...</span>
     <span class="p">}</span>
 
-    <span class="n">graphics</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="o">*</span><span class="n">sprite</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+    <span class="n">graphics</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="o">*</span><span class="n">sprite</span><span class="p">,</span> <span class="n">obj</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">obj</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
   <span class="p">}</span>
 
 <span class="nl">private:</span>
-  <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics_</span><span class="p">;</span>
+  <span class="n">BjornPhysicsComponent</span><span class="o">*</span> <span class="n">physics_</span><span class="p">;</span>
 
   <span class="n">Sprite</span> <span class="n">spriteStand_</span><span class="p">;</span>
   <span class="n">Sprite</span> <span class="n">spriteWalkLeft_</span><span class="p">;</span>

@@ -72,6 +72,11 @@ namespace Monolithic
   class Bjorn
   {
   public:
+    Bjorn()
+    : velocity_(0),
+      x_(0), y_(0)
+    {}
+
     void update(World& world, Graphics& graphics)
     {
       // Apply user input to hero's velocity.
@@ -306,8 +311,8 @@ namespace ComponentBjorn
     }
 
   private:
-    InputComponent    input_;
-    PhysicsComponent  physics_;
+    InputComponent input_;
+    PhysicsComponent physics_;
     GraphicsComponent graphics_;
   };
   //^7
@@ -407,8 +412,8 @@ namespace AbstractInputBjorn
     }
 
   private:
-    InputComponent*   input_;
-    PhysicsComponent  physics_;
+    InputComponent* input_;
+    PhysicsComponent physics_;
     GraphicsComponent graphics_;
   };
   //^10
@@ -500,8 +505,8 @@ namespace BaseGameObject
     }
 
   private:
-    InputComponent*    input_;
-    PhysicsComponent*  physics_;
+    InputComponent* input_;
+    PhysicsComponent* physics_;
     GraphicsComponent* graphics_;
   };
   //^15
@@ -538,13 +543,13 @@ namespace BaseGameObject
 
 namespace DirectComponentRef
 {
-  class PhysicsComponent
+  class BjornPhysicsComponent
   {
   public:
     bool isOnGround() { return true; }
   };
 
-  class Bjorn
+  class GameObject
   {
   public:
     int velocity;
@@ -552,14 +557,14 @@ namespace DirectComponentRef
   };
 
   //^18
-  class GraphicsComponent
+  class BjornGraphicsComponent
   {
   public:
-    GraphicsComponent(PhysicsComponent* physics)
+    BjornGraphicsComponent(BjornPhysicsComponent* physics)
     : physics_(physics)
     {}
 
-    void Update(Bjorn& bjorn, Graphics& graphics)
+    void Update(GameObject& obj, Graphics& graphics)
     {
       Sprite* sprite;
       if (!physics_->isOnGround())
@@ -574,11 +579,11 @@ namespace DirectComponentRef
         //^omit
       }
 
-      graphics.draw(*sprite, bjorn.x, bjorn.y);
+      graphics.draw(*sprite, obj.x, obj.y);
     }
 
   private:
-    PhysicsComponent* physics_;
+    BjornPhysicsComponent* physics_;
 
     Sprite spriteStand_;
     Sprite spriteWalkLeft_;
