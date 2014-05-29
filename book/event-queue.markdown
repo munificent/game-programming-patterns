@@ -291,10 +291,10 @@ then determines the kind of entity slain and the difficulty of the kill so it
 can dish out an appropriate reward.
 
 That requires various pieces of state in the world. We need the entity that died
-to see how tough it was. We may want to inspect its surroundings to see what
-other obstacles or minions were nearby. But if the event isn't received until
-later, that stuff may be gone. The entity may have been deallocated, and other
-nearby foes may have wandered off.
+so we can see how tough it was. We may want to inspect its surroundings to see
+what other obstacles or minions were nearby. But if the event isn't received
+until later, that stuff may be gone. The entity may have been deallocated, and
+other nearby foes may have wandered off.
 
 When you receive an event, you have to be careful not to assume the *current*
 state of the world reflects how the world was *when the event was raised*. This
@@ -346,7 +346,7 @@ Next, we need to give `Audio` some storage space to keep track of these pending
 play messages. Now, your <span name="prof">algorithms professor</span> would
 tell you to use some exciting data structure here like a [Fibonacci
 heap](http://en.wikipedia.org/wiki/Fibonacci_heap) or a [skip
-list](http://en.wikipedia.org/wiki/Skip_list), or, hell at least a *linked*
+list](http://en.wikipedia.org/wiki/Skip_list), or, hell, at least a *linked*
 list. But, in practice, the best way to store a bunch of homogenous things is
 almost always a plain old array:
 
@@ -357,9 +357,11 @@ They aren't exactly incentivized to stick to the basics.
 
 </aside>
 
- 1. No dynamic allocation.
- 2. No memory overhead for bookkeeping information or pointers.
- 3. <span name="locality">Cache-friendly</span> contiguous memory usage.
+ *  No dynamic allocation.
+
+ *  No memory overhead for bookkeeping information or pointers.
+
+ *  <span name="locality">Cache-friendly</span> contiguous memory usage.
 
 <aside name="locality">
 
@@ -519,7 +521,7 @@ a request if it matches an already pending one:
 ^code drop-dupe-play
 
 When we get two requests to play the same sound, we collapse them to a single
-request for whichever was loudest. This "aggregation" is pretty rudimentary, but
+request for whichever is loudest. This "aggregation" is pretty rudimentary, but
 we could use the same idea to do more interesting batching.
 
 Note that we're merging when the request is *enqueued*, not when it's
@@ -591,10 +593,16 @@ the details of any specific API or locking mechanism.
 At a high level, all we need to do is ensure that the queue isn't modified
 concurrently. Since `playSound()` does a very small amount of work -- basically
 just assigning a few fields -- it can lock without blocking processing for long.
-In `update()` we wait on something like a condition variable so that we don't
+In `update()`, we wait on something like a condition variable so that we don't
 burn CPU cycles until there's a request to process.
 
 ## Design Decisions
+
+Many games use event queues as a key part of their communication structure, and
+you can spend a ton of time designing all sorts of complex routing and filtering
+for messages. But, before you go off and build something like the Los Angeles
+telephone switchboard, I encourage you to start simple. Here's a few starter
+questions to consider:
 
 ### What goes in the queue?
 
@@ -658,7 +666,7 @@ distinguish these, and both styles are useful.
 
     This is the natural fit when a queue is part of a class's API. Like in our
     audio example, from the caller's perspective, they just see a
-    `playSound()`method they can call.
+    `playSound()` method they can call.
 
      *  *The queue becomes an implementation detail of the reader.* All the
         sender knows is that it sent a message.
@@ -680,10 +688,10 @@ distinguish these, and both styles are useful.
     This is how most "event" systems work. If you have ten listeners when an
     event comes in, all ten of them see the event.
 
-     *  *Events can get dropped on the floor.* A corollary to the above is that
-        if you have *zero* listeners, all zero of them see the event. In most
-        broadcast systems, if there are no listeners at the point in time that
-        an event is processed, the event just gets discarded.
+     *  *Events can get dropped on the floor.* A corollary to the previous point
+        is that if you have *zero* listeners, all zero of them see the event. In
+        most broadcast systems, if there are no listeners at the point in time
+        that an event is processed, the event just gets discarded.
 
      *  *You may need to filter events.* Broadcast queues are often widely
         visible to much of the program, and you can end up with a bunch of
@@ -806,8 +814,8 @@ enough.
 ## See Also
 
  *  I've mentioned this a few times already, but in many ways, this pattern is
-    the asynchronous cousin to the well-known <a href="observer.html
-    class="gif-pattern">Observer</a> pattern.
+    the asynchronous cousin to the well-known <a href="observer.html"
+    class="gof-pattern">Observer</a> pattern.
 
  *  Like many patterns, event queues go by a number of aliases. One established
     term is "message queue". It's usually referring to a higher level

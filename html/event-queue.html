@@ -292,10 +292,10 @@ reward her for her grisly efficiency. It receives these &#8220;entity died&#8221
 then determines the kind of entity slain and the difficulty of the kill so it
 can dish out an appropriate reward.</p>
 <p>That requires various pieces of state in the world. We need the entity that died
-to see how tough it was. We may want to inspect its surroundings to see what
-other obstacles or minions were nearby. But if the event isn&#8217;t received until
-later, that stuff may be gone. The entity may have been deallocated, and other
-nearby foes may have wandered off.</p>
+so we can see how tough it was. We may want to inspect its surroundings to see
+what other obstacles or minions were nearby. But if the event isn&#8217;t received
+until later, that stuff may be gone. The entity may have been deallocated, and
+other nearby foes may have wandered off.</p>
 <p>When you receive an event, you have to be careful not to assume the <em>current</em>
 state of the world reflects how the world was <em>when the event was raised</em>. This
 means queued events tend to be more data heavy than in synchronous systems. With
@@ -344,7 +344,7 @@ until later.</p>
 play messages. Now, your <span name="prof">algorithms professor</span> would
 tell you to use some exciting data structure here like a <a href="http://en.wikipedia.org/wiki/Fibonacci_heap">Fibonacci
 heap</a> or a <a href="http://en.wikipedia.org/wiki/Skip_list">skip
-list</a>, or, hell at least a <em>linked</em>
+list</a>, or, hell, at least a <em>linked</em>
 list. But, in practice, the best way to store a bunch of homogenous things is
 almost always a plain old array:</p>
 <aside name="prof">
@@ -353,11 +353,17 @@ almost always a plain old array:</p>
 They aren&#8217;t exactly incentivized to stick to the basics.</p>
 </aside>
 
-<ol>
-<li>No dynamic allocation.</li>
-<li>No memory overhead for bookkeeping information or pointers.</li>
-<li><span name="locality">Cache-friendly</span> contiguous memory usage.</li>
-</ol>
+<ul>
+<li>
+<p>No dynamic allocation.</p>
+</li>
+<li>
+<p>No memory overhead for bookkeeping information or pointers.</p>
+</li>
+<li>
+<p><span name="locality">Cache-friendly</span> contiguous memory usage.</p>
+</li>
+</ul>
 <aside name="locality">
 
 <p>For lots more on what being &#8220;cache friendly&#8221; means, see the chapter on <a
@@ -614,7 +620,7 @@ a request if it matches an already pending one:</p>
 
 
 <p>When we get two requests to play the same sound, we collapse them to a single
-request for whichever was loudest. This &#8220;aggregation&#8221; is pretty rudimentary, but
+request for whichever is loudest. This &#8220;aggregation&#8221; is pretty rudimentary, but
 we could use the same idea to do more interesting batching.</p>
 <p>Note that we&#8217;re merging when the request is <em>enqueued</em>, not when it&#8217;s
 <em>processed</em>. That&#8217;s easier on our queue since we don&#8217;t waste slots on redundant
@@ -678,9 +684,14 @@ the details of any specific API or locking mechanism.</p>
 <p>At a high level, all we need to do is ensure that the queue isn&#8217;t modified
 concurrently. Since <code>playSound()</code> does a very small amount of work&#8202;&mdash;&#8202;basically
 just assigning a few fields&#8202;&mdash;&#8202;it can lock without blocking processing for long.
-In <code>update()</code> we wait on something like a condition variable so that we don&#8217;t
+In <code>update()</code>, we wait on something like a condition variable so that we don&#8217;t
 burn CPU cycles until there&#8217;s a request to process.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
+<p>Many games use event queues as a key part of their communication structure, and
+you can spend a ton of time designing all sorts of complex routing and filtering
+for messages. But, before you go off and build something like the Los Angeles
+telephone switchboard, I encourage you to start simple. Here&#8217;s a few starter
+questions to consider:</p>
 <h3><a href="#what-goes-in-the-queue" name="what-goes-in-the-queue">What goes in the queue?</a></h3>
 <p>I&#8217;ve used &#8220;event&#8221; and &#8220;message&#8221; interchangeably so far because it mostly doesn&#8217;t
 matter. You get the same decoupling and aggregation abilities regardless of what
@@ -747,7 +758,7 @@ distinguish these, and both styles are useful.</p>
 <p><strong>A single-cast queue:</strong></p>
 <p>This is the natural fit when a queue is part of a class&#8217;s API. Like in our
 audio example, from the caller&#8217;s perspective, they just see a
-<code>playSound()</code>method they can call.</p>
+<code>playSound()</code> method they can call.</p>
 <ul>
 <li>
 <p><em>The queue becomes an implementation detail of the reader.</em> All the
@@ -774,10 +785,10 @@ behavior you want. With a single listener, that complexity disappears.</p>
 event comes in, all ten of them see the event.</p>
 <ul>
 <li>
-<p><em>Events can get dropped on the floor.</em> A corollary to the above is that
-    if you have <em>zero</em> listeners, all zero of them see the event. In most
-    broadcast systems, if there are no listeners at the point in time that
-    an event is processed, the event just gets discarded.</p>
+<p><em>Events can get dropped on the floor.</em> A corollary to the previous point
+    is that if you have <em>zero</em> listeners, all zero of them see the event. In
+    most broadcast systems, if there are no listeners at the point in time
+    that an event is processed, the event just gets discarded.</p>
 </li>
 <li>
 <p><em>You may need to filter events.</em> Broadcast queues are often widely
@@ -908,8 +919,8 @@ href="object-pool.html" class="pattern">Object Pool</a>.</p>
 <ul>
 <li>
 <p>I&#8217;ve mentioned this a few times already, but in many ways, this pattern is
-    the asynchronous cousin to the well-known <a href="observer.html
-    class="gif-pattern">Observer</a> pattern.</p>
+    the asynchronous cousin to the well-known <a href="observer.html"
+    class="gof-pattern">Observer</a> pattern.</p>
 </li>
 <li>
 <p>Like many patterns, event queues go by a number of aliases. One established
