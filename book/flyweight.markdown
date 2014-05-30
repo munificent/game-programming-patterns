@@ -61,7 +61,7 @@ Note that the stuff in the small boxes is the same for each tree.
 
 </aside>
 
-We carn model that explicitly by splitting the object in half. First, we pull
+We can model that explicitly by splitting the object in half. First, we pull
 out the data that all trees have <span name="type">in common</span> and move it
 into a separate class:
 
