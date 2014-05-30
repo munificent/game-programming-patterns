@@ -76,14 +76,14 @@ namespace DataLocality
     : ai_(ai), physics_(physics), render_(render)
     {}
 
-    AIComponent*      ai()      { return ai_; }
+    AIComponent* ai() { return ai_; }
     PhysicsComponent* physics() { return physics_; }
-    RenderComponent*  render()  { return render_; }
+    RenderComponent* render() { return render_; }
 
   private:
-    AIComponent*      ai_;
+    AIComponent* ai_;
     PhysicsComponent* physics_;
-    RenderComponent*  render_;
+    RenderComponent* render_;
   };
   //^game-entity
 
@@ -179,6 +179,10 @@ namespace DataLocality
   class ParticleSystem
   {
   public:
+    ParticleSystem()
+    : numParticles_(0)
+    {}
+
     void update();
     //^omit particle-system
     void activateParticle(int index);
@@ -187,7 +191,7 @@ namespace DataLocality
   private:
     static const int MAX_PARTICLES = 100000;
 
-    int numParticles_ = 0;
+    int numParticles_;
     Particle particles_[MAX_PARTICLES];
   };
   //^particle-system
@@ -281,8 +285,8 @@ namespace DataLocality
 
     private:
       Animation* animation_;
-      double     energy_;
-      Vector     goalPos_;
+      double energy_;
+      Vector goalPos_;
     };
     //^ai-component
   }
@@ -298,9 +302,9 @@ namespace DataLocality
     private:
       // Previous fields...
       LootType drop_;
-      int      minDrops_;
-      int      maxDrops_;
-      double   chanceOfDrop_;
+      int minDrops_;
+      int maxDrops_;
+      double chanceOfDrop_;
     };
     //^loot-drop
   }
@@ -315,11 +319,11 @@ namespace DataLocality
     public:
       // Methods...
     private:
-      Animation*   animation_;
-      double       energy_;
-      Vector       goalPos_;
+      Animation* animation_;
+      double energy_;
+      Vector goalPos_;
 
-      LootDrop*    loot_;
+      LootDrop* loot_;
     };
 
     class LootDrop

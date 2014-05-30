@@ -3,7 +3,7 @@
 
 ## Intent
 
-*Speed memory access by arranging data to take advantage of CPU caching.*
+*Accelerate memory access by arranging data to take advantage of CPU caching.*
 
 ## Motivation
 
@@ -19,8 +19,8 @@ Chips *have* been getting faster (though even that's plateauing now), but the ha
 
 Processor and RAM speed relative to their respective speeds in 1980. As you can see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.
 
-Data for this is from "Computer architecture: a quantitative approach"
-by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht's "[Pitfalls of Object-Oriented Programming](http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf)".
+Data for this is from *Computer Architecture: A Quantitative Approach*
+by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht's "[Pitfalls of Object-Oriented Programming](http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf)&rdquo;.
 
 </aside>
 
@@ -32,7 +32,7 @@ Actually, they *are* stuck waiting on memory an astonishingly large fraction of 
 
 <aside name="ram">
 
-It's called "Random access memory" because, unlike disc drives, you can theoretically access any piece of it as quick as any other. You don't have to worry about reading things consecutively like you do a disc.
+It's called "random access memory" because, unlike disc drives, you can theoretically access any piece of it as quick as any other. You don't have to worry about reading things consecutively like you do a disc.
 
 Or, at least, you *didn't*. As we'll see, RAM isn't so random access anymore.
 
@@ -123,7 +123,7 @@ Your mileage will vary.
 
 </aside>
 
-This was a real eye-opener to me. I'm used to thinking of performance being an aspect of *code* not *data*. A byte isn't slow or fast, it's just some static thing sitting there. But, because of caching, *the way you organize data directly impacts performance.*
+This was a real eye-opener to me. I'm used to thinking of performance being an aspect of *code*, not *data*. A byte isn't slow or fast, it's just some static thing sitting there. But, because of caching, *the way you organize data directly impacts performance.*
 
 The challenge now is to wrap that up into something that fits into a chapter here. Optimization for cache usage is a huge topic. I haven't even touched on *instruction caching*. Remember, code is in memory too and has to be loaded onto the CPU before it can be executed. Someone more versed on the subject could write an entire <span name="book">book</span> on it.
 
@@ -143,7 +143,8 @@ There's a key assumption here, though: one thread. If you are modifying nearby d
 
 </aside>
 
-In other words, if your code is crunching on `Thing` then `Another` then `Also`, you want them laid out in memory like this:
+In other words, if your code is crunching on `Thing`, then `Another`, then
+`Also`, you want them laid out in memory like this:
 
 <img src="images/data-locality-things.png" />
 
@@ -318,7 +319,7 @@ Having objects in a contiguous array doesn't solve much if the objects we're act
 
 <aside name="branch">
 
-Savvy low-level coders can see another problem here. Doing an `if` check for every particle can cause a *branch misprediction* and a *pipeline stall*. In modern CPUs a single "instruction" actually takes several clock cycles. To keep the CPU busy, instructions are *pipelined* so that the subsequent instructions start processing before the first one finishes.
+Savvy low-level coders can see another problem here. Doing an `if` check for every particle can cause a *branch misprediction* and a *pipeline stall*. In modern CPUs, a single "instruction" actually takes several clock cycles. To keep the CPU busy, instructions are *pipelined* so that the subsequent instructions start processing before the first one finishes.
 
 To do that, the CPU has to guess which instructions it will be executing next. In straight line code, that's easy, but with flow control, it's harder. While it's executing the instructions for that `if`, does it guess that the particle is active and start executing the code for the `update()` call, or does it guess that it isn't?
 
