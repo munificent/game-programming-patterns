@@ -56,7 +56,9 @@ public:
 class LoggedAudio : public Audio
 {
 public:
-  LoggedAudio(Audio &wrapped) : wrapped_(wrapped) {}
+  LoggedAudio(Audio &wrapped)
+  : wrapped_(wrapped)
+  {}
 
   virtual void playSound(int soundID)
   {
