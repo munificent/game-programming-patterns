@@ -8,9 +8,12 @@ namespace Version1
   class Particle
   {
   public:
-    Particle() : framesLeft_(0) {}
+    Particle()
+    : framesLeft_(0)
+    {}
 
-    void init(int x, int y, int xVel, int yVel, int lifetime)
+    void init(double x, double y,
+              double xVel, double yVel, int lifetime)
     {
       x_ = x; y_ = y;
       xVel_ = xVel; yVel_ = yVel;
@@ -19,21 +22,19 @@ namespace Version1
 
     void animate()
     {
-      if (inUse())
-      {
-        framesLeft_--;
+      if (!inUse()) return;
 
-        x_ += xVel_;
-        y_ += yVel_;
-      }
+      framesLeft_--;
+      x_ += xVel_;
+      y_ += yVel_;
     }
 
     bool inUse() const { return framesLeft_ > 0; }
 
   private:
-    int  framesLeft_;
-    int  x_, y_;
-    int  xVel_, yVel_;
+    int framesLeft_;
+    double x_, y_;
+    double xVel_, yVel_;
   };
   //^1
 
@@ -41,7 +42,8 @@ namespace Version1
   class ParticlePool
   {
   public:
-    void create(int x, int y, int xVel, int yVel, int lifetime);
+    void create(double x, double y,
+                double xVel, double yVel, int lifetime);
 
     void animate()
     {
@@ -58,8 +60,8 @@ namespace Version1
   //^2
 
   //^3
-  void ParticlePool::create(int x, int y, int xVel, int yVel,
-                            int lifetime)
+  void ParticlePool::create(double x, double y,
+                            double xVel, double yVel, int lifetime)
   {
     // Find an available particle.
     for (int i = 0; i < POOL_SIZE; i++)
@@ -85,13 +87,19 @@ namespace Temp1
   {
   public:
     //^omit
-    void init(int x, int y, int xVel, int yVel, int lifetime) {}
-    bool animate() { return true; }
+    void init(double x, double y,
+              double xVel, double yVel, int lifetime) {}
+    bool animate();
+    bool inUse() { return false; }
+    double x_;
+    double y_;
+    double xVel_;
+    double yVel_;
     //^omit
     // ...
 
-    Particle *getNext() const { return state_.next; }
-    void setNext(Particle *next) { state_.next = next; }
+    Particle* getNext() const { return state_.next; }
+    void setNext(Particle* next) { state_.next = next; }
 
   private:
     int framesLeft_;
@@ -101,22 +109,36 @@ namespace Temp1
       // State when it's in use.
       struct
       {
-        int  x, y;
-        int  xVel, yVel;
+        double x, y;
+        double xVel, yVel;
       } live;
 
       // State when it's available.
-      Particle *next;
+      Particle* next;
     } state_;
   };
   //^4
+
+  //^particle-animate
+  bool Particle::animate()
+  {
+    if (!inUse()) return false;
+
+    framesLeft_--;
+    x_ += xVel_;
+    y_ += yVel_;
+
+    return framesLeft_ == 0;
+  }
+  //^particle-animate
 
   //^5
   class ParticlePool
   {
     //^omit
     ParticlePool();
-    void create(int x, int y, int xVel, int yVel, int lifetime);
+    void create(double x, double y,
+                double xVel, double yVel, int lifetime);
     void animate();
     //^omit
     // ...
@@ -125,7 +147,7 @@ namespace Temp1
     static const int POOL_SIZE = 100;
     Particle particles_[POOL_SIZE];
     //^omit
-    Particle *firstAvailable_;
+    Particle* firstAvailable_;
   };
   //^5
 
@@ -147,14 +169,14 @@ namespace Temp1
   //^6
 
   //^7
-  void ParticlePool::create(int x, int y, int xVel, int yVel,
-                            int lifetime)
+  void ParticlePool::create(double x, double y,
+                            double xVel, double yVel, int lifetime)
   {
     // Make sure the pool isn't full.
     assert(firstAvailable_ != NULL);
 
     // Remove it from the available list.
-    Particle *newParticle = firstAvailable_;
+    Particle* newParticle = firstAvailable_;
     firstAvailable_ = newParticle->getNext();
 
     newParticle->init(x, y, xVel, yVel, lifetime);
@@ -166,7 +188,6 @@ namespace Temp1
   {
     for (int i = 0; i < POOL_SIZE; i++)
     {
-      // Particle::animate returns true if the particle died.
       if (particles_[i].animate())
       {
         // Add this particle to the front of the list.
@@ -188,7 +209,9 @@ namespace Temp2
     friend class ParticlePool;
 
   private:
-    Particle() : inUse_(false) {}
+    Particle()
+    : inUse_(false)
+    {}
 
     bool inUse_;
   };
@@ -221,22 +244,28 @@ namespace Temp4
   class Particle
   {
     // Multiple ways to initialize.
-    void init(int x, int y);
-    void init(int x, int y, int xVel, int yVel);
-    void init(int x, int y, double direction, double speed);
+    void init(double x, double y);
+    void init(double x, double y, double angle);
+    void init(double x, double y, double xVel, double yVel);
   };
 
   class ParticlePool
   {
   public:
-    void create(int x, int y)
-    { /* forward to Particle... */ }
+    void create(double x, double y)
+    {
+      // Forward to Particle...
+    }
 
-    void create(int x, int y, int xVel, int yVel)
-    { /* forward to Particle... */ }
+    void create(double x, double y, double angle)
+    {
+      // Forward to Particle...
+    }
 
-    void create(int x, int y, double direction, double speed)
-    { /* forward to Particle... */ }
+    void create(double x, double y, double xVel, double yVel)
+    {
+      // Forward to Particle...
+    }
   };
   //^12
 }
@@ -248,15 +277,15 @@ namespace Temp5
   {
   public:
     // Multiple ways to initialize.
-    void init(int x, int y);
-    void init(int x, int y, int xVel, int yVel);
-    void init(int x, int y, double direction, double speed);
+    void init(double x, double y);
+    void init(double x, double y, double angle);
+    void init(double x, double y, double xVel, double yVel);
   };
 
   class ParticlePool
   {
   public:
-    Particle *create()
+    Particle* create()
     {
       // Return reference to available particle...
       //^omit
@@ -276,12 +305,12 @@ namespace Temp5
       ParticlePool pool;
 
       pool.create()->init(1, 2);
-      pool.create()->init(1, 2, 3, 4);
-      pool.create()->init(1, 2, 3.3f, 4.4f);
+      pool.create()->init(1, 2, 0.3);
+      pool.create()->init(1, 2, 3.3, 4.4);
       //^14
 
       //^15
-      Particle *particle = pool.create();
+      Particle* particle = pool.create();
       if (particle != NULL) particle->init(1, 2);
       //^15
     }
