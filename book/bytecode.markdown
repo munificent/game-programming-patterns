@@ -76,7 +76,7 @@ bytes in a file express behavior? There are a few ways to do this. I think it
 will help you get a picture of *this* pattern's strengths and weaknesses if we
 compare it to another one: the <a
 href="http://en.wikipedia.org/wiki/Interpreter_pattern"
-class="gof-pattern">Interpreter pattern</a>.
+class="gof-pattern">Interpreter</a> pattern.
 
 ### The Interpreter pattern
 
@@ -145,8 +145,8 @@ right objects and wire them up correctly.
 <aside name="ruby">
 
 Ruby was implemented like this for something like 15 years. At version 1.9, they
-switched to the kind of bytecode VM this chapter describes. Look how much time
-I'm saving you!
+switched to bytecode like this chapter describes. Look how much time I'm saving
+you!
 
 </aside>
 
@@ -226,10 +226,10 @@ machine code on the fly.
 
 </aside>
 
-We'd call our little emulator a <span name="virtual">*virtual machine*</span>,
-and the synthetic binary machine code it runs *bytecode*. It's got the
-flexibility and ease of use of defining things in data, but better performance
-than higher-level representations like the Interpreter pattern.
+We'd call our little emulator a <span name="virtual">*virtual machine*</span>
+(or "VM" for short), and the synthetic binary machine code it runs *bytecode*.
+It's got the flexibility and ease of use of defining things in data, but better
+performance than higher-level representations like the Interpreter pattern.
 
 <aside name="virtual">
 
@@ -287,7 +287,7 @@ striving to create a virtual space for others to play and be creative in.
 Every time I see someone define a little language or a scripting system, they
 say, "Don't worry, it will be tiny." Then, inevitably, they add more and more
 little features until it's a full-fledged <span name="template">language</span>.
-Except, unlike some other languages, it grew in an ad-hoc organic fashion and
+Except, unlike some other languages, it grew in an ad-hoc, organic fashion and
 has all of the architectural elegance of a shanty town.
 
 <aside name="template">
@@ -324,7 +324,7 @@ It was my first introduction to assembly-like languages.
 Much like the Gang of Four's Interpreter pattern, it's assumed that you also
 have some way to *generate* the bytecode. Usually, users author their behavior
 in some higher level format and a tool translates that to the bytecode that our
-VM understands. In other words, a compiler.
+virtual machine understands. In other words, a compiler.
 
 I know, that sounds scary. That's why I'm mentioning it here. If you don't have
 the resources to build an authoring tool, then bytecode isn't for you. But, as
@@ -379,9 +379,9 @@ a couple for that:
 ^code magic-api
 
 The first parameter identifies which wizard is affected, say `0` for the
-player's and `1` for their opponent. This way, healing spells can affect your
-own wizard, while damaging attacks harm your nemesis. These three little methods
-cover a surprisingly wide variety of magical effects.
+player's and `1` for their opponent. This way, healing spells can affect the
+player's own wizard, while damaging attacks harm their nemesis. These three
+little methods cover a surprisingly wide variety of magical effects.
 
 If the spells just silently tweaked stats, the game logic would be fine, but
 playing it would bore players to tears. Let's fix that:
@@ -397,9 +397,9 @@ enough to get us started.
 Now let's see how we'd turn this *programmatic* API into something that can be
 controlled from data. Let's start small and then we'll work our way up to the
 whole shebang. For now, we'll ditch all of the parameters to these methods.
-We'll say the `set___()` methods always affect your own wizard and always max
-out the stat. Likewise, the FX operations always play a single hard-coded sound
-and particle effect.
+We'll say the `set___()` methods always affect the player's own wizard and
+always max out the stat. Likewise, the FX operations always play a single
+hard-coded sound and particle effect.
 
 Given that, a spell is just a series of instructions. Each one identifies which
 operation you want to perform. We can enumerate them:
@@ -437,8 +437,8 @@ We can wrap this in a little VM that executes an entire spell like so:
 ^code vm
 
 Type that in and you'll have written your first virtual machine. Unfortunately,
-it's not very flexible. We can't define a spell that touches your opponent, or
-lowers a stat. We can only play one sound!
+it's not very flexible. We can't define a spell that touches the player's
+opponent, or lowers a stat. We can only play one sound!
 
 To get something that starts to have the expressive feel of an actual language,
 we need to get parameters in here.
@@ -527,9 +527,10 @@ Finally, it executes `INST_SET_HEALTH`. That pops `10` and stores it in
 `amount`, then pops `0` and stores it in `wizard`. Then it calls `setHealth()`
 with those parameters.
 
-Ta-da! We've got a spell that sets your wizard's health to ten points. Now we've
-got enough flexibility to define spells that set either wizard's stats to
-whatever amounts we want. We can also play different sounds and spawn particles.
+Ta-da! We've got a spell that sets the player's wizard's health to ten points.
+Now we've got enough flexibility to define spells that set either wizard's stats
+to whatever amounts we want. We can also play different sounds and spawn
+particles.
 
 But... this still just feels like a *data* format. We can't, for example, raise
 a wizard's health by half of their wisdom. Our designers want to be able to
@@ -572,8 +573,8 @@ obvious, but we can now handle all sorts of complicated, deeply nested
 arithmetic expressions.
 
 Let's walk through a slightly more complex example. Say we want a spell that
-increases your wizard's health by the average of their agility and wisdom. In
-code, that's:
+increases the player's wizard's health by the average of their agility and
+wisdom. In code, that's:
 
 ^code increase-health
 
@@ -581,8 +582,8 @@ You might think we'd need instructions to handle the explicit grouping that
 parentheses give you in the expression here, but the stack supports that
 implicitly. Here's how you could evaluate this by hand:
 
-1. Get our wizard's current health and remember it.
-1. Get our wizard's agility and remember it.
+1. Get the wizard's current health and remember it.
+1. Get the wizard's agility and remember it.
 2. Do the same for their wisdom.
 3. Get those last two and add them, and remember the result.
 4. Divide that by two and remember the result.
@@ -598,7 +599,7 @@ health is:
     LITERAL 0
     GET_HEALTH
 
-This bit of bytecode pushes our wizard's health onto the stack. If we
+This bit of bytecode pushes the wizard's health onto the stack. If we
 mechanically translate each line like that, we end up with a chunk of bytecode
 that evaluates our original expression. To give you a feel for how the
 instructions compose, I've done that below.
@@ -638,7 +639,7 @@ Maybe my threshold for "magic" is a little too low here.
 I could keep going, adding more and more instructions, but this is a good place
 to stop. As it is, we've got a nice little VM that lets us define fairly
 open-ended behavior using a simple, compact data format. While "bytecode" and
-"virtual machines" sound intimidating, you can see they're often as simple a
+"virtual machines" sound intimidating, you can see they're often as simple as a
 stack, a loop, and a switch statement.
 
 Remember our original goal to have behavior be nicely sandboxed? Now that you've
@@ -679,7 +680,7 @@ That probably sounds way harder than making the VM. Many programmers were
 dragged through a compilers class in college and took away from it nothing but
 PTSD triggered by the sight of a <span name="dragon">book</span> with a dragon
 on the cover or the words "[lex](http://en.wikipedia.org/wiki/Lex_(software))"
-and "[yacc](http://en.wikipedia.org/wiki/Yacc)".
+and "[yacc](http://en.wikipedia.org/wiki/Yacc)&rdquo;.
 
 <aside name="dragon">
 
@@ -691,8 +692,8 @@ niques,_and_Tools).
 
 In truth, compiling a text-based language isn't that bad, though it's a *bit*
 too broad of a topic to cram in here. However, you don't have to do that. What I
-said we need was a *tool* -- it doesn't have to be a compiler whose input format
-is a text file.
+said we need is a *tool* -- it doesn't have to be a *compiler* whose input
+format is a *text file*.
 
 On the contrary, I encourage you to consider building a graphical interface to
 let users define their behavior, especially if the people using it won't be
@@ -1042,7 +1043,7 @@ only option.
 
  *  This pattern's close sister is the Gang of Four's <a
     href="http://en.wikipedia.org/wiki/Interpreter_pattern"
-    class="gof-pattern">Interpreter pattern</a>. Both give you a way to express
+    class="gof-pattern">Interpreter</a> pattern. Both give you a way to express
     composable behavior in terms of data.
 
     In fact, you'll often end up using *both* patterns. The tool you use to

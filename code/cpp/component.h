@@ -72,6 +72,11 @@ namespace Monolithic
   class Bjorn
   {
   public:
+    Bjorn()
+    : velocity_(0),
+      x_(0), y_(0)
+    {}
+
     void update(World& world, Graphics& graphics)
     {
       // Apply user input to hero's velocity.
@@ -95,8 +100,14 @@ namespace Monolithic
 
       // Draw the appropriate sprite.
       Sprite* sprite = &spriteStand_;
-      if (velocity_ < 0) sprite = &spriteWalkLeft_;
-      else if (velocity_ > 0) sprite = &spriteWalkRight_;
+      if (velocity_ < 0)
+      {
+        sprite = &spriteWalkLeft_;
+      }
+      else if (velocity_ > 0)
+      {
+        sprite = &spriteWalkRight_;
+      }
 
       graphics.draw(*sprite, x_, y_);
     }
@@ -181,8 +192,14 @@ namespace SplitAIComponent
 
       // Draw the appropriate sprite.
       Sprite* sprite = &spriteStand_;
-      if (velocity < 0) sprite = &spriteWalkLeft_;
-      else if (velocity > 0) sprite = &spriteWalkRight_;
+      if (velocity < 0)
+      {
+        sprite = &spriteWalkLeft_;
+      }
+      else if (velocity > 0)
+      {
+        sprite = &spriteWalkRight_;
+      }
 
       graphics.draw(*sprite, x, y);
     }
@@ -237,8 +254,14 @@ namespace Components
     void update(Bjorn& bjorn, Graphics& graphics)
     {
       Sprite* sprite = &spriteStand_;
-      if (bjorn.velocity < 0) sprite = &spriteWalkLeft_;
-      else if (bjorn.velocity > 0) sprite = &spriteWalkRight_;
+      if (bjorn.velocity < 0)
+      {
+        sprite = &spriteWalkLeft_;
+      }
+      else if (bjorn.velocity > 0)
+      {
+        sprite = &spriteWalkRight_;
+      }
 
       graphics.draw(*sprite, bjorn.x, bjorn.y);
     }
@@ -288,8 +311,8 @@ namespace ComponentBjorn
     }
 
   private:
-    InputComponent    input_;
-    PhysicsComponent  physics_;
+    InputComponent input_;
+    PhysicsComponent physics_;
     GraphicsComponent graphics_;
   };
   //^7
@@ -389,8 +412,8 @@ namespace AbstractInputBjorn
     }
 
   private:
-    InputComponent*   input_;
-    PhysicsComponent  physics_;
+    InputComponent* input_;
+    PhysicsComponent physics_;
     GraphicsComponent graphics_;
   };
   //^10
@@ -482,8 +505,8 @@ namespace BaseGameObject
     }
 
   private:
-    InputComponent*    input_;
-    PhysicsComponent*  physics_;
+    InputComponent* input_;
+    PhysicsComponent* physics_;
     GraphicsComponent* graphics_;
   };
   //^15
@@ -520,13 +543,13 @@ namespace BaseGameObject
 
 namespace DirectComponentRef
 {
-  class PhysicsComponent
+  class BjornPhysicsComponent
   {
   public:
     bool isOnGround() { return true; }
   };
 
-  class Bjorn
+  class GameObject
   {
   public:
     int velocity;
@@ -534,17 +557,20 @@ namespace DirectComponentRef
   };
 
   //^18
-  class GraphicsComponent
+  class BjornGraphicsComponent
   {
   public:
-    GraphicsComponent(PhysicsComponent* physics)
+    BjornGraphicsComponent(BjornPhysicsComponent* physics)
     : physics_(physics)
     {}
 
-    void Update(Bjorn& bjorn, Graphics& graphics)
+    void Update(GameObject& obj, Graphics& graphics)
     {
       Sprite* sprite;
-      if (!physics_->isOnGround()) sprite = &spriteJump_;
+      if (!physics_->isOnGround())
+      {
+        sprite = &spriteJump_;
+      }
       else
       {
         // Existing graphics code...
@@ -553,11 +579,11 @@ namespace DirectComponentRef
         //^omit
       }
 
-      graphics.draw(*sprite, bjorn.x, bjorn.y);
+      graphics.draw(*sprite, obj.x, obj.y);
     }
 
   private:
-    PhysicsComponent* physics_;
+    BjornPhysicsComponent* physics_;
 
     Sprite spriteStand_;
     Sprite spriteWalkLeft_;

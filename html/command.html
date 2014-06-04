@@ -42,7 +42,7 @@ of software where words can mean anything, a &#8220;client&#8221; is a <em>perso
 you do business with. Last I checked, people can&#8217;t be &#8220;parameterized&#8221;.</p>
 <p>Then, the rest of that sentence is just a list of stuff you could maybe possibly
 use the pattern for. Not very illuminating unless your use case happens to be in
-that list. <em>My</em> pithy tagline the command pattern is:</p>
+that list. <em>My</em> pithy tagline the Command pattern is:</p>
 <p><strong>A command is a <em><span name="latin">reified</span> method call</em>.</strong></p>
 <aside name="latin">
 <p>&#8220;Reify&#8221; comes from the Latin &#8220;res&#8221;, for &#8220;thing&#8221;, with the English suffix
@@ -61,7 +61,7 @@ other words, reflection is a <em>reified type system</em>.</p>
 </aside>
 <p>Both terms mean taking some <span name="reflection"><em>concept</em></span> and turning
 it into a piece of <em>data</em>&#8202;&mdash;&#8202;an object&#8202;&mdash;&#8202;that you can stick in a variable, pass
-to a function, etc. So by saying the command pattern is a &#8220;reified method call&#8221;,
+to a function, etc. So by saying the Command pattern is a &#8220;reified method call&#8221;,
 what I mean is that it&#8217;s a method call wrapped in an object.</p>
 <p>That sounds a lot like a &#8220;callback&#8221;, &#8220;first class function&#8221;, &#8220;function pointer&#8221;,
 &#8220;closure&#8221;, or &#8220;partially applied function&#8221;, depending on which language you&#8217;re
@@ -290,7 +290,7 @@ them a level editor that can&#8217;t undo their fat-fingered mistakes.</p>
 <aside name="hate">
 <p>I may be speaking from experience here.</p>
 </aside>
-<p>Without the command pattern, implementing undo is surprisingly hard. With it,
+<p>Without the Command pattern, implementing undo is surprisingly hard. With it,
 it&#8217;s a piece of cake. Let&#8217;s say we&#8217;re making a single player turn-based game and
 we want to let users undo moves so they can focus more on strategy and less on
 guesswork.</p>
@@ -324,7 +324,7 @@ case, we specifically want to <em>bind</em> it to the unit being moved. An insta
 this command isn&#8217;t a general &#8220;move something&#8221; operation that you could use in a
 bunch of contexts, it&#8217;s a specific concrete move in the game&#8217;s sequence of
 turns.</p>
-<p>This highlights a variation in how the command pattern gets implemented. In some
+<p>This highlights a variation in how the Command pattern gets implemented. In some
 cases, like our first couple of examples, a command is a reusable object that
 represents a <em>thing that can be done</em>. Our earlier input handler held on to a
 single command object and called its <code>execute()</code> method anytime the right button
@@ -416,10 +416,11 @@ that move, we have to remember the unit&#8217;s previous position ourselves, whi
 what <code>xBefore_</code> and <code>yBefore_</code> in the command are.</p>
 <aside name="memento">
 <p>This seems like a place for the <a
-href="http://en.wikipedia.org/wiki/Memento_pattern" class="gof-pattern">Memento
-pattern</a>, but I haven&#8217;t found it to work well. Since commands tend to modify
-only a small part of an object&#8217;s state, snapshotting the rest of its data is a
-waste of memory. It&#8217;s cheaper to just manually store only the bits you change.</p>
+href="http://en.wikipedia.org/wiki/Memento_pattern"
+class="gof-pattern">Memento</a> pattern, but I haven&#8217;t found it to work well.
+Since commands tend to modify only a small part of an object&#8217;s state,
+snapshotting the rest of its data is a waste of memory. It&#8217;s cheaper to just
+manually store only the bits you change.</p>
 <p><a href="http://en.wikipedia.org/wiki/Persistent_data_structure"><em>Persistent data structures</em></a> are another option. With these, every modification to an object returns a new one, leaving the original unchanged. Through clever implementation, these new objects share data with the previous ones, so it&#8217;s much cheaper than cloning the entire object.</p>
 <p>Using this, each command stores a reference to the object before the command was performed, and undo just means switching back to the old object.</p>
 </aside>
@@ -455,9 +456,9 @@ functional programming, you&#8217;re probably wondering where the functions are.
 class functions. Function pointers are stateless, functors are weird and still
 require defining a class, and the lambdas in C++11 are tricky to work with
 because of manual memory management.</p>
-<p>That&#8217;s <em>not</em> to say you shouldn&#8217;t use functions for the command pattern in other
+<p>That&#8217;s <em>not</em> to say you shouldn&#8217;t use functions for the Command pattern in other
 languages. If you have the luxury of a language with real closures, by all means
-use them! In <span name="some">some</span> ways, the command pattern is a way of
+use them! In <span name="some">some</span> ways, the Command pattern is a way of
 emulating closures in languages that don&#8217;t have them.</p>
 <aside name="some">
 <p>I say <em>some</em> ways here because building actual classes or structures for
@@ -499,7 +500,7 @@ unit command just like this:</p>
 
 <p>If you&#8217;re comfortable with a functional style, this way of doing things is
 natural. If you aren&#8217;t, I hope this chapter helped you along the way a bit. For
-me, the usefulness of the command pattern really shows how effective the
+me, the usefulness of the Command pattern really shows how effective the
 functional paradigm is for many problems.</p>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>

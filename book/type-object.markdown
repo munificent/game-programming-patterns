@@ -164,7 +164,7 @@ data we can define at runtime.
 We can create hundreds of different breeds just by instantiating more instances
 of `Breed` with different values. If we create breeds by initializing them from
 data read from some configuration file, we have the ability to define new types
-of monsters completely in data. So easy a designer could do it!
+of monsters completely in data. So easy, a designer could do it!
 
 ## The Pattern
 
@@ -459,16 +459,16 @@ that defines them. It could look like:
 
 We'd have a chunk of code that reads each breed entry and instantiates a new
 breed instance with its data. As you can see from the `"parent": "Troll"`
-fields, the Troll Archer and Troll Wizard breeds inherit from the base Troll
-breed.
+fields, the `Troll Archer` and `Troll Wizard` breeds inherit from the base
+`Troll` breed.
 
 Since both of them have zero for their health, they'll inherit it from the base
-Troll breed instead. This means now our designer can tune the health in Troll
-and all three breeds will be updated. As the number of breeds and the number of
-different attributes each breed has increases, this can be a big time-saver.
-Now, with a pretty small chunk of code, we have an open-ended system that puts
-control in our designer's hands and makes the best use of their time. Meanwhile,
-we can get back to coding other features.
+`Troll` breed instead. This means now our designer can tune the health in
+`Troll` and all three breeds will be updated. As the number of breeds and the
+number of different attributes each breed has increases, this can be a big
+time-saver. Now, with a pretty small chunk of code, we have an open-ended system
+that puts control in our designer's hands and makes the best use of their time.
+Meanwhile, we can get back to coding other features.
 
 ## Design Decisions
 
@@ -485,7 +485,7 @@ leave the far reaches for the academics and explorers.
 
 ### Is the Type Object encapsulated or exposed?
 
-In our sample implementation, `Monster` has a reference to a `Breed`, but it
+In our sample implementation, `Monster` has a reference to a breed, but it
 doesn't publicly expose it. Outside code can't get directly at the monster's
 breed. From the codebase's perspective, monsters are essentially typeless, and
 the fact that they have breeds is an implementation detail.

@@ -666,8 +666,8 @@ Russell and co. managed to create Spacewar! on it.
 
 ## See Also
 
- *  The classic article on game loops is Glenn Fiedler's [Fix Your
-    Timestep](http://gafferongames.com/game-physics/fix-your-timestep/). This
+ *  The classic article on game loops is Glenn Fiedler's ["Fix Your
+    Timestep"](http://gafferongames.com/game-physics/fix-your-timestep/). This
     chapter wouldn't be the same without it.
 
  *  Witters' article on [game
@@ -675,5 +675,6 @@ Russell and co. managed to create Spacewar! on it.
     runner-up.
 
  *  The [Unity](http://unity3d.com/) framework has a complex game loop, detailed
-    in a wonderful illustration [here](http://www.richardfine.co.uk/2012/10/unit
-    y3d-monobehaviour-lifecycle/).
+    in a wonderful illustration [here][unity].
+
+[unity]: http://www.richardfine.co.uk/2012/10/unity3d-monobehaviour-lifecycle/

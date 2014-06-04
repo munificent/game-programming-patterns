@@ -87,7 +87,9 @@ appropriate for that breed.</p>
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="n">Dragon</span><span class="p">()</span> <span class="o">:</span> <span class="n">Monster</span><span class="p">(</span><span class="mi">230</span><span class="p">)</span> <span class="p">{}</span>
-  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span> <span class="p">{</span>
+
+  <span class="k">virtual</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span>
+  <span class="p">{</span>
     <span class="k">return</span> <span class="s">&quot;The dragon breathes fire!&quot;</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">};</span>
@@ -96,7 +98,9 @@ appropriate for that breed.</p>
 <span class="p">{</span>
 <span class="nl">public:</span>
   <span class="n">Troll</span><span class="p">()</span> <span class="o">:</span> <span class="n">Monster</span><span class="p">(</span><span class="mi">48</span><span class="p">)</span> <span class="p">{}</span>
-  <span class="k">virtual</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span> <span class="p">{</span>
+
+  <span class="k">virtual</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span>
+  <span class="p">{</span>
     <span class="k">return</span> <span class="s">&quot;The troll clubs you!&quot;</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">};</span>
@@ -191,7 +195,7 @@ data we can define at runtime.</p>
 <p>We can create hundreds of different breeds just by instantiating more instances
 of <code>Breed</code> with different values. If we create breeds by initializing them from
 data read from some configuration file, we have the ability to define new types
-of monsters completely in data. So easy a designer could do it!</p>
+of monsters completely in data. So easy, a designer could do it!</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>Define a <strong>type object</strong> class and a <strong>typed object</strong> class. Each type object
 instance represents a different logical type. Each typed object stores a
@@ -302,11 +306,11 @@ class:</p>
     <span class="n">attack_</span><span class="p">(</span><span class="n">attack</span><span class="p">)</span>
   <span class="p">{}</span>
 
-  <span class="kt">int</span>         <span class="n">getHealth</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">health_</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kt">int</span> <span class="n">getHealth</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">health_</span><span class="p">;</span> <span class="p">}</span>
   <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">attack_</span><span class="p">;</span> <span class="p">}</span>
 
 <span class="nl">private:</span>
-  <span class="kt">int</span>         <span class="n">health_</span><span class="p">;</span> <span class="c1">// Starting health.</span>
+  <span class="kt">int</span> <span class="n">health_</span><span class="p">;</span> <span class="c1">// Starting health.</span>
   <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">attack_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
@@ -322,7 +326,8 @@ health and the attack string. Let&#8217;s see how monsters use it:</p>
     <span class="n">breed_</span><span class="p">(</span><span class="n">breed</span><span class="p">)</span>
   <span class="p">{}</span>
 
-  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span>
+  <span class="p">{</span>
     <span class="k">return</span> <span class="n">breed_</span><span class="p">.</span><span class="n">getAttack</span><span class="p">();</span>
   <span class="p">}</span>
 
@@ -378,7 +383,7 @@ construct new instances by calling a method on the class object itself.</p>
     <span class="n">breed_</span><span class="p">(</span><span class="n">breed</span><span class="p">)</span>
   <span class="p">{}</span>
 
-  <span class="kt">int</span>    <span class="n">health_</span><span class="p">;</span> <span class="c1">// Current health.</span>
+  <span class="kt">int</span> <span class="n">health_</span><span class="p">;</span> <span class="c1">// Current health.</span>
   <span class="n">Breed</span><span class="o">&amp;</span> <span class="n">breed_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
@@ -539,15 +544,15 @@ that defines them. It could look like:</p>
 
 <p>We&#8217;d have a chunk of code that reads each breed entry and instantiates a new
 breed instance with its data. As you can see from the <code>"parent": "Troll"</code>
-fields, the Troll Archer and Troll Wizard breeds inherit from the base Troll
-breed.</p>
+fields, the <code>Troll Archer</code> and <code>Troll Wizard</code> breeds inherit from the base
+<code>Troll</code> breed.</p>
 <p>Since both of them have zero for their health, they&#8217;ll inherit it from the base
-Troll breed instead. This means now our designer can tune the health in Troll
-and all three breeds will be updated. As the number of breeds and the number of
-different attributes each breed has increases, this can be a big time-saver.
-Now, with a pretty small chunk of code, we have an open-ended system that puts
-control in our designer&#8217;s hands and makes the best use of their time. Meanwhile,
-we can get back to coding other features.</p>
+<code>Troll</code> breed instead. This means now our designer can tune the health in
+<code>Troll</code> and all three breeds will be updated. As the number of breeds and the
+number of different attributes each breed has increases, this can be a big
+time-saver. Now, with a pretty small chunk of code, we have an open-ended system
+that puts control in our designer&#8217;s hands and makes the best use of their time.
+Meanwhile, we can get back to coding other features.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>The Type Object pattern lets us build a type system as if we were designing our
 own programming language. The design space is wide open, and we can do all sorts
@@ -559,7 +564,7 @@ able to easily understand it. The simpler we can make it, the more usable it
 will be. So what we&#8217;ll cover here is the well-trodden design space, and we&#8217;ll
 leave the far reaches for the academics and explorers.</p>
 <h3><a href="#is-the-type-object-encapsulated-or-exposed?" name="is-the-type-object-encapsulated-or-exposed?">Is the Type Object encapsulated or exposed?</a></h3>
-<p>In our sample implementation, <code>Monster</code> has a reference to a <code>Breed</code>, but it
+<p>In our sample implementation, <code>Monster</code> has a reference to a breed, but it
 doesn&#8217;t publicly expose it. Outside code can&#8217;t get directly at the monster&#8217;s
 breed. From the codebase&#8217;s perspective, monsters are essentially typeless, and
 the fact that they have breeds is an implementation detail.</p>

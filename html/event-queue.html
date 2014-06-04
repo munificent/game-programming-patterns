@@ -30,16 +30,28 @@
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Decouple when a message or event is sent from when it is processed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>Unless you live under one of the few rocks that still lack Internet access, you&#8217;ve probably already heard of an <span name="message">&#8220;event queue&#8221;</span>. If not, maybe &#8220;message queue&#8221;, or &#8220;event loop&#8221;, or &#8220;message pump&#8221; rings a bell. To refresh your memory, let&#8217;s walk through a couple of common manifestations of the pattern.</p>
+<p>Unless you live under one of the few rocks that still lack Internet access,
+you&#8217;ve probably already heard of an <span name="message">&#8220;event queue&#8221;</span>.
+If not, maybe &#8220;message queue&#8221;, or &#8220;event loop&#8221;, or &#8220;message pump&#8221; rings a bell.
+To refresh your memory, let&#8217;s walk through a couple of common manifestations of
+the pattern.</p>
 <aside name="message">
-<p>For most of the chapter, I use &#8220;event&#8221; and &#8220;message&#8221; interchangeably. Where the distinction matters, I&#8217;ll make it obvious.</p>
+<p>For most of the chapter, I use &#8220;event&#8221; and &#8220;message&#8221; interchangeably. Where the
+distinction matters, I&#8217;ll make it obvious.</p>
 </aside>
 <h3><a href="#gui-event-loops" name="gui-event-loops">GUI event loops</a></h3>
-<p>If you&#8217;ve ever done any <span name="event-driven">user interface</span> programming, then you&#8217;re well acquainted with <em>events</em>. Every time the user interacts with your program&#8202;&mdash;&#8202;clicks a button, pulls down a menu, or presses a key&#8202;&mdash;&#8202;the operating system generates an event. It throws this object at your app, and your job is to grab it and hook it up to some interesting behavior.</p>
+<p>If you&#8217;ve ever done any <span name="event-driven">user interface</span>
+programming, then you&#8217;re well acquainted with <em>events</em>. Every time the user
+interacts with your program&#8202;&mdash;&#8202;clicks a button, pulls down a menu, or presses a
+key&#8202;&mdash;&#8202;the operating system generates an event. It throws this object at your
+app, and your job is to grab it and hook it up to some interesting behavior.</p>
 <aside name="event-driven">
-<p>This application style is so common, it&#8217;s considered a paradigm: <a href="http://en.wikipedia.org/wiki/Event-driven_programming"><em>event-driven programming</em></a>.</p>
+<p>This application style is so common, it&#8217;s considered a paradigm: <a
+href="http://en.wikipedia.org/wiki/Event-driven_programming"><em>event-driven
+programming</em></a>.</p>
 </aside>
-<p>In order to receive these missives, somewhere deep in the bowels of your code is an <em>event loop</em>. It looks roughly like this:</p>
+<p>In order to receive these missives, somewhere deep in the bowels of your code is
+an <em>event loop</em>. It looks roughly like this:</p>
 <div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="n">running</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">Event</span> <span class="n">event</span> <span class="o">=</span> <span class="n">getNextEvent</span><span class="p">();</span>
@@ -48,34 +60,79 @@
 </pre></div>
 
 
-<p>The call to <code>getNextEvent()</code> pulls a bit of unprocessed user input into your app. You route it to an event handler and, like magic, your application comes to life. The interesting part is that the application <em>pulls</em> in the event when <em>it</em> wants it. The operating system doesn&#8217;t just immediately <span name="interrupt">jump</span> to some code in your app when the user pokes a peripheral.</p>
+<p>The call to <code>getNextEvent()</code> pulls a bit of unprocessed user input into your
+app. You route it to an event handler and, like magic, your application comes to
+life. The interesting part is that the application <em>pulls</em> in the event when
+<em>it</em> wants it. The operating system doesn&#8217;t just immediately <span
+name="interrupt">jump</span> to some code in your app when the user pokes a
+peripheral.</p>
 <aside name="interrupt">
-<p>In contrast, <em>interrupts</em> from the operating system <em>do</em> work like that. When an interrupt happens, the OS stops whatever your app was doing and forces it to jump to an interrupt handler. This abruptness is why interrupts are so hard to work with.</p>
+<p>In contrast, <em>interrupts</em> from the operating system <em>do</em> work like that. When an
+interrupt happens, the OS stops whatever your app was doing and forces it to
+jump to an interrupt handler. This abruptness is why interrupts are so hard to
+work with.</p>
 </aside>
-<p>That means when user input comes in, it needs to go somewhere so that the operating system doesn&#8217;t lose it between when the device driver reported the input and when your app gets around to calling <code>getNextEvent()</code>. That &#8220;somewhere&#8221; is a <em>queue</em>.</p>
+<p>That means when user input comes in, it needs to go somewhere so that the
+operating system doesn&#8217;t lose it between when the device driver reported the
+input and when your app gets around to calling <code>getNextEvent()</code>. That
+&#8220;somewhere&#8221; is a <em>queue</em>.</p>
 <p><img src="images/event-queue-loop.png" /></p>
-<p>When user input comes in, the OS adds it to a queue of unprocessed events. When you call <code>getNextEvent()</code>, it pulls the oldest event off the queue and hands it to your application.</p>
+<p>When user input comes in, the OS adds it to a queue of unprocessed events. When
+you call <code>getNextEvent()</code>, it pulls the oldest event off the queue and hands it
+to your application.</p>
 <h3><a href="#central-event-bus" name="central-event-bus">Central event bus</a></h3>
-<p>Most <span name="game-loop">games</span> aren&#8217;t event-driven like this, but it is common for a game to have its own event queue as the backbone of its nervous system. You&#8217;ll often hear &#8220;central&#8221; or &#8220;global&#8221; or &#8220;main&#8221; used to describe it. It&#8217;s used for high level communication between game systems that want to stay decoupled.</p>
+<p>Most <span name="game-loop">games</span> aren&#8217;t event-driven like this, but it
+is common for a game to have its own event queue as the backbone of its nervous
+system. You&#8217;ll often hear &#8220;central&#8221; or &#8220;global&#8221; or &#8220;main&#8221; used to describe it.
+It&#8217;s used for high level communication between game systems that want to stay
+decoupled.</p>
 <aside name="game-loop">
-<p>If you want to know <em>why</em> they aren&#8217;t, crack open the <a href="game-loop.html" class="pattern">Game Loop</a> chapter.</p>
+<p>If you want to know <em>why</em> they aren&#8217;t, crack open the <a href="game-loop.html"
+class="pattern">Game Loop</a> chapter.</p>
 </aside>
-<p>Say your game has a <span name="tutorial">tutorial</span> system to display help boxes after specific in-game events. For example, the first time the player vanquishes a foul beastie, you want to show a little balloon that says, &#8220;Press X to grab the loot!&#8221;</p>
+<p>Say your game has a <span name="tutorial">tutorial</span> system to display help
+boxes after specific in-game events. For example, the first time the player
+vanquishes a foul beastie, you want to show a little balloon that says, &#8220;Press X
+to grab the loot!&#8221;</p>
 <aside name="tutorial">
-<p>Tutorial systems are a pain to implement gracefully and most players will spend only a fraction of their time using it, so it feels like they aren&#8217;t worth the effort. But that fraction where they <em>are</em> using the tutorial can be invaluable for easing the player into your game.</p>
+<p>Tutorial systems are a pain to implement gracefully and most players will spend
+only a fraction of their time using it, so it feels like they aren&#8217;t worth the
+effort. But that fraction where they <em>are</em> using the tutorial can be invaluable
+for easing the player into your game.</p>
 </aside>
-<p>Your gameplay and combat code are likely complex enough as it is. The last thing you want to do is stuff a bunch of checks for triggering tutorials in there. Instead, some games have a central event queue. Any game system can send to it, so the combat code can add an &#8220;enemy died&#8221; event every time you slay a foe.</p>
-<p><span name="blackboard">Likewise</span>, any game system can <em>receive</em> events from the queue. The tutorial engine registers itself with the queue and indicates it wants to receive &#8220;enemy died&#8221; events. This way, knowledge of an enemy dying makes its way from the combat system over to the tutorial engine without the two being directly aware of each other.</p>
+<p>Your gameplay and combat code are likely complex enough as it is. The last thing
+you want to do is stuff a bunch of checks for triggering tutorials in there.
+Instead, some games have a central event queue. Any game system can send to it,
+so the combat code can add an &#8220;enemy died&#8221; event every time you slay a foe.</p>
+<p><span name="blackboard">Likewise</span>, any game system can <em>receive</em> events
+from the queue. The tutorial engine registers itself with the queue and
+indicates it wants to receive &#8220;enemy died&#8221; events. This way, knowledge of an
+enemy dying makes its way from the combat system over to the tutorial engine
+without the two being directly aware of each other.</p>
 <aside name="blackboard">
-<p>This model where you have a shared space that entities can post information to and get notified by is similar to <a href="http://en.wikipedia.org/wiki/Blackboard_system">blackboard systems</a> in the AI field.</p>
+<p>This model where you have a shared space that entities can post information to
+and get notified by is similar to <a
+href="http://en.wikipedia.org/wiki/Blackboard_system">blackboard systems</a> in
+the AI field.</p>
 </aside>
 <p><img src="images/event-queue-central.png" /></p>
-<p>I thought about using this as the example for the rest of the chapter, but I&#8217;m not generally a fan of global systems. It is a common technique, but I don&#8217;t want you to think that event queues <em>have</em> to be global.</p>
+<p>I thought about using this as the example for the rest of the chapter, but I&#8217;m
+not generally a fan of global systems. It is a common technique, but I don&#8217;t
+want you to think that event queues <em>have</em> to be global.</p>
 <h3><a href="#say-what?" name="say-what?">Say what?</a></h3>
-<p>Instead, let&#8217;s add sound to our game. Humans are mainly visual animals, but hearing is deeply connected to our emotions and our sense of physical space. The right simulated echo can make a black screen feel like an enormous cavern, and a well-timed violin adagio can make your heartstrings hum in sympathetic resonance.</p>
-<p>To get our game wound for sound, we&#8217;ll start with the simplest possible approach and see how it goes. We&#8217;ll add a little <span name="singleton">&#8220;audio engine&#8221;</span> that has an API for playing a sound given an identifier and a volume:</p>
+<p>Instead, let&#8217;s add sound to our game. Humans are mainly visual animals, but
+hearing is deeply connected to our emotions and our sense of physical space. The
+right simulated echo can make a black screen feel like an enormous cavern, and a
+well-timed violin adagio can make your heartstrings hum in sympathetic
+resonance.</p>
+<p>To get our game wound for sound, we&#8217;ll start with the simplest possible approach
+and see how it goes. We&#8217;ll add a little <span name="singleton">&#8220;audio
+engine&#8221;</span> that has an API for playing a sound given an identifier and a
+volume:</p>
 <aside name="singleton">
-<p>While I almost always shy away from the <a href="singleton.html" class="gof-pattern">Singleton</a> pattern, this is one of the places where it may fit. I&#8217;m doing a simpler approach and just making the method static.</p>
+<p>While I almost always shy away from the <a href="singleton.html"
+class="gof-pattern">Singleton</a> pattern, this is one of the places where it
+may fit. I&#8217;m doing a simpler approach and just making the method static.</p>
 </aside>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Audio</span>
 <span class="p">{</span>
@@ -85,7 +142,10 @@
 </pre></div>
 
 
-<p>It&#8217;s responsible for loading the appropriate sound resource, finding an available channel to play it on, and starting it up. This chapter isn&#8217;t about some platform&#8217;s real audio API, so I&#8217;ll conjure one up that we can presume is implemented elsewhere. Using it, we write our method like so:</p>
+<p>It&#8217;s responsible for loading the appropriate sound resource, finding an
+available channel to play it on, and starting it up. This chapter isn&#8217;t about
+some platform&#8217;s real audio API, so I&#8217;ll conjure one up that we can presume is
+implemented elsewhere. Using it, we write our method like so:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Audio</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">id</span><span class="p">,</span> <span class="kt">int</span> <span class="n">volume</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">ResourceId</span> <span class="n">resource</span> <span class="o">=</span> <span class="n">loadSound</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
@@ -96,7 +156,9 @@
 </pre></div>
 
 
-<p>We check that in, create a few sound files, and start sprinkling <code>playSound()</code> calls through our codebase like some magical audio fairy. For example, in our UI code, when the selected menu item changes, we play a little bloop:</p>
+<p>We check that in, create a few sound files, and start sprinkling <code>playSound()</code>
+calls through our codebase like some magical audio fairy. For example, in our UI
+code, when the selected menu item changes, we play a little bloop:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Menu</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -109,65 +171,147 @@
 </pre></div>
 
 
-<p>After doing this, we notice that sometimes when you switch menu items, the whole screen freezes for a few frames. We&#8217;ve hit our first issue:</p>
+<p>After doing this, we notice that sometimes when you switch menu items, the whole
+screen freezes for a few frames. We&#8217;ve hit our first issue:</p>
 <ul>
-<li><strong>Problem 1: The API blocks the caller until the audio engine has completely processed the request.</strong></li>
+<li><strong>Problem 1: The API blocks the caller until the audio engine has completely
+    processed the request.</strong></li>
 </ul>
-<p>Our <code>playSound()</code> method is <em>synchronous</em>&#8202;&mdash;&#8202;it doesn&#8217;t return back to the caller until bleeps are coming out of the speakers. If a sound file has to be loaded from disc first, that may take a while.</p>
-<p>Ignoring that for now, we move on. In the AI code, we add a call to let out a wail of anguish when an enemy takes damage from the player. Nothing warms a gamer&#8217;s heart like inflicting simulated pain on a virtual living being.</p>
-<p>It works, but sometimes when the hero does a mighty attack, it hits two enemies in the exact same frame. That causes the game to play the wail sound twice simultaneously. <span name="hatsworth">If</span> you know anything about audio, you know mixing multiple sounds together sums their waveforms. When those are the <em>same</em> waveform, it&#8217;s the same as <em>one</em> sound played <em>twice as loud</em>. It&#8217;s jarringly loud.</p>
+<p>Our <code>playSound()</code> method is <em>synchronous</em>&#8202;&mdash;&#8202;it doesn&#8217;t return back to the
+caller until bleeps are coming out of the speakers. If a sound file has to be
+loaded from disc first, that may take a while.</p>
+<p>Ignoring that for now, we move on. In the AI code, we add a call to let out a
+wail of anguish when an enemy takes damage from the player. Nothing warms a
+gamer&#8217;s heart like inflicting simulated pain on a virtual living being.</p>
+<p>It works, but sometimes when the hero does a mighty attack, it hits two enemies
+in the exact same frame. That causes the game to play the wail sound twice
+simultaneously. <span name="hatsworth">If</span> you know anything about audio,
+you know mixing multiple sounds together sums their waveforms. When those are
+the <em>same</em> waveform, it&#8217;s the same as <em>one</em> sound played <em>twice as loud</em>. It&#8217;s
+jarringly loud.</p>
 <aside name="hatsworth">
-<p>I ran into this exact issue working on <a href="http://en.wikipedia.org/wiki/Henry_Hatsworth_in_the_Puzzling_Adventure">Henry Hatsworth in the Puzzling Adventure</a>. My solution there is similar to what we&#8217;ll cover here.</p>
+<p>I ran into this exact issue working on <a href="http://en.wikipedia.org/wiki/Hen
+ry_Hatsworth_in_the_Puzzling_Adventure">Henry Hatsworth in the Puzzling
+Adventure</a>. My solution there is similar to what we&#8217;ll cover here.</p>
 </aside>
-<p>We have a related problem in boss fights when piles of minions are running around causing mayhem. The hardware can only play so many sounds at one time. When we go over that limit, sounds get ignored or cut off.</p>
-<p>To handle these issues, we need to look at the entire <em>set</em> of sound calls to aggregate and prioritize them. Unfortunately, our audio API handles each <code>playSound()</code> call independently. It sees requests through a pinhole, one at a time.</p>
+<p>We have a related problem in boss fights when piles of minions are running
+around causing mayhem. The hardware can only play so many sounds at one time.
+When we go over that limit, sounds get ignored or cut off.</p>
+<p>To handle these issues, we need to look at the entire <em>set</em> of sound calls to
+aggregate and prioritize them. Unfortunately, our audio API handles each
+<code>playSound()</code> call independently. It sees requests through a pinhole, one at a
+time.</p>
 <ul>
 <li><strong>Problem 2: Requests cannot be processed in aggregate.</strong></li>
 </ul>
-<p>These problems seem like mere annoyances compared to the next issue that falls in our lap. By now, we&#8217;ve strewn <code>playSound()</code> calls throughout the codebase in lots of different game systems. But our game engine is running on modern multi-core hardware. To take advantage of those cores, we distribute those systems on different threads&#8202;&mdash;&#8202;rendering on one, AI on another, etc.</p>
-<p>Since our API is synchronous, it runs on the <em>caller&#8217;s</em> thread. When we call it from different game systems, we&#8217;re hitting our API concurrently from multiple threads. Look at that sample code. See any thread synchronization? Me neither.</p>
-<p>This is particularly egregious because we intended to have a <em>separate</em> thread for audio. It&#8217;s just sitting there totally idle while these other threads are busy stepping all over each other and breaking things.</p>
+<p>These problems seem like mere annoyances compared to the next issue that falls
+in our lap. By now, we&#8217;ve strewn <code>playSound()</code> calls throughout the codebase in
+lots of different game systems. But our game engine is running on modern
+multi-core hardware. To take advantage of those cores, we distribute those
+systems on different threads&#8202;&mdash;&#8202;rendering on one, AI on another, etc.</p>
+<p>Since our API is synchronous, it runs on the <em>caller&#8217;s</em> thread. When we call it
+from different game systems, we&#8217;re hitting our API concurrently from multiple
+threads. Look at that sample code. See any thread synchronization? Me neither.</p>
+<p>This is particularly egregious because we intended to have a <em>separate</em> thread
+for audio. It&#8217;s just sitting there totally idle while these other threads are
+busy stepping all over each other and breaking things.</p>
 <ul>
 <li><strong>Problem 3: Requests are processed on the wrong thread.</strong></li>
 </ul>
-<p>The common theme to these problems is that the audio engine interprets a call to <code>playSound()</code> to mean, &#8220;Drop everything and play the sound right now!&#8221; <em>Immediacy</em> is the problem. Other game systems call <code>playSound()</code> at <em>their</em> convenience, but not necessarily when it&#8217;s convenient for the audio engine to handle that request. To fix that, we&#8217;ll decouple <em>receiving</em> a request from <em>processing</em> it.</p>
+<p>The common theme to these problems is that the audio engine interprets a call to
+<code>playSound()</code> to mean, &#8220;Drop everything and play the sound right now!&#8221;
+<em>Immediacy</em> is the problem. Other game systems call <code>playSound()</code> at <em>their</em>
+convenience, but not necessarily when it&#8217;s convenient for the audio engine to
+handle that request. To fix that, we&#8217;ll decouple <em>receiving</em> a request from
+<em>processing</em> it.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
-<p>A <strong>queue</strong> stores a series of <strong>notifications or requests</strong> in first-in, first-out order. Sending a notification <strong>enqueues the request and returns</strong>. The request processor then <strong>processes items from the queue</strong> at a later time.</p>
-<p>Requests can be <strong>handled directly</strong>, or <strong>routed to interested parties</strong>. This <strong>decouples the sender from the receiver</strong> both <strong>statically</strong> and <strong>in time</strong>.</p>
+<p>A <strong>queue</strong> stores a series of <strong>notifications or requests</strong> in first-in,
+first-out order. Sending a notification <strong>enqueues the request and returns</strong>.
+The request processor then <strong>processes items from the queue</strong> at a later time.</p>
+<p>Requests can be <strong>handled directly</strong>, or <strong>routed to interested parties</strong>. This
+<strong>decouples the sender from the receiver</strong> both <strong>statically</strong> and <strong>in time</strong>.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
-<p>If you just want to decouple <em>who</em> receives a message from its sender, patterns like <href="observer.html" class="pattern">Observer</a> and <a href="command.html">Command</a> will take care of you with less <span name="simple">complexity</span>. You only need a queue when you want to decouple something <em>in time</em>.</p>
+<p>If you just want to decouple <em>who</em> receives a message from its sender, patterns
+like <a href="observer.html">Observer</a> and <a href="command.html">Command</a>
+will take care of you with less <span name="simple">complexity</span>. You only
+need a queue when you want to decouple something <em>in time</em>.</p>
 <aside name="simple">
-<p>I mention this in nearly every chapter, but it&#8217;s worth emphasizing. Complexity slows you down, so treat simplicity as a precious resource.</p>
+<p>I mention this in nearly every chapter, but it&#8217;s worth emphasizing. Complexity
+slows you down, so treat simplicity as a precious resource.</p>
 </aside>
-<p>I think of it in terms of pushing and pulling. You have some code A that wants another chunk B to do some work. The natural way for A to initiate that is by <em>pushing</em> the request to B.</p>
-<p>Meanwhile, the natural way for B to process that request is by <em>pulling</em> it in at a convenient time in <em>its</em> run cycle. When you have a push model on one end and a pull model on the other, you need a buffer between them. That&#8217;s what a queue provides that simpler decoupling patterns don&#8217;t.</p>
-<p>Queues give control to the code that pulls from it: the receiver can delay processing, aggregate requests, or discard them entirely. But it does this by taking control <em>away</em> from the sender. All it can do is throw a request on the queue and hope for the best. This makes queues a poor fit when the sender needs a response.</p>
+<p>I think of it in terms of pushing and pulling. You have some code A that wants
+another chunk B to do some work. The natural way for A to initiate that is by
+<em>pushing</em> the request to B.</p>
+<p>Meanwhile, the natural way for B to process that request is by <em>pulling</em> it in
+at a convenient time in <em>its</em> run cycle. When you have a push model on one end
+and a pull model on the other, you need a buffer between them. That&#8217;s what a
+queue provides that simpler decoupling patterns don&#8217;t.</p>
+<p>Queues give control to the code that pulls from it: the receiver can delay
+processing, aggregate requests, or discard them entirely. But it does this by
+taking control <em>away</em> from the sender. All it can do is throw a request on the
+queue and hope for the best. This makes queues a poor fit when the sender needs
+a response.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
-<p>Unlike some more modest patterns in this book, event queues are complex and tend to have a wide-reaching effect on the architecture of our games. That means you&#8217;ll want to think hard about how&#8202;&mdash;&#8202;or if&#8202;&mdash;&#8202;you use it.</p>
+<p>Unlike some more modest patterns in this book, event queues are complex and tend
+to have a wide-reaching effect on the architecture of our games. That means
+you&#8217;ll want to think hard about how&#8202;&mdash;&#8202;or if&#8202;&mdash;&#8202;you use it.</p>
 <h3><a href="#a-central-event-queue-is-a-global-variable" name="a-central-event-queue-is-a-global-variable">A central event queue is a global variable</a></h3>
-<p>One common use of this pattern is for a sort of Grand Central Station that all parts of the game can route messages through. It&#8217;s a powerful piece of infrastructure, but <em>powerful</em> doesn&#8217;t always mean <em>good</em>.</p>
-<p>It took a while, but most of us learned the hard way that global variables are bad. When you have a piece of state that any part of the program can poke at, all sorts of subtle interdependencies creep in. This pattern wraps that state in a nice little protocol, but it&#8217;s still a global, with all of the danger that entails.</p>
+<p>One common use of this pattern is for a sort of Grand Central Station that all
+parts of the game can route messages through. It&#8217;s a powerful piece of
+infrastructure, but <em>powerful</em> doesn&#8217;t always mean <em>good</em>.</p>
+<p>It took a while, but most of us learned the hard way that global variables are
+bad. When you have a piece of state that any part of the program can poke at,
+all sorts of subtle interdependencies creep in. This pattern wraps that state in
+a nice little protocol, but it&#8217;s still a global, with all of the danger that
+entails.</p>
 <h3><a href="#the-state-of-the-world-can-change-under-you" name="the-state-of-the-world-can-change-under-you">The state of the world can change under you</a></h3>
-<p>Say some AI code posts an &#8220;entity died&#8221; event to a queue when a virtual minion shuffles off its mortal coil. That event hangs out in the queue for who knows how many frames until it eventually works its way to the front and gets processed.</p>
-<p>Meanwhile, the experience system wants to track the heroine&#8217;s body count and reward her for her grisly efficiency. It receives these &#8220;entity died&#8221; events then determines the kind of entity slain and the difficulty of the kill so it can dish out an appropriate reward.</p>
-<p>That requires various pieces of state in the world. We need the entity that died to see how tough it was. We may want to inspect its surroundings to see what other obstacles or minions were nearby. But if the event isn&#8217;t received until later, that stuff may be gone. The entity may have been deallocated, and other nearby foes may have wandered off.</p>
-<p>When you receive an event, you have to be careful not to assume the <em>current</em> state of the world reflects how the world was <em>when the event was raised</em>. This means queued events tend to be more data heavy than in synchronous systems. With the latter, the notification can just say &#8220;something happened&#8221; and the receiver can look around for the details. With a queue, those ephemeral details must be captured when the event is sent so they can be used later.</p>
+<p>Say some AI code posts an &#8220;entity died&#8221; event to a queue when a virtual minion
+shuffles off its mortal coil. That event hangs out in the queue for who knows
+how many frames until it eventually works its way to the front and gets
+processed.</p>
+<p>Meanwhile, the experience system wants to track the heroine&#8217;s body count and
+reward her for her grisly efficiency. It receives these &#8220;entity died&#8221; events
+then determines the kind of entity slain and the difficulty of the kill so it
+can dish out an appropriate reward.</p>
+<p>That requires various pieces of state in the world. We need the entity that died
+so we can see how tough it was. We may want to inspect its surroundings to see
+what other obstacles or minions were nearby. But if the event isn&#8217;t received
+until later, that stuff may be gone. The entity may have been deallocated, and
+other nearby foes may have wandered off.</p>
+<p>When you receive an event, you have to be careful not to assume the <em>current</em>
+state of the world reflects how the world was <em>when the event was raised</em>. This
+means queued events tend to be more data heavy than in synchronous systems. With
+the latter, the notification can just say &#8220;something happened&#8221; and the receiver
+can look around for the details. With a queue, those ephemeral details must be
+captured when the event is sent so they can be used later.</p>
 <h3><a href="#you-can-get-stuck-in-feedback-loops" name="you-can-get-stuck-in-feedback-loops">You can get stuck in feedback loops</a></h3>
 <p>All event and message systems have to worry about cycles:</p>
 <ol>
 <li>A sends an event.</li>
 <li>B receives it and responds by sending an event.</li>
-<li>That event happens to be one that A cares about, so it receives it. In response, it sends an event&#8230;</li>
+<li>That event happens to be one that A cares about, so it receives it. In
+    response, it sends an event&#8230;</li>
 <li>Go to 2.</li>
 </ol>
-<p>When your messaging system is <em>synchronous</em>, you find cycles quickly: they overflow the stack and crash your game. With a queue, the asynchrony unwinds the stack, so the game may keep running even though spurious events are <span name="log">sloshing</span> back and forth in there. A common rule to avoid this is to avoid sending events from within an event handler.</p>
+<p>When your messaging system is <em>synchronous</em>, you find cycles quickly: they
+overflow the stack and crash your game. With a queue, the asynchrony unwinds the
+stack, so the game may keep running even though spurious events are <span
+name="log">sloshing</span> back and forth in there. A common rule to avoid this
+is to avoid sending events from within an event handler.</p>
 <aside name="log">
 <p>A little debug logging in your event system is probably a good idea too.</p>
 </aside>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
-<p>We&#8217;ve already seen some code. It&#8217;s not perfect, but it has the right basic functionality: the public API we want, and the right low level audio calls. All that&#8217;s left for us to do now is fix its problems.</p>
-<p>The first is that our API <em>blocks</em>. When a piece of code plays a sound, it can&#8217;t do anything else until <code>playSound()</code> finishes loading the resource and actually starts making the speaker wiggle.</p>
-<p>We want to defer that work until later so that <code>playSound()</code> can return quickly. To do that, we need to <em>reify</em> the request to play a sound. We need a little structure that stores the details of a pending request so we can keep it around until later.</p>
+<p>We&#8217;ve already seen some code. It&#8217;s not perfect, but it has the right basic
+functionality: the public API we want, and the right low level audio calls. All
+that&#8217;s left for us to do now is fix its problems.</p>
+<p>The first is that our API <em>blocks</em>. When a piece of code plays a sound, it can&#8217;t
+do anything else until <code>playSound()</code> finishes loading the resource and actually
+starts making the speaker wiggle.</p>
+<p>We want to defer that work until later so that <code>playSound()</code> can return quickly.
+To do that, we need to <em>reify</em> the request to play a sound. We need a little
+structure that stores the details of a pending request so we can keep it around
+until later.</p>
 <div class="codehilite"><pre><span class="k">struct</span> <span class="n">PlayMessage</span>
 <span class="p">{</span>
   <span class="n">SoundId</span> <span class="n">id</span><span class="p">;</span>
@@ -176,17 +320,31 @@
 </pre></div>
 
 
-<p>Next, we need to give <code>Audio</code> some storage space to keep track of these pending play messages. Now, your <span name="prof">algorithms professor</span> would tell you to use some exciting data structure here like a <a href="http://en.wikipedia.org/wiki/Fibonacci_heap">Fibonacci heap</a> or a <a href="http://en.wikipedia.org/wiki/Skip_list">skip list</a>, or, hell at least a <em>linked</em> list. But, in practice, the best way to store a bunch of homogenous things is almost always a plain old array:</p>
+<p>Next, we need to give <code>Audio</code> some storage space to keep track of these pending
+play messages. Now, your <span name="prof">algorithms professor</span> would
+tell you to use some exciting data structure here like a <a href="http://en.wikipedia.org/wiki/Fibonacci_heap">Fibonacci
+heap</a> or a <a href="http://en.wikipedia.org/wiki/Skip_list">skip
+list</a>, or, hell, at least a <em>linked</em>
+list. But, in practice, the best way to store a bunch of homogenous things is
+almost always a plain old array:</p>
 <aside name="prof">
-<p>Algorithm researchers get paid to publish analyses of novel data structures. They aren&#8217;t exactly incentivized to stick to the basics.</p>
+<p>Algorithm researchers get paid to publish analyses of novel data structures.
+They aren&#8217;t exactly incentivized to stick to the basics.</p>
 </aside>
-<ol>
-<li>No dynamic allocation.</li>
-<li>No memory overhead for bookkeeping information or pointers.</li>
-<li><span name="locality">Cache-friendly</span> contiguous memory usage.</li>
-</ol>
+<ul>
+<li>
+<p>No dynamic allocation.</p>
+</li>
+<li>
+<p>No memory overhead for bookkeeping information or pointers.</p>
+</li>
+<li>
+<p><span name="locality">Cache-friendly</span> contiguous memory usage.</p>
+</li>
+</ul>
 <aside name="locality">
-<p>For lots more on what being &#8220;cache friendly&#8221; means, see the chapter on <a href="data-locality.html" class="pattern">Data Locality</a>.</p>
+<p>For lots more on what being &#8220;cache friendly&#8221; means, see the chapter on <a
+href="data-locality.html" class="pattern">Data Locality</a>.</p>
 </aside>
 <p>So let&#8217;s do that:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Audio</span>
@@ -207,7 +365,8 @@
 </pre></div>
 
 
-<p>We can tune the array size to cover our worst case. To play a sound, we just slot a new message in there at the end:</p>
+<p>We can tune the array size to cover our worst case. To play a sound, we just
+slot a new message in there at the end:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Audio</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">id</span><span class="p">,</span> <span class="kt">int</span> <span class="n">volume</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">assert</span><span class="p">(</span><span class="n">numPending_</span> <span class="o">&lt;</span> <span class="n">MAX_PENDING</span><span class="p">);</span>
@@ -219,7 +378,9 @@
 </pre></div>
 
 
-<p>This lets <code>playSound()</code> return almost instantly, but we do still have to play the sound, of course. That code needs to go somewhere, and that somewhere is an <code>update()</code> method:</p>
+<p>This lets <code>playSound()</code> return almost instantly, but we do still have to play
+the sound, of course. That code needs to go somewhere, and that somewhere is an
+<code>update()</code> method:</p>
 <p><span name="update"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Audio</span>
 <span class="p">{</span>
@@ -243,25 +404,45 @@
 
 
 <aside name="update">
-<p>As the name implies, this is the <a href="update-method.html" class="pattern">Update Method</a> pattern.</p>
+<p>As the name implies, this is the <a href="update-method.html"
+class="pattern">Update Method</a> pattern.</p>
 </aside>
-<p>Now we just need to call that from somewhere convenient. What &#8220;convenient&#8221; means depends on your game. It may mean calling it from the main <a href="game-loop.html" class="pattern">Game Loop</a>, or from a dedicated audio thread.</p>
-<p>This works fine, but it does presume we can process <em>every</em> sound request in a single call to <code>update()</code>. If you&#8217;re doing something like processing a request asynchronously after its sound resource is loaded, that won&#8217;t work. For <code>update()</code> to work on one request at a time, it needs to be able to pull requests out of the buffer while leaving the rest. In other words, we need an actual queue.</p>
+<p>Now we just need to call that from somewhere convenient. What &#8220;convenient&#8221; means
+depends on your game. It may mean calling it from the main <a
+href="game-loop.html" class="pattern">Game Loop</a>, or from a dedicated audio
+thread.</p>
+<p>This works fine, but it does presume we can process <em>every</em> sound request in a
+single call to <code>update()</code>. If you&#8217;re doing something like processing a request
+asynchronously after its sound resource is loaded, that won&#8217;t work. For
+<code>update()</code> to work on one request at a time, it needs to be able to pull
+requests out of the buffer while leaving the rest. In other words, we need an
+actual queue.</p>
 <h3><a href="#a-ring-buffer" name="a-ring-buffer">A ring buffer</a></h3>
-<p>There are a bunch of ways to implement queues, but my favorite is called a <em>ring buffer</em>. It preserves everything that&#8217;s great about arrays, but lets us incrementally remove items from the front of the queue.</p>
-<p>Now, I know what you&#8217;re thinking. If we remove items from the beginning of the array, don&#8217;t we have to shift all of the remaining items over? Isn&#8217;t that slow?</p>
-<p>This is why they made us learn linked lists: you can remove nodes from them without having to shift things around. Well, it turns out you can implement a queue without any shifting in an array too. I&#8217;ll walk you through it, but first let&#8217;s get precise on some terms.</p>
+<p>There are a bunch of ways to implement queues, but my favorite is called a <em>ring
+buffer</em>. It preserves everything that&#8217;s great about arrays, but lets us
+incrementally remove items from the front of the queue.</p>
+<p>Now, I know what you&#8217;re thinking. If we remove items from the beginning of the
+array, don&#8217;t we have to shift all of the remaining items over? Isn&#8217;t that slow?</p>
+<p>This is why they made us learn linked lists: you can remove nodes from them
+without having to shift things around. Well, it turns out you can implement a
+queue without any shifting in an array too. I&#8217;ll walk you through it, but first
+let&#8217;s get precise on some terms.</p>
 <ul>
 <li>
-<p>The <strong>head</strong> of the queue is where requests are <em>read</em> from. The head is the oldest pending request.</p>
+<p>The <strong>head</strong> of the queue is where requests are <em>read</em> from. The head is the
+    oldest pending request.</p>
 </li>
 <li>
-<p>The <strong>tail</strong> is the other end. It&#8217;s the slot in the array where the next enqueued request will be <em>written</em>. Note that it&#8217;s just <em>past</em> the end of the queue. You can think of it as a half-open range if that helps.</p>
+<p>The <strong>tail</strong> is the other end. It&#8217;s the slot in the array where the next
+    enqueued request will be <em>written</em>. Note that it&#8217;s just <em>past</em> the end of
+    the queue. You can think of it as a half-open range if that helps.</p>
 </li>
 </ul>
-<p>Since <code>playSound()</code> appends new requests at the end of the array, the head starts at element zero and the tail grows to the right.</p>
+<p>Since <code>playSound()</code> appends new requests at the end of the array, the head
+starts at element zero and the tail grows to the right.</p>
 <p><img src="images/event-queue-queue.png" /></p>
-<p>Let&#8217;s code that up. First, we&#8217;ll tweak our fields a bit to make these two markers explicit in the class:</p>
+<p>Let&#8217;s code that up. First, we&#8217;ll tweak our fields a bit to make these two
+markers explicit in the class:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Audio</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -281,7 +462,8 @@
 </pre></div>
 
 
-<p>In the implementation of <code>playSound()</code>, <code>numPending_</code> has been replaced by <code>tail_</code>, but otherwise it&#8217;s the same:</p>
+<p>In the implementation of <code>playSound()</code>, <code>numPending_</code> has been replaced by
+<code>tail_</code>, but otherwise it&#8217;s the same:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Audio</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">id</span><span class="p">,</span> <span class="kt">int</span> <span class="n">volume</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">assert</span><span class="p">(</span><span class="n">tail_</span> <span class="o">&lt;</span> <span class="n">MAX_PENDING</span><span class="p">);</span>
@@ -310,18 +492,31 @@
 </pre></div>
 
 
-<p>We process the request at the head and then discard it by advancing the head pointer to the right. We detect an <span name="empty">empty queue</span> by seeing if there&#8217;s any distance between the head and tail.</p>
+<p>We process the request at the head and then discard it by advancing the head
+pointer to the right. We detect an <span name="empty">empty queue</span> by
+seeing if there&#8217;s any distance between the head and tail.</p>
 <aside name="empty">
-<p>This is why we made the tail one <em>past</em> the last item. It means that the queue will be empty if the head and tail are the same index.</p>
+<p>This is why we made the tail one <em>past</em> the last item. It means that the queue
+will be empty if the head and tail are the same index.</p>
 </aside>
-<p>Now we&#8217;ve got a queue&#8202;&mdash;&#8202;we can add to the end and remove from the front. There&#8217;s an obvious problem, though. As we run requests through the queue, the head and tail keep crawling to the right. Eventually, <code>tail_</code> will hit the end of the array and <span name="party">party time</span> is over. This is where it gets clever.</p>
+<p>Now we&#8217;ve got a queue&#8202;&mdash;&#8202;we can add to the end and remove from the front.
+There&#8217;s an obvious problem, though. As we run requests through the queue, the
+head and tail keep crawling to the right. Eventually, <code>tail_</code> will hit the end
+of the array and <span name="party">party time</span> is over. This is where it
+gets clever.</p>
 <aside name="party">
 <p>Do you want party time to be over? No. You do not.</p>
 </aside>
 <p><img src="images/event-queue-crawl.png" /></p>
-<p>Notice that while the tail is creeping forward, the <em>head</em> is too. That means we&#8217;ve got array elements at the <em>beginning</em> of the array that aren&#8217;t being used any more. So what we do is wrap the tail back around to the beginning of the array when it runs off the end. That&#8217;s why it&#8217;s called a <em>ring</em> buffer: it acts like a circular array of cells.</p>
+<p>Notice that while the tail is creeping forward, the <em>head</em> is too. That means
+we&#8217;ve got array elements at the <em>beginning</em> of the array that aren&#8217;t being used
+any more. So what we do is wrap the tail back around to the beginning of the
+array when it runs off the end. That&#8217;s why it&#8217;s called a <em>ring</em> buffer: it acts
+like a circular array of cells.</p>
 <p><img src="images/event-queue-ring.png" /></p>
-<p>Implementing that is remarkably easy. When we enqueue an item, we just need to make sure the tail wraps around to the beginning of the array when it reaches the end:</p>
+<p>Implementing that is remarkably easy. When we enqueue an item, we just need to
+make sure the tail wraps around to the beginning of the array when it reaches
+the end:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Audio</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">id</span><span class="p">,</span> <span class="kt">int</span> <span class="n">volume</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">assert</span><span class="p">((</span><span class="n">tail_</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">MAX_PENDING</span> <span class="o">!=</span> <span class="n">head_</span><span class="p">);</span>
@@ -334,7 +529,13 @@
 </pre></div>
 
 
-<p>Replacing <code>tail_++</code> with an increment modulo the array size wraps it back around. The other change is the assertion. We need to ensure the queue doesn&#8217;t overflow. As long as there are fewer than <code>MAX_PENDING</code> requests in the queue, there will be a little gap of unused cells between the head and tail. If the queue fills up, those will be gone and, like some weird backwards Ouroboros, the tail will collide with the head and start overwriting it. The assertion ensures that doesn&#8217;t happen.</p>
+<p>Replacing <code>tail_++</code> with an increment modulo the array size wraps it back
+around. The other change is the assertion. We need to ensure the queue doesn&#8217;t
+overflow. As long as there are fewer than <code>MAX_PENDING</code> requests in the queue,
+there will be a little gap of unused cells between the head and tail. If the
+queue fills up, those will be gone and, like some weird backwards Ouroboros, the
+tail will collide with the head and start overwriting it. The assertion ensures
+that doesn&#8217;t happen.</p>
 <p>In <code>update()</code>, we wrap the head around too:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Audio</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>
 <span class="p">{</span>
@@ -351,13 +552,20 @@
 </pre></div>
 
 
-<p>There you go: a queue with <span name="capacity">no dynamic allocation</span>, no copying elements around, and the cache-friendliness of a simple array.</p>
+<p>There you go: a queue with <span name="capacity">no dynamic allocation</span>,
+no copying elements around, and the cache-friendliness of a simple array.</p>
 <aside name="capacity">
-<p>If the maximum capacity bugs you, you can use a growable array. When the queue gets full, allocate a new array twice the size of the current array (or some other multiple), then copy the items over.</p>
-<p>Even though you copy when they array grows, enqueuing an item still has constant <em>amortized</em> complexity.</p>
+<p>If the maximum capacity bugs you, you can use a growable array. When the queue
+gets full, allocate a new array twice the size of the current array (or some
+other multiple), then copy the items over.</p>
+<p>Even though you copy when they array grows, enqueuing an item still has constant
+<em>amortized</em> complexity.</p>
 </aside>
 <h3><a href="#aggregating-requests" name="aggregating-requests">Aggregating requests</a></h3>
-<p>Now that we&#8217;ve got a queue in place, we can move onto the other problems. The first is that multiple requests to play the same sound end up too loud. Since we know which requests are waiting to be processed now, all we need to do is merge a request if it matches an already pending one:</p>
+<p>Now that we&#8217;ve got a queue in place, we can move onto the other problems. The
+first is that multiple requests to play the same sound end up too loud. Since we
+know which requests are waiting to be processed now, all we need to do is merge
+a request if it matches an already pending one:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Audio</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">id</span><span class="p">,</span> <span class="kt">int</span> <span class="n">volume</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Walk the pending requests.</span>
@@ -379,20 +587,47 @@
 </pre></div>
 
 
-<p>When we get two requests to play the same sound, we collapse them to a single request for whichever was loudest. This &#8220;aggregation&#8221; is pretty rudimentary, but we could use the same idea to do more interesting batching.</p>
-<p>Note that we&#8217;re merging when the request is <em>enqueued</em>, not when it&#8217;s <em>processed</em>. That&#8217;s easier on our queue since we don&#8217;t waste slots on redundant requests that will end up being collapsed later. It&#8217;s also simpler to implement.</p>
-<p>It does, however, put the processing burden on the caller. A call to <code>playSound()</code> will walk the entire queue before it returns, which could be <span name="slow">slow</span> if the queue is large. It may make more sense to aggregate in <code>update()</code> instead.</p>
+<p>When we get two requests to play the same sound, we collapse them to a single
+request for whichever is loudest. This &#8220;aggregation&#8221; is pretty rudimentary, but
+we could use the same idea to do more interesting batching.</p>
+<p>Note that we&#8217;re merging when the request is <em>enqueued</em>, not when it&#8217;s
+<em>processed</em>. That&#8217;s easier on our queue since we don&#8217;t waste slots on redundant
+requests that will end up being collapsed later. It&#8217;s also simpler to implement.</p>
+<p>It does, however, put the processing burden on the caller. A call to
+<code>playSound()</code> will walk the entire queue before it returns, which could be <span
+name="slow">slow</span> if the queue is large. It may make more sense to
+aggregate in <code>update()</code> instead.</p>
 <aside name="slow">
-<p>Another way to avoid the <em>O(n)</em> cost of scanning the queue is to use a different data structure. If we use a hash table keyed on the <code>SoundId</code>, then we can check for duplicates in constant time.</p>
+<p>Another way to avoid the <em>O(n)</em> cost of scanning the queue is to use a different
+data structure. If we use a hash table keyed on the <code>SoundId</code>, then we can check
+for duplicates in constant time.</p>
 </aside>
-<p>There&#8217;s something important to keep in mind here. The window of &#8220;simultaneous&#8221; requests that we can aggregate is only as big as the queue. If we process requests more quickly and the queue size stays small, then we&#8217;ll have fewer opportunities to batch things together. Likewise, if processing lags behind and the queue gets full, we&#8217;ll find more things to collapse.</p>
-<p>This pattern insulates the requester from knowing when the request gets processed, but when you treat the entire queue as a live data structure to be played with, then lag between request and processing can visibly affect behavior. Make sure you&#8217;re OK with that before doing this.</p>
+<p>There&#8217;s something important to keep in mind here. The window of &#8220;simultaneous&#8221;
+requests that we can aggregate is only as big as the queue. If we process
+requests more quickly and the queue size stays small, then we&#8217;ll have fewer
+opportunities to batch things together. Likewise, if processing lags behind and
+the queue gets full, we&#8217;ll find more things to collapse.</p>
+<p>This pattern insulates the requester from knowing when the request gets
+processed, but when you treat the entire queue as a live data structure to be
+played with, then lag between request and processing can visibly affect
+behavior. Make sure you&#8217;re OK with that before doing this.</p>
 <h3><a href="#spanning-threads" name="spanning-threads">Spanning threads</a></h3>
-<p>Finally, the most pernicious problem. With our synchronous audio API, whatever thread called <code>playSound()</code> was the thread that processed the request. That&#8217;s often not what we want.</p>
-<p>On today&#8217;s <span name="multicore">multi-core</span> hardware, you need more than one thread if you want to get the most out of your chip. There are infinite ways to distribute code across threads, but a common strategy is to move each domain of the game onto its own thread&#8202;&mdash;&#8202;audio, rendering, AI, etc.</p>
+<p>Finally, the most pernicious problem. With our synchronous audio API, whatever
+thread called <code>playSound()</code> was the thread that processed the request. That&#8217;s
+often not what we want.</p>
+<p>On today&#8217;s <span name="multicore">multi-core</span> hardware, you need more than
+one thread if you want to get the most out of your chip. There are infinite ways
+to distribute code across threads, but a common strategy is to move each domain
+of the game onto its own thread&#8202;&mdash;&#8202;audio, rendering, AI, etc.</p>
 <aside name="multicore">
-<p>Straight-line code only runs on a single core at a time. If you don&#8217;t use threads, even if you do the asynchronous-style programming that&#8217;s in vogue, the best you&#8217;ll do is keep one core busy, which is a fraction of your CPU&#8217;s abilities.</p>
-<p>Server programmers compensate for that by splitting their application into multiple independent <em>processes</em>. That lets the OS run them concurrently on different cores. Games are almost always a single process, so a bit of threading really helps.</p>
+<p>Straight-line code only runs on a single core at a time. If you don&#8217;t use
+threads, even if you do the asynchronous-style programming that&#8217;s in vogue, the
+best you&#8217;ll do is keep one core busy, which is a fraction of your CPU&#8217;s
+abilities.</p>
+<p>Server programmers compensate for that by splitting their application into
+multiple independent <em>processes</em>. That lets the OS run them concurrently on
+different cores. Games are almost always a single process, so a bit of threading
+really helps.</p>
 </aside>
 <p>We&#8217;re in good shape to do that now that we have three critical pieces:</p>
 <ol>
@@ -406,38 +641,71 @@
 <p>The queue is encapsulated from the rest of the program.</p>
 </li>
 </ol>
-<p>All that&#8217;s left is to make the methods that modify the queue&#8202;&mdash;&#8202;<code>playSound()</code> and <code>update()</code>&#8202;&mdash;&#8202;thread-safe. Normally, I&#8217;d whip up some concrete code to do that, but since this is a book about architecture, I don&#8217;t want to get mired in the details of any specific API or locking mechanism.</p>
-<p>At a high level, all we need to do is ensure that the queue isn&#8217;t modified concurrently. Since <code>playSound()</code> does a very small amount of work&#8202;&mdash;&#8202;basically just assigning a few fields&#8202;&mdash;&#8202;it can lock without blocking processing for long. In <code>update()</code> we wait on something like a condition variable so that we don&#8217;t burn CPU cycles until there&#8217;s a request to process.</p>
+<p>All that&#8217;s left is to make the methods that modify the queue&#8202;&mdash;&#8202;<code>playSound()</code>
+and <code>update()</code>&#8202;&mdash;&#8202;thread-safe. Normally, I&#8217;d whip up some concrete code to do
+that, but since this is a book about architecture, I don&#8217;t want to get mired in
+the details of any specific API or locking mechanism.</p>
+<p>At a high level, all we need to do is ensure that the queue isn&#8217;t modified
+concurrently. Since <code>playSound()</code> does a very small amount of work&#8202;&mdash;&#8202;basically
+just assigning a few fields&#8202;&mdash;&#8202;it can lock without blocking processing for long.
+In <code>update()</code>, we wait on something like a condition variable so that we don&#8217;t
+burn CPU cycles until there&#8217;s a request to process.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
+<p>Many games use event queues as a key part of their communication structure, and
+you can spend a ton of time designing all sorts of complex routing and filtering
+for messages. But, before you go off and build something like the Los Angeles
+telephone switchboard, I encourage you to start simple. Here&#8217;s a few starter
+questions to consider:</p>
 <h3><a href="#what-goes-in-the-queue?" name="what-goes-in-the-queue?">What goes in the queue?</a></h3>
-<p>I&#8217;ve used &#8220;event&#8221; and &#8220;message&#8221; interchangeably so far because it mostly doesn&#8217;t matter. You get the same decoupling and aggregation abilities regardless of what you&#8217;re stuffing in the queue.</p>
+<p>I&#8217;ve used &#8220;event&#8221; and &#8220;message&#8221; interchangeably so far because it mostly doesn&#8217;t
+matter. You get the same decoupling and aggregation abilities regardless of what
+you&#8217;re stuffing in the queue.</p>
 <ul>
 <li>
 <p><strong>If you queue events:</strong></p>
-<p>An &#8220;event&#8221; or &#8220;notification&#8221; describes something that <em>already</em> happened, like &#8220;monster died&#8221;. You queue it so that other objects can <em>respond</em> to the event, sort of like an asynchronous <a href="observer.html" class="gof-pattern">Observer pattern</a>.</p>
+<p>An &#8220;event&#8221; or &#8220;notification&#8221; describes something that <em>already</em> happened,
+like &#8220;monster died&#8221;. You queue it so that other objects can <em>respond</em> to the
+event, sort of like an asynchronous <a href="observer.html"
+class="gof-pattern">Observer</a> pattern.</p>
 <ul>
 <li>
-<p><em>You are likely to allow multiple listeners.</em> Since the queue contains things that already happened, the sender probably doesn&#8217;t care who receives it. From its perspective, the event is in the past and is already forgotten.</p>
+<p><em>You are likely to allow multiple listeners.</em> Since the queue contains
+    things that already happened, the sender probably doesn&#8217;t care who
+    receives it. From its perspective, the event is in the past and is
+    already forgotten.</p>
 </li>
 <li>
-<p><em>The scope of the queue tends to be broader.</em> Event queues are often used to <em>broadcast</em> events to any and all interested parties. To allow maximum flexibility for which parties can be interested, these queues tend to be more globally visible.</p>
+<p><em>The scope of the queue tends to be broader.</em> Event queues are often
+    used to <em>broadcast</em> events to any and all interested parties. To allow
+    maximum flexibility for which parties can be interested, these queues
+    tend to be more globally visible.</p>
 </li>
 </ul>
 </li>
 <li>
 <p><strong>If you queue messages:</strong></p>
-<p>A <span name="command">&#8220;message&#8221;</href="observer.html"> or &#8220;request&#8221; describes an action that we <em>want</em> to happen <em>in the future</em>, like &#8220;play sound&#8221;. You can think of this as an asynchronous API to a service.</p>
+<p>A <span name="command">&#8220;message&#8221;</href="observer.html"> or &#8220;request&#8221;
+describes an action that we <em>want</em> to happen <em>in the future</em>, like &#8220;play
+sound&#8221;. You can think of this as an asynchronous API to a service.</p>
 <aside name="command">
 
-<p>Another word for &#8220;request&#8221; is &#8220;command&#8221;, as in the <a href="command.html" class="gof-pattern">Command pattern</a>, and queues can be used there too.</p>
+<p>Another word for &#8220;request&#8221; is &#8220;command&#8221;, as in the <a href="command.html"
+class="gof-pattern">Command</a> pattern, and queues can be used there too.</p>
 </aside>
 
 <ul>
 <li>
-<p><em>You are more <span name="locator">likely</span> to have a single listener.</em> In the example, the queued messages are requests specifically for <em>the audio API</em> to play a sound. If other random parts of the game engine started stealing messages off the queue, it wouldn&#8217;t do much good.</p>
+<p><em>You are more <span name="locator">likely</span> to have a single
+    listener.</em> In the example, the queued messages are requests specifically
+    for <em>the audio API</em> to play a sound. If other random parts of the game
+    engine started stealing messages off the queue, it wouldn&#8217;t do much
+    good.</p>
 <aside name="locator">
 
-<p>I say &#8220;more likely&#8221; here, because you can enqueue messages without caring which code processes it, as long as it gets processed <em>how</em> you expect. In that case, you&#8217;re doing something akin to a <a href="service-locator.html" class="pattern">Service Locator</a>.</p>
+<p>I say &#8220;more likely&#8221; here, because you can enqueue messages without
+caring which code processes it, as long as it gets processed <em>how</em> you
+expect. In that case, you&#8217;re doing something akin to a <a
+href="service-locator.html" class="pattern">Service Locator</a>.</p>
 </aside>
 
 </li>
@@ -445,84 +713,136 @@
 </li>
 </ul>
 <h3><a href="#who-can-read-from-the-queue?" name="who-can-read-from-the-queue?">Who can read from the queue?</a></h3>
-<p>In our example, the queue is encapsulated and only the <code>Audio</code> class can read from it. In a user interface&#8217;s event system, you can register listeners to your heart&#8217;s content. You sometimes hear the terms &#8220;single-cast&#8221; and &#8220;broadcast&#8221; to distinguish these, and both styles are useful.</p>
+<p>In our example, the queue is encapsulated and only the <code>Audio</code> class can read
+from it. In a user interface&#8217;s event system, you can register listeners to your
+heart&#8217;s content. You sometimes hear the terms &#8220;single-cast&#8221; and &#8220;broadcast&#8221; to
+distinguish these, and both styles are useful.</p>
 <ul>
 <li>
 <p><strong>A single-cast queue:</strong></p>
-<p>This is the natural fit when a queue is part of a class&#8217;s API. Like in our audio example, from the caller&#8217;s perspective, they just see a <code>playSound()</code>method they can call.</p>
+<p>This is the natural fit when a queue is part of a class&#8217;s API. Like in our
+audio example, from the caller&#8217;s perspective, they just see a
+<code>playSound()</code> method they can call.</p>
 <ul>
 <li>
-<p><em>The queue becomes an implementation detail of the reader.</em> All the sender knows is that it sent a message.</p>
+<p><em>The queue becomes an implementation detail of the reader.</em> All the
+    sender knows is that it sent a message.</p>
 </li>
 <li>
-<p><em>The queue is more encapsulated.</em> All other things being equal, more  encapsulation is usually better.</p>
+<p><em>The queue is more encapsulated.</em> All other things being equal, more
+    encapsulation is usually better.</p>
 </li>
 <li>
-<p><em>You don&#8217;t have to worry about contention between listeners.</em> With multiple listeners, you have to decide if they <em>all</em> get every item (broadcast) or if <em>each</em> item in the queue is parcelled out to <em>one</em> listener (something more like a work queue).</p>
-<p>In either case, the listeners may end up doing redundant work or interfere with each other, and you have to think carefully about the behavior you want. With a single listener, that complexity disappears.</p>
+<p><em>You don&#8217;t have to worry about contention between listeners.</em> With
+    multiple listeners, you have to decide if they <em>all</em> get every item
+    (broadcast) or if <em>each</em> item in the queue is parcelled out to <em>one</em>
+    listener (something more like a work queue).</p>
+<p>In either case, the listeners may end up doing redundant work or
+interfere with each other, and you have to think carefully about the
+behavior you want. With a single listener, that complexity disappears.</p>
 </li>
 </ul>
 </li>
 <li>
 <p><strong>A broadcast queue:</strong></p>
-<p>This is how most &#8220;event&#8221; systems work. If you have ten listeners when an event comes in, all ten of them see the event.</p>
+<p>This is how most &#8220;event&#8221; systems work. If you have ten listeners when an
+event comes in, all ten of them see the event.</p>
 <ul>
 <li>
-<p><em>Events can get dropped on the floor.</em> A corollary to the above is that if you have <em>zero</em> listeners, all zero of them see the event. In most broadcast systems, if there are no listeners at the point in time that an event is processed, the event just gets discarded.</p>
+<p><em>Events can get dropped on the floor.</em> A corollary to the previous point
+    is that if you have <em>zero</em> listeners, all zero of them see the event. In
+    most broadcast systems, if there are no listeners at the point in time
+    that an event is processed, the event just gets discarded.</p>
 </li>
 <li>
-<p><em>You may need to filter events.</em> Broadcast queues are often widely visible to much of the program, and you can end up with a bunch of listeners. Multiply lots of events times lots of listeners, and you end up with a ton of event handlers to invoke.</p>
-<p>To cut that down to size, most broadcast event systems let a listener winnow down the set of events they receive. For example, they may say they only want to receive mouse events, or events within a certain region of the UI.</p>
+<p><em>You may need to filter events.</em> Broadcast queues are often widely
+    visible to much of the program, and you can end up with a bunch of
+    listeners. Multiply lots of events times lots of listeners, and you end
+    up with a ton of event handlers to invoke.</p>
+<p>To cut that down to size, most broadcast event systems let a listener
+winnow down the set of events they receive. For example, they may say
+they only want to receive mouse events, or events within a certain
+region of the UI.</p>
 </li>
 </ul>
 </li>
 <li>
 <p><strong>A work queue:</strong></p>
-<p>Like a broadcast queue, here you have multiple listeners too. The difference is that each item in the queue only goes to <em>one</em> of them. This is a common pattern for parcelling out jobs to a pool of concurrently running threads.</p>
+<p>Like a broadcast queue, here you have multiple listeners too. The difference
+is that each item in the queue only goes to <em>one</em> of them. This is a common
+pattern for parcelling out jobs to a pool of concurrently running threads.</p>
 <ul>
-<li><em>You have to schedule.</em> Since an item only goes to one listener, the queue needs logic to figure out the best one to choose. This may be as simple as round robin or random choice, or some more complex prioritizing system.</li>
+<li><em>You have to schedule.</em> Since an item only goes to one listener, the
+    queue needs logic to figure out the best one to choose. This may be as
+    simple as round robin or random choice, or some more complex
+    prioritizing system.</li>
 </ul>
 </li>
 </ul>
 <h3><a href="#who-can-write-to-the-queue?" name="who-can-write-to-the-queue?">Who can write to the queue?</a></h3>
-<p>This is the flip side of the previous design choice. This pattern works with all of the possible read/write <span name="configs">configurations</span>: one-to-one, one-to-many, many-to-one, or many-to-many.</p>
+<p>This is the flip side of the previous design choice. This pattern works with all
+of the possible read/write <span name="configs">configurations</span>:
+one-to-one, one-to-many, many-to-one, or many-to-many.</p>
 <aside name="configs">
-<p>You sometimes hear &#8220;fan-in&#8221; used to describe many-to-one communication systems, and &#8220;fan-out&#8221; for one-to-many.</p>
+<p>You sometimes hear &#8220;fan-in&#8221; used to describe many-to-one communication systems,
+and &#8220;fan-out&#8221; for one-to-many.</p>
 </aside>
 <ul>
 <li>
 <p><strong>With one writer:</strong></p>
-<p>This style is most similar to the synchronous Observer pattern. You have one privileged object that generates events that others can then receive.</p>
+<p>This style is most similar to the synchronous Observer pattern. You have one
+privileged object that generates events that others can then receive.</p>
 <ul>
 <li>
-<p><em>You implicitly know where the event is coming from.</em> Since there&#8217;s only one object that can add to the queue, any listener can safely assume that&#8217;s the sender.</p>
+<p><em>You implicitly know where the event is coming from.</em> Since there&#8217;s only
+    one object that can add to the queue, any listener can safely assume
+    that&#8217;s the sender.</p>
 </li>
 <li>
-<p><em>You usually allow multiple readers.</em> You can have a one-sender-one-receiver queue, but that starts to feel less like the communication system this pattern is about and more a vanilla queue data structure.</p>
+<p><em>You usually allow multiple readers.</em> You can have a
+    one-sender-one-receiver queue, but that starts to feel less like the
+    communication system this pattern is about and more a vanilla queue data
+    structure.</p>
 </li>
 </ul>
 </li>
 <li>
 <p><strong>With multiple writers:</strong></p>
-<p>This is how our audio engine example works. Since <code>playSound()</code> is a public method, any part of the codebase can add a request to the queue. &#8220;Global&#8221; or &#8220;central&#8221; event buses work like this too.</p>
+<p>This is how our audio engine example works. Since <code>playSound()</code> is a public
+method, any part of the codebase can add a request to the queue. &#8220;Global&#8221; or
+&#8220;central&#8221; event buses work like this too.</p>
 <ul>
 <li>
-<p><strong>You have to be more careful of cycles.</strong> Since anything can potentially put something onto the queue, it&#8217;s easier to accidentally enqueue something in the middle of handling an event. If you aren&#8217;t careful, that may trigger a feedback loop.</p>
+<p><strong>You have to be more careful of cycles.</strong> Since anything can
+    potentially put something onto the queue, it&#8217;s easier to accidentally
+    enqueue something in the middle of handling an event. If you aren&#8217;t
+    careful, that may trigger a feedback loop.</p>
 </li>
 <li>
 <p><strong>You&#8217;ll likely want some reference to the sender in the event itself.</strong>
-When a listener gets an event, it doesn&#8217;t know who sent it, since it could be anyone. If that&#8217;s something they need to know, you&#8217;ll want to pack that into the event object so that the listener can use it.</p>
+    When a listener gets an event, it doesn&#8217;t know who sent it, since it
+    could be anyone. If that&#8217;s something they need to know, you&#8217;ll want to
+    pack that into the event object so that the listener can use it.</p>
 </li>
 </ul>
 </li>
 </ul>
 <h3><a href="#what-is-the-lifetime-of-the-objects-in-the-queue?" name="what-is-the-lifetime-of-the-objects-in-the-queue?">What is the lifetime of the objects in the queue?</a></h3>
-<p>With a synchronous notification, execution doesn&#8217;t return to the sender until all of the receivers have finished processing the message. That means the message itself can safely live in a local variable on the stack. With a queue, the message outlives the call that enqueues it.</p>
-<p>If you&#8217;re using a garbage collected language, you don&#8217;t need to worry about this too much. Stuff the message in the queue and it will stick around in memory as long as it&#8217;s needed. In C or C++, it&#8217;s up to you to ensure the object lives long enough.</p>
+<p>With a synchronous notification, execution doesn&#8217;t return to the sender until
+all of the receivers have finished processing the message. That means the
+message itself can safely live in a local variable on the stack. With a queue,
+the message outlives the call that enqueues it.</p>
+<p>If you&#8217;re using a garbage collected language, you don&#8217;t need to worry about this
+too much. Stuff the message in the queue and it will stick around in memory as
+long as it&#8217;s needed. In C or C++, it&#8217;s up to you to ensure the object lives long
+enough.</p>
 <ul>
 <li>
 <p><strong>Pass ownership:</strong></p>
-<p>This is the <span name="unique">traditional</span> way to do things when managing memory manually. When a message gets queued, the queue claims it and the sender no longer owns it. When it gets processed, the receiver takes ownership and is responsible for deallocating it.</p>
+<p>This is the <span name="unique">traditional</span> way to do things when
+managing memory manually. When a message gets queued, the queue claims it
+and the sender no longer owns it. When it gets processed, the receiver takes
+ownership and is responsible for deallocating it.</p>
 <aside name="unique">
 
 <p>In C++, <code>unique_ptr&lt;T&gt;</code> gives you these exact semantics out of the box.</p>
@@ -531,7 +851,10 @@ When a listener gets an event, it doesn&#8217;t know who sent it, since it could
 </li>
 <li>
 <p><strong>Share ownership:</strong></p>
-<p>These days, now that even C++ programmers are more comfortable with garbage collection, <span name="shared">shared</span> ownership is more typical. With this, the message sticks around as long as anything has a reference to it and is automatically freed when forgotten.</p>
+<p>These days, now that even C++ programmers are more comfortable with garbage
+collection, <span name="shared">shared</span> ownership is more typical.
+With this, the message sticks around as long as anything has a reference to
+it and is automatically freed when forgotten.</p>
 <aside name="shared">
 
 <p>Likewise, the C++ type for this is <code>shared_ptr&lt;T&gt;</code>.</p>
@@ -540,10 +863,16 @@ When a listener gets an event, it doesn&#8217;t know who sent it, since it could
 </li>
 <li>
 <p><strong>The queue owns it:</strong></p>
-<p><span name="pool">Another option</span> is to have messages <em>always</em> live on the queue. Instead of allocating the message itself, the sender requests a &#8220;fresh&#8221; one from the queue. The queue returns a reference to a message already in memory inside the queue, and the sender fills it in. When the message gets processed, the receiver just refers to the same message in the queue.</p>
+<p><span name="pool">Another option</span> is to have messages <em>always</em> live on
+the queue. Instead of allocating the message itself, the sender requests a
+&#8220;fresh&#8221; one from the queue. The queue returns a reference to a message
+already in memory inside the queue, and the sender fills it in. When the
+message gets processed, the receiver just refers to the same message in the
+queue.</p>
 <aside name="pool">
 
-<p>In other words, the backing store for the queue is an <a href="object-pool.html" class="pattern">Object Pool</a>.</p>
+<p>In other words, the backing store for the queue is an <a
+href="object-pool.html" class="pattern">Object Pool</a>.</p>
 </aside>
 
 </li>
@@ -551,18 +880,32 @@ When a listener gets an event, it doesn&#8217;t know who sent it, since it could
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
 <li>
-<p>I&#8217;ve mentioned this a few times already, but in many ways, this pattern is the asynchronous cousin to the well-known <a href="observer.html class="gif-pattern">Observer pattern</a>.</p>
+<p>I&#8217;ve mentioned this a few times already, but in many ways, this pattern is
+    the asynchronous cousin to the well-known <a href="observer.html"
+    class="gof-pattern">Observer</a> pattern.</p>
 </li>
 <li>
-<p>Like many patterns, event queues go by a number of aliases. One established term is &#8220;message queue&#8221;. It&#8217;s usually referring to a higher level manifestation. Where our event queues are <em>within</em> an application, message queues are usually used for communicating <em>between</em> them.</p>
-<p>Another term is &#8220;publish/subscribe&#8221;, sometimes abbreviated to &#8220;pubsub&#8221;. Like &#8220;message queue&#8221;, it usually refers to larger distributed systems and less the humble coding pattern we&#8217;re focused on.</p>
+<p>Like many patterns, event queues go by a number of aliases. One established
+    term is &#8220;message queue&#8221;. It&#8217;s usually referring to a higher level
+    manifestation. Where our event queues are <em>within</em> an application, message
+    queues are usually used for communicating <em>between</em> them.</p>
+<p>Another term is &#8220;publish/subscribe&#8221;, sometimes abbreviated to &#8220;pubsub&#8221;. Like
+&#8220;message queue&#8221;, it usually refers to larger distributed systems and less
+the humble coding pattern we&#8217;re focused on.</p>
 </li>
 <li>
-<p>A <a href="http://en.wikipedia.org/wiki/Finite-state_machine">finite state machine</a>, similar to the Gang of Four&#8217;s <a href="state.html" class="gof-pattern">State pattern</a>, requires a stream of inputs. If you want it to respond to those asynchronously, it makes sense to queue them.</p>
-<p>When you have a bunch of state machines sending messages to each other, each with a little queue of pending inputs (called a <em>mailbox</em>) then you&#8217;ve re-invented the <a href="http://en.wikipedia.org/wiki/Actor_model">actor model</a> of computation.</p>
+<p>A <a href="http://en.wikipedia.org/wiki/Finite-state_machine">finite state machine</a>,
+    similar to the Gang of Four&#8217;s <a href="state.html"
+    class="gof-pattern">State</a> pattern, requires a stream of inputs. If you
+    want it to respond to those asynchronously, it makes sense to queue them.</p>
+<p>When you have a bunch of state machines sending messages to each other, each
+with a little queue of pending inputs (called a <em>mailbox</em>) then you&#8217;ve
+re-invented the <a href="http://en.wikipedia.org/wiki/Actor_model">actor model</a> of
+computation.</p>
 </li>
 <li>
-<p>The <a href="http://golang.org/">Go</a> programming language&#8217;s built-in &#8220;channel&#8221; type is essentially an event or message queue.</p>
+<p>The <a href="http://golang.org/">Go</a> programming language&#8217;s built-in &#8220;channel&#8221; type
+    is essentially an event or message queue.</p>
 </li>
 </ul>
 <nav>

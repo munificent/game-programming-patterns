@@ -114,7 +114,8 @@ namespace Bytecode
     Instruction instruction = INST_SET_AGILITY;
 
     //^interpret-instruction
-    switch (instruction) {
+    switch (instruction)
+    {
       case INST_SET_HEALTH:
         setHealth(0, 100);
         break;

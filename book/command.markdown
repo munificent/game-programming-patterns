@@ -17,7 +17,7 @@ you do business with. Last I checked, people can't be "parameterized".
 
 Then, the rest of that sentence is just a list of stuff you could maybe possibly
 use the pattern for. Not very illuminating unless your use case happens to be in
-that list. *My* pithy tagline the command pattern is:
+that list. *My* pithy tagline the Command pattern is:
 
 **A command is a *<span name="latin">reified</span> method call*.**
 
@@ -45,7 +45,7 @@ other words, reflection is a *reified type system*.
 
 Both terms mean taking some <span name="reflection">*concept*</span> and turning
 it into a piece of *data* -- an object -- that you can stick in a variable, pass
-to a function, etc. So by saying the command pattern is a "reified method call",
+to a function, etc. So by saying the Command pattern is a "reified method call",
 what I mean is that it's a method call wrapped in an object.
 
 That sounds a lot like a "callback", "first class function", "function pointer",
@@ -247,7 +247,7 @@ I may be speaking from experience here.
 
 </aside>
 
-Without the command pattern, implementing undo is surprisingly hard. With it,
+Without the Command pattern, implementing undo is surprisingly hard. With it,
 it's a piece of cake. Let's say we're making a single player turn-based game and
 we want to let users undo moves so they can focus more on strategy and less on
 guesswork.
@@ -265,7 +265,7 @@ this command isn't a general "move something" operation that you could use in a
 bunch of contexts, it's a specific concrete move in the game's sequence of
 turns.
 
-This highlights a variation in how the command pattern gets implemented. In some
+This highlights a variation in how the Command pattern gets implemented. In some
 cases, like our first couple of examples, a command is a reusable object that
 represents a *thing that can be done*. Our earlier input handler held on to a
 single command object and called its `execute()` method anytime the right button
@@ -304,10 +304,11 @@ what `xBefore_` and `yBefore_` in the command are.
 <aside name="memento">
 
 This seems like a place for the <a
-href="http://en.wikipedia.org/wiki/Memento_pattern" class="gof-pattern">Memento
-pattern</a>, but I haven't found it to work well. Since commands tend to modify
-only a small part of an object's state, snapshotting the rest of its data is a
-waste of memory. It's cheaper to just manually store only the bits you change.
+href="http://en.wikipedia.org/wiki/Memento_pattern"
+class="gof-pattern">Memento</a> pattern, but I haven't found it to work well.
+Since commands tend to modify only a small part of an object's state,
+snapshotting the rest of its data is a waste of memory. It's cheaper to just
+manually store only the bits you change.
 
  <a href="http://en.wikipedia.org/wiki/Persistent_data_structure">*Persistent data structures*</a> are another option. With these, every modification to an object returns a new one, leaving the original unchanged. Through clever implementation, these new objects share data with the previous ones, so it's much cheaper than cloning the entire object.
 
@@ -359,9 +360,9 @@ class functions. Function pointers are stateless, functors are weird and still
 require defining a class, and the lambdas in C++11 are tricky to work with
 because of manual memory management.
 
-That's *not* to say you shouldn't use functions for the command pattern in other
+That's *not* to say you shouldn't use functions for the Command pattern in other
 languages. If you have the luxury of a language with real closures, by all means
-use them! In <span name="some">some</span> ways, the command pattern is a way of
+use them! In <span name="some">some</span> ways, the Command pattern is a way of
 emulating closures in languages that don't have them.
 
 <aside name="some">
@@ -408,7 +409,7 @@ We could add support for undo as well using a pair of closures:
 
 If you're comfortable with a functional style, this way of doing things is
 natural. If you aren't, I hope this chapter helped you along the way a bit. For
-me, the usefulness of the command pattern really shows how effective the
+me, the usefulness of the Command pattern really shows how effective the
 functional paradigm is for many problems.
 
 ## See Also

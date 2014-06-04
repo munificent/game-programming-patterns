@@ -36,7 +36,7 @@
 <p><img src="images/data-locality-chart.png" /></p>
 <aside name="legend">
 <p>Скорость процессора и доступа к памяти относительно уровня 1980-го года. Как видно, скорость процессоров растет как на дрожжах, а вот доступ к памяти плетётся далеко позади.</p>
-<p>Данные взяты из &#8220;Computer architecture: a quantitative approach&#8221; John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht&#8217;s &#8220;<a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf">Pitfalls of Object-Oriented Programming</a>&#8220;.</p>
+<p>Данные взяты из &#8220;Computer Architecture: A Quantitative Approach&#8221; John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht&#8217;s &#8220;<a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf">Pitfalls of Object-Oriented Programming</a>&#8220;.</p>
 </aside>
 <p>Для того, чтобы сверхбыстрый процессор провернул свои вычисления, ему, вообще-то, нужно выгрузить данные из главной памяти в свои регистры. И как видите, память не так быстра, как скорость процессора. Даже близко не так.</p>
 <p>С современным уровнем развития железа, может понадобиться <em>сотни</em> тактов, чтобы вытащить байт из <span name="ram">RAM</span>. Если большинство операций связано с данными, и нужно сотни тактов, чтобы их получить - как так получается, что наши процессоры не бездельничают 99% времени, ожидая поступления данных?</p>
@@ -147,14 +147,14 @@
    <span class="o">:</span> <span class="n">ai_</span><span class="p">(</span><span class="n">ai</span><span class="p">),</span> <span class="n">physics_</span><span class="p">(</span><span class="n">physics</span><span class="p">),</span> <span class="n">render_</span><span class="p">(</span><span class="n">render</span><span class="p">)</span>
    <span class="p">{}</span>
 
-   <span class="n">AIComponent</span><span class="o">*</span>      <span class="n">ai</span><span class="p">()</span>      <span class="p">{</span> <span class="k">return</span> <span class="n">ai_</span><span class="p">;</span> <span class="p">}</span>
+   <span class="n">AIComponent</span><span class="o">*</span> <span class="n">ai</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">ai_</span><span class="p">;</span> <span class="p">}</span>
    <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">physics_</span><span class="p">;</span> <span class="p">}</span>
-   <span class="n">RenderComponent</span><span class="o">*</span>  <span class="n">render</span><span class="p">()</span>  <span class="p">{</span> <span class="k">return</span> <span class="n">render_</span><span class="p">;</span> <span class="p">}</span>
+   <span class="n">RenderComponent</span><span class="o">*</span> <span class="n">render</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">render_</span><span class="p">;</span> <span class="p">}</span>
 
  <span class="nl">private:</span>
-   <span class="n">AIComponent</span><span class="o">*</span>      <span class="n">ai_</span><span class="p">;</span>
+   <span class="n">AIComponent</span><span class="o">*</span> <span class="n">ai_</span><span class="p">;</span>
    <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics_</span><span class="p">;</span>
-   <span class="n">RenderComponent</span><span class="o">*</span>  <span class="n">render_</span><span class="p">;</span>
+   <span class="n">RenderComponent</span><span class="o">*</span> <span class="n">render_</span><span class="p">;</span>
  <span class="p">};</span>
 </pre></div>
 
@@ -324,11 +324,15 @@ organized.</p>
 <span class="k">class</span> <span class="nc">ParticleSystem</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
+  <span class="n">ParticleSystem</span><span class="p">()</span>
+  <span class="o">:</span> <span class="n">numParticles_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  <span class="p">{}</span>
+
   <span class="kt">void</span> <span class="n">update</span><span class="p">();</span>
 <span class="nl">private:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">MAX_PARTICLES</span> <span class="o">=</span> <span class="mi">100000</span><span class="p">;</span>
 
-  <span class="kt">int</span> <span class="n">numParticles_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">numParticles_</span><span class="p">;</span>
   <span class="n">Particle</span> <span class="n">particles_</span><span class="p">[</span><span class="n">MAX_PARTICLES</span><span class="p">];</span>
 <span class="p">};</span>
 </pre></div>
@@ -428,8 +432,8 @@ organized.</p>
 
 <span class="nl">private:</span>
   <span class="n">Animation</span><span class="o">*</span> <span class="n">animation_</span><span class="p">;</span>
-  <span class="kt">double</span>     <span class="n">energy_</span><span class="p">;</span>
-  <span class="n">Vector</span>     <span class="n">goalPos_</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">energy_</span><span class="p">;</span>
+  <span class="n">Vector</span> <span class="n">goalPos_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
@@ -443,9 +447,9 @@ organized.</p>
 <span class="nl">private:</span>
   <span class="c1">// Previous fields...</span>
   <span class="n">LootType</span> <span class="n">drop_</span><span class="p">;</span>
-  <span class="kt">int</span>      <span class="n">minDrops_</span><span class="p">;</span>
-  <span class="kt">int</span>      <span class="n">maxDrops_</span><span class="p">;</span>
-  <span class="kt">double</span>   <span class="n">chanceOfDrop_</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">minDrops_</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">maxDrops_</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">chanceOfDrop_</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 
@@ -458,11 +462,11 @@ organized.</p>
 <span class="nl">public:</span>
   <span class="c1">// Methods...</span>
 <span class="nl">private:</span>
-  <span class="n">Animation</span><span class="o">*</span>   <span class="n">animation_</span><span class="p">;</span>
-  <span class="kt">double</span>       <span class="n">energy_</span><span class="p">;</span>
-  <span class="n">Vector</span>       <span class="n">goalPos_</span><span class="p">;</span>
+  <span class="n">Animation</span><span class="o">*</span> <span class="n">animation_</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">energy_</span><span class="p">;</span>
+  <span class="n">Vector</span> <span class="n">goalPos_</span><span class="p">;</span>
 
-  <span class="n">LootDrop</span><span class="o">*</span>    <span class="n">loot_</span><span class="p">;</span>
+  <span class="n">LootDrop</span><span class="o">*</span> <span class="n">loot_</span><span class="p">;</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">LootDrop</span>

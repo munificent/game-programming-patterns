@@ -32,7 +32,7 @@
   referring to object implementing pattern.
   Ex: "Object Pool is a great pattern. An object pool will save you memory."
 - Design Patterns and other book titles are *italicized*.
-- Don't use ":" in sentence before illustration.
+- Can end sentence before illustration with ":".
 - "vtable", all lowercase, no hyphen.
 - "on-screen" when an adjective ("the on-screen player"), "on screen" when a
   place ("the player is on screen").

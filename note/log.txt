@@ -1,3 +1,8 @@
+2014-05-26 - fix #207
+2014-05-26 - four bugs
+2014-05-25 - revise last 2182 words of component
+2014-05-24 - revise 2449 words component
+2014-05-23 - revise type object
 2014-05-22 - revise subclass sandbox and behavioral patterns. reformat bytecode
 2014-05-21 - revise update method
 2014-05-20 - revise game loop

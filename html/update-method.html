@@ -175,7 +175,7 @@ file, which is exactly what our level designers want.</p>
 an <strong>update method</strong> that <strong>simulates one frame</strong> of the object&#8217;s behavior. Each
 frame, the game updates every object in the collection.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
-<p>If the <a href="game-loop.html" class="pattern">Game Loop pattern</a> is the
+<p>If the <a href="game-loop.html" class="pattern">Game Loop</a> pattern is the
 best thing since sliced bread, then this pattern is its butter. A wide swath of
 games featuring live entities that the player interacts with use this pattern in
 some form or other. If the game has space marines, dragons, martians, ghosts, or
@@ -236,7 +236,7 @@ currently executing.</p>
 <code>patrollingLeft</code> variable to track that. When we return out of the code, the
 execution position is lost so we need to explicitly store enough information to
 restore it on the next frame.</p>
-<p>The <a href="state.html" class="pattern">State pattern</a> can often help here.
+<p>The <a href="state.html" class="pattern">State</a> pattern can often help here.
 Part of the reason state machines are common in games is because (like their
 name implies) they store the kind of state that you need to pick up where you
 left off.</p>
@@ -595,7 +595,7 @@ stuck.</p>
 <li>
 <p><strong>The component class:</strong></p>
 <p>If you&#8217;re already using the <a href="component.html"
-class="pattern">Component pattern</a>, this is a no-brainer. It lets each
+class="pattern">Component</a> pattern, this is a no-brainer. It lets each
 component update itself independently. In the same way that the update
 pattern in general lets you decouple game entities from each other in the
 game world, this lets you decouple <em>parts of a single entity</em> from each

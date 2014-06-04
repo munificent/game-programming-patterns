@@ -116,7 +116,7 @@ frame, the game updates every object in the collection.
 
 ## When to Use It
 
-If the <a href="game-loop.html" class="pattern">Game Loop pattern</a> is the
+If the <a href="game-loop.html" class="pattern">Game Loop</a> pattern is the
 best thing since sliced bread, then this pattern is its butter. A wide swath of
 games featuring live entities that the player interacts with use this pattern in
 some form or other. If the game has space marines, dragons, martians, ghosts, or
@@ -192,7 +192,7 @@ When we changed this to a one-frame-at-a-time form, we had to create a
 execution position is lost so we need to explicitly store enough information to
 restore it on the next frame.
 
-The <a href="state.html" class="pattern">State pattern</a> can often help here.
+The <a href="state.html" class="pattern">State</a> pattern can often help here.
 Part of the reason state machines are common in games is because (like their
 name implies) they store the kind of state that you need to pick up where you
 left off.
@@ -491,7 +491,7 @@ The most obvious and most important decision you'll make is what class to put
  *  **The component class:**
 
     If you're already using the <a href="component.html"
-    class="pattern">Component pattern</a>, this is a no-brainer. It lets each
+    class="pattern">Component</a> pattern, this is a no-brainer. It lets each
     component update itself independently. In the same way that the update
     pattern in general lets you decouple game entities from each other in the
     game world, this lets you decouple *parts of a single entity* from each
