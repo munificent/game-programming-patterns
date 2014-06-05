@@ -597,11 +597,12 @@ were in before.
 
 Even with those common extensions to state machines, they are still pretty
 limited. The trend these days in game AI is more towards exciting things like
-[behavior
-trees](http://www.altdevblogaday.com/2011/02/24/introduction-to-behavior-trees/)
-and [planning systems](http://web.media.mit.edu/~jorkin/goap.html). If AI is
-what you're interested in, all this chapter has done is whet your appetite.
-You'll want to read other books to satisfy it.
+[behavior trees][] and [planning systems][]. If AI is what you're interested in,
+all this chapter has done is whet your appetite. You'll want to read other books
+to satisfy it.
+
+[behavior trees]: http://web.archive.org/web/20140402204854/http://www.altdevblogaday.com/2011/02/24/introduction-to-behavior-trees/
+[planning systems]: http://web.media.mit.edu/~jorkin/goap.html
 
 This doesn't mean finite state machines, pushdown automata, and other simple
 systems aren't useful. They're a good modelling tool for certain kinds of
