@@ -17,7 +17,7 @@ namespace DirtyFlag
   public:
     static Transform origin();
 
-    Transform combine(const Transform& other) const;
+    Transform combine(Transform& other);
   };
   //^transform
 
@@ -26,7 +26,7 @@ namespace DirtyFlag
     return Transform();
   }
 
-  Transform Transform::combine(const Transform& other) const
+  Transform Transform::combine(Transform& other)
   {
     return other;
   }
@@ -96,12 +96,14 @@ namespace DirtyFlag
     };
 
     //^render-on-fly
-    void GraphNode::render(Transform parentWorld) {
+    void GraphNode::render(Transform parentWorld)
+    {
       Transform world = local_.combine(parentWorld);
 
       if (mesh_) renderMesh(mesh_, world);
 
-      for (int i = 0; i < numChildren_; i++) {
+      for (int i = 0; i < numChildren_; i++)
+      {
         children_[i]->render(world);
       }
     }
@@ -150,23 +152,27 @@ namespace DirtyFlag
     //^dirty-graph-node
 
     //^set-transform
-    void GraphNode::setTransform(Transform local) {
+    void GraphNode::setTransform(Transform local)
+    {
       local_ = local;
       dirty_ = true;
     }
     //^set-transform
 
     //^dirty-render
-    void GraphNode::render(Transform parentWorld, bool dirty) {
+    void GraphNode::render(Transform parentWorld, bool dirty)
+    {
       dirty |= dirty_;
-      if (dirty) {
+      if (dirty)
+      {
         world_ = local_.combine(parentWorld);
         dirty_ = false;
       }
 
       if (mesh_) renderMesh(mesh_, world_);
 
-      for (int i = 0; i < numChildren_; i++) {
+      for (int i = 0; i < numChildren_; i++)
+      {
         children_[i]->render(world_, dirty);
       }
     }
