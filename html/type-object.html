@@ -818,10 +818,17 @@ traversed and have the foresight to design an intelligent hierarchy.</p>
     href="prototype.html">Prototype</a>.</p>
 </li>
 <li>
+<p>Type Object is a close cousin to <a class="gof-pattern">Flyweight</a>. Both
+    let you share data across instances. With Flyweight, the intent is on saving
+    memory, and the shared data may not represent any conceptual &#8220;type&#8221; of
+    object. With the Type Object pattern, the focus is on organization and
+    flexibility.</p>
+</li>
+<li>
 <p>There&#8217;s a lot of similarity between this pattern and the <a
     class="gof-pattern" href="state.html">State</a> pattern. Both patterns let
     an object delegate part of what defines itself to another object. With a
-    Type Object, we&#8217;re usually delegating what the object <em>is</em>: invariant data
+    type object, we&#8217;re usually delegating what the object <em>is</em>: invariant data
     that broadly describes the object. With State, we delegate what an object
     <em>is right now</em>: temporal data that describes an object&#8217;s current
     configuration.</p>

@@ -1,14 +1,14 @@
 Here's some dimensions of popular programming books on Amazon:
 
-don't make me think    9.1 x 7   x 0.5 inches
-learning python        9.3 x 7.1 x 2.8 inches
-html & css             9.6 x 7.9 x 1   inches
-touch develop          9   x 6   x 0.6 inches
-beginning c++          9   x 7.2 x 1.1 inches
-minecraft for dummies  8.6 x 5.4 x 0.3 inches
-node.js in action      9.2 x 7.4 x 0.8 inches
-invent your own games 10   x 8   x 0.9 inches
-unity 4 by example     9.2 x 7.5 x 1.2 inches
+minecraft for dummies 5.4 x  8.6 x 0.3 inches
+touch develop         6   x  9   x 0.6 inches
+don't make me think   7   x  9.1 x 0.5 inches
+learning python       7.1 x  9.3 x 2.8 inches
+beginning c++         7.2 x  9   x 1.1 inches
+node.js in action     7.4 x  9.2 x 0.8 inches
+unity 4 by example    7.5 x  9.2 x 1.2 inches
+html & css            7.9 x  9.6 x 1   inches
+invent your own games 8   x 10   x 0.9 inches
 
 Print on demand printers:
 
@@ -35,3 +35,18 @@ Trim Size: 7.5" x 9.25"
 Number of Pages: 280
 Quantity: 1
 Per Book: $4.21 each
+
+
+Margins:
+
+InDesign Classroom in a Book:
+  Bottom: ~0.375"
+  Outside: ~0.375"
+  Top: ~0.5"
+  Inside: ~0.875."
+
+SICP:
+  Top: ~0.5"
+  Outside: ~0.75"
+  Bottom: ~0.75"
+  Inside: ~1.0"

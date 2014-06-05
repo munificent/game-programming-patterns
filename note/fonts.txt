@@ -1,0 +1,88 @@
+Body
+----
+
+Maybe:
+
+Albertina
+Andron
+Bembo
+Berthold Baskerville Book
+Cala (Hoftype)
+  http://www.myfonts.com/fonts/hoftype/cala/
+  *Very* readable. Nice minimal thickness changes should balance well with code
+  font. Nice ligatures. Love the italics.
+Caslon
+Century Schoolbook
+Dante
+  http://www.myfonts.com/fonts/mti/dante-mt/
+  Looks nice. Vertical "o" looks nice and modern. Italics are a bit too old
+  style.
+Dolly
+Electra
+Elena
+  http://processtypefoundry.com/fonts/elena/
+  Nice modern serif. A bit brushstroke-y.
+Fenland
+Girando Pro
+Harriet Text Regular (Okay Type)
+  Sweet Jesus, it's heavenly. May get played out in a few years. Super
+  fashionable right now.
+Lyon
+Mercury
+Sabon Next
+  http://www.linotype.com/240/sabon.html
+  Very readable, very lucid. I think it will pair well. A bit too boring and
+  too similar to Times New Roman.
+Sina Nova
+  http://www.fontsquirrel.com/fonts/sina-nova
+  Very nice. Similar to Cala.
+Sirba
+  http://www.type-together.com/Sirba
+  Very beautiful. Modern, a bit informal. Would match the prose well.
+Tundra
+  https://www.fontfont.com/fonts/tundra
+  Beautiful, clean, lucid. Very strong contender. Maybe a bit too square and
+  narrow.
+
+No:
+
+Janson - Classy, but a bit thin at points.
+Jenson - Beautiful font but too old style for my writing.
+Minion - Too 90's, overdone.
+Scala - Too angular.
+Augustin
+  http://www.myfonts.com/fonts/ludwiguebele/augustin/
+  Pretty. Italics are nice. Tail on "y" and "j" are distinctive but not in a
+  way that would fit well with the book. Might clash with the code font.
+Comenia
+  OK. Has a matching sans, but no light weights. Regular weight is a bit heavy.
+Documenta - Too old style.
+Expo - Meh. Too... artsy? Feels like it would be good for a history text, but
+  not my book.
+Iowan OS
+  http://www.myfonts.com/fonts/bitstream/iowan-old-style/
+  Nice. A bit plain. Diamond dots over i's.
+Miller Text Regular - Similar to Harriet. Very pretty, but a bit too dense.
+Milo Serif - Not a fan.
+Novel
+  http://www.myfonts.com/fonts/atlas-font-foundry/novel-std/
+  Clean and pretty. The italics are meh.
+Quadraat - "B" is WTF. Italics too angular.
+Stuart - Neat, but not the right character for the book.
+Storm Baskerville 10 - Too Victorian.
+Verdigris - Very beautiful, similar to Jenson and Sabon. Too old style.
+Yoga - Chunky.
+
+http://www.typophile.com/node/100581
+http://www.myfonts.com/users/pjy2ao1bxc/albums/591331/
+
+Sans
+----
+
+News Gothic
+JAF Bernini Sans
+
+No:
+
+Franklin Gothic - Too heavy.
+Folio - Too wide.

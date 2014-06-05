@@ -314,7 +314,8 @@ declaration, but this could be defined externally by using a dynamic array of a
 given size, or using a value template parameter.</p>
 <p>Creating a new particle is straightforward:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticlePool</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span>
-                          <span class="kt">double</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">double</span> <span class="n">yVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">lifetime</span><span class="p">)</span>
+                          <span class="kt">double</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">double</span> <span class="n">yVel</span><span class="p">,</span>
+                          <span class="kt">int</span> <span class="n">lifetime</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Find an available particle.</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">POOL_SIZE</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
@@ -449,7 +450,8 @@ name="first">first</span> available one:</p>
 </aside>
 
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticlePool</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span>
-                          <span class="kt">double</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">double</span> <span class="n">yVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">lifetime</span><span class="p">)</span>
+                          <span class="kt">double</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">double</span> <span class="n">yVel</span><span class="p">,</span>
+                          <span class="kt">int</span> <span class="n">lifetime</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Make sure the pool isn&#39;t full.</span>
   <span class="n">assert</span><span class="p">(</span><span class="n">firstAvailable_</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">);</span>

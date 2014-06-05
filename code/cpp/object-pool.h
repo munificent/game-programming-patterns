@@ -61,7 +61,8 @@ namespace Version1
 
   //^3
   void ParticlePool::create(double x, double y,
-                            double xVel, double yVel, int lifetime)
+                            double xVel, double yVel,
+                            int lifetime)
   {
     // Find an available particle.
     for (int i = 0; i < POOL_SIZE; i++)
@@ -170,7 +171,8 @@ namespace Temp1
 
   //^7
   void ParticlePool::create(double x, double y,
-                            double xVel, double yVel, int lifetime)
+                            double xVel, double yVel,
+                            int lifetime)
   {
     // Make sure the pool isn't full.
     assert(firstAvailable_ != NULL);
