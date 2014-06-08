@@ -814,7 +814,7 @@ Register-based VMs got a reputation for being a bit faster after Lua converted
 to that style, but it depends *deeply* on your actual instructions and lots of
 other details of your VM.
 
-### What intructions do you have?
+### What instructions do you have?
 
 Your instruction set defines the boundaries of what can and cannot be expressed
 in bytecode, and also has a big impact on the performance of your VM. Here's a
