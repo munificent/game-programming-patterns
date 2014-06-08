@@ -662,10 +662,8 @@ communication paths if you need them.
 
 ## See Also
 
- *  The [Unity](http://unity3d.com) framework's core [`GameObject`](http://docs.
-    unity3d.com/Documentation/Manual/GameObjects.html) class is designed
-    entirely around [components](http://docs.unity3d.com/Documentation/Manual/Us
-    ingComponents40.html).
+ *  The [Unity](http://unity3d.com) framework's core [`GameObject`](http://docs.unity3d.com/Documentation/Manual/GameObjects.html) class is designed
+    entirely around [components](http://docs.unity3d.com/Documentation/Manual/UsingComponents40.html).
 
  *  The open source [Delta3D](http://www.delta3d.org) engine has a base
     `GameActor` class that implements this pattern with the appropriately named
