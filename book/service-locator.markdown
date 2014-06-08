@@ -471,7 +471,7 @@ vary, based on differing answers to a few core questions:
 
     Assertions help us track down bugs as soon as the game does something
     unexpected, and not later when that error finally manifests as something
-    visibly wrong to the user. They are fences in your codebase, corraling bugs
+    visibly wrong to the user. They are fences in your codebase, corralling bugs
     so that they can't escape from the code that created them.
 
     </aside>

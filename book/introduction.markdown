@@ -4,7 +4,7 @@ In fifth grade, my friends and I were given access to a little unused
 classroom housing a couple of very beat up TRS-80s. Hoping to inspire us, a
 teacher found a printout of some simple BASIC programs for us to tinker with.
 
-The audio casette drives on the computers were broken, so any time we wanted to
+The audio cassette drives on the computers were broken, so any time we wanted to
 run some code, we'd have to carefully type it in from scratch. This led us
 to prefer programs that were only a few lines long:
 

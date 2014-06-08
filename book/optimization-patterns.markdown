@@ -7,7 +7,7 @@ crowded with games vying for a player's attention -- and cash! -- and the game
 that pushes the hardware the farthest often wins.
 
 Optimizing for performance is a deep art that touches all aspects of software.
-Low-level coders master the myriad idiosyncracies of hardware architectures.
+Low-level coders master the myriad idiosyncrasies of hardware architectures.
 Meanwhile, algorithms researchers compete to prove mathematically whose
 procedure is the most efficient.
 

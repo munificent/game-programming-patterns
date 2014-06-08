@@ -451,7 +451,7 @@ to solve.
 
         <aside name="sort">
 
-        This is directly analagous to sorted binary search trees like red-black
+        This is directly analogous to sorted binary search trees like red-black
         trees or AVL trees: when you add a single item, you may end up needing to
         re-sort the tree and shuffle a bunch of nodes around.
 
@@ -521,7 +521,7 @@ to solve.
 
         Removing objects is equally simple. You remove the object from its
         square and if the parent square's total count is now below the
-        threshhold, you can collapse those subdivisions.
+        threshold, you can collapse those subdivisions.
 
      *  *Objects can be moved quickly.* This, of course, follows from the above.
         "Moving" an object is just an add and a remove, and both of those are

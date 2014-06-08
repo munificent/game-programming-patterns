@@ -342,7 +342,7 @@ Then `Superpower` just provides access to it:
 
 ^code 8
 
-Shunting provided operations into auxilliary classes like this can do a few
+Shunting provided operations into auxiliary classes like this can do a few
 things for you:
 
  *  *It reduces the number of methods in the base class.* In the example here,
