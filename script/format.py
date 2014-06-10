@@ -5,6 +5,7 @@
 
 import glob
 import os
+import re
 import subprocess
 import sys
 import time
@@ -54,9 +55,10 @@ num_chapters = 0
 empty_chapters = 0
 total_words = 0
 
+extension = "html"
 
-def htmlpath(pattern):
-  return 'html/' + pattern + '.html'
+def output_path(pattern):
+  return extension + "/" + pattern + "." + extension
 
 
 def cpp_path(pattern):
@@ -73,7 +75,7 @@ def pretty(text):
   return text
 
 
-def formatfile(path, nav, skip_up_to_date):
+def format_file(path, nav, skip_up_to_date):
   basename = os.path.basename(path)
   basename = basename.split('.')[0]
 
@@ -84,8 +86,8 @@ def formatfile(path, nav, skip_up_to_date):
     sourcemod = max(sourcemod, os.path.getmtime(cpp_path(basename)))
 
   destmod = 0
-  if os.path.exists(htmlpath(basename)):
-    destmod = max(destmod, os.path.getmtime(htmlpath(basename)))
+  if os.path.exists(output_path(basename)):
+    destmod = max(destmod, os.path.getmtime(output_path(basename)))
 
   if skip_up_to_date and sourcemod < destmod:
     return
@@ -141,11 +143,11 @@ def formatfile(path, nav, skip_up_to_date):
   modified = datetime.fromtimestamp(os.path.getmtime(path))
   mod_str = modified.strftime('%B %d, %Y')
 
-  with open("asset/template.html") as f:
+  with open("asset/template." + extension) as f:
     template = f.read()
 
-  # Write the HTML output.
-  with open(htmlpath(basename), 'w') as out:
+  # Write the output.
+  with open(output_path(basename), 'w') as out:
     title_text = title
     section_header = ""
 
@@ -165,17 +167,20 @@ def formatfile(path, nav, skip_up_to_date):
 
     body = smartypants.smartypants(body)
 
-    html = template
-    html = html.replace("{{title}}", title_text)
-    html = html.replace("{{section_header}}", section_header)
-    html = html.replace("{{header}}", title)
-    html = html.replace("{{body}}", body)
-    html = html.replace("{{prev}}", prev_link)
-    html = html.replace("{{next}}", next_link)
-    html = html.replace("{{navigation}}",
-      navigationtohtml(title, navigation))
+    output = template
+    output = output.replace("{{title}}", title_text)
+    output = output.replace("{{section_header}}", section_header)
+    output = output.replace("{{header}}", title)
+    output = output.replace("{{body}}", body)
+    output = output.replace("{{prev}}", prev_link)
+    output = output.replace("{{next}}", next_link)
+    output = output.replace("{{navigation}}",
+        navigation_to_html(title, navigation))
 
-    out.write(html)
+    if extension == "xml":
+      output = clean_up_xml(output)
+
+    out.write(output)
 
   global total_words
   global num_chapters
@@ -199,6 +204,75 @@ def formatfile(path, nav, skip_up_to_date):
     # Section header chapters aren't counted like regular chapters.
     print "{}•{} {} ({} words)".format(
       GREEN, DEFAULT, basename, word_count)
+
+
+def clean_up_xml(output):
+  """Takes the XHTML output and massages it to play nicer with InDesign's XML
+  import... idiosyncracies."""
+
+  # Split into preformatted code and regular markup sections. We need to treat
+  # code blocks specially so we can preserve their formatting.
+  in_code = False
+  chunks = re.split("(</?pre>)", output)
+
+  def clean_up_code_xml(code):
+    # Ditch most code formatting tags.
+    code = re.sub(r'<span class="(k|kt|mi|n|nb|nc|nf|nl|o|p)">([^<]+)</span>',
+                  r"\2", code)
+
+    # Turn comments into something InDesign can map to a style.
+    code = re.sub(r'<span class="(c1|cn)">([^<]+)</span>',
+                  r"<comment>\2</comment>", code)
+
+    # Turn newlines into soft returns so code blocks stay one paragraph, except
+    # for the last one.
+    code = code[:-1].replace("\n", "&#x2028;") + "\n"
+
+    return code
+
+  def clean_up_xhtml(html):
+    # Remove links.
+    html = re.sub(r"<a\s[^>]+>", "", html)
+    html = re.sub(r"</a>", "", html)
+
+    # Ditch newlines in the middle of blocks of text. Out of sheer malice,
+    # even though they are meaningless in actual XML, InDesign treats them
+    # as significant.
+    html = re.sub(r"\n(?<!<)", " ", html)
+
+    # Also collapse redundant whitespace.
+    html = re.sub(r" +", " ", html)
+    html = html.replace("> <", "><")
+
+    # Re-add newlines after closing paragraph-level tags.
+    html = html.replace("</p>", "</p>\n")
+    html = html.replace("</h2>", "</h2>\n")
+    html = html.replace("</h3>", "</h3>\n")
+    html = html.replace("</li>", "</li>\n")
+    html = html.replace("</ol>", "</ol>\n")
+    html = html.replace("</ul>", "</ul>\n")
+    html = html.replace("</pre>", "</pre>\n")
+    html = html.replace("</aside>", "</aside>\n")
+    html = html.replace("</blockquote>", "</blockquote>\n")
+
+    # TODO: Non-breaking spaces in <code>...</code> sections.
+    return html
+
+  result = ""
+  for chunk in chunks:
+    if chunk == "<pre>":
+      in_code = True
+      result += chunk
+    elif chunk == "</pre>":
+      in_code = False
+      result += chunk
+    else:
+      if in_code:
+        result += clean_up_code_xml(chunk)
+      else:
+        result += clean_up_xhtml(chunk)
+
+  return result
 
 
 def title_to_file(title):
@@ -229,7 +303,7 @@ def make_prev_next(title):
   return (prev_link, next_link)
 
 
-def navigationtohtml(chapter, headers):
+def navigation_to_html(chapter, headers):
   nav = ''
 
   # Section headers start two levels deep.
@@ -332,11 +406,11 @@ def buildnav(searchpath):
   return nav
 
 
-def formatfiles(file_filter, skip_up_to_date):
+def format_files(file_filter, skip_up_to_date):
   '''Process each markdown file.'''
   for f in glob.iglob(searchpath):
     if file_filter == None or file_filter in f:
-      formatfile(f, nav, skip_up_to_date)
+      format_file(f, nav, skip_up_to_date)
 
 
 def check_sass():
@@ -355,16 +429,20 @@ nav = buildnav(searchpath)
 
 if len(sys.argv) == 2 and sys.argv[1] == '--watch':
   while True:
-    formatfiles(None, True)
+    format_files(None, True)
     check_sass()
     time.sleep(0.3)
 else:
+  if len(sys.argv) > 1 and sys.argv[1] == '--xml':
+    extension = "xml"
+    del sys.argv[1]
+
   # Can specify a file name filter to just regenerate a subset of the files.
   file_filter = None
   if len(sys.argv) > 1:
     file_filter = sys.argv[1]
 
-  formatfiles(file_filter, False)
+  format_files(file_filter, False)
 
   average_word_count = total_words / (num_chapters - empty_chapters)
   estimated_word_count = total_words + (empty_chapters * average_word_count)
