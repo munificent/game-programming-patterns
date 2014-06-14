@@ -1,3 +1,9 @@
+2014-06-09 - massage xml a bunch to make indesign happy
+2014-06-08 - more work on xml and masters
+2014-06-07 - fight with xml
+2014-06-06 - work on masters and styling xml
+2014-06-05 - add xml support to format script, start figuring out how to import
+2014-06-04 - fix four bugs, send money to lauren
 2014-06-03 - pick body font, start laying out masters
 2014-06-02 - lots of design work
 2014-06-01 - start playing with design
