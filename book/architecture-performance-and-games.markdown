@@ -5,8 +5,7 @@ Before we plunge headfirst into a pile of patterns, I thought it might help to
 give you some context about how I think about software architecture and how it
 applies to games. It may help you understand the rest of this book better. If
 nothing else, when you get dragged into an <span name="ammo">argument</span>
-about how terrible (or awesome) design patterns and software architecture suck
-or are awesome, it will give you some ammo to use.
+about how terrible (or awesome) design patterns and software architecture are, it will give you some ammo to use.
 
 <aside name="ammo">
 
@@ -18,7 +17,7 @@ dealer, I have wares for sale to all combatants.
 ## What is Software Architecture?
 
 <span name="won't">If</span> you read this book cover to cover, you won't come
-away knowing the linear algebra behind 3D graphics, or the calculus behind game
+away knowing the linear algebra behind 3D graphics or the calculus behind game
 physics. It won't show you how to alpha-beta prune your AI's search tree or
 simulate a room's reverberation in your audio playback.
 
@@ -28,13 +27,13 @@ Wow, this paragraph would make a terrible ad for the book.
 
 </aside>
 
-Instead, it's about the code *between* all of that. It's less about writing code
+Instead, this book is about the code *between* all of that. It's less about writing code
 than it is about *organizing* it. Every program has *some* organization, even if
 it's just "jam the whole thing into `main()` and see what happens", so I think
 it's more interesting to talk about what makes for *good* organization. How do
 we tell a good architecture from a bad one?
 
-I've been mulling this question over for about five years. Of course, like you,
+I've been mulling over this question for about five years. Of course, like you,
 I have an intuition about good design. We've all suffered through codebases so
 <span name="suffered">bad</span>, the best you could hope to do for them is take
 them out back and put them out of their misery.
@@ -62,14 +61,14 @@ that changes don't disturb its placid surface." Right.
 
 Let me break that down a bit. The first key piece is that *architecture is about
 change*. Someone has to be modifying the codebase. If no one is touching the
-code -- whether because it's perfect and complete, or so wretched no one will
+code -- whether because it's perfect and complete or so wretched no one will
 sully their text editor with it -- its design is irrelevant. The measure of a
 design is how easily it accommodates changes. With no changes, it's a runner who
 never leaves the starting line.
 
 ### How do you make a change?
 
-Before you can change the code to add a new feature, or fix a bug, or whatever
+Before you can change the code to add a new feature, to fix a bug, or for whatever
 reason caused you to fire up your editor, you have to understand what the
 existing code is doing. You don't have to know the whole program, of course, but
 you need to <span name="ocr">load</aside> all of the relevant pieces of it into
@@ -77,7 +76,7 @@ your primate brain.
 
 <aside name="ocr">
 
-It's weird to think that that is literally an OCR process.
+It's weird to think that this is literally an OCR process.
 
 </aside>
 
@@ -93,12 +92,11 @@ parts of the code it touches, the actual coding is sometimes trivial.
 You beat your meaty fingers on the keyboard for a while until the right colored
 lights blink on screen and you're done, right? Not just yet! Before you write
 <span name="tests">tests</span> and send it off for code review, you often have
-some clean up to do.
+some cleanup to do.
 
 <aside name="tests">
 
-Did I say "tests"? Oh, yes, I did. Some of a game's codebase is hard to write
-unit tests for, but a large fraction of it is perfectly testable.
+Did I say "tests"? Oh, yes, I did. It's hard to write unit tests for some of a game's codebase, but a large fraction of the codebase is perfectly testable.
 
 I won't get on a soapbox here, but I'll ask you to consider doing more automated
 testing if you aren't already. Don't you have better things to do than manually
@@ -151,8 +149,8 @@ that change ripples throughout the rest of the game.
 ## At What Cost?
 
 This sounds great, right? Decouple everything and you'll be able to code like
-the wind. Each change will just mean touching one or two select methods and you
-can dance across the surface of the codebase leaving nary a shadow on it.
+the wind. Each change will mean touching only one or two select methods, and you
+can dance across the surface of the codebase leaving nary a shadow.
 
 This feeling is exactly why people get excited about abstraction, modularity,
 design patterns, and software architecture. A well-architected program really is
@@ -170,8 +168,8 @@ make up a development cycle.
 <aside name="maintain">
 
 The second half of this -- maintaining your design -- deserves special
-attention. I've seen many programs start out beautiful and then die a death of a
-thousand cuts as programmers add "just one tiny little hack" to it over and over
+attention. I've seen many programs start out beautifully and then die a death of a
+thousand cuts as programmers add "just one tiny little hack" over and over
 again.
 
 Like gardening, it's not enough to put in new plants. You must also weed and
@@ -179,7 +177,7 @@ prune.
 
 </aside>
 
-You have to think about which parts of the program should be decoupled, and
+You have to think about which parts of the program should be decoupled and
 introduce abstractions at those points. Likewise, you have to determine where
 extensibility should be engineered in so future changes are easier to make.
 
@@ -194,7 +192,7 @@ that you will need that flexibility later. You're adding code and complexity to
 your game that takes time to develop, debug, and maintain.
 
 That effort pays off if you guess right and end up touching that code later. But
-<span name="yagni">predicting</span> the future is *hard* and when that
+<span name="yagni">predicting</span> the future is *hard*, and when that
 modularity doesn't end up being helpful, it quickly becomes actively harmful.
 After all, it is more code you have to deal with.
 
@@ -208,7 +206,7 @@ to fight this urge to speculate about what your future self may want.
 
 When people get overzealous about this, you get a codebase whose architecture
 has spiraled out of control. You've got interfaces and abstractions everywhere.
-Plug-in systems, abstract base classes, virtual methods galore and all sorts of
+Plug-in systems, abstract base classes, virtual methods galore, and all sorts of
 extension points.
 
 It takes you forever to trace through all of that scaffolding to find some real
@@ -228,7 +226,7 @@ an "engine" without ever figuring out what it's an engine *for*.
 There's another critique of software architecture and abstraction that you hear
 sometimes, especially in game development: that it hurts your game's
 performance. Many patterns that make your code more flexible rely on virtual
-dispatch, interfaces, pointers, messages and <span name="templates">other
+dispatch, interfaces, pointers, messages, and <span name="templates">other
 mechanisms</span> that all have at least some runtime cost.
 
 <aside name="templates">
@@ -238,10 +236,9 @@ can sometimes give you the abstraction of interfaces without any penalty at
 runtime.
 
 There's a spectrum of flexibility here. When you write code to call a concrete
-method in some class, you're fixing that class at *author* time -- you've hard-
-coded which class you call into. When you go through a virtual method or
+method in some class, you're fixing that class at *author* time -- you've hard-coded which class you call into. When you go through a virtual method or
 interface, the class that gets called isn't known until *runtime*. That's much
-more flexible, but implies some runtime overhead.
+more flexible but implies some runtime overhead.
 
 Template metaprogramming is somewhere between the two. There, you make the
 decision of which class to call at *compile time* when the template is
@@ -255,7 +252,7 @@ means encoding fewer assumptions in the program. You use interfaces so that your
 code works with *any* class that implements it instead of just the one that does
 today. You use <a href="observer.html" class="gof-pattern">observers</a> and <a
 href="event-queue.html" class="pattern">messaging</a> to let two parts of the
-game talk to each other so that tomorrow it can easily be three or four.
+game talk to each other so that tomorrow, it can easily be three or four.
 
 But performance is all about assumptions. The practice of optimization thrives
 on concrete limitations. Can we safely assume we'll never have more than 256
@@ -278,14 +275,14 @@ There's no easy answer here. Making your program more flexible so you can
 prototype faster will have some performance cost. Likewise, optimizing your code
 will make it less flexible.
 
-My experience, though, is that it's easier to make a fun game fast than it is to
+My experience is that it's easier to make a fun game fast than it is to
 make a fast game fun. One compromise is to keep the code flexible until the
 design settles down and then tear out some of the abstraction later to improve
 your performance.
 
 ## The Good in Bad Code
 
-That brings me to the next point which is that there's a time and place for
+That brings me to the next point, which is that there's a time and place for
 different styles of coding. Much of this book is about making maintainable,
 clean code, so my allegiance is pretty clearly to doing things the "right" way,
 but there's value in slapdash code too.
@@ -327,14 +324,14 @@ and time again:
 
 You need to make sure the people using the <span
 name="throwaway">throwaway</span> code understand that even though it kind of
-looks like it works, it *cannot* be maintained and must be *rewritten*. If
-there's a *chance* you'll end up having to keep it around, you may have to just
+looks like it works, it *cannot* be maintained and *must* be rewritten. If
+there's a *chance* you'll end up having to keep it around, you may have to
 defensively write it well.
 
 <aside name="throwaway">
 
 One trick to ensuring your prototype code isn't obliged to become real code is
-to write it in another language than your game uses. That way you have to
+to write it in a language different from the one your game uses. That way, you have to
 rewrite it before it can end up in your actual game.
 
 </aside>
@@ -350,7 +347,7 @@ We have a few forces in play:
 
 <aside name="speed">
 
-I think it's interesting that these are all really about some kind of speed: our
+I think it's interesting that these are all about some kind of speed: our
 long-term development speed, the game's execution speed, and our short-term
 development speed.
 
@@ -383,13 +380,13 @@ someone's distinguished career in <span name="ditch">ditch digging</span>.
 
 <aside name="ditch">
 
-Maybe you do; I didn't research that analogy. For all I know there could be avid
+Maybe you do; I didn't research that analogy. For all I know, there could be avid
 ditch digging hobbyists, ditch digging conventions, and a whole subculture
 around it. Who am I to judge?
 
 </aside>
 
-In fact, to me this has much in common with games themselves. A game like chess
+To me, this has much in common with games themselves. A game like chess
 can never be mastered because all of the pieces are so perfectly balanced
 against one another. This means you can spend your life exploring the vast space
 of viable strategies. A poorly designed game collapses to the one winning tactic
@@ -455,12 +452,12 @@ it this far. I don't have much in return for your patience, but I'll offer up a
 few bits of advice that I hope may be useful to you:
 
  *  Abstraction and decoupling make evolving your program faster and easier, but
-    don't waste time doing it unless you're confident the code in question needs
+    don't waste time doing them unless you're confident the code in question needs
     that flexibility.
 
  *  <span name="think">Think</span> about and design for performance throughout
-    your development cycle, but put off the low-level nitty gritty optimizations
-    that lock assumptions into your code as late as possible.
+    your development cycle, but put off the low-level, nitty-gritty optimizations
+    that lock assumptions into your code until as late as possible.
 
 <aside name="think">
 

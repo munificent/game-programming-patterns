@@ -20,8 +20,8 @@ going to throw them at a different kind of problem here.
 
 <aside name="two-camps">
 
-This pairing echoes the early days of artificial intelligence. In the 50s and
-60s, much of AI research was focused on language processing. Many of the
+This pairing echoes the early days of artificial intelligence. In the '50s and
+'60s, much of AI research was focused on language processing. Many of the
 techniques compilers now use for parsing programming languages were invented for
 parsing human languages.
 
@@ -37,9 +37,9 @@ respond to user input. Push the B button and she should jump. Simple enough:
 
 Spot the bug?
 
-There's nothing to prevent "air jumping": keep hammering B while she's in the
-air and she will float forever. The simple <span name="landing">fix</span> is to
-add an `isJumping_` boolean field to `Heroine` that tracks when she's jumping,
+There's nothing to prevent "air jumping" -- keep hammering B while she's in the
+air, and she will float forever. The simple <span name="landing">fix</span> is to
+add an `isJumping_` Boolean field to `Heroine` that tracks when she's jumping,
 and then do:
 
 ^code spaghetti-2
@@ -52,7 +52,7 @@ heroine touches the ground. I've omitted that here for brevity's sake.
 </aside>
 
 Next, we want the heroine to duck if the player presses down while she's on the
-ground, and stand back up when the button is released:
+ground and stand back up when the button is released:
 
 ^code spaghetti-3
 
@@ -65,11 +65,11 @@ With this code, the player could:
 3. Release down while still in the air.
 
 The heroine will switch to her standing graphic in the middle of the jump. Time
-for another flag...
+for another flag:
 
 ^code spaghetti-4
 
-Next, it would be cool if the heroine did a dive attack if the player presses
+Next, it would be cool if the heroine did a dive attack when the player presses
 down in the middle of a jump:
 
 ^code spaghetti-5
@@ -80,18 +80,18 @@ We check that you can't air jump while jumping, but not while diving. Yet
 another field...
 
 Something is clearly <span name="se">wrong</span> with our approach. Every time
-we touch this handful of code we break something. We need to add a bunch more
-moves -- we haven't even added *walking* yet -- but at this rate it will
+we touch this handful of code, we break something. We need to add a bunch more
+moves -- we haven't even added *walking* yet -- but at this rate, it will
 collapse into a heap of bugs before we're done with it.
 
 <aside name="se">
 
 Those coders you idolize who always seem to create flawless code aren't simply
 superhuman programmers. Instead, they have an intuition about which *kinds* of
-code are error-prone, and they steer away from that.
+code are error-prone, and they steer away from them.
 
 Complex branching and mutable state -- fields that change over time -- are two
-of those error-prone kinds of code and this has both.
+of those error-prone kinds of code, and the examples above have both.
 
 </aside>
 
@@ -107,7 +107,7 @@ with that button, and connect it to the state she changes to.
 
 Congratulations, you've just created a *finite state machine*. These came out of
 a branch of computer science called *automata theory* whose family of data
-structures also include the famous Turing machine. FSMs are the simplest member
+structures also includes the famous Turing machine. FSMs are the simplest member
 of that family.
 
 The <span name="adventure">gist</span> is:
@@ -119,7 +119,7 @@ The <span name="adventure">gist</span> is:
     jumping and standing simultaneously. In fact, preventing that is one reason
     we're going to use an FSM.
 
- *  A sequence of *inputs* or *events* are sent to the machine. In our example,
+ *  A sequence of *inputs* or *events* is sent to the machine. In our example,
     that's the raw button presses and releases.
 
  *  Each state has a *set of transitions*, each associated with an input and
@@ -132,7 +132,7 @@ The <span name="adventure">gist</span> is:
 In their pure form, that's the whole banana: states, inputs, and transitions.
 You can draw it out like a little flowchart. Unfortunately, the compiler doesn't
 recognize our scribbles, so how do we go about *implementing* one? The Gang of
-Four's State pattern is one way which we'll get to, but let's start simpler.
+Four's State pattern is one method, but let's start simpler.
 
 <aside name="adventure">
 
@@ -140,7 +140,7 @@ My favorite analogy for FSMs is the old text adventure games like Zork. You have
 a world of rooms that are connected to each other by exits. You explore them by
 entering commands like "go north".
 
-This maps directly to a state machine: each room is a state. The room you're in
+This maps directly to a state machine -- each room is a state. The room you're in
 is the current state. Each room's exits are its transitions. The navigation
 commands are the inputs.
 
@@ -148,12 +148,12 @@ commands are the inputs.
 
 ## Enums and Switches
 
-One problem our `Heroine` class has is some combinations of those boolean fields
+One problem our `Heroine` class has is some combinations of those Boolean fields
 aren't valid: `isJumping_` and `isDucking_` should never both be true, for
 example. When you have a handful of flags where only one is `true` at a time,
-that's a hint that what you really want is an *enum*.
+that's a hint that what you really want is an `enum`.
 
-In this case, that enum is exactly the set of states for our FSM, so let's
+In this case, that `enum` is exactly the set of states for our FSM, so let's
 define that:
 
 ^code enum
@@ -161,7 +161,7 @@ define that:
 Instead of a bunch of flags, `Heroine` will just have one `state_` field. We
 also flip the order of our branching. In the previous code, we switched on
 input, *then* on state. This kept the code for handling one button press
-together, but smeared around the code for one state. We want to keep that
+together, but it smeared around the code for one state. We want to keep that
 together, so we switch on state first. That gives us:
 
 ^code state-switch
@@ -175,7 +175,7 @@ to implement a state machine and is fine for some uses.
 <aside name="invalid">
 
 In particular, the heroine can no longer be in an *invalid* state. With the
-boolean flags, some sets of values were possible but meaningless. With the enum,
+Boolean flags, some sets of values were possible but meaningless. With the `enum`,
 each value is valid.
 
 </aside>
@@ -202,8 +202,8 @@ We need to reset the timer when she starts ducking, so we modify
 
 ^code state-switch-reset
 
-All in all, to add this charge attack we had to modify two methods and add a
-`chargeTime_` field onto `Heroine`, even though it's only meaningful while in
+All in all, to add this charge attack, we had to modify two methods and add a
+`chargeTime_` field onto `Heroine` even though it's only meaningful while in
 the ducking state. What we'd prefer is to have all of that code and data nicely
 wrapped up in one place. The Gang of Four has us covered.
 
@@ -212,12 +212,12 @@ wrapped up in one place. The Gang of Four has us covered.
 For people deeply into the object-oriented mindset, every conditional <span
 name="branch">branch</span> is an opportunity to use dynamic dispatch (in other
 words a virtual method call in C++). I think you can go too far down that
-rabbithole. Sometimes an `if` is all you need.
+rabbit hole. Sometimes an `if` is all you need.
 
 <aside name="branch">
 
 There's a historical basis for this. Many of the original object-oriented
-apostles like Design Patterns' Gang of Four, and Refactoring's Martin Fowler
+apostles like *Design Patterns*' Gang of Four, and *Refactoring*'s Martin Fowler
 came from Smalltalk. There, `ifThen:` is just a method you invoke on the
 condition, which is implemented differently by the `true` and `false` objects.
 
@@ -230,7 +230,7 @@ of the Gang of Four:
 > Allow an object to alter its behavior when its internal state changes. The object will appear to change its class.
 
 That doesn't tell us much. Heck, our `switch` does that. The concrete pattern
-they describe, applied to our heroine looks like this:
+they describe looks like this when applied to our heroine:
 
 ### A state interface
 
@@ -244,24 +244,23 @@ method in that interface. For us, that's `handleInput()` and `update()`:
 
 For each state, we define a class that implements the interface. Its methods
 define the heroine's behavior when in that state. In other words, take each case
-from the earlier switches and move them into their state's class. For example:
+from the earlier uses of `switch` and move them into their state's class. For example:
 
 ^code ducking-state
 
-Note that we also moved `chargeTime_` out of Heroine and into the `DuckingState`
-class. This is great: that piece of data is only meaningful while in that state,
+Note that we also moved `chargeTime_` out of `Heroine` and into the `DuckingState`
+class. This is great -- that piece of data is only meaningful while in that state,
 and now our object model reflects that explicitly.
 
 ### Delegate to the state
 
-Next, we give the `Heroine` a pointer to her current state and then lose those
-big switches and delegate to the state instead:
+Next, we give the `Heroine` a pointer to her current state, lose each big `switch`, and delegate to the state instead:
 
 <span name="delegate"></span>
 
 ^code gof-heroine
 
-In order to "change state", we just need to assign `state_` to point to a
+In order to "change state", we need to assign `state_` to point to a
 different `HeroineState` object. That's the State pattern in its entirety.
 
 <aside name="delegate">
@@ -285,9 +284,9 @@ that delegates to another subordinate one. The difference is *intent*.
 ## Where Are the State Objects?
 
 I did gloss over one bit here. To change states, we need to assign `state_` to
-point to the new one, but where does that object come from? With our enum
-implementation, that was a no-brainer: enum values are just primitives like
-numbers. But now our states are classes which means we need an actual instance
+point to the new one, but where does that object come from? With our `enum`
+implementation, that was a no-brainer -- `enum` values are primitives like
+numbers. But now our states are classes, which means we need an actual instance
 to point to. There are two common answers to this:
 
 ### Static states
@@ -295,18 +294,18 @@ to point to. There are two common answers to this:
 If the state object doesn't have any other <span name="fn">fields</span>, then
 the only data it stores is a pointer to the internal virtual method table so
 that its methods can be called. In that case, there's no reason to ever have
-more than one instance of it: every instance would be identical anyway.
+more than one instance of it. Every instance would be identical anyway.
 
 <aside name="fn">
 
 If your state has no fields and only *one* virtual method in it, you can
 simplify this pattern even more. Replace each state *class* with a state
-*function* -- just a plain vanilla top-level function. Then the `state_` field
+*function* -- just a plain vanilla top-level function. Then, the `state_` field
 in your main class becomes a simple function pointer.
 
 </aside>
 
-In that case, you can just make a single *static* instance. Even if you have a
+In that case, you can make a single *static* instance. Even if you have a
 bunch of FSMs all going at the same time in that same state, they can all point
 to the <span name="flyweight">same instance</span> since it has nothing
 machine-specific about it.
@@ -335,7 +334,7 @@ happens to be ducking. This may coincidentally work in our game if there's only
 one heroine, but if we try to add two-player co-op and have two heroines on
 screen at the same time, we'll have problems.
 
-In that case, we actually have to <span name="fragment">create</span> a state
+In that case, we have to <span name="fragment">create</span> a state
 object when we transition to it, like:
 
 ^code duck
@@ -362,7 +361,7 @@ the standing state, when we *start* ducking, it does some initialization:
 
 ^code start-ducking
 
-The ducking state should really take care of resetting the charge time (after
+The ducking state should take care of resetting the charge time (after
 all, it's the object that has that field) and playing the animation. We can
 handle that by giving the state an *entry action*:
 
@@ -392,8 +391,8 @@ state.
 
 ## What's the Catch?
 
-I've spent all this time selling you on FSMs and now I'm going to pull the rug
-out from under you. Everything I've said so far is true, and they are a good fit
+I've spent all this time selling you on FSMs, and now I'm going to pull the rug
+out from under you. Everything I've said so far is true, and FSMs are a good fit
 for some problems. But their greatest virtue is also their greatest flaw.
 
 State machines help you untangle hairy code by enforcing a very <span
@@ -458,7 +457,7 @@ we define a separate state machine for what she's carrying. `Heroine` will have
 <aside name="equip-state">
 
 For illustrative purposes, we're using the full State pattern for her equipment.
-In practice, since it just has two states, a boolean flag would work too.
+In practice, since it only has two states, a Boolean flag would work too.
 
 </aside>
 
@@ -483,7 +482,7 @@ unrelated, this works well.
 In practice, you'll find a few cases where the states do interact. For example,
 maybe she can't fire while jumping, or maybe she can't do a dive attack if she's
 armed. To handle that, in the code for one state, you'll probably just do some
-crude `if` tests on the *other* machine's state to coordinate them. Not the most
+crude `if` tests on the *other* machine's state to coordinate them. It's not the most
 elegant solution, but it gets the job done.
 
 ## Hierarchical State Machines
@@ -505,7 +504,7 @@ sliding would then inherit from that and add their own additional behavior.
 <aside name="inheritance">
 
 This has both good and bad implications. Inheritance is a powerful means of code
-reuse, but also a very strong coupling between two chunks of code. It's a big
+reuse, but it is also a very strong coupling between two chunks of code. It's a big
 hammer, so swing it carefully.
 
 </aside>
@@ -515,7 +514,7 @@ A state can have a *superstate* (making itself a *substate*). When an event
 comes in, if the substate doesn't handle it, it rolls up the chain of
 superstates. In other words, it works just like overriding inherited methods.
 
-In fact, if we're using the actual State pattern to implement our FSM, we can
+In fact, if we're using the State pattern to implement our FSM, we can
 use class inheritance to implement the hierarchy. Define a base class for the
 superstate:
 
@@ -533,7 +532,7 @@ instead of a single state in the main class.
 The current state is the one on the top of the stack, under that is its
 immediate superstate, and then *that* state's superstate and so on. When you
 dish out some state-specific behavior, you start at the top of the stack and
-walk down until one of the states handles it. (If none do, you just ignore it.)
+walk down until one of the states handles it. (If none do, you ignore it.)
 
 ## Pushdown Automata
 
@@ -575,7 +574,7 @@ automaton*](http://en.wikipedia.org/wiki/Pushdown_automaton).
 
 Where a finite state machine has a *single* pointer to a state, a pushdown
 automaton has a *stack* of them. In an FSM, transitioning to a new state
-*replaces* the previous one. A pushdown automaton lets you do that, but also
+*replaces* the previous one. A pushdown automaton lets you do that, but it also
 gives you two additional operations:
 
  1. You can *push* a new state onto the stack. The "current" state is always the
@@ -596,7 +595,7 @@ were in before.
 ## So How Useful Are They?
 
 Even with those common extensions to state machines, they are still pretty
-limited. The trend these days in game AI is more towards exciting things like
+limited. The trend these days in game AI is more toward exciting things like
 [behavior trees][] and [planning systems][]. If AI is what you're interested in,
 all this chapter has done is whet your appetite. You'll want to read other books
 to satisfy it.
@@ -605,7 +604,7 @@ to satisfy it.
 [planning systems]: http://web.media.mit.edu/~jorkin/goap.html
 
 This doesn't mean finite state machines, pushdown automata, and other simple
-systems aren't useful. They're a good modelling tool for certain kinds of
+systems aren't useful. They're a good modeling tool for certain kinds of
 problems. Finite state machines are useful when:
 
  *  You have an entity whose behavior changes based on some internal state.

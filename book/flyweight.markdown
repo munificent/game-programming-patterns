@@ -35,7 +35,7 @@ If you were to sketch it out in code, you'd have something like this:
 
 ^code heavy-tree
 
-That's a lot of data and the mesh and textures are particularly large. An entire
+That's a lot of data, and the mesh and textures are particularly large. An entire
 forest of these objects is too much to throw at the GPU in one frame.
 Fortunately, there's a time-honored trick to handling this.
 
@@ -85,9 +85,9 @@ Object</a> pattern. Both involve delegating part of an object's state to some
 other object shared between a number of instances. However, the intent behind
 the patterns differs.
 
-With a Type Object, the goal is to minimize the number of classes you have to
+With a Type Object pattern, the goal is to minimize the number of classes you have to
 define by lifting "types" into your own object model. Any memory sharing you get
-from that is just bonus. The Flyweight pattern is purely about efficiency.
+from that is a bonus. The Flyweight pattern is purely about efficiency.
 
 </aside>
 
@@ -101,11 +101,11 @@ card understands.
 To minimize the amount of data we have to push to the GPU, we want to be able to
 send the shared data -- the `TreeModel` -- just *once*. Then, separately, we
 push over every tree instance's unique data -- its position, color, and scale.
-Finally, we tell the GPU, "use that one model to render each of these
+Finally, we tell the GPU, "Use that one model to render each of these
 instances."
 
 Fortunately, today's graphics APIs and <span name="hardware">cards</span>
-support exactly that. The details are fiddly, and out of the scope of this book,
+support exactly that. The details are fiddly and out of the scope of this book,
 but both Direct3D and OpenGL can do something called [*instanced
 rendering*](http://en.wikipedia.org/wiki/Geometry_instancing).
 
@@ -134,7 +134,7 @@ With instanced rendering, it's not so much that they take up too much memory as
 it is they take too much *time* to push each separate tree over the bus to the
 GPU, but the basic idea is the same.
 
-The pattern solves that by separating out an object's data into two kinds: The
+The pattern solves that by separating out an object's data into two kinds. The
 first kind of data is the stuff that's not specific to a single *instance* of
 that object and can be shared across all of them. The Gang of Four calls this
 the *intrinsic* state, but I like to think of it as the "context-free" stuff. In
@@ -145,7 +145,7 @@ instance. In this case, that is each tree's position, scale, and color. Just
 like in the chunk of sample code up there, this pattern saves memory by sharing
 one copy of the intrinsic state across every place where an object appears.
 
-From what we've seen so far, this just seems like basic resource sharing, and
+From what we've seen so far, this seems like basic resource sharing,
 hardly worth being called a pattern. That's partially because in this example
 here, we could come up with a clear separate *identity* for the shared state:
 the `TreeModel`.
@@ -263,8 +263,7 @@ algorithm.
 
 </aside>
 
-Now instead of methods on `World` for accessing the terrain properties, we can
-just expose the `Terrain` object directly:
+Now instead of methods on `World` for accessing the terrain properties, we can expose the `Terrain` object directly:
 
 ^code get-tile
 
@@ -274,14 +273,14 @@ you want some property of the tile, you can get it right from that object:
 ^code use-get-tile
 
 We're back to the pleasant API of working with real objects, and we did this
-with almost no overhead: a pointer is often no larger than an enum.
+with almost no overhead -- a pointer is often no larger than an enum.
 
 ## What About Performance?
 
 I say "almost" here because the performance bean counters will rightfully want
 to know how this compares to using an enum. Referencing the terrain by pointer
 implies an indirect lookup. To get to some terrain data like the movement cost,
-you first have to follow the pointer in the grid to find the terrain object, and
+you first have to follow the pointer in the grid to find the terrain object and
 then find the movement cost there. Chasing a pointer like this can cause a <span
 name="cache">cache miss</span>, which can slow things down.
 
@@ -329,8 +328,7 @@ maintainable style.
     Pool</a> might be a helpful place to store them.
 
  *  When you're using the <a class="pattern" href="state.html">State</a>
-    pattern, you often have "state" objects that don't have any fields that are
-    specific to the machine that the state is being used in. The state's
+    pattern, you often have "state" objects that don't have any fields specific to the machine that the state is being used in. The state's
     identity and methods are enough to be useful. In that case, you can apply
     this pattern and reuse that same state instance in multiple state machines
     at the same time without any problems.

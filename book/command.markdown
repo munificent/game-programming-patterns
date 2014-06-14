@@ -17,7 +17,7 @@ you do business with. Last I checked, people can't be "parameterized".
 
 Then, the rest of that sentence is just a list of stuff you could maybe possibly
 use the pattern for. Not very illuminating unless your use case happens to be in
-that list. *My* pithy tagline the Command pattern is:
+that list. *My* pithy tagline for the Command pattern is:
 
 **A command is a *<span name="latin">reified</span> method call*.**
 
@@ -31,8 +31,7 @@ fun word to use.
 
 Of course, "pithy" often means "impenetrably terse", so this may not be much of
 an improvement. Let me unpack that a bit. "Reify", in case you've never heard
-it, means "make real". Another term for reifying is making something "first
-class".
+it, means "make real". Another term for reifying is making something "first-class".
 
 <aside name="reflection">
 
@@ -48,8 +47,8 @@ it into a piece of *data* -- an object -- that you can stick in a variable, pass
 to a function, etc. So by saying the Command pattern is a "reified method call",
 what I mean is that it's a method call wrapped in an object.
 
-That sounds a lot like a "callback", "first class function", "function pointer",
-"closure", or "partially applied function", depending on which language you're
+That sounds a lot like a "callback", "first-class function", "function pointer",
+"closure", or "partially applied function" depending on which language you're
 coming from, and indeed those are all in the same ballpark. The Gang of Four
 later says:
 
@@ -63,7 +62,7 @@ all examples where commands are a brilliant fit.
 
 ## Configuring Input
 
-Somewhere in every game is a chunk of code that reads in raw user input --
+Somewhere in every game is a chunk of code that reads raw user input --
 button presses, keyboard events, mouse clicks, whatever. It takes each input and
 translates it to a meaningful action in the game:
 
@@ -137,7 +136,7 @@ indirection:
 <img src="images/command-buttons-two.png" />
 
 This is the Command pattern in a nutshell. If you can see the merit of it
-already, consider the rest of this chapter bonus.
+already, consider the rest of this chapter a bonus.
 
 ## Directions for Actors
 
@@ -159,7 +158,7 @@ methods on an actor of our choice, like so:
 
 ^code jump-actor
 
-Now we can use this one class to make any character in the game hop around.
+Now, we can use this one class to make any character in the game hop around.
 We're just missing a piece between the input handler and the command that takes
 the command and invokes it on the right object. First, we change `handleInput()`
 so that it *returns* commands:
@@ -168,9 +167,9 @@ so that it *returns* commands:
 
 It can't execute the command immediately since it doesn't know what actor to
 pass in. Here's where we take advantage of the fact that the command is a
-reified call: we can *delay* when the call is executed.
+reified call -- we can *delay* when the call is executed.
 
-Then we need some code that takes that command and runs it on the actor
+Then, we need some code that takes that command and runs it on the actor
 representing the player. Something like:
 
 ^code call-actor-command
@@ -179,16 +178,16 @@ Assuming `actor` is a reference to the player's character, this correctly drives
 him based on the user's input, so we're back to the same behavior we had in the
 first example. But adding a layer of indirection between the command and the
 actor that performs it has given us a neat little ability: *we can let the
-player control any actor in the game now by just changing the actor we execute
+player control any actor in the game now by changing the actor we execute
 the commands on.*
 
 In practice, that's not a common feature, but there is a similar use case that
 *does* pop up frequently. So far, we've only considered the player-driven
 character, but what about all of the other actors in the world? Those are driven
 by the game's AI. We can use this same command pattern as the interface between
-the AI engine and the actors: the AI code just emits `Command` objects.
+the AI engine and the actors; the AI code simply emits `Command` objects.
 
-The decoupling here between the AI that selects commands, and the actor code
+The decoupling here between the AI that selects commands and the actor code
 that performs them gives us a lot of flexibility. We can use different AI
 modules for different actors. Or we can mix and match AI for different kinds of
 behavior. Want a more aggressive opponent? Just plug-in a more aggressive AI to
@@ -196,8 +195,7 @@ generate commands for it. In fact, we can even bolt AI onto the *player's*
 character, which can be useful for things like demo mode where the game needs to
 run on auto-pilot.
 
-<span name="queue">By</span> making the commands that control an actor first
-class objects, we've removed the tight coupling of a direct method call.
+<span name="queue">By</span> making the commands that control an actor first-class objects, we've removed the tight coupling of a direct method call.
 Instead, think of it as a queue or stream of commands:
 
 <aside name="queue">
@@ -248,7 +246,7 @@ I may be speaking from experience here.
 </aside>
 
 Without the Command pattern, implementing undo is surprisingly hard. With it,
-it's a piece of cake. Let's say we're making a single player turn-based game and
+it's a piece of cake. Let's say we're making a single-player, turn-based game and
 we want to let users undo moves so they can focus more on strategy and less on
 guesswork.
 
@@ -262,7 +260,7 @@ Note this is a little different from our previous commands. In the last example,
 we wanted to *abstract* the command from the actor that it modified. In this
 case, we specifically want to *bind* it to the unit being moved. An instance of
 this command isn't a general "move something" operation that you could use in a
-bunch of contexts, it's a specific concrete move in the game's sequence of
+bunch of contexts; it's a specific concrete move in the game's sequence of
 turns.
 
 This highlights a variation in how the Command pattern gets implemented. In some
@@ -299,7 +297,7 @@ An `undo()` method reverses the game state changed by the corresponding
 Note that we added some <span name="memento">more state</span> to the class.
 When a unit moves, it forgets where it used to be. If we want to be able to undo
 that move, we have to remember the unit's previous position ourselves, which is
-what `xBefore_` and `yBefore_` in the command are.
+what `xBefore_` and `yBefore_` are in the command.
 
 <aside name="memento">
 
@@ -307,8 +305,7 @@ This seems like a place for the <a
 href="http://en.wikipedia.org/wiki/Memento_pattern"
 class="gof-pattern">Memento</a> pattern, but I haven't found it to work well.
 Since commands tend to modify only a small part of an object's state,
-snapshotting the rest of its data is a waste of memory. It's cheaper to just
-manually store only the bits you change.
+snapshotting the rest of its data is a waste of memory. It's cheaper to manually store only the bits you change.
 
 <a href="http://en.wikipedia.org/wiki/Persistent_data_structure">*Persistent
 data structures*</a> are another option. With these, every modification to an
@@ -316,7 +313,7 @@ object returns a new one, leaving the original unchanged. Through clever
 implementation, these new objects share data with the previous ones, so it's
 much cheaper than cloning the entire object.
 
-Using this, each command stores a reference to the object before the command was
+Using persistent data structures, each command stores a reference to the object before the command was
 performed, and undo just means switching back to the old object.
 
 </aside>
@@ -333,7 +330,7 @@ at it.
 <img src="images/command-undo.png" />
 
 When the player chooses "Undo", we undo the current command and move the current
-pointer back. When they <span name="replay">redo</span>, we advance the pointer
+pointer back. When they choose <span name="replay">"Redo"</span>, we advance the pointer
 and then execute that command. If they choose a new command after undoing some,
 everything in the list after the current command is discarded.
 
@@ -356,17 +353,16 @@ executing the pre-recorded commands.
 
 ## Classy and Dysfunctional?
 
-Earlier, I said commands are similar to first class functions or closures, but
+Earlier, I said commands are similar to first-class functions or closures, but
 every example I showed here used class definitions. If you're familiar with
 functional programming, you're probably wondering where the functions are.
 
-I wrote the examples this way because C++ has pretty limited support for first-
-class functions. Function pointers are stateless, functors are weird and still
+I wrote the examples this way because C++ has pretty limited support for first-class functions. Function pointers are stateless, functors are weird and still
 require defining a class, and the lambdas in C++11 are tricky to work with
 because of manual memory management.
 
 That's *not* to say you shouldn't use functions for the Command pattern in other
-languages. If you have the luxury of a language with real closures, by all means
+languages. If you have the luxury of a language with real closures, by all means,
 use them! In <span name="some">some</span> ways, the Command pattern is a way of
 emulating closures in languages that don't have them.
 
@@ -423,7 +419,7 @@ functional paradigm is for many problems.
     easier to implement those, it's often helpful to define a concrete base
     class with a bunch of convenient high-level methods that the derived
     commands can compose to define their behavior. That turns the command's main
-    `execute` method into a <a href="subclass-sandbox.html"
+    `execute()` method into a <a href="subclass-sandbox.html"
     class="pattern">Subclass Sandbox</a>.
 
  *  In our examples, we explicitly chose which actor would handle a command. In
@@ -435,7 +431,7 @@ functional paradigm is for many problems.
 
  *  Some commands are stateless chunks of pure behavior like the `JumpCommand`
     in the first example. In cases like that, having <span
-    name="singleton">more</span> than one instance of that class wastes memory,
+    name="singleton">more</span> than one instance of that class wastes memory
     since all instances are equivalent. The <a class="gof-pattern"
     href="flyweight.html">Flyweight</a> pattern addresses that.
 
