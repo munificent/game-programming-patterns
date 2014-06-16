@@ -344,7 +344,7 @@ methods. A slow observer can block a subject.</p>
 something you have to be aware of. UI programmers&#8202;&mdash;&#8202;who&#8217;ve been doing event-
 based programming like this for ages&#8202;&mdash;&#8202;have an established motto for this:
 &#8220;stay off the UI thread&#8221;.</p>
-<p>If you&#8217;re responding to a event synchronously, you need to finish and return
+<p>If you&#8217;re responding to an event synchronously, you need to finish and return
 control as quickly as possible so that the UI doesn&#8217;t lock up. When you have
 slow work to do, push it onto another thread or a work queue.</p>
 <p>You do have to be careful mixing observers with threading and explicit locks,
