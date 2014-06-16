@@ -286,7 +286,7 @@ something you have to be aware of. UI programmers -- who've been doing event-
 based programming like this for ages -- have an established motto for this:
 "stay off the UI thread".
 
-If you're responding to a event synchronously, you need to finish and return
+If you're responding to an event synchronously, you need to finish and return
 control as quickly as possible so that the UI doesn't lock up. When you have
 slow work to do, push it onto another thread or a work queue.
 
