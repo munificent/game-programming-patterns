@@ -260,7 +260,7 @@ slower there.
 The first variation we'll look at adds a simple fix. Say you want your game to
 run at 60 FPS. That gives you about <span name="16">16</span> milliseconds per
 frame. As long as you can reliably do all of your game processing and rendering
-in less than that time, you can run at a steady frame rate. All you do process
+in less than that time, you can run at a steady frame rate. All you do is process
 the frame and then *wait* until it's time for the next one, like so:
 
 <img src="images/game-loop-simple.png"/>
