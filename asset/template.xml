@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="yes" ?>
+<!DOCTYPE chapter [
+  <!ENTITY mdash   "&#8212;"> <!-- em dash, U+2014 ISOpub -->
+  <!ENTITY lsquo   "&#8216;"> <!-- left single quotation mark,
+                                      U+2018 ISOnum -->
+  <!ENTITY rsquo   "&#8217;"> <!-- right single quotation mark,
+                                      U+2019 ISOnum -->
+  <!ENTITY sbquo   "&#8218;"> <!-- single low-9 quotation mark, U+201A NEW -->
+  <!ENTITY ldquo   "&#8220;"> <!-- left double quotation mark,
+                                      U+201C ISOnum -->
+  <!ENTITY rdquo   "&#8221;"> <!-- right double quotation mark,
+                                      U+201D ISOnum -->
+]>
+<chapter>
+{{body}}
+</chapter>

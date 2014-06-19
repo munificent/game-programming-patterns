@@ -51,6 +51,32 @@ CHAPTERS = [
   "Spatial Partition"
 ]
 
+# URLs for hyperlinks to chapters. Note that the order is significant here.
+# The index in this list + 1 is the chapter's number in the table of contents.
+CHAPTER_HREFS = [
+  "introduction.html",
+  "architecture-performance-and-games.html",
+  "command.html",
+  "flyweight.html",
+  "observer.html",
+  "prototype.html",
+  "singleton.html",
+  "state.html",
+  "double-buffer.html",
+  "game-loop.html",
+  "update-method.html",
+  "bytecode.html",
+  "subclass-sandbox.html",
+  "type-object.html",
+  "component.html",
+  "event-queue.html",
+  "service-locator.html",
+  "data-locality.html",
+  "dirty-flag.html",
+  "object-pool.html",
+  "spatial-partition.html"
+]
+
 num_chapters = 0
 empty_chapters = 0
 total_words = 0
@@ -121,7 +147,7 @@ def format_file(path, nav, skip_up_to_date):
         else:
           print "UNKNOWN COMMAND:", command, args
 
-      elif stripped.startswith('#'):
+      elif extension != "xml" and stripped.startswith('#'):
         # Build the page navigation from the headers.
         index = stripped.find(" ")
         headertype = stripped[:index]
@@ -230,10 +256,24 @@ def clean_up_xml(output):
 
     return code
 
+  def fix_link(match):
+    tag = match.group(1)
+    contents = match.group(2)
+    href = re.search(r'href\s*=\s*"([^"]+)"', tag).group(1)
+
+    # If it's not a link to a chapter, just return the contents of the link and
+    # strip out the link itself.
+    if not href in CHAPTER_HREFS:
+      return contents
+
+    # Turn it into a chapter number reference.
+    return "{}<chap-ref> ({})</chap-ref>".format(
+        contents, CHAPTER_HREFS.index(href) + 1)
+
   def clean_up_xhtml(html):
-    # Remove links.
-    html = re.sub(r"<a\s[^>]+>", "", html)
-    html = re.sub(r"</a>", "", html)
+    # Replace chapter links with chapter number references and remove other
+    # links.
+    html = re.sub(r"<a\s+([^>]+)>([^<]+)</a>", fix_link, html)
 
     # Ditch newlines in the middle of blocks of text. Out of sheer malice,
     # even though they are meaningless in actual XML, InDesign treats them

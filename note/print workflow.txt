@@ -1,0 +1,19 @@
+- Export to XML
+- Import XML
+- Place it in main text flow
+- Untag everything and remove the story structure
+- Pull out asides and restyle
+- Change first paragraph body text styles
+- Set chapter title and number on first page
+- Update section in running footer
+- Clean up
+  - Make sure there aren't bits of 14.4pt line height
+- Fix prose references to hyperlinks to make them make sense
+- Add illustrations
+  - Make 600 dpi bitmap
+  - Save to Print/Illustrations/...
+  - Place
+  - Make inline anchor
+  - Set Position to "Above Line" with 9pts of space before and 4.5pts after
+  - Add a caption
+- Position asides

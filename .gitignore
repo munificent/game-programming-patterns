@@ -4,3 +4,5 @@ code/flyweight/tiles/Build/
 xcuserdata/
 *.xcuserstate
 project.xcworkspace/
+
+xml/
