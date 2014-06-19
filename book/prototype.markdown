@@ -54,14 +54,14 @@ Implementing it would look like this:
 
 ^code spawner-classes
 
-Unless you get paid by the line of code, this is pretty obviously not a fun way
+Unless you get paid by the line of code, this obviously is not a fun way
 to hack this together. Lots of classes, lots of boilerplate, lots of redundancy,
 lots of duplication, lots of repeating myself...
 
-The prototype pattern offers a solution. The key idea is that *an object can
+The Prototype pattern offers a solution. The key idea is that *an object can
 spawn other objects similar to itself*. If you have one ghost, you can make more
 ghosts from it. If you have a demon, you can make other demons. Any monster can
-be treated as a *prototypical* monster used to generate other versions of
+be treated as a *prototypal* monster used to generate other versions of
 itself.
 
 To implement this, we give our base class, `Monster`, an abstract `clone()`
@@ -85,14 +85,14 @@ queen bee who never leaves the hive.
 
 <img src="images/prototype-spawner.png" />
 
-To create a ghost spawner, we just create a prototypical ghost instance, and
+To create a ghost spawner, we create a prototypal ghost instance and
 then create a spawner holding that prototype:
 
 ^code spawn-ghost-clone
 
 One neat part about this pattern is that it doesn't just clone the *class* of
 the prototype, it clones its *state* too. This means we could make a spawner for
-fast ghosts, or weak ones, or slow ones, just by creating an appropriate
+fast ghosts, weak ghosts, or slow ghosts just by creating an appropriate
 prototype ghost.
 
 I find something both elegant and yet surprising about this pattern. I can't
@@ -129,11 +129,11 @@ each monster, we could make spawn *functions*, like so:
 ^code callback
 
 This is less boilerplate than rolling a whole class for constructing a monster
-of some type. Then the one spawner class can just store a function pointer:
+of some type. Then the one spawner class can simply store a function pointer:
 
 ^code spawner-callback
 
-To create a spawner for ghosts, you just do:
+To create a spawner for ghosts, you do:
 
 ^code spawn-ghost-callback
 
@@ -146,7 +146,7 @@ is to make it a *type parameter*, which templates let us do:
 
 <aside name="templates">
 
-I'm not sure if C++ programmers learned to love them, or if templates just
+I'm not sure if C++ programmers learned to love them or if templates just
 scared some people completely away from C++. Either way, everyone I see using
 C++ today uses templates too.
 
@@ -176,8 +176,8 @@ spawners of any monster type would itself need to take a template parameter.
 The previous two solutions address the need to have a class, `Spawner`, which is
 parameterized by a type. In C++, types aren't generally first-class, so that
 requires some <span name="type-obj">gymnastics</span>. If you're using a
-dynamically-typed language like JavaScript, Python or Ruby where classes *are*
-just regular objects you can pass around, you can solve this much more directly.
+dynamically-typed language like JavaScript, Python, or Ruby where classes *are*
+ regular objects you can pass around, you can solve this much more directly.
 
 <aside name="type-obj">
 
@@ -190,11 +190,11 @@ language's built-in classes provide.
 </aside>
 
 When you make a spawner, just pass in the class of monster that it should
-construct -- literally the actual runtime object that represents the monster's
+construct -- the actual runtime object that represents the monster's
 class. Easy as pie.
 
 With all of these options, I honestly can't say I've found a case where I felt
-the prototype *design pattern* was the best answer. Maybe your experience will
+the Prototype *design pattern* was the best answer. Maybe your experience will
 be different, but for now let's put that away and talk about something else:
 prototypes as a *language paradigm*.
 
@@ -264,7 +264,7 @@ parent.
 <aside name="parent">
 
 I'm simplifying here. Self actually supports multiple parents. Parents are just
-specially marked fields, which means you can do things like inherit parents, or
+specially marked fields, which means you can do things like inherit parents or
 change them at runtime, leading to what's called *dynamic inheritance*.
 
 </aside>
@@ -282,8 +282,7 @@ bunch of new things that all have stuff in common? Just like the design pattern,
 the way you do this in Self is by *cloning*.
 
 In Self, it's as if *every* object supports the Prototype design pattern
-automatically. Any object can be cloned. To make a bunch of similar objects, you
-just:
+automatically. Any object can be cloned. To make a bunch of similar objects, you:
 
 1. Beat one object into the shape you want. You can just clone the base `Object`
    built into the system and then stuff fields and methods into it.
@@ -291,16 +290,15 @@ just:
 2. Clone it to make as many... uh... clones as you want.
 
 This gives us the elegance of the Prototype design pattern without the tedium of
-having to implement `clone()` ourselves; it's just built into the system.
+having to implement `clone()` ourselves; it's built into the system.
 
 This is such a beautiful, clever, minimal system that as soon as I learned about
-it, <span name="finch">I started</span> creating a prototype-based language just
-to get more experience with it.
+it, <span name="finch">I started</span> creating a prototype-based language to get more experience with it.
 
 <aside name="finch">
 
 I realize building a language from scratch is not the most efficient way to
-learn, but what can I say, I'm a bit peculiar. If you're curious, the language
+learn, but what can I say? I'm a bit peculiar. If you're curious, the language
 is called [Finch](http://finch.stuffwithstuff.com/).
 
 </aside>
@@ -330,17 +328,17 @@ complexity onto the user. As soon as I started trying to use it, I found myself
 missing the structure that classes give. I ended up trying to recapitulate it at
 the library level since the language didn't have it.
 
-Maybe this is just because my prior experience is in class-based languages, so
+Maybe this is because my prior experience is in class-based languages, so
 my mind has been tainted by that paradigm. But my hunch is that most people just
 like well-defined "kinds of things".
 
-In addition to the runaway success of classes-based languages, look at how many
-games have explicit character classes, and a precise roster of different sorts
-of enemies, items, and skills, each neatly labelled. You don't see many games
+In addition to the runaway success of class-based languages, look at how many
+games have explicit character classes and a precise roster of different sorts
+of enemies, items, and skills, each neatly labeled. You don't see many games
 where each monster is a unique snowflake, like "sort of halfway between a troll
 and a goblin with a bit of snake mixed in".
 
-While prototypes are a really cool paradigm, and one that I wish more people
+While prototypes are a really cool paradigm and one that I wish more people
 knew about, I'm glad that most of us aren't actually programming using them
 every day. <span name="telling">The code</span> I've seen that fully embraces
 prototypes has a weird mushiness to it that I find hard to wrap my head around.
@@ -379,7 +377,7 @@ taken steps away from Self is that the core operation in a prototype-based
 language, *cloning*, is nowhere to be seen. There is no method to clone an
 object in JavaScript.
 
-The closest it has is `Object.create` which lets you create a new object that
+The closest it has is `Object.create`, which lets you create a new object that
 delegates to an existing one. Even that wasn't added until ECMAScript 5,
 fourteen years after JavaScript came out. Instead of cloning, let me walk you
 through the typical way you define types and create objects in JavaScript. You
@@ -396,7 +394,7 @@ This creates a new object and initializes its fields. You invoke it like:
     :::javascript
     var sword = new Weapon(10, 16);
 
-The `new` here invokes the body of the `Weapon` function with `this` bound to a
+The `new` here invokes the body of the `Weapon()` function with `this` bound to a
 new empty object. The body adds a bunch of fields to it, then the now-filled-in
 object is automatically returned.
 
@@ -467,7 +465,7 @@ classes, we can put it in a separate class that those classes inherit from or
 mix in.
 
 When your game's data reaches a certain size, you really start wanting similar
-features. Data modelling is a deep subject that I can't hope to do justice here,
+features. Data modeling is a deep subject that I can't hope to do justice here,
 but I do want to throw out one feature for you to consider in your own games:
 using prototypes and delegation for reusing data.
 
@@ -482,8 +480,8 @@ top-down multi-player dungeon crawl arcade games. Please don't sue me.
 
 </aside>
 
-One common approach is to use JSON: data entities are basically *maps*, or
-*property bags* or any of a dozen other terms because there's nothing
+One common approach is to use JSON. Data entities are basically *maps*, or
+*property bags*, or any of a dozen other terms because there's nothing
 programmers like more than <span name="inventing">inventing</span> a new name
 for something that already has one.
 
@@ -578,8 +576,8 @@ With that, we can simplify the JSON for our goblin horde:
     }
 
 Since the archer and wizard have the grunt as their prototype, we don't have to
-repeat the health, resists and weaknesses in each of them. The logic we've added
-to our data model is super simple -- just basic single delegation -- but we've
+repeat the health, resists, and weaknesses in each of them. The logic we've added
+to our data model is super simple -- basic single delegation -- but we've
 already gotten rid of a bunch of duplication.
 
 One interesting thing to note here is that we didn't set up a fourth "base
@@ -604,7 +602,7 @@ some bonuses, can be expressed as that directly:
       "damageBonus": "20"
     }
 
-A little extra power in your game engine's data modelling system can make it
+A little extra power in your game engine's data modeling system can make it
 easier for designers to add lots of little variations to the armaments and
 beasties populating your game world, and that richness is exactly what delights
 players.

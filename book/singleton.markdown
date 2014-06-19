@@ -11,7 +11,7 @@ by the Gang of Four usually does more harm than good. They stress that the
 pattern should be used sparingly, but that message was often lost in translation
 to the <span name="instance">game industry</span>.
 
-Like any pattern, using it where it doesn't belong is about as helpful as
+Like any pattern, using Singleton where it doesn't belong is about as helpful as
 treating a bullet wound with a splint. Since it's so overused, most of this
 chapter will be about *avoiding* singletons, but first, let's go over the
 pattern itself.
@@ -20,7 +20,7 @@ pattern itself.
 
 When much of the industry moved to object-oriented programming from C, one
 problem they ran into was "how do I get an instance?" They had some method they
-wanted to call, but didn't have an instance of the object that provides that
+wanted to call but didn't have an instance of the object that provides that
 method in hand. Singletons (in other words, making it global) were an easy way
 out.
 
@@ -43,24 +43,24 @@ system that maintains its own global state.
 Consider a class that wraps an underlying file system API. Because file
 operations can take a while to complete, our class performs operations
 asynchronously. This means multiple operations can be running concurrently, so
-they must be coordinated with each other. If we start one call to create a file,
+they must be coordinated with each other. If we start one call to create a file
 and another one to delete that same file, our wrapper needs to be aware of both
 to make sure they don't interfere with each other.
 
 To do this, a call into our wrapper needs to have access to every previous
-operation. If users could freely create instances of our class, one instance has
-no way of knowing about operations that other instances started. Enter the
-singleton. It provides a way for a class to ensure at compile time that there is
-only a single instance of the class.
+operation. If users could freely create instances of our class, one instance
+would have no way of knowing about operations that other instances started.
+Enter the singleton. It provides a way for a class to ensure at compile time
+that there is only a single instance of the class.
 
 ### Providing a global point of access
 
 Several different systems in the game will use our file system wrapper: logging,
 content loading, game state saving, etc. If those systems can't create their own
-instances of our file system wrapper, how do they get ahold of one?
+instances of our file system wrapper, how can they get ahold of one?
 
 Singleton provides a solution to this too. In addition to creating the single
-instance, it also provides a globally-available method to get it. This way,
+instance, it also provides a globally available method to get it. This way,
 anyone anywhere can get their paws on our blessed instance. All together, the
 classic implementation looks like this:
 
@@ -77,7 +77,7 @@ A modern take looks like this:
 ^code local-static
 
 C++11 <span name="thread">mandates</span> that the initializer for a local
-static variable is only run once even in the presence of concurrency. So,
+static variable is only run once, even in the presence of concurrency. So,
 assuming you've got a modern C++ compiler, this code is thread-safe where the
 first example is not.
 
@@ -117,7 +117,7 @@ It's got some other nice features too:
 
 *   **You can subclass the singleton.** This is a powerful but often overlooked
     capability. Let's say we need our file system wrapper to be cross-platform.
-    To make this work, we want it to be an abstract interface for a file system,
+    To make this work, we want it to be an abstract interface for a file system
     with subclasses that implement the interface for each platform. Here are the
     basic classes:
 
@@ -144,22 +144,22 @@ code and celebrate with a tasty beverage.
 
 ## Why We Regret Using It
 
-In the short-term, the Singleton pattern is relatively benign. Like many design
-choices, we pay the cost in the long-term. Once we've cast a few unnecessary
+In the short term, the Singleton pattern is relatively benign. Like many design
+choices, we pay the cost in the long term. Once we've cast a few unnecessary
 singletons into cold hard code, here's the trouble we've bought ourselves:
 
 ### It's a global variable
 
 When games were still written by a couple of guys in a garage, pushing the
 hardware was more important than ivory-tower software engineering principles.
-Old-school C and assembly coders used globals and statics without any trouble,
+Old-school C and assembly coders used globals and statics without any trouble
 and shipped good games. As games got bigger and more complex, architecture and
 maintainability started to become the bottleneck. We struggled to ship games not
 because of hardware limitations, but because of *productivity* limitations.
 
 So we moved to languages like C++ and started applying some of the hard-earned
 wisdom of our software engineer forebears. One lesson we learned is that global
-variables are bad, for a variety of reasons:
+variables are bad for a variety of reasons:
 
 *   **They make it harder to reason about code.** Say we're tracking down a bug
     in a function someone else wrote. If that function doesn't touch any global
@@ -179,15 +179,15 @@ variables are bad, for a variety of reasons:
 
     </aside>
 
-    Now imagine right in the middle of that function is a call to
-    `SomeClass::getSomeGlobalData()`. Now to figure out what's going on, we have
+    Now, imagine right in the middle of that function is a call to
+    `SomeClass::getSomeGlobalData()`. To figure out what's going on, we have
     to hunt through the entire codebase to see what touches that global data.
     You don't really hate global state until you've had to `grep` a million
     lines of code at three in the morning trying to find the one errant call
     that's setting a static variable to the wrong value.
 
 *   **They encourage coupling.** The new coder on your team isn't familiar with
-    your game's beautifully maintainable loosely-coupled architecture, but he's
+    your game's beautifully maintainable loosely coupled architecture, but he's
     just been given his first task: make boulders play sounds when they crash
     onto the ground. You and I know we don't want the physics code to be coupled
     to *audio* of all things, but he's just trying to get his task done.
@@ -222,7 +222,7 @@ been doing for years.
 
 Unfortunately, it's more placebo than cure. If you scan the list of problems
 that globals cause, you'll notice that the Singleton pattern doesn't solve any
-of them. That's because a singleton *is* global state, just encapsulated in a
+of them. That's because a singleton *is* global state -- it's just encapsulated in a
 class.
 
 ### It solves two problems even when you just have one
@@ -316,14 +316,14 @@ with static memory.
 
 The usual argument for choosing singletons over static classes is that if you
 decide to change the static class into a non-static one later, you'll need to
-fix every call site. In theory, you don't have to do that with singletons,
+fix every call site. In theory, you don't have to do that with singletons
 because you could be passing the instance around and calling it like a normal
 instance method.
 
 In practice, I've ever seen it work that way. Everyone just does
-`Foo::instance().bar()` in one line. So, if we changed Foo to not be a
+`Foo::instance().bar()` in one line. If we changed Foo to not be a
 singleton, we'd still have to touch every call site. Given that, I'd rather have
-a simpler class, and a simpler syntax to call into it.
+a simpler class and a simpler syntax to call into it.
 
 </aside>
 
@@ -349,16 +349,16 @@ unfamiliarity with OOP. Consider these two contrived classes:
 
 Maybe this example is a bit dumb, but I've seen plenty of code that reveals a
 design just like this after you scrape away the crusty details. If you look at
-this code, it's natural to think that BulletManager should be a singleton. After
-all, anything that has a Bullet will need the manager too, and how many
-instances of BulletManager do you need?
+this code, it's natural to think that `BulletManager` should be a singleton. After
+all, anything that has a `Bullet` will need the manager too, and how many
+instances of `BulletManager` do you need?
 
 The answer here is *zero*, actually. Here's how we solve the "singleton" problem
 for our manager class:
 
 ^code 9
 
-There we go. No manager, no problem. Poorly-designed singletons are often
+There we go. No manager, no problem. Poorly designed singletons are often
 "helpers" that add functionality to another class. If you can, just move all of
 that behavior into the class it helps. After all, OOP is about letting objects
 take care of themselves.
@@ -373,7 +373,7 @@ This is one half of what the Singleton pattern gives you. As in our file system
 example, it can be critical to ensure there's only a single instance of a class.
 However, that doesn't necessarily mean we also want to provide *public*,
 *global* access to that instance. We may want to restrict access to certain
-areas of the code, or even make it <span name="wrapper">private</span> to a
+areas of the code or even make it <span name="wrapper">private</span> to a
 single class. In those cases, providing a public global point of access weakens
 the architecture.
 
@@ -389,22 +389,22 @@ There are a couple of ways to accomplish this. Here's one:
 
 ^code 6
 
-This class allows anyone to construct it, but will assert and fail if you try to
+This class allows anyone to construct it, but it will assert and fail if you try to
 construct more than one instance. As long as the right code creates the instance
 first, then we've ensured no other code can either get at that instance or
 create their own. The class ensures the single instantiation requirement it
-cares about, but doesn't dictate how the class should be used.
+cares about, but it doesn't dictate how the class should be used.
 
 The downside with this implementation is that the check to prevent multiple
 instantiation is only done at *runtime*. The Singleton pattern, in contrast,
-guarantees a single instance at compile time, by the very nature of the class's
+guarantees a single instance at compile time by the very nature of the class's
 structure.
 
 ### To provide convenient access to an instance
 
 Convenient access is the main reason we reach for singletons. They make it easy
 to get our hands on an object we need to use in a lot of different places. That
-ease comes at a cost, though: it becomes equally easy to get our hands on the
+ease comes at a cost, though -- it becomes equally easy to get our hands on the
 object in places where we *don't* want it being used.
 
 The general rule is that we want variables to be as narrowly scoped as possible
@@ -429,7 +429,7 @@ other ways our codebase can get access to an object:
 
     Consider a function for rendering objects. In order to render, it needs
     access to an object that represents the graphics device and maintains the
-    render state. It's very common to just pass that in to all of the rendering
+    render state. It's very common to simply pass that in to all of the rendering
     functions, usually as a parameter named something like `context`.
 
     On the other hand, some objects don't belong in the signature of a method.
@@ -441,7 +441,7 @@ other ways our codebase can get access to an object:
     <aside name="aop">
 
     The term for things like logging that appear scattered throughout a codebase
-    is a "cross-cutting concern". Handling cross-cutting concerns gracefully is
+    is "cross-cutting concern". Handling cross-cutting concerns gracefully is
     a continuing architectural challenge, especially in statically typed
     languages.
 
@@ -453,10 +453,10 @@ other ways our codebase can get access to an object:
 
  *  **Get it from the base class.** Many game architectures have shallow but
     wide inheritance hierarchies, often only one level deep. For example, you
-    may have a base `GameObject` class, with derived classes for each enemy or
+    may have a base `GameObject` class with derived classes for each enemy or
     object in the game. With architectures like this, a large portion of the
     game code will live in these "leaf" derived classes. This means that all
-    these classes already has access to the same thing: their `GameObject` base
+    these classes already have access to the same thing: their `GameObject` base
     class. We can use that to our advantage:
 
     <span name="gameobject"></span>
@@ -464,7 +464,7 @@ other ways our codebase can get access to an object:
     ^code 10
 
     This ensures nothing outside of `GameObject` has access to its `Log` object,
-    but every derived entity does, using `getLog()`. This pattern of letting
+    but every derived entity does using `getLog()`. This pattern of letting
     derived objects implement themselves in terms of protected methods provided
     to them is covered in the <a class="pattern"
     href="subclass-sandbox.html">Subclass Sandbox</a> chapter.
@@ -484,7 +484,7 @@ other ways our codebase can get access to an object:
 
  *  **Get it from something already global.** The goal of removing *all* global
     state is admirable, but rarely practical. Most codebases will still have a
-    couple of globally available objects, for example a single `Game` or `World`
+    couple of globally available objects, such as a single `Game` or `World`
     object representing the entire game state.
 
     We can reduce the number of global classes by piggybacking on existing ones
@@ -493,7 +493,7 @@ other ways our codebase can get access to an object:
 
     ^code 11
 
-    With this, only `World` is globally-available. Functions can get to the
+    With this, only `World` is globally available. Functions can get to the
     other systems <span name="demeter">through</span> it:
 
     ^code 12
@@ -518,7 +518,7 @@ other ways our codebase can get access to an object:
     here.
 
  *  **Get it from a Service Locator.** So far, we're assuming the global class
-    is some regular concrete class like World. Another option is to define a
+    is some regular concrete class like `World`. Another option is to define a
     class whose sole reason for being is to give global access to objects. This
     common pattern is called a <a class="pattern"
     href="service-locator.html">Service Locator</a> and gets its own chapter.
@@ -535,5 +535,5 @@ There are a couple of other chapters in this book that can also help here. The
 <a class="pattern" href="subclass-sandbox.html">Subclass Sandbox</a> pattern
 gives instances of a class access to some shared state without making it
 globally available. The <a class="pattern" href="service-locator.html">Service
-Locator</a> *does* make an object globally available, but it gives you more
+Locator</a> pattern *does* make an object globally available, but it gives you more
 flexibility with how that object is configured.
