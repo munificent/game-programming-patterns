@@ -68,7 +68,7 @@ to the GPU.</p>
 </pre></div>
 
 
-<p>That&#8217;s a lot of data and the mesh and textures are particularly large. An entire
+<p>That&#8217;s a lot of data, and the mesh and textures are particularly large. An entire
 forest of these objects is too much to throw at the GPU in one frame.
 Fortunately, there&#8217;s a time-honored trick to handling this.</p>
 <p>The key observation is that even though there may be thousands of trees in the
@@ -127,9 +127,9 @@ tree in the world has a <em>reference</em> to that shared <code>TreeModel</code>
 Object</a> pattern. Both involve delegating part of an object&#8217;s state to some
 other object shared between a number of instances. However, the intent behind
 the patterns differs.</p>
-<p>With a Type Object, the goal is to minimize the number of classes you have to
+<p>With a type object, the goal is to minimize the number of classes you have to
 define by lifting &#8220;types&#8221; into your own object model. Any memory sharing you get
-from that is just bonus. The Flyweight pattern is purely about efficiency.</p>
+from that is a bonus. The Flyweight pattern is purely about efficiency.</p>
 </aside>
 
 <p>This is all well and good for storing stuff in main memory, but that doesn&#8217;t
@@ -140,10 +140,10 @@ card understands.</p>
 <p>To minimize the amount of data we have to push to the GPU, we want to be able to
 send the shared data&#8202;&mdash;&#8202;the <code>TreeModel</code>&#8202;&mdash;&#8202;just <em>once</em>. Then, separately, we
 push over every tree instance&#8217;s unique data&#8202;&mdash;&#8202;its position, color, and scale.
-Finally, we tell the GPU, &#8220;use that one model to render each of these
+Finally, we tell the GPU, &#8220;Use that one model to render each of these
 instances.&#8221;</p>
 <p>Fortunately, today&#8217;s graphics APIs and <span name="hardware">cards</span>
-support exactly that. The details are fiddly, and out of the scope of this book,
+support exactly that. The details are fiddly and out of the scope of this book,
 but both Direct3D and OpenGL can do something called <a href="http://en.wikipedia.org/wiki/Geometry_instancing"><em>instanced
 rendering</em></a>.</p>
 <p>In both APIs, you provide two streams of data. The first is the blob of common
@@ -166,7 +166,7 @@ many of them.</p>
 <p>With instanced rendering, it&#8217;s not so much that they take up too much memory as
 it is they take too much <em>time</em> to push each separate tree over the bus to the
 GPU, but the basic idea is the same.</p>
-<p>The pattern solves that by separating out an object&#8217;s data into two kinds: The
+<p>The pattern solves that by separating out an object&#8217;s data into two kinds. The
 first kind of data is the stuff that&#8217;s not specific to a single <em>instance</em> of
 that object and can be shared across all of them. The Gang of Four calls this
 the <em>intrinsic</em> state, but I like to think of it as the &#8220;context-free&#8221; stuff. In
@@ -175,7 +175,7 @@ the example here, this is the geometry and textures for the tree.</p>
 instance. In this case, that is each tree&#8217;s position, scale, and color. Just
 like in the chunk of sample code up there, this pattern saves memory by sharing
 one copy of the intrinsic state across every place where an object appears.</p>
-<p>From what we&#8217;ve seen so far, this just seems like basic resource sharing, and
+<p>From what we&#8217;ve seen so far, this seems like basic resource sharing,
 hardly worth being called a pattern. That&#8217;s partially because in this example
 here, we could come up with a clear separate <em>identity</em> for the shared state:
 the <code>TreeModel</code>.</p>
@@ -378,7 +378,7 @@ algorithm.</p>
 </aside>
 
 <p>Now instead of methods on <code>World</code> for accessing the terrain properties, we can
-just expose the <code>Terrain</code> object directly:</p>
+expose the <code>Terrain</code> object directly:</p>
 <div class="codehilite"><pre><span class="k">const</span> <span class="n">Terrain</span><span class="o">&amp;</span> <span class="n">World</span><span class="o">::</span><span class="n">getTile</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span> <span class="k">const</span>
 <span class="p">{</span>
   <span class="k">return</span> <span class="o">*</span><span class="n">tiles_</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">];</span>
@@ -393,12 +393,12 @@ you want some property of the tile, you can get it right from that object:</p>
 
 
 <p>We&#8217;re back to the pleasant API of working with real objects, and we did this
-with almost no overhead: a pointer is often no larger than an enum.</p>
+with almost no overhead&#8202;&mdash;&#8202;a pointer is often no larger than an enum.</p>
 <h2><a href="#what-about-performance" name="what-about-performance">What About Performance?</a></h2>
 <p>I say &#8220;almost&#8221; here because the performance bean counters will rightfully want
 to know how this compares to using an enum. Referencing the terrain by pointer
 implies an indirect lookup. To get to some terrain data like the movement cost,
-you first have to follow the pointer in the grid to find the terrain object, and
+you first have to follow the pointer in the grid to find the terrain object and
 then find the movement cost there. Chasing a pointer like this can cause a <span
 name="cache">cache miss</span>, which can slow things down.</p>
 <aside name="cache">
@@ -441,8 +441,8 @@ Pool</a> might be a helpful place to store them.</p>
 </li>
 <li>
 <p>When you&#8217;re using the <a class="pattern" href="state.html">State</a>
-    pattern, you often have &#8220;state&#8221; objects that don&#8217;t have any fields that are
-    specific to the machine that the state is being used in. The state&#8217;s
+    pattern, you often have &#8220;state&#8221; objects that don&#8217;t have any fields specific
+    to the machine that the state is being used in. The state&#8217;s
     identity and methods are enough to be useful. In that case, you can apply
     this pattern and reuse that same state instance in multiple state machines
     at the same time without any problems.</p>

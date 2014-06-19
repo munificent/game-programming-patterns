@@ -184,7 +184,7 @@ may add fields, you need to ensure that each slot in the pool has enough memory
 for the <em>largest</em> possible object. Otherwise, an unexpectedly large object will
 stomp over the next one and trash memory.</p>
 <p>At the same time, when your objects vary in size, you waste memory. Each slot
-needs to be big enough to accomodate the largest object. If objects are rarely
+needs to be big enough to accommodate the largest object. If objects are rarely
 that big, you&#8217;re throwing away memory every time you put a smaller one in that
 slot. It&#8217;s like going through airport security and using a huge carry-on-sized
 luggage tray just for your keys and wallet.</p>
@@ -344,7 +344,7 @@ very large and mostly full, that can get slow. Let&#8217;s see how we can improv
 that.</p>
 <aside name="create">
 
-<p>Creating a particle has O(n) complexity, for those of us who remember our
+<p>Creating a particle has <em>O(n)</em> complexity, for those of us who remember our
 algorithms class.</p>
 </aside>
 
@@ -400,7 +400,7 @@ pointer to the next available particle after this one.</p>
 
 <p>Unions don&#8217;t seem to be used that often these days, so the syntax may be
 unfamiliar to you. If you&#8217;re on a game team, you&#8217;ve probably got a &#8220;memory
-guru&#8221;, that beleaguered compatriot whose job it is to come up with a solution
+guru,&#8221; that beleaguered compatriot whose job it is to come up with a solution
 when the game has inevitably blown its memory budget. Ask them about unions.
 They&#8217;ll know all about them and other fun bit-packing tricks.</p>
 </aside>
@@ -446,7 +446,7 @@ list should thread through the entire pool. The pool constructor sets that up:</
 name="first">first</span> available one:</p>
 <aside name="first">
 
-<p>O(1) complexity, baby! Now we&#8217;re cooking!</p>
+<p><em>O(1)</em> complexity, baby! Now we&#8217;re cooking!</p>
 </aside>
 
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticlePool</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span>

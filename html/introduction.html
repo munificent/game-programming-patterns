@@ -28,9 +28,9 @@
 <h1>Introduction</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a></h1>
 <p>In fifth grade, my friends and I were given access to a little unused
-classroom housing a couple of very beat up TRS-80s. Hoping to inspire us, a
+classroom housing a couple of very beat-up TRS-80s. Hoping to inspire us, a
 teacher found a printout of some simple BASIC programs for us to tinker with.</p>
-<p>The audio casette drives on the computers were broken, so any time we wanted to
+<p>The audio cassette drives on the computers were broken, so any time we wanted to
 run some code, we&#8217;d have to carefully type it in from scratch. This led us
 to prefer programs that were only a few lines long:</p>
 <p><span name="radical"></span></p>
@@ -49,17 +49,17 @@ so a tiny syntax error was impenetrable to us. If the program didn&#8217;t work,
 which was often, we started over from the beginning.</p>
 <p>At the back of the stack of pages was a real monster: a program that took up
 several dense pages of code. It took a while before we worked up the courage
-to even try it, but it was irresistible: the title above the listing was
+to even try it, but it was irresistible&#8202;&mdash;&#8202;the title above the listing was
 &#8220;Tunnels and Trolls.&#8221; We had no idea what it did, but it sounded like a game,
 and what could be cooler than a computer game that you programmed yourself?</p>
-<p>We never did get it running, and after a year we moved out of that classroom.
+<p>We never did get it running, and after a year, we moved out of that classroom.
 (Much later when I actually knew a bit of BASIC, I realized that it was just a
-character generator for the table-top game, and not a game in itself.) But the
-die was cast&#8202;&mdash;&#8202;from here on out, I wanted to be a game programmer.</p>
+character generator for the table-top game and not a game in itself.) But the
+die was cast&#8202;&mdash;&#8202;from there on out, I wanted to be a game programmer.</p>
 <p>When I was in my teens, my family got a Macintosh with QuickBASIC and later
 THINK C. I spent almost all of my <span name="snakes">summer vacations</span>
 hacking together games. Learning on my own was slow and painful. I&#8217;d get
-something up and running easily&#8202;&mdash;&#8202;maybe a map screen, or a little puzzle &#8212;
+something up and running easily&#8202;&mdash;&#8202;maybe a map screen or a little puzzle &#8212;
 but as the program grew, it got harder and harder.</p>
 <aside name="snakes">
 
@@ -68,15 +68,15 @@ of southern Louisiana. If it wasn&#8217;t so blisteringly hot outside, there&#82
 good chance this would be a herpetology book instead of a programming one.</p>
 </aside>
 
-<p>At first, the challenge was just getting something on screen. Now it became
-figuring out how to write programs bigger than would fit in my head. Instead
+<p>At first, the challenge was just getting something on screen. Then, it became
+figuring out how to write programs bigger than what would fit in my head. Instead
 of just reading about &#8220;How to Program in C++,&#8221; I started trying to find books
 about how to <em>organize</em> programs.</p>
-<p>Fast-forward several years and a <span name="friend">friend</span> hands me a
+<p>Fast-forward several years, and a <span name="friend">friend</span> hands me a
 book: <em>Design Patterns: Elements of Reusable Object-Oriented Software</em>.
 Finally! The book I&#8217;d been looking for since I was a teenager. I read it cover
 to cover in one sitting. I still struggled with my own programs, but it was
-such a relief to see that other people struggled too, and came up with
+such a relief to see that other people struggled too and came up with
 solutions. I felt like I finally had a couple of <em>tools</em> to use instead of
 just my bare hands.</p>
 <aside name="friend">
@@ -94,20 +94,19 @@ Football? How did the different systems interact? How did they get a single
 codebase to run on multiple platforms?</p>
 <p>Cracking open the source code was a humbling and surprising experience. There
 was brilliant code in graphics, AI, animation, and visual effects. We had
-people who knew how to squeeze every last cycle out of a CPU, and put it to
+people who knew how to squeeze every last cycle out of a CPU and put it to
 good use. Stuff I didn&#8217;t even know was <em>possible</em>, these people did before
 lunch.</p>
 <p>But the <em>architecture</em> this brilliant code hung from was often an
-afterthought. They were so focused on <em>features</em> that there wasn&#8217;t much
-attention left for how they were organized. Coupling was rife between modules.
+afterthought. They were so focused on <em>features</em> that organization went overlooked. Coupling was rife between modules.
 New features were often bolted onto the codebase wherever they could be made
-to fit. To my disillusioned eyes it looked like many programmers, if they ever
+to fit. To my disillusioned eyes, it looked like many programmers, if they ever
 cracked open <em>Design Patterns</em> at all, never got past <a class="pattern"
 href="singleton.html">Singleton</a>.</p>
 <p>Of course, it wasn&#8217;t really that bad. I&#8217;d imagined game programmers sitting in
 some ivory tower covered in whiteboards, calmly discussing architectural
-minutia for weeks on end. The reality was that the code I was looking at was
-written by people working under intense deadlines. They did the best they
+minutiae for weeks on end. The reality was that the code I was looking at was
+written by people working to meet intense deadlines. They did the best they
 could, and, as I gradually realized, their best was often very good. The more
 time I spent working on game code, the more bits of brilliance I found hiding
 under the surface.</p>
@@ -116,8 +115,8 @@ in the code, but many people walked right over them. I watched coworkers
 struggle to reinvent good solutions when examples of exactly what they needed
 were nestled in the same codebase they were standing on.</p>
 <p>That problem is what this book aims to solve. I dug up and polished the best
-patterns I&#8217;ve found in games and presented them here so that we can spend our
-time inventing things instead of <em>re</em>-inventing them.</p>
+patterns I&#8217;ve found in games, and presented them here so that we can spend our
+time inventing new things instead of <em>re</em>-inventing them.</p>
 <h2><a href="#what's-in-store" name="what's-in-store">What&#8217;s in Store</a></h2>
 <p>There are already dozens of game programming books out there. Why write
 another?</p>
@@ -128,20 +127,19 @@ another?</p>
   on some specific aspect of game development. They&#8217;ll teach you about 3D
   graphics, real-time rendering, physics simulation, artificial intelligence,
   or audio. These are the areas that many game programmers specialize in as
-  their career progresses.</p>
+  their careers progress.</p>
 </li>
 <li>
 <p><strong>Whole-engine books.</strong> In contrast, these try to span all of the different
-  parts of an entire game engine. They compose them together to build a
-  complete engine suited to some specific genre of game, usually a 3D first-
-  person shooter.</p>
+  parts of an entire game engine. They are composed to build a
+  complete engine suited to some specific genre of game, usually a 3D first-person shooter.</p>
 </li>
 </ul>
 <p>I like both of these kinds of books, but I think they leave some gaps. Books
 specific to a domain rarely tell you how that chunk of code interacts with the
 rest of the game. You may be a wizard at physics and rendering, but do you
 know how to tie them together gracefully?</p>
-<p>The second category covers that, but I find it often too monolithic and too
+<p>The second category covers that, but I often find whole-engine books to be too monolithic and too
 genre-specific. Especially with the rise of mobile and casual gaming, we&#8217;re in
 a period where lots of different genres of games are being created. We aren&#8217;t
 all just cloning Quake anymore. Books that walk you through a single engine
@@ -159,7 +157,7 @@ Programming Gems</em></a> series.</p>
 <h2><a href="#how-it-relates-to-design-patterns" name="how-it-relates-to-design-patterns">How it Relates to Design Patterns</a></h2>
 <p>Any programming book with <span name="alexander">&#8220;Patterns&#8221;</span> in its name
 clearly bears a relationship to the classic <em>Design Patterns: Elements of
-Reusable Object-Oriented Software</em> by Erich Gamma, Richard Helm, Ralph Johnson
+Reusable Object-Oriented Software</em> by Erich Gamma, Richard Helm, Ralph Johnson,
 and John Vlissides (ominously called the &#8220;Gang of Four&#8221;).</p>
 <aside name="alexander">
 
@@ -176,8 +174,8 @@ attempt to do that for software.</p>
 
 <p>By calling this book &#8220;Game Programming Patterns,&#8221; I&#8217;m not trying to imply that
 the Gang of Four&#8217;s book is <span name="nongames">inapplicable</span> to games.
-On the contrary: the <a href="design-patterns-
-revisited.html">Design Patterns Revisited</a> section of this book covers many of the patterns from <em>Design
+On the contrary: the <a href="design-patterns-revisited.html">Design Patterns Revisited</a>
+section of this book covers many of the patterns from <em>Design
 Patterns</em>, but with an emphasis on how they can be applied to game
 programming.</p>
 <p>Conversely, I think this book is applicable to non-game software too. I could
@@ -190,10 +188,10 @@ commonly encountered in games:</p>
 <ul>
 <li>
 <p>Time and sequencing are often a core part of a game&#8217;s architecture. Things
-    must happen in the right order, and at the right time.</p>
+    must happen in the right order and at the right time.</p>
 </li>
 <li>
-<p>Development cycles are highly compressed and a number of programmers need
+<p>Development cycles are highly compressed, and a number of programmers need
     to be able to rapidly build and iterate on a rich set of different
     behavior without stepping on each other&#8217;s toes or leaving footprints all
     over the codebase.</p>
@@ -208,7 +206,7 @@ commonly encountered in games:</p>
 <p>And, finally, performance is critical in games. Game developers are in a
     constant race to see who can squeeze the most out of their platform.
     Tricks for shaving off cycles can mean the difference between an A-rated
-    game and millions of sales, or dropped frames and angry reviewers.</p>
+    game and millions of sales or dropped frames and angry reviewers.</p>
 </li>
 </ul>
 <h2><a href="#how-to-read-the-book" name="how-to-read-the-book">How to Read the Book</a></h2>
@@ -216,12 +214,11 @@ commonly encountered in games:</p>
 introduces and frames the book. It&#8217;s the chapter you&#8217;re reading now along with
 the <a href="architecture-performance-and-games.html">next one</a>.</p>
 <p>The second section, <a href="design-patterns-revisited.html">Design Patterns Revisited</a>,
-goes through a handful of patterns from the Gang of Four book. With each one,
-I give my spin on it and how I think it relates to game programming.</p>
-<p>Finally, the last part is the real meat of the book. It presents thirteen
+goes through a handful of patterns from the Gang of Four book. With each chapter,
+I give my spin on a pattern and how I think it relates to game programming.</p>
+<p>The last section is the real meat of the book. It presents thirteen
 design patterns that I&#8217;ve found useful. They&#8217;re grouped into four categories:
-<a href="sequencing-patterns.html">Sequencing Patterns</a>, <a href="behavioral-patterns.html">Behavioral Patterns
-</a>, <a href="decoupling-patterns.html">Decoupling Patterns</a>,
+<a href="sequencing-patterns.html">Sequencing Patterns</a>, <a href="behavioral-patterns.html">Behavioral Patterns</a>, <a href="decoupling-patterns.html">Decoupling Patterns</a>,
 and <a href="optimization-patterns.html">Optimization Patterns</a>.</p>
 <p>Each of these patterns is described using a consistent structure so that you
 can use this book as a reference and quickly find what you need:</p>
@@ -247,9 +244,9 @@ can use this book as a reference and quickly find what you need:</p>
 </li>
 <li>
 <p>So far, the pattern has only been explained in terms of a single example.
-  But how do you know if <em>your</em> problem is a good one to use the pattern on?
+  But how do you know if the pattern will be good for <em>your</em> problem?
   The <strong>When to Use It</strong> section provides some guidelines on when the pattern
-  is useful, and when it&#8217;s best avoided. The <strong>Keep in Mind</strong> section points
+  is useful and when it&#8217;s best avoided. The <strong>Keep in Mind</strong> section points
   out consequences and risks when using the pattern.</p>
 </li>
 <li>
@@ -259,7 +256,7 @@ can use this book as a reference and quickly find what you need:</p>
 </li>
 <li>
 <p>Patterns differ from single algorithms because they are open-ended. Each
-  time you use it, you&#8217;ll likely implement it differently. The next section,
+  time you use a pattern, you&#8217;ll likely implement it differently. The next section,
   <strong>Design Decisions</strong>, explores that space and shows you different options to
   consider when applying a pattern.</p>
 </li>
@@ -271,7 +268,7 @@ can use this book as a reference and quickly find what you need:</p>
 </ul>
 <h2><a href="#about-the-sample-code" name="about-the-sample-code">About the Sample Code</a></h2>
 <p>Code samples in this book are in C++, but that isn&#8217;t to imply that these
-patterns are only useful in that language, or that C++ is a better language
+patterns are only useful in that language or that C++ is a better language
 for them than others. Almost any language will work fine, though some patterns
 do tend to presume your language has objects and classes.</p>
 <p>I chose C++ for a couple of reasons. First, it&#8217;s the most popular language for
@@ -306,7 +303,7 @@ This book continues the process started by the Gang of Four of documenting and
 sharing the software patterns they saw, and that process will continue after
 the ink dries on these pages.</p>
 <p>You are a core part of that process. As you develop your own patterns and
-refine (or refute!) the patterns in this one, you contribute to the software
+refine (or refute!) the patterns in this book, you contribute to the software
 community. If you have suggestions, corrections, or other feedback about
 what&#8217;s in here, please get in touch!</p>
 <nav>
