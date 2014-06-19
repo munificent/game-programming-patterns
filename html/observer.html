@@ -76,7 +76,7 @@ coupling the achievement code to all of them?</p>
 something interesting happened <em>without actually caring who receives the
 notification</em>.</p>
 <p>For example, we&#8217;ve got some physics code that handles gravity and tracks which
-bodies are relaxing on nice flat surfaces and which are plummeting towards sure
+bodies are relaxing on nice flat surfaces and which are plummeting toward sure
 demise. To implement the &#8220;Fall off a Bridge&#8221; badge, we could just jam the
 achievement code right in there, but that&#8217;s a mess. Instead, we can just do:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Physics</span><span class="o">::</span><span class="n">updateEntity</span><span class="p">(</span><span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">)</span>
@@ -105,8 +105,8 @@ entirely decoupled. But in architecture, we&#8217;re most often trying to make s
 a notification, the achievement receives it. It can then check to see if the
 falling body is our less-than-graceful hero, and if his perch prior to this new,
 unpleasant encounter with classical mechanics was a bridge. If so, it unlocks
-the proper achievement with associated fireworks and fanfare, and all of this
-with no involvement from the physics code.</p>
+the proper achievement with associated fireworks and fanfare, and it does all of
+this with no involvement from the physics code.</p>
 <p><span name="tear">In fact</span>, we can change the set of achievements or tear
 out the entire achievement system without touching a line of the physics engine.
 It will still send out its notifications, oblivious to the fact that nothing is
@@ -120,8 +120,8 @@ flexibility.</p>
 </aside>
 
 <h2><a href="#how-it-works" name="how-it-works">How it Works</a></h2>
-<p>If you don&#8217;t already know how to implement the pattern, you could probably guess
-just from the previous description, but to keep things easy on you, I&#8217;ll walk
+<p>If you don&#8217;t already know how to implement the pattern, you could probably
+guess from the previous description, but to keep things easy on you, I&#8217;ll walk
 through it quickly.</p>
 <h3><a href="#the-observer" name="the-observer">The observer</a></h3>
 <p>We&#8217;ll start with the nosy class that wants to know when another object does
@@ -143,8 +143,8 @@ something interesting. These nosy objects are defined by this interface:</p>
 Typical parameters are the object that sent the notification and a generic
 &#8220;data&#8221; parameter you stuff other details into.</p>
 <p>If you&#8217;re coding in a language with generics or templates, you&#8217;ll probably use
-them here, but it&#8217;s also fine to tailor it to your specific use case. Here, I&#8217;m
-just hardcoding it to take a game entity, and an enum that describes what
+them here, but it&#8217;s also fine to tailor them to your specific use case. Here,
+I&#8217;m just hardcoding it to take a game entity and an enum that describes what
 happened.</p>
 </aside>
 
@@ -197,7 +197,7 @@ the list of observers that are waiting oh-so-patiently for a missive from it:</p
 
 <p>In real code, you would use a dynamically-sized collection instead of a dumb
 array. I&#8217;m sticking with the basics here for people coming from other languages
-that don&#8217;t know C++&#8217;s standard library.</p>
+who don&#8217;t know C++&#8217;s standard library.</p>
 </aside>
 
 <p>The important bit is that the subject exposes a <em>public</em> API for modifying that
@@ -221,8 +221,8 @@ list:</p>
 
 
 <p>That allows outside code to control who receives notifications. The subject
-communicates with the observers, but isn&#8217;t <em>coupled</em> to them. In our example, no
-line of physics code will mention achievements. Yet, it can still notify the
+communicates with the observers, but it isn&#8217;t <em>coupled</em> to them. In our example,
+no line of physics code will mention achievements. Yet, it can still notify the
 achievements system. That&#8217;s the clever part about this pattern.</p>
 <p>It&#8217;s also important that the subject has a <em>list</em> of observers instead of a
 single one. It makes sure that observers aren&#8217;t implicitly coupled to <em>each
@@ -294,7 +294,7 @@ the latter, you observe an object that represents <em>the interesting thing that
 happened</em>.</p>
 </aside>
 
-<p>Now, when the physics engine does something noteworthy, it calls <code>notify()</code> just
+<p>Now, when the physics engine does something noteworthy, it calls <code>notify()</code>
 like in the motivating example before. That walks the observer list and gives
 them all the heads up.</p>
 <p><img src="images/observer-list.png" /></p>
@@ -302,7 +302,8 @@ them all the heads up.</p>
 instances of some interface. It&#8217;s hard to believe that something so
 straightforward is the communication backbone of countless programs and app
 frameworks.</p>
-<p>But it isn&#8217;t without its detractors. When I&#8217;ve asked other game programmers what
+<p>But the Observer pattern isn&#8217;t without its detractors. When I&#8217;ve asked other
+game programmers what
 they think about this pattern, I hear a few common complaints. Let&#8217;s see what we
 can do to address them, if anything.</p>
 <h2><a href="#"it's-too-slow"" name=""it's-too-slow"">&#8220;It&#8217;s Too Slow&#8221;</a></h2>
@@ -319,7 +320,7 @@ like queuing or doing dynamic allocation for each notification.</p>
 
 <p>This is why I think documenting patterns is important. When we get fuzzy about
 terminology, we lose the ability to communicate clearly and succinctly. You say,
-&#8220;Observer&#8221; and someone hears &#8220;Events&#8221; or &#8220;Messaging&#8221; because either no one
+&#8220;Observer&#8221;, and someone hears &#8220;Events&#8221; or &#8220;Messaging&#8221; because either no one
 bothered to write down the difference or they didn&#8217;t happen to read it.</p>
 <p>That&#8217;s what I&#8217;m trying to do with this book. To cover my bases, I&#8217;ve got a
 chapter on events and messages too: <a href="event-queue.html"
@@ -327,9 +328,9 @@ class="pattern">Event Queue</a>.</p>
 </aside>
 
 <p>But, now that you&#8217;ve seen how the pattern is actually implemented, you know that
-isn&#8217;t the case. Sending a notification is just walking a list and calling some
+isn&#8217;t the case. Sending a notification is simply walking a list and calling some
 virtual methods. Granted, it&#8217;s a <em>bit</em> slower than a statically dispatched
-method, but that cost is negligible in all but the most performance critical
+method, but that cost is negligible in all but the most performance-critical
 code.</p>
 <p>I find this pattern fits best outside of hot code paths anyway, so you can
 usually afford the dynamic dispatch. Aside from that, there&#8217;s virtually no
@@ -340,9 +341,9 @@ just an indirection over a synchronous method call.</p>
 The subject invokes its observers directly, which means it doesn&#8217;t resume its
 own work until all of the observers have returned from their notification
 methods. A slow observer can block a subject.</p>
-<p>This sounds scary, but in practice it&#8217;s not the end of the world. It&#8217;s just
-something you have to be aware of. UI programmers&#8202;&mdash;&#8202;who&#8217;ve been doing event-
-based programming like this for ages&#8202;&mdash;&#8202;have an established motto for this:
+<p>This sounds scary, but in practice, it&#8217;s not the end of the world. It&#8217;s just
+something you have to be aware of. UI programmers&#8202;&mdash;&#8202;who&#8217;ve been doing
+event-based programming like this for ages&#8202;&mdash;&#8202;have an established motto for this:
 &#8220;stay off the UI thread&#8221;.</p>
 <p>If you&#8217;re responding to an event synchronously, you need to finish and return
 control as quickly as possible so that the UI doesn&#8217;t lock up. When you have
@@ -355,7 +356,7 @@ class="pattern">Event Queue</a>.</p>
 <h2><a href="#"it-does-too-much-dynamic-allocation"" name=""it-does-too-much-dynamic-allocation"">&#8220;It Does Too Much Dynamic Allocation&#8221;</a></h2>
 <p>Whole tribes of the programmer clan&#8202;&mdash;&#8202;including many game developers&#8202;&mdash;&#8202;have
 moved onto garbage collected languages, and dynamic allocation isn&#8217;t the boogie
-man that it used to be. But for performance critical software like games, memory
+man that it used to be. But for performance-critical software like games, memory
 allocation still matters, even in managed languages. <span
 name="fragment">Dynamic</span> allocation takes time, as does reclaiming memory,
 even if it happens automatically.</p>
@@ -369,7 +370,7 @@ you from shipping.</p>
 more detail about this and a common technique for avoiding it.</p>
 </aside>
 
-<p>In the example code before, I just used a fixed array because I&#8217;m trying to keep
+<p>In the example code before, I used a fixed array because I&#8217;m trying to keep
 things dead simple. In real implementations, the observer list is almost always
 a dynamically allocated collection that grows and shrinks as observers are
 added and removed. That memory churn spooks some people.</p>
@@ -437,7 +438,7 @@ option and insert it at the front:</p>
 
 
 <p>The other option is to add it to the end of the linked list. Doing that adds a
-bit more complexity: <code>Subject</code> has to either walk the list to find the end, or
+bit more complexity. <code>Subject</code> has to either walk the list to find the end or
 keep a separate <code>tail_</code> pointer that always points to the last node.</p>
 <p>Adding it to the front of the list is simpler, but does have one side effect.
 When we walk the list to send a notification to every observer, the most
@@ -551,7 +552,7 @@ lists less flexible but, as we&#8217;ve seen, also more efficient. They&#8217;re
 places like the Linux kernel where that trade-off makes sense.</p>
 </aside>
 
-<p>The way you avoid dynamic allocation is simple: Since all of those nodes are the
+<p>The way you avoid dynamic allocation is simple: since all of those nodes are the
 same size and type, you pre-allocate an <a href="object-pool.html"
 class="pattern">Object Pool</a> of them. That gives you a fixed-size pile of
 list nodes to work with, and you can use and reuse them as you need without
@@ -568,8 +569,9 @@ apply good patterns to the wrong problem and end up making things worse.</p>
 maintainability level. We&#8217;ll do the technical one first because those are always
 easiest.</p>
 <h3><a href="#destroying-subjects-and-observers" name="destroying-subjects-and-observers">Destroying subjects and observers</a></h3>
-<p>The sample code we walked through is solid, but it <span name="destruct">side-
-steps</span> an important issue: what happens when you delete a subject or an
+<p>The sample code we walked through is solid, but it
+<span name="destruct">side-steps</span> an important issue: what happens when
+you delete a subject or an
 observer? If you carelessly call <code>delete</code> on some observer, a subject may still
 have a pointer to it. That&#8217;s now a dangling pointer into deallocated memory.
 When that subject tries to send a notification, well&#8230; let&#8217;s just say you&#8217;re
@@ -598,7 +600,7 @@ name="destructor">adding</span> a <code>removeObserver()</code> call to its dest
 
 <p>If you don&#8217;t want to leave observers hanging when a subject gives up the ghost,
 that&#8217;s easy to fix. Just have the subject send one final &#8220;dying breath&#8221;
-notification right before it gets destroyed. That way any observer can receive
+notification right before it gets destroyed. That way, any observer can receive
 that and take <span name="mourn">whatever action</span> it thinks is
 appropriate.</p>
 <aside name="mourn">
@@ -628,10 +630,10 @@ about the object and let the GC clean it up.</p>
 sends a notification. The UI screen observes that and updates the little health
 bar. Great. Now what happens when the player dismisses the screen, but you don&#8217;t
 unregister the observer?</p>
-<p>The UI isn&#8217;t visible anymore, but won&#8217;t get garbage collected since the
+<p>The UI isn&#8217;t visible anymore, but it won&#8217;t get garbage collected since the
 character&#8217;s observer list still has a reference to it. Every time the screen is
 loaded, we add a new instance of it to that increasingly long list.</p>
-<p>The entire time the player is playing the game, running around, getting in
+<p>The entire time the player is playing the game, running around, and getting in
 fights, the character is sending notifications that get received by <em>all</em> of
 those screens. They aren&#8217;t on screen, but they receive notifications and waste
 CPU cycles updating invisible UI elements. If they do other things like play
@@ -657,8 +659,8 @@ physics engine, you really don&#8217;t want your editor&#8202;&mdash;&#8202;or y
 up with a bunch of stuff about achievements.</p>
 <p>On the other hand, if your program isn&#8217;t working and the bug spans some chain of
 observers, reasoning about that communication flow is much more difficult. With
-an explicit coupling, it&#8217;s as easy as looking up the method being called.
-Child&#8217;s play for your average IDE, since the coupling is static.</p>
+an explicit coupling, it&#8217;s as easy as looking up the method being called. This
+is child&#8217;s play for your average IDE since the coupling is static.</p>
 <p>But if that coupling happens through an observer list, the only way to tell who
 will get notified is by seeing which observers happen to be in that list <em>at
 runtime</em>. Instead of being able to <em>statically</em> reason about the communication
@@ -680,9 +682,9 @@ unrelated domains, likely implemented by different people. We want the bare
 minimum of communication between them so that working on either one doesn&#8217;t
 require much knowledge of the other.</p>
 <h2><a href="#observers-today" name="observers-today">Observers Today</a></h2>
-<p>Design Patterns came out in the <span name="90s">90s</span>. Back then,
+<p><em>Design Patterns</em> came out in the <span name="90s">90s</span>. Back then,
 object-oriented programming was <em>the</em> hot paradigm. Every programmer on Earth
-wanted to &#8220;Learn OOP in 30 Days&#8221; and middle managers paid them based on the
+wanted to &#8220;Learn OOP in 30 Days,&#8221; and middle managers paid them based on the
 number of classes they created. Engineers judged their mettle by the depth of
 their inheritance hierarchies.</p>
 <aside name="90s">
@@ -692,7 +694,7 @@ tell you something about our taste and discernment back then.</p>
 </aside>
 
 <p>The Observer pattern got popular during that zeitgeist, so it&#8217;s no surprise that
-it&#8217;s class heavy. But mainstream coders now are more comfortable with functional
+it&#8217;s class-heavy. But mainstream coders now are more comfortable with functional
 programming. Having to implement an entire interface just to receive a
 notification doesn&#8217;t fit today&#8217;s aesthetic.</p>
 <p>It feels <span name="different">heavyweight</span> and rigid. It <em>is</em>
@@ -705,14 +707,14 @@ only has a single <code>onNotify()</code> method, if it&#8217;s observing multip
 needs to be able to tell which one called it.</p>
 </aside>
 
-<p>A more modern approach is for an &#8220;observer&#8221; to just be a reference to a method
-or function. In languages with first class functions, and especially ones with
+<p>A more modern approach is for an &#8220;observer&#8221; to be only a reference to a method
+or function. In languages with first-class functions, and especially ones with
 <span name="closures">closures</span>, this is a much more common way to do
 observers.</p>
 <aside name="closures">
 
-<p>These days practically <em>every</em> language has closures. C++ overcame the challenge
-of closures in a language without garbage collection and even Java finally got
+<p>These days, practically <em>every</em> language has closures. C++ overcame the challenge
+of closures in a language without garbage collection, and even Java finally got
 its act together and introduced them in JDK 8.</p>
 </aside>
 
@@ -723,7 +725,7 @@ special <code>EventListener</code> protocol, but they can also just be functions
 latter is almost always what people use.</p>
 <p>If I were designing an observer system today, I&#8217;d make it <span
 name="function">function-based</span> instead of class-based. Even in C++, I
-would tend towards a system that let you register member function pointers as
+would tend toward a system that let you register member function pointers as
 observers instead of instances of some <code>Observer</code> interface.</p>
 <aside name="function">
 
@@ -759,7 +761,7 @@ you&#8217;re tweaking a UI element or calculated property to reflect a change to
 value.</p>
 <p>Like other declarative systems, data binding is probably a bit too slow and
 complex to fit inside the core of a game engine. But I would be surprised if I
-didn&#8217;t see it start making in-roads into less critical areas of the game like
+didn&#8217;t see it start making inroads into less critical areas of the game like
 UI.</p>
 <p>In the meantime, the good old Observer pattern will still be here waiting for
 us. Sure, it&#8217;s not as exciting as some hot technique that manages to cram both
