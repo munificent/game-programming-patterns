@@ -1,3 +1,11 @@
+2014-06-17 - figure captions and start working on front matter
+2014-06-16 - turn links to chapter references
+2014-06-15 - title and section pages
+2014-06-14 - running footer, new column proportion
+2014-06-13 - work on illustration workflow
+2014-06-12 - 13.5pt baseline grid
+2014-06-11 - more hand layout and style tweaking
+2014-06-10 - start hand laying out object pool, more style work
 2014-06-09 - massage xml a bunch to make indesign happy
 2014-06-08 - more work on xml and masters
 2014-06-07 - fight with xml
