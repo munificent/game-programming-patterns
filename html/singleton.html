@@ -406,7 +406,7 @@ decide to change the static class into a non-static one later, you&#8217;ll need
 fix every call site. In theory, you don&#8217;t have to do that with singletons
 because you could be passing the instance around and calling it like a normal
 instance method.</p>
-<p>In practice, I&#8217;ve ever seen it work that way. Everyone just does
+<p>In practice, I&#8217;ve never seen it work that way. Everyone just does
 <code>Foo::instance().bar()</code> in one line. If we changed Foo to not be a
 singleton, we&#8217;d still have to touch every call site. Given that, I&#8217;d rather have
 a simpler class and a simpler syntax to call into it.</p>
