@@ -317,7 +317,7 @@ fix every call site. In theory, you don't have to do that with singletons
 because you could be passing the instance around and calling it like a normal
 instance method.
 
-In practice, I've ever seen it work that way. Everyone just does
+In practice, I've never seen it work that way. Everyone just does
 `Foo::instance().bar()` in one line. If we changed Foo to not be a
 singleton, we'd still have to touch every call site. Given that, I'd rather have
 a simpler class and a simpler syntax to call into it.
