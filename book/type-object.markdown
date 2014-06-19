@@ -666,11 +666,11 @@ zombie one.
     a different way is <a class="gof-pattern"
     href="prototype.html">Prototype</a>.
 
- *  Type Object is a close cousin to <a class="gof-pattern">Flyweight</a>. Both
-    let you share data across instances. With Flyweight, the intent is on saving
-    memory, and the shared data may not represent any conceptual "type" of
-    object. With the Type Object pattern, the focus is on organization and
-    flexibility.
+ *  Type Object is a close cousin to <a class="gof-pattern"
+    href="flyweight.html">Flyweight</a>. Both let you share data across
+    instances. With Flyweight, the intent is on saving memory, and the shared
+    data may not represent any conceptual "type" of object. With the Type Object
+    pattern, the focus is on organization and flexibility.
 
  *  There's a lot of similarity between this pattern and the <a
     class="gof-pattern" href="state.html">State</a> pattern. Both patterns let

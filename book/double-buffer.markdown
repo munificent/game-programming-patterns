@@ -11,7 +11,7 @@ simultaneous.*
 In their hearts, computers are <span name="sequential">sequential</span> beasts.
 Their power comes from being able to break down the largest tasks into tiny
 steps that can be performed one after another. Often, though, our users need to
-see things occur in a single instanteous step, or see multiple tasks performed
+see things occur in a single instantaneous step, or see multiple tasks performed
 simultaneously.
 
 <aside name="sequential">

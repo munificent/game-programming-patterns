@@ -298,7 +298,7 @@ that.
 
 <aside name="create">
 
-Creating a particle has O(n) complexity, for those of us who remember our
+Creating a particle has *O(n)* complexity, for those of us who remember our
 algorithms class.
 
 </aside>
@@ -336,7 +336,7 @@ pointer to the next available particle after this one.
 
 Unions don't seem to be used that often these days, so the syntax may be
 unfamiliar to you. If you're on a game team, you've probably got a "memory
-guru", that beleaguered compatriot whose job it is to come up with a solution
+guru," that beleaguered compatriot whose job it is to come up with a solution
 when the game has inevitably blown its memory budget. Ask them about unions.
 They'll know all about them and other fun bit-packing tricks.
 
@@ -365,7 +365,7 @@ name="first">first</span> available one:
 
 <aside name="first">
 
-O(1) complexity, baby! Now we're cooking!
+*O(1)* complexity, baby! Now we're cooking!
 
 </aside>
 
