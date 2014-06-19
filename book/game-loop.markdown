@@ -515,7 +515,7 @@ instead of rolling your own.
 
      *  *It plays nice with the platform.* You don't have to worry about
         explicitly giving the host time to process its own events, caching
-        events, or otherwise managing the impedence mismatch between the
+        events, or otherwise managing the impedance mismatch between the
         platform's input model and yours.
 
      *  *You lose control over timing.* The platform will call your code as it

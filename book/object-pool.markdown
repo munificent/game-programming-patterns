@@ -179,7 +179,7 @@ for the *largest* possible object. Otherwise, an unexpectedly large object will
 stomp over the next one and trash memory.
 
 At the same time, when your objects vary in size, you waste memory. Each slot
-needs to be big enough to accomodate the largest object. If objects are rarely
+needs to be big enough to accommodate the largest object. If objects are rarely
 that big, you're throwing away memory every time you put a smaller one in that
 slot. It's like going through airport security and using a huge carry-on-sized
 luggage tray just for your keys and wallet.
