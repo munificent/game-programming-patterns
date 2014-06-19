@@ -20,8 +20,8 @@ going to throw them at a different kind of problem here.
 
 <aside name="two-camps">
 
-This pairing echoes the early days of artificial intelligence. In the '50s and
-'60s, much of AI research was focused on language processing. Many of the
+This pairing echoes the early days of artificial intelligence. In the &rsquo;50s and
+&rsquo;60s, much of AI research was focused on language processing. Many of the
 techniques compilers now use for parsing programming languages were invented for
 parsing human languages.
 
