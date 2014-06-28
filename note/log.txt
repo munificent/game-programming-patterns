@@ -1,3 +1,13 @@
+2014-06-27 - layout state
+2014-06-26 - 6 emails
+2014-06-25 - lay out singleton
+2014-06-24 - lay out prototype
+2014-06-23 - lay out observer
+2014-06-22 - finish command, lay out flyweight
+2014-06-21 - start laying out command
+2014-06-20 - layout architecture, start building book
+2014-06-19 - akkurat -> source, layout intro
+2014-06-18 - merge pull requests, including lauren's changes
 2014-06-17 - figure captions and start working on front matter
 2014-06-16 - turn links to chapter references
 2014-06-15 - title and section pages
