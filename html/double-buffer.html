@@ -34,16 +34,16 @@ simultaneous.</em></p>
 <p>In their hearts, computers are <span name="sequential">sequential</span> beasts.
 Their power comes from being able to break down the largest tasks into tiny
 steps that can be performed one after another. Often, though, our users need to
-see things occur in a single instantaneous step, or see multiple tasks performed
+see things occur in a single instantaneous step or see multiple tasks performed
 simultaneously.</p>
 <aside name="sequential">
 
-<p>With threading and multi-core architectures, this is becoming less true, but
-even with several cores only a few operations are really running concurrently.</p>
+<p>With threading and multi-core architectures this is becoming less true, but
+even with several cores, only a few operations are running concurrently.</p>
 </aside>
 
 <p>A typical example, and one that every game engine must address, is rendering.
-When the game draws the world the users see, it does so one piece at a time: the
+When the game draws the world the users see, it does so one piece at a time&#8202;&mdash;&#8202;the
 mountains in the distance, the rolling hills, the trees, each in its turn. If
 the user <em>watched</em> the view draw incrementally like that, the illusion of a
 coherent world would be shattered. The scene must update smoothly and quickly,
@@ -52,7 +52,7 @@ displaying a series of complete frames, each appearing instantly.</p>
 review how a computer displays graphics.</p>
 <h3><a href="#how-computer-graphics-work-(briefly)" name="how-computer-graphics-work-(briefly)">How computer graphics work (briefly)</a></h3>
 <p>A <span name="scan">video</span> display like a computer monitor draws one pixel
-at a time. It sweeps across each row of pixels from left to right, and then
+at a time. It sweeps across each row of pixels from left to right and then
 moves down to the next row. When it reaches the bottom right corner, it scans
 back up to the top left and starts all over again. It does this so fast &#8212;
 around sixty times a second&#8202;&mdash;&#8202;that our eyes can&#8217;t see the scanning. To us, it&#8217;s
@@ -79,11 +79,11 @@ one byte at a time.</p>
 
 <p>The specific mapping between byte values and colors is described by the <em>pixel
 format</em> and the <em>color depth</em> of the system. In most gaming consoles today, each
-pixel gets 32 bits: eight each for the red, green and blue channels, and another
+pixel gets 32 bits: eight each for the red, green, and blue channels, and another
 eight left over for various other purposes.</p>
 </aside>
 
-<p>In order to get our game to appear on screen, all we ultimately do is write to
+<p>Ultimately, in order to get our game to appear on screen, all we do is write to
 that array. All of the crazy advanced graphics algorithms we have boil down to
 just that: setting byte values in the framebuffer. But there&#8217;s a little problem.</p>
 <p>Earlier, I said computers are sequential. If the machine is executing a chunk of
@@ -97,7 +97,7 @@ through the framebuffer, coloring pixels. What we don&#8217;t realize is that th
 video driver is pulling from the framebuffer right as we&#8217;re writing to it. As it
 scans across the pixels we&#8217;ve written, our face starts to appear, but then it
 outpaces us and moves into pixels we haven&#8217;t written yet. The result is
-<em>tearing:</em> a hideous visual bug where you see half of something drawn on screen.</p>
+<em>tearing</em>, a hideous visual bug where you see half of something drawn on screen.</p>
 <p><span name="tearing"></span></p>
 <p><img src="images/double-buffer-tearing.png" /></p>
 <aside name="tearing">
@@ -111,26 +111,25 @@ then races past it to pixels we haven&#8217;t written yet (Fig. 2). We finish dr
 </aside>
 
 <p>This is why we need this pattern. Our program renders the pixels one at a time,
-but we need the display driver to see them all at once&#8202;&mdash;&#8202;one frame the face
-isn&#8217;t there, the next one it is. Double buffering solves this. I&#8217;ll explain how
+but we need the display driver to see them all at once&#8202;&mdash;&#8202;in one frame the face
+isn&#8217;t there, and in the next one it is. Double buffering solves this. I&#8217;ll explain how
 by analogy.</p>
 <h3><a href="#act-1,-scene-1" name="act-1,-scene-1">Act 1, Scene 1</a></h3>
-<p>Imagine our users are watching a play, produced by ourselves. As scene one ends
-and scene two starts, we need to change the stage setting. If we just have the
+<p>Imagine our users are watching a play produced by ourselves. As scene one ends
+and scene two starts, we need to change the stage setting. If we have the
 stagehands run on after the scene and start dragging props around, the illusion
 of a coherent place will be broken. We could dim the lights while we do that
 (which of course, is what real theaters do), but the audience still knows
-<em>something</em> is going on then. We want there to be no gap in time between scenes.</p>
-<p>So, with a bit of real estate we come up with this clever solution: We build
+<em>something</em> is going on. We want there to be no gap in time between scenes.</p>
+<p>With a bit of real estate, we come up with this clever solution: we build
 <span name="stage"><em>two</em></span> stages set up so the audience can see both. Each
-has its own set of lights. We&#8217;ll call them stage A and B. Scene one is shown on
-stage A. Meanwhile, stage B is dark and the stagehands are setting up scene two
-on it. As soon as scene one ends, we cut the lights on stage A, and bring them
+has its own set of lights. We&#8217;ll call them stage A and stage B. Scene one is shown on
+stage A. Meanwhile, stage B is dark as the stagehands are setting up scene two. As soon as scene one ends, we cut the lights on stage A and bring them
 up on stage B. The audience looks to the new stage and scene two begins
 immediately.</p>
 <p>At the same time, our stagehands are over on the now darkened stage <em>A</em>,
 striking scene one and setting up scene <em>three</em>. As soon as scene two ends, we
-switch the lights again back to stage A. We continue this process for the entire
+switch the lights back to stage A again. We continue this process for the entire
 play, using the darkened stage as a work area where we can set up the next
 scene. Every scene transition, we just toggle the lights between the two stages.
 Our audience gets a continuous performance with no delay between scenes. They
@@ -138,8 +137,8 @@ never see a stagehand.</p>
 <aside name="stage">
 
 <p>Using a half-silvered mirror and some very smart layout, you could actually
-build this so that the two stages appear to the audience in the same <em>place</em>. As
-soon as the lights switch, they would be looking at a different stage, but would
+build this so that the two stages would appear to the audience in the same <em>place</em>. As
+soon as the lights switch, they would be looking at a different stage, but they would
 never have to change where they look. Building this is left as an exercise for
 the reader.</p>
 </aside>
@@ -153,25 +152,25 @@ reading from. The GPU can scan through it as much as it wants whenever it wants.
 <aside name="sync">
 
 <p>Not <em>all</em> games and consoles do this, though. Older and simpler consoles where
-memory is limited actually carefully sync their drawing to the video refresh
+memory is limited carefully sync their drawing to the video refresh
 instead. It&#8217;s tricky.</p>
 </aside>
 
-<p>Meanwhile, our rendering code is writing to the <em>other</em> buffer. This is our
+<p>Meanwhile, our rendering code is writing to the <em>other</em> framebuffer. This is our
 darkened stage B. When our rendering code is done drawing the scene, it switches
 the lights by <em>swapping</em> the buffers. This tells the video hardware to start
 reading from the second buffer now instead of the first one. As long as it times
 that switch at the end of a refresh, we won&#8217;t get any tearing, and the entire
-scene appears all at once.</p>
+scene will appear all at once.</p>
 <p>Meanwhile, the old framebuffer is now available for use. We start rendering the
 next frame onto it. Voil&agrave;!</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>A <strong>buffered class</strong> encapsulates a <strong>buffer</strong>: a piece of state that can be
 modified. This buffer is edited incrementally, but we want all outside code to
 see the edit as a single atomic change. To do this, the class keeps <em>two</em>
-instances of the buffer, a <strong>next buffer</strong> and a <strong>current buffer</strong>.</p>
+instances of the buffer: a <strong>next buffer</strong> and a <strong>current buffer</strong>.</p>
 <p>When information is read <em>from</em> a buffer, it is always from the <em>current</em>
-buffer. When information is <em>written</em> to a buffer, it occurs on the <em>next</em>
+buffer. When information is written <em>to</em> a buffer, it occurs on the <em>next</em>
 buffer. When the changes are complete, a <strong>swap</strong> operation swaps the next and
 current buffers instantly so that the new buffer is now publicly visible. The
 old current buffer is now available to be reused as the new next buffer.</p>
@@ -190,7 +189,7 @@ appropriate when all of these are true:</p>
 </li>
 <li>
 <p>We want to prevent the code that&#8217;s accessing the state from
-    seeing the work-in-progress.</p>
+    seeing the work in progress.</p>
 </li>
 <li>
 <p>We want to be able to read the state and we don&#8217;t want to have to
@@ -209,7 +208,7 @@ are being swapped. Often, the swap is as quick as assigning a pointer, but if it
 takes longer than it does to modify the state to begin with, then we haven&#8217;t
 helped ourselves at all.</p>
 <h3><a href="#we-have-to-have-two-buffers" name="we-have-to-have-two-buffers">We have to have two buffers</a></h3>
-<p>The other consequence of this pattern is memory usage. As its name implies, the
+<p>The other consequence of this pattern is increased memory usage. As its name implies, the
 pattern requires you to keep <em>two</em> copies of your state in memory at all times.
 On memory-constrained devices, this can be a heavy price to pay. If you can&#8217;t
 afford two buffers, you may have to look into other ways to ensure your state
@@ -217,8 +216,8 @@ isn&#8217;t being accessed during modification.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>Now that we&#8217;ve got the theory, let&#8217;s see how it works in practice. We&#8217;ll write a
 very bare-bones graphics system that lets us draw pixels on a frame buffer. In
-most consoles and PCs, this low-level part of the graphics system is provided by
-the video driver, but hand-implementing it here will let us see what&#8217;s going on.
+most consoles and PCs, the video driver provides this low-level part of the
+graphics system, but implementing it by hand here will let us see what&#8217;s going on.
 First up is the buffer itself:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Framebuffer</span>
 <span class="p">{</span>
@@ -252,7 +251,7 @@ First up is the buffer itself:</p>
 </pre></div>
 
 
-<p>It has basic operations for clearing the entire buffer to a default color, and
+<p>It has basic operations for clearing the entire buffer to a default color and
 setting the color of an individual pixel. It also has a function, <code>getPixels()</code>,
 to expose the raw array of memory holding the pixel data. We won&#8217;t see this in
 the example, but the video driver will call that function frequently to stream
@@ -306,7 +305,7 @@ buffer at <em>any</em> point in time, even here:</p>
 
 
 <p>When that happens, the user will see the eyes of the face, but the mouth will
-disappear for a single frame. The next frame, it could get interrupted at some
+disappear for a single frame. In the next frame, it could get interrupted at some
 other point. The end result is horribly flickering graphics. We&#8217;ll fix this with
 double buffering:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Scene</span>
@@ -348,19 +347,19 @@ double buffering:</p>
 
 <p>Now <code>Scene</code> has two buffers, stored in the <code>buffers_</code> array. We don&#8217;t directly
 reference them from the array. Instead, there are two members, <code>next_</code> and
-<code>current_</code>, that point into that array. When we draw, we draw onto the next
-buffer, referenced by <code>next_</code>. When the video driver needs to get at the pixels,
+<code>current_</code>, that point into the array. When we draw, we draw onto the next
+buffer, referenced by <code>next_</code>. When the video driver needs to get the pixels,
 it always accesses the <em>other</em> buffer through <code>current_</code>.</p>
 <p>This way, the video driver never sees the buffer that we&#8217;re working on. The only
 remaining piece of the puzzle is the call to <code>swap()</code> when the scene is done
 drawing the frame. That swaps the two buffers by simply switching the <code>next_</code>
 and <code>current_</code> references. The next time the video driver calls <code>getBuffer()</code>,
-it will now get the new buffer we just finished drawing and put our recently
-drawn buffer onscreen. No more tearing or unsightly glitches.</p>
+it will get the new buffer we just finished drawing and put our recently
+drawn buffer on screen. No more tearing or unsightly glitches.</p>
 <h3><a href="#not-just-for-graphics" name="not-just-for-graphics">Not just for graphics</a></h3>
 <p>The core problem that double buffering solves is state being accessed while it&#8217;s
 being modified. There are two common causes of this. We&#8217;ve covered the first one
-with our graphics example: the state is directly accessed from code on another
+with our graphics example&#8202;&mdash;&#8202;the state is directly accessed from code on another
 thread or interrupt.</p>
 <p>There is another equally common cause, though: when the code <em>doing the
 modification</em> is accessing the same state that it&#8217;s modifying. This can manifest
@@ -389,7 +388,7 @@ around and get up to various hijinks and shenanigans. Here&#8217;s our base acto
 
 
 <p>Every frame, the game is responsible for calling <span
-name="update"><code>update()</code></span> on it so that it has a chance to do some
+name="update"><code>update()</code></span> on the actor so that it has a chance to do some
 processing. Critically, from the user&#8217;s perspective, <em>all actors should appear
 to update simultaneously</em>.</p>
 <aside name="update">
@@ -400,7 +399,7 @@ Method</a> pattern.</p>
 
 <p>Actors can also interact with each other, if by &#8220;interacting&#8221;, we mean &#8220;they can
 slap each other around.&#8221; When updating, the actor can call <code>slap()</code> on another
-actor to slap it, and call <code>wasSlapped()</code> to determine if it has been slapped.</p>
+actor to slap it and call <code>wasSlapped()</code> to determine if it has been slapped.</p>
 <p>The actors need a stage where they can interact, so let&#8217;s build that:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Stage</span>
 <span class="p">{</span>
@@ -427,8 +426,8 @@ actor to slap it, and call <code>wasSlapped()</code> to determine if it has been
 </pre></div>
 
 
-<p>It lets us add actors, and provides a single <code>update()</code> call that updates each
-actor. Even though actors appear to move simultaneously to the user, internally
+<p><code>Stage</code> lets us add actors, and provides a single <code>update()</code> call that updates each
+actor. To the user, actors appear to move simultaneously, but internally,
 they are updated one at a time.</p>
 <p>The only other point to note is that each actor&#8217;s &#8220;slapped&#8221; state is cleared
 immediately after updating. This is so that an actor only responds to a given
@@ -471,8 +470,8 @@ big circle:</p>
 </pre></div>
 
 
-<p>The resulting stage is set up a bit like the following image shows. The arrows
-show who is facing who, and the numbers show their index in the stage&#8217;s array:</p>
+<p>The resulting stage is set up as shown in the following image. The arrows
+show who the actors are facing, and the numbers show their index in the stage&#8217;s array.</p>
 <p><img src="images/double-buffer-slaps-1.png" /></p>
 <p>We&#8217;ll slap Harry to get things going and see what happens when we start
 processing:</p>
@@ -482,7 +481,7 @@ processing:</p>
 </pre></div>
 
 
-<p>Remember that the <code>update()</code> function in Stage updates each actor in turn, so if
+<p>Remember that the <code>update()</code> function in <code>Stage</code> updates each actor in turn, so if
 we step through the code, we&#8217;ll find that the following occurs:</p>
 <div class="codehilite"><pre><span class="n">Stage</span> <span class="n">updates</span> <span class="n">actor</span> <span class="mi">0</span> <span class="p">(</span><span class="n">Harry</span><span class="p">)</span>
   <span class="n">Harry</span> <span class="n">was</span> <span class="n">slapped</span><span class="p">,</span> <span class="n">so</span> <span class="n">he</span> <span class="n">slaps</span> <span class="n">Baldy</span>
@@ -494,11 +493,11 @@ we step through the code, we&#8217;ll find that the following occurs:</p>
 </pre></div>
 
 
-<p>So, in a single frame, our initial slap on Harry has propagated through all of
+<p>In a single frame, our initial slap on Harry has propagated through all of
 the comedians. Now, to mix things up a bit, let&#8217;s say we reorder the comedians
-within the stage&#8217;s array, but leave them still facing each other the same way.</p>
+within the stage&#8217;s array but leave them facing each other the same way.</p>
 <p><img src="images/double-buffer-slaps-2.png" /></p>
-<p>We&#8217;ll leave the rest of the stage setup alone, but replace the chunk of code
+<p>We&#8217;ll leave the rest of the stage setup alone, but we&#8217;ll replace the chunk of code
 where we add the actors to the stage with this:</p>
 <div class="codehilite"><pre><span class="n">stage</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">harry</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
 <span class="n">stage</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">baldy</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
@@ -529,11 +528,11 @@ cascade through the actors, one per frame. In the first frame, Harry
 slaps Baldy. In the next frame, Baldy slaps Chump, and so on.</p>
 </aside>
 
-<p>The ultimate result is that an actor may respond to being slapped on
-either the <em>same</em> frame as the slap or the <em>next</em> frame, based
+<p>The ultimate result is that an actor may respond to being slapped in
+either the <em>same</em> frame as the slap or in the <em>next</em> frame based
 entirely on how the two actors happen to be ordered on the stage. This
 violates our requirement that actors need to appear to run in
-parallel: the order that they update within a single frame shouldn&#8217;t
+parallel&#8202;&mdash;&#8202;the order that they update within a single frame shouldn&#8217;t
 matter.</p>
 <h3><a href="#buffered-slaps" name="buffered-slaps">Buffered slaps</a></h3>
 <p>Fortunately, our Double Buffer pattern can help. This time, instead of
@@ -595,14 +594,14 @@ small change in <code>Stage</code>:</p>
 
 <p>The <code>update()</code> function now updates all of the actors and <em>then</em> swaps
 all of their states.</p>
-<p>The end result of this is that an actor will only see a slap on the
-frame <em>after</em> it was actually slapped. This way, no matter what order
-they appear in the stage&#8217;s array, they will behave the same. As far as the user or any outside code can tell, all of the actors update simultaneously within a frame.</p>
+<p>The end result of this is that an actor will only see a slap in the
+frame <em>after</em> it was actually slapped. This way, the actors will behave the
+same no matter their order in the stage&#8217;s array. As far as the user or any
+outside code can tell, all of the actors update simultaneously within a frame.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
-<p>The Double Buffer pattern is pretty straightforward, and the examples
-we&#8217;ve seen so far cover most of the variations you&#8217;re likely to
-encounter. There are two main decisions that come up when implementing
-it.</p>
+<p>Double Buffer is pretty straightforward, and the examples we&#8217;ve seen so far
+cover most of the variations you&#8217;re likely to encounter. There are two main
+decisions that come up when implementing this pattern.</p>
 <h3><a href="#how-are-the-buffers-swapped" name="how-are-the-buffers-swapped">How are the buffers swapped?</a></h3>
 <p>The swap operation is the most critical step of the process since we
 must lock out all reading and modification of both buffers while it&#8217;s
@@ -611,7 +610,7 @@ quickly as possible.</p>
 <ul>
 <li>
 <p><strong>Swap pointers or references to the buffer:</strong></p>
-<p>This is how our graphics example works, and is the most common
+<p>This is how our graphics example works, and it&#8217;s the most common
 solution for double-buffering graphics.</p>
 <ul>
 <li>
@@ -625,7 +624,7 @@ solution for double-buffering graphics.</p>
     essentially doing is periodically telling the rest of the codebase to
     look somewhere else for the buffer, like in our original stage analogy.
     This means that the rest of the codebase can&#8217;t store pointers directly
-    to data within the buffer: they may be pointing at the wrong one a
+    to data within the buffer&#8202;&mdash;&#8202;they may be pointing at the wrong one a
     moment later.</p>
 <p>This can be particularly troublesome on a system where the video driver
 expects the framebuffer to always be at a fixed location in memory. In
@@ -633,7 +632,7 @@ that case, we won&#8217;t be able to use this option.</p>
 </li>
 <li>
 <p><em>Existing data on the buffer will be from two frames ago, not the last
-    frame.</em> Successive frames are drawn on alternating buffers, with no data
+    frame.</em> Successive frames are drawn on alternating buffers with no data
     copied between them, like so:</p>
 <div class="codehilite"><pre>Frame 1 drawn on buffer A
 Frame 2 drawn on buffer B
@@ -644,15 +643,15 @@ Frame 3 drawn on buffer A
 
 <p>You&#8217;ll note that when we go to draw the third frame, the data already on
 the buffer is from frame <em>one</em>, not the more recent second frame. In
-most cases, this isn&#8217;t an issue&#8202;&mdash;&#8202;we usually just clear the whole
-buffer right before drawing. But, if we intend to <span
+most cases, this isn&#8217;t an issue&#8202;&mdash;&#8202;we usually clear the whole
+buffer right before drawing. But if we intend to <span
 name="blur">reuse</span> some of the existing data on the buffer, it&#8217;s
 important to take into account that that data will be a frame older than
 we might expect.</p>
 <aside name="blur">
 
 <p>One classic use of old framebuffer data is simulating motion blur. The
-current frame is blended with a bit of the previously rendered frame, to
+current frame is blended with a bit of the previously rendered frame to
 make a resulting image that looks more like what a real camera captures.</p>
 </aside>
 
@@ -661,10 +660,10 @@ make a resulting image that looks more like what a real camera captures.</p>
 </li>
 <li>
 <p><strong>Copy the data between the buffers:</strong></p>
-<p>If we can&#8217;t just repoint users to the other buffer, the only other option is
+<p>If we can&#8217;t repoint users to the other buffer, the only other option is
 to actually copy the data from the next frame to the current frame. This is
-how our slapstick comedians work. In that case, we chose this way because
-the state&#8202;&mdash;&#8202;a single boolean flag&#8202;&mdash;&#8202;doesn&#8217;t take any longer to copy than a
+how our slapstick comedians work. In that case, we chose this method because
+the state&#8202;&mdash;&#8202;a single Boolean flag&#8202;&mdash;&#8202;doesn&#8217;t take any longer to copy than a
 pointer to the buffer would.</p>
 <ul>
 <li>
@@ -684,11 +683,11 @@ pointer to the buffer would.</p>
 </li>
 </ul>
 <h3><a href="#what-is-the-granularity-of-the-buffer" name="what-is-the-granularity-of-the-buffer">What is the granularity of the buffer?</a></h3>
-<p>The other question is how the buffer itself is organized: as a single monolithic
-chunk of data, or distributed among a collection of objects. Our graphics
+<p>The other question is how the buffer itself is organized&#8202;&mdash;&#8202;is it a single monolithic
+chunk of data or distributed among a collection of objects? Our graphics
 example uses the former, and the actors use the latter.</p>
 <p>Most of the time, the nature of what you&#8217;re buffering will lead to the answer,
-but there&#8217;s some flexibility. For example, our actors could have all stored
+but there&#8217;s some flexibility. For example, our actors all could have stored
 their messages in a single message block that they all reference into by their
 index.</p>
 <ul>
@@ -706,7 +705,7 @@ index.</p>
 <ul>
 <li>
 <p><em>Swapping is slower.</em> In order to swap, we need to iterate through the
-    entire collection of objects, telling each one to swap.</p>
+    entire collection of objects and tell each one to swap.</p>
 <p>In our comedian example, that was OK since we needed to clear the next
 slap state anyway&#8202;&mdash;&#8202;every piece of buffered state needed to be touched
 each frame. If we don&#8217;t need to otherwise touch the old buffer, there&#8217;s
@@ -735,9 +734,9 @@ Like so:</p>
 
 <p>Actors access their current slap state by using <code>current_</code> to index into
 the state array. The next state is always the other index in the array,
-so we can calculate that with <code>next()</code>. Swapping the state just
+so we can calculate that with <code>next()</code>. Swapping the state simply
 alternates the <code>current_</code> index. The clever bit is that <code>swap()</code> is now
-a <em>static</em> function: it only needs to be called once, and <em>every</em>
+a <em>static</em> function&#8202;&mdash;&#8202;it only needs to be called once, and <em>every</em>
 actor&#8217;s state will be swapped.</p>
 </li>
 </ul>
@@ -745,9 +744,10 @@ actor&#8217;s state will be swapped.</p>
 </ul>
 <h2><a href="#see-also" name="see-also">See Also</a></h2>
 <ul>
-<li><p>You can find this pattern in use in almost every graphics API out there.
-    OpenGL has <code>swapBuffers()</code>. Microsoft&#8217;s XNA framework swaps the framebuffers
-    within its <code>endDraw()</code> function.</p></li>
+<li><p>You can find the Double Buffer pattern in use in almost every graphics
+    API out there. For example, OpenGL has <code>swapBuffers()</code>, Direct3D has &#8220;swap
+    chains&#8221;, and Microsoft&#8217;s XNA framework swaps the framebuffers within its
+    <code>endDraw()</code> function.</p></li>
 </ul>
 <nav>
   <span class="prev">&larr; <a href="sequencing-patterns.html">Previous Chapter</a></span>
