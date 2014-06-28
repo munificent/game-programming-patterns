@@ -377,7 +377,7 @@ taken steps away from Self is that the core operation in a prototype-based
 language, *cloning*, is nowhere to be seen. There is no method to clone an
 object in JavaScript.
 
-The closest it has is `Object.create`, which lets you create a new object that
+The closest it has is `Object.create()`, which lets you create a new object that
 delegates to an existing one. Even that wasn't added until ECMAScript 5,
 fourteen years after JavaScript came out. Instead of cloning, let me walk you
 through the typical way you define types and create objects in JavaScript. You

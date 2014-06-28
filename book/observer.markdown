@@ -186,7 +186,7 @@ The other job of the subject is sending notifications:
 
 <aside name="concurrent">
 
-Note that this code assumes observers don't modify the list in their `onNotify`
+Note that this code assumes observers don't modify the list in their `onNotify()`
 methods. A more robust implementation would either prevent or gracefully handle
 concurrent modification like that.
 

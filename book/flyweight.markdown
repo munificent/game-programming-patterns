@@ -182,7 +182,7 @@ After all, we already learned our lesson with those trees.
 
 Then the world maintains a huge grid of those:
 
-<span name="grid"></aside>
+<span name="grid"></span>
 
 ^code enum-world
 

@@ -1,0 +1,2 @@
+Create cross-references to other chapters
+Remove footers from blank pages?
