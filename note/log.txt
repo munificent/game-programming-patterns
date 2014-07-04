@@ -1,3 +1,8 @@
+2014-07-03 - more work on format script for epub, alt text for images
+2014-07-02 - more work on epub
+2014-07-01 - start working on epub version
+2014-06-29 - sequencing patterns, start working on double buffer
+2014-06-28 - merge changes from lauren
 2014-06-27 - layout state
 2014-06-26 - 6 emails
 2014-06-25 - lay out singleton

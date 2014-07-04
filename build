@@ -1,2 +1,2 @@
 #!/bin/bash
-python script/format.py
+python script/format.py $@
