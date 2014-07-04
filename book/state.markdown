@@ -103,7 +103,7 @@ can be doing: standing, jumping, ducking, and diving. When she can respond to a
 button press in one of those states, you draw an arrow from that box, label it
 with that button, and connect it to the state she changes to.
 
-<img src="images/state-flowchart.png"/>
+<img src="images/state-flowchart.png" alt="A flowchart containing boxes for Standing, Jumping, Diving, and Ducking. Arrows for button presses and releases connect some of the boxes." />
 
 Congratulations, you've just created a *finite state machine*. These came out of
 a branch of computer science called *automata theory* whose family of data
@@ -584,7 +584,7 @@ gives you two additional operations:
  2. You can *pop* the topmost state off the stack. That state is discarded, and
     the state under it becomes the new current state.
 
-<img src="images/state-pushdown.png" />
+<img src="images/state-pushdown.png" alt="The stack for a pushdown automaton. First it just contains a Standing state. A Firing state is pushed on top, then popped back off when done." />
 
 This is just what we need for firing. We create a *single* firing state. When
 the fire button is pressed while in any other state, we *push* the firing state

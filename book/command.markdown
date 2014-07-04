@@ -66,7 +66,7 @@ Somewhere in every game is a chunk of code that reads in raw user input --
 button presses, keyboard events, mouse clicks, whatever. It takes each input and
 translates it to a meaningful action in the game:
 
-<img src="images/command-buttons-one.png" />
+<img src="images/command-buttons-one.png" alt="A controller, with A mapped to swapWeapon(), B mapped to lurch(), X mapped to jump(), and Y mapped to fireGun()." />
 
 A dead simple implementation looks like:
 
@@ -133,7 +133,7 @@ Object](http://en.wikipedia.org/wiki/Null_Object_pattern).
 Where each input used to directly call a function, now there's a layer of
 indirection:
 
-<img src="images/command-buttons-two.png" />
+<img src="images/command-buttons-two.png" alt="A controller, with each button mapped to a corresponding 'button_' variable which in turn is mapped to a function." />
 
 This is the Command pattern in a nutshell. If you can see the merit of it
 already, consider the rest of this chapter a bonus.
@@ -208,7 +208,7 @@ class="pattern">Event Queue</a>.
 
 <span name="stream"></span>
 
-<img src="images/command-stream.png" />
+<img src="images/command-stream.png" alt="A pipe connecting AI to Actor." />
 
 <aside name="stream">
 
@@ -330,7 +330,7 @@ last command, we keep a list of commands and a reference to the "current" one.
 When the player executes a command, we append it to the list and point "current"
 at it.
 
-<img src="images/command-undo.png" />
+<img src="images/command-undo.png" alt="A stack of commands from older to newer. A 'current' arrow points to one command, an 'undo' arrow points to the previous one, and 'redo' points to the next." />
 
 When the player chooses "Undo", we undo the current command and move the current
 pointer back. When they choose <span name="replay">"Redo"</span>, we advance the

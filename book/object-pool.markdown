@@ -44,7 +44,7 @@ free space is *fragmented* into bits of open curb between half a dozen cars.
 
 <span name="heap"></span>
 
-<img src="images/object-pool-heap-fragment.png" />
+<img src="images/object-pool-heap-fragment.png" alt="A series of memory operations leading to fragmentation." />
 
 <aside name="heap">
 

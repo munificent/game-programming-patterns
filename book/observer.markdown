@@ -33,7 +33,7 @@ specific milestones like "Kill 100 Monkey Demons", "Fall off a Bridge", or
 
 <aside name="weasel">
 
-<img src="images/observer-weasel-wielder.png" width="240" />
+<img src="images/observer-weasel-wielder.png" width="240" alt="Achievement: Weasel Wielder" />
 
 I swear I had no double meaning in mind when I drew this.
 
@@ -226,7 +226,7 @@ Now, when the physics engine does something noteworthy, it calls `notify()`
 like in the motivating example before. That walks the observer list and gives
 them all the heads up.
 
-<img src="images/observer-list.png" />
+<img src="images/observer-list.png" alt="A Subject containing a list of Observer pointers. The first two point to Achievements and Audio." />
 
 Pretty simple, right? Just one class that maintains a list of pointers to
 instances of some interface. It's hard to believe that something so
@@ -344,7 +344,7 @@ allocation problem by threading the subject's list *through the observers
 themselves*. Instead of the subject having a separate collection of pointers,
 the observer objects become nodes in a linked list:
 
-<img src="images/observer-linked.png" />
+<img src="images/observer-linked.png" alt="A linked list of Observers. Each has a next_ field pointing to the next one. A Subject has a head_ pointing to the first Observer." />
 
 To implement this, first we'll get rid of the array in `Subject` and replace it
 with a pointer to the head of the list of observers:
@@ -447,7 +447,7 @@ list nodes won't be the observer objects themselves. Instead, they'll be
 separate little "list <span name="intrusive">node</span>" objects that contain a
 pointer to the observer and then a pointer to the next node in the list.
 
-<img src="images/observer-nodes.png" />
+<img src="images/observer-nodes.png" alt="A linked list of nodes. Each node has an observer_ field pointing to an Observer, and a next_ field pointing to the next node in the list. A Subject's head_ field points to the first node." />
 
 Since multiple nodes can all point to the same observer, that means an observer
 can be in more than one subject's list at the same time. We're back to being

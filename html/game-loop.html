@@ -261,7 +261,7 @@ run at 60 FPS. That gives you about <span name="16">16</span> milliseconds per
 frame. As long as you can reliably do all of your game processing and rendering
 in less than that time, you can run at a steady frame rate. All you do is process
 the frame and then <em>wait</em> until it&#8217;s time for the next one, like so:</p>
-<p><img src="images/game-loop-simple.png"/></p>
+<p><img src="images/game-loop-simple.png" alt="A simple game loop flowchart. Process Input &rarr; Update Game &rarr; Render &rarr; Wait, then loop back to the beginning." /></p>
 <p>The code looks a bit like this:</p>
 <aside name="16">
 
@@ -425,7 +425,7 @@ on how much real time passed. This measures how far the game&#8217;s clock is be
 compared to the real world. We then have an inner loop to update the game one
 fixed step at a time until it&#8217;s caught up. Once we&#8217;re caught up, we render and
 start over again. You can visualize it sort of like this:</p>
-<p><img src="images/game-loop-fixed.png"/></p>
+<p><img src="images/game-loop-fixed.png" alt="A modified flowchart. Process Input &rarr; Update Game &rarr; Wait, then loop back to this step then &rarr; Render &rarr; Loop back to the beginning." /></p>
 <p>Note that the time step here isn&#8217;t the <em>visible</em> frame rate any more.
 <code>MS_PER_UPDATE</code> is just the <em>granularity</em> we use to update the game. The shorter
 this step is, the more processing time it takes to catch up to real time. The
@@ -453,12 +453,12 @@ at a fixed time step, but we render at arbitrary points in time. This means that
 from the user&#8217;s perspective, the game will often display at a point in time
 between two updates.</p>
 <p>Here&#8217;s a timeline:</p>
-<p><img src="images/game-loop-timeline.png" /></p>
+<p><img src="images/game-loop-timeline.png" alt="A timeline containing evenly spaced Updates and intermittent Renders." /></p>
 <p>As you can see, we update at a nice tight, fixed interval. Meanwhile, we render
 whenever we can. It&#8217;s less frequent than updating, and isn&#8217;t steady either. Both
 of those are OK. The lame part is that we don&#8217;t always render right at the point
 of updating. Look at the third render time. It&#8217;s right between two updates:</p>
-<p><img src="images/game-loop-timeline-close.png" /></p>
+<p><img src="images/game-loop-timeline-close.png" alt="Close-up of the timeline showing Renders falling between Update steps." /></p>
 <p>Imagine a bullet is flying across the screen. On the first update, it&#8217;s on the
 left side. The second update moves it to the right side. The game is rendered at
 a point in time right between those two updates, so the user expects to see that

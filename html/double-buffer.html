@@ -99,7 +99,7 @@ scans across the pixels we&#8217;ve written, our face starts to appear, but then
 outpaces us and moves into pixels we haven&#8217;t written yet. The result is
 <em>tearing</em>, a hideous visual bug where you see half of something drawn on screen.</p>
 <p><span name="tearing"></span></p>
-<p><img src="images/double-buffer-tearing.png" /></p>
+<p><img src="images/double-buffer-tearing.png" alt="A series of images of an in-progress frame being rendered. A pointer writes pixels while another reads them. The reader outpaces the writer until it starts reading pixels that haven't been rendered yet." /></p>
 <aside name="tearing">
 
 <p>We start drawing pixels just as the video driver starts reading from the
@@ -285,7 +285,7 @@ by making a bunch of <code>draw()</code> calls on its buffer:</p>
 <aside name="draw">
 
 <p>Specifically, it draws this artistic masterpiece:</p>
-<p><img src="images/double-buffer-face.png" width="240" /></p>
+<p><img src="images/double-buffer-face.png" width="240" alt="A pixellated smiley face." /></p>
 </aside>
 
 <p>Every frame, the game tells the scene to draw. The scene clears the buffer and
@@ -472,7 +472,7 @@ big circle:</p>
 
 <p>The resulting stage is set up as shown in the following image. The arrows
 show who the actors are facing, and the numbers show their index in the stage&#8217;s array.</p>
-<p><img src="images/double-buffer-slaps-1.png" /></p>
+<p><img src="images/double-buffer-slaps-1.png" alt="Boxes for Harry, Baldy, and Chump, in that order. Harry has an arrow pointing to Baldy, who has an arrow pointing to Chump, who has an arrow pointing back to Harry." /></p>
 <p>We&#8217;ll slap Harry to get things going and see what happens when we start
 processing:</p>
 <div class="codehilite"><pre><span class="n">harry</span><span class="o">-&gt;</span><span class="n">slap</span><span class="p">();</span>
@@ -496,7 +496,7 @@ we step through the code, we&#8217;ll find that the following occurs:</p>
 <p>In a single frame, our initial slap on Harry has propagated through all of
 the comedians. Now, to mix things up a bit, let&#8217;s say we reorder the comedians
 within the stage&#8217;s array but leave them facing each other the same way.</p>
-<p><img src="images/double-buffer-slaps-2.png" /></p>
+<p><img src="images/double-buffer-slaps-2.png" alt="The same boxes as before with the same arrows, but now they are ordered Chump, Baldy, Harry." /></p>
 <p>We&#8217;ll leave the rest of the stage setup alone, but we&#8217;ll replace the chunk of code
 where we add the actors to the stage with this:</p>
 <div class="codehilite"><pre><span class="n">stage</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">harry</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>

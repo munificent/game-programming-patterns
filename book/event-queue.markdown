@@ -62,7 +62,7 @@ operating system doesn't lose it between when the device driver reported the
 input and when your app gets around to calling `getNextEvent()`. That
 "somewhere" is a *queue*.
 
-<img src="images/event-queue-loop.png" />
+<img src="images/event-queue-loop.png" alt="An event queue. The operating system enqueues Shift, Down, Up, and Click events, and the getNextEvent() function dequeues them." />
 
 When user input comes in, the OS adds it to a queue of unprocessed events. When
 you call `getNextEvent()`, it pulls the oldest event off the queue and hands it
@@ -117,7 +117,7 @@ the AI field.
 
 </aside>
 
-<img src="images/event-queue-central.png" />
+<img src="images/event-queue-central.png" alt="A central event queue is read from and written to by the Combat and Tutorial code." />
 
 I thought about using this as the example for the rest of the chapter, but I'm
 not generally a fan of global systems. It is a common technique, but I don't
@@ -430,7 +430,7 @@ let's get precise on some terms.
 Since `playSound()` appends new requests at the end of the array, the head
 starts at element zero and the tail grows to the right.
 
-<img src="images/event-queue-queue.png" />
+<img src="images/event-queue-queue.png" alt="An array of events. The head points to the first element, and the tail grows to the right." />
 
 Let's code that up. First, we'll tweak our fields a bit to make these two
 markers explicit in the class:
@@ -469,7 +469,7 @@ Do you want party time to be over? No. You do not.
 
 </aside>
 
-<img src="images/event-queue-crawl.png" />
+<img src="images/event-queue-crawl.png" alt="The same array as before but now the head is moving towards the right, leaving available cells on the left." />
 
 Notice that while the tail is creeping forward, the *head* is too. That means
 we've got array elements at the *beginning* of the array that aren't being used
@@ -477,7 +477,7 @@ any more. So what we do is wrap the tail back around to the beginning of the
 array when it runs off the end. That's why it's called a *ring* buffer: it acts
 like a circular array of cells.
 
-<img src="images/event-queue-ring.png" />
+<img src="images/event-queue-ring.png" alt="The array wraps around and now the head can circle back to the beginning." />
 
 Implementing that is remarkably easy. When we enqueue an item, we just need to
 make sure the tail wraps around to the beginning of the array when it reaches
@@ -629,7 +629,7 @@ you're stuffing in the queue.
 
  *  **If you queue messages:**
 
-    A <span name="command">"message"</href="observer.html"> or "request"
+    A <span name="command">"message"</span> or "request"
     describes an action that we *want* to happen *in the future*, like "play
     sound". You can think of this as an asynchronous API to a service.
 

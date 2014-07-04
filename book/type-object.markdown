@@ -115,11 +115,11 @@ hierarchy like this:
 
 <span name="inherits-arrow"></span>
 
-<img src="images/type-object-subclasses.png" />
+<img src="images/type-object-subclasses.png" alt="A Monster base class with derived classes for Dragon, Troll, etc." />
 
 <aside name="inherits-arrow">
 
-Here, the <img src="images/arrow-inherits.png" class="arrow" /> means "inherits
+Here, the <img src="images/arrow-inherits.png" class="arrow" alt="A UML arrow representing inheritance." /> means "inherits
 from".
 
 </aside>
@@ -135,11 +135,11 @@ breed, we have a single `Monster` class and a single `Breed` class:
 
 <span name="references-arrow"></span>
 
-<img src="images/type-object-breed.png" />
+<img src="images/type-object-breed.png" alt="A Monster object has a reference to a Breed object." />
 
 <aside name="references-arrow">
 
-Here, the <img src="images/arrow-references.png" class="arrow" /> means "is
+Here, the <img src="images/arrow-references.png" class="arrow" alt="A UML arrow for an object reference." /> means "is
 referenced by".
 
 </aside>

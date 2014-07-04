@@ -57,7 +57,7 @@ of units. To find a unit near some location, we have to walk the entire array.
 Now imagine we simplify our game a bit. Instead of a 2D battle*field*, imagine
 it's a 1D battle*line*.
 
-<img src="images/spatial-partition-battle-line.png" />
+<img src="images/spatial-partition-battle-line.png" alt="A number line with Units positioned at different coordinates on it." />
 
 In that case, we could make things easier on ourselves by *sorting* the array of
 units by their position on the battleline. Once we do that, we can use something
@@ -144,7 +144,7 @@ grid of fixed-size squares onto it like a sheet of graph paper. Instead of
 storing our units in a single array, we put them in the cells of this grid. Each
 cell stores the list of units whose positions are within that cell's boundary.
 
-<img src="images/spatial-partition-grid.png" />
+<img src="images/spatial-partition-grid.png" alt="A grid with Units occupying different cells. Some cells have multiple Units." />
 
 When we handle combat, we only consider units within the same cell. Instead of
 comparing each unit in the game with every other unit, we've *partitioned* the
@@ -174,7 +174,7 @@ we'll extend `Unit` with `next` and `prev` pointers:
 This lets us organize units into a [doubly-linked
 list](http://en.wikipedia.org/wiki/Doubly_linked_list) instead of an array.
 
-<img src="images/spatial-partition-linked-list.png" />
+<img src="images/spatial-partition-linked-list.png" alt="A Cell pointing to a a doubly linked list of Units." />
 
 Each cell in the grid points to the first unit in the list of units within that
 cell, and each unit has pointers to the units before it and after it in the
@@ -303,7 +303,7 @@ match, we'll do something more like:
 When range gets involved, there's a corner case we need to consider: units in
 different cells may still be close enough to interact.
 
-<img src="images/spatial-partition-adjacent.png" />
+<img src="images/spatial-partition-adjacent.png" alt="Two Units in adjacent Cells are close enough to interact." />
 
 Here, B is within A's attack radius even through their centerpoints are in
 different cells. To handle this, we will need to compare units not only in the
@@ -332,7 +332,7 @@ unit's attack radius, it will find the hit.
 
 The cell with the unit is `U`, and the neighboring cells it looks at are `X`.
 
-<img src="images/spatial-partition-neighbors.png" width="240" />
+<img src="images/spatial-partition-neighbors.png" width="240" alt="The set of neighbors for a Cell with the four being considered highlighted." />
 
 </aside>
 
@@ -509,7 +509,7 @@ to solve.
 
     You can see the partitioning in action reading from left to right here:
 
-    <img src="images/spatial-partition-quadtree.png" />
+    <img src="images/spatial-partition-quadtree.png" alt="A quadtree." />
 
      *  *Objects can be added incrementally.* Adding a new object means finding
         the right square and adding it. If that bumps that square above the

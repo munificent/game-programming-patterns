@@ -98,12 +98,12 @@ execute. Say, for example, it supports arithmetic expressions like this:</p>
 
 <p>Then you take each piece of that expression, each rule in the language&#8217;s
 grammar, and turn it into an <em>object</em>. The number literals will be objects:</p>
-<p><img src="images/bytecode-numbers.png" /></p>
+<p><img src="images/bytecode-numbers.png" alt="A series of number literal objects." /></p>
 <p>Basically just little wrappers around the raw value. The operators will be
 objects too, and they&#8217;ll have references to their operands. If you take into
 account the parentheses and precedence, that expression <span
 name="magic">magically</span> turns into a little tree of objects like so:</p>
-<p><img src="images/bytecode-ast.png" /></p>
+<p><img src="images/bytecode-ast.png" alt="A syntax tree. The number literals are connected by operator objects." /></p>
 <aside name="magic">
 
 <p>What &#8220;magic&#8221; is this? It&#8217;s simple: <em>parsing</em>. A parser takes a string of
@@ -437,7 +437,7 @@ operation you want to perform. We can enumerate them:</p>
 a few different primitives, so the range of enum values easily fits into a byte.
 This means a spell is just a list of <span name="byte">bytes</span>&#8202;&mdash;&#8202;ergo
 &#8220;bytecode&#8221;.</p>
-<p><img src="images/bytecode-code.png" /></p>
+<p><img src="images/bytecode-code.png" alt="A sequence of bytecode instructions: 0x00 HEALTH, 0x03 SOUND, 0x004 PARTICLES, ..." /></p>
 <aside name="byte">
 
 <p>Some bytecode VMs use more than a single byte for each instruction and have more
@@ -617,18 +617,18 @@ required to decode a multiple-byte integer, but in a real implementation, you&#8
 want to be able to have literals that cover your full numeric range.</p>
 </aside>
 
-<p><img src="images/bytecode-literal.png" /></p>
+<p><img src="images/bytecode-literal.png" alt="Binary encoding of a literal instruction: 0x05 (LITERAL) followed by 123 (the value)." /></p>
 <p>It reads the next <span name="single">byte</span> in the bytecode stream <em>as a
 number</em>, and pushes it onto the stack.</p>
 <p>Let&#8217;s string a few of these instructions together and watch the interpreter
 execute them to get a feel for how the stack works. We start with an empty stack
 and the interpreter pointing to the first instruction:</p>
-<p><img src="images/bytecode-stack-1.png" /></p>
+<p><img src="images/bytecode-stack-1.png" alt="Executing a bytecode sequence. The execution pointer points to the first literal instruction and the stack is empty." /></p>
 <p>First, it executes the first <code>INST_LITERAL</code>. That reads the next byte from the
 bytecode (<code>0</code>) and pushes it onto the stack:</p>
-<p><img src="images/bytecode-stack-2.png" /></p>
+<p><img src="images/bytecode-stack-2.png" alt="The next step. The literal 0 has been pushed onto the stack and the execution pointer is on the next literal." /></p>
 <p>Then it executes the second <code>INST_LITERAL</code>. That reads the <code>10</code> and pushes it:</p>
-<p><img src="images/bytecode-stack-3.png" /></p>
+<p><img src="images/bytecode-stack-3.png" alt="The next step. Now 10 has been pushed onto the stack and the execution pointer is at the Health instruction." /></p>
 <p>Finally, it executes <code>INST_SET_HEALTH</code>. That pops <code>10</code> and stores it in
 <code>amount</code>, then pops <code>0</code> and stores it in <code>wizard</code>. Then it calls <code>setHealth()</code>
 with those parameters.</p>
@@ -804,12 +804,11 @@ people who haven&#8217;t spent years getting used to a compiler yelling at them.
 little boxes or pulling down menu items, or whatever else makes sense for the
 kind of behavior you want them to create.</p>
 <p><span name="text"></span></p>
-<p><img src="images/bytecode-ui.png" /></p>
+<p><img src="images/bytecode-ui.png" alt="A mock-up of a little tree-based UI for authoring behavior." /></p>
 <aside name="text">
 
-<p>The scripting system I wrote for <a href="ht
-tp://en.wikipedia.org/wiki/Henry_Hatsworth_in_the_Puzzling_Adventure">Henry Hatsworth and the Puzzling Adventure</a> worked
-like this.</p>
+<p>The scripting system I wrote for <a href="http://en.wikipedia.org/wiki/Henry_Hatsworth_in_the_Puzzling_Adventure">Henry Hatsworth and the Puzzling
+Adventure</a> worked like this.</p>
 </aside>
 
 <p>The nice thing about this is that your UI can make it impossible for users to

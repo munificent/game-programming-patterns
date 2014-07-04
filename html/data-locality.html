@@ -33,7 +33,7 @@
 <p>We&#8217;ve been lied to. They keep showing us charts where CPU speed goes up and up every year as if Moore&#8217;s Law isn&#8217;t just a historical observation but some kind of divine right. Without lifting a finger, we software folks watch our programs magically accelerate just by virtue of new hardware.</p>
 <p>Chips <em>have</em> been getting faster (though even that&#8217;s plateauing now), but the hardware heads failed to mention something. Sure, we can <em>process</em> data faster than ever, but we can&#8217;t <em>get</em> that data faster.</p>
 <p><span name="legend"></span></p>
-<p><img src="images/data-locality-chart.png" /></p>
+<p><img src="images/data-locality-chart.png" alt="A chart showing processor and RAM speed from 1980 to 2010. Processor speed increases quickly, but RAM speed lags behind." /></p>
 <aside name="legend">
 
 <p>Processor and RAM speed relative to their respective speeds in 1980. As you can see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.</p>
@@ -137,7 +137,7 @@ pallet of boxes. Whenever your chip needs a byte of data from RAM, it
 automatically grabs a whole chunk of contiguous memory&#8202;&mdash;&#8202;usually around 64 to
 128 bytes&#8202;&mdash;&#8202;and puts it in the cache. This dollop of memory is called a <em>cache
 line</em>.</p>
-<p><img src="images/data-locality-cache-line.png" /></p>
+<p><img src="images/data-locality-cache-line.png" alt="A cache line showing the one byte requested along with the adjacent bytes that also get loaded into the cache." /></p>
 <p>If the <span name="pallet">next byte</span> of data you need happens to be in
 that chunk, the CPU reads it straight from the cache, which is <em>much</em> faster
 than hitting RAM. Successfully finding a piece of data in the cache is called a
@@ -220,7 +220,7 @@ costly synchronization of their caches.</p>
 
 <p>In other words, if your code is crunching on <code>Thing</code>, then <code>Another</code>, then
 <code>Also</code>, you want them laid out in memory like this:</p>
-<p><img src="images/data-locality-things.png" /></p>
+<p><img src="images/data-locality-things.png" alt="Thing, Another, and Also laid out directly next to each other in order in memory." /></p>
 <p>Note, these aren&#8217;t <em>pointers</em> to <code>Thing</code>, <code>Another</code>, and <code>Also</code>. This is the
 actual data for them, in place, lined up one after the other. As soon as the CPU
 reads in <code>Thing</code>, it will start to get <code>Another</code> and <code>Also</code> too (depending on
@@ -421,7 +421,7 @@ We&#8217;re completely at the mercy of the memory manager. As entities get alloc
 and freed over time, the heap is likely to become increasingly randomly
 organized.</p>
 <p><span name="lines"></span></p>
-<p><img src="images/data-locality-pointer-chasing.png" /></p>
+<p><img src="images/data-locality-pointer-chasing.png" alt="A tangled mess of objects strewn randomly through memory with pointers wiring them all together." /></p>
 <aside name="lines">
 
 <p>Every frame, the game loop has to follow all of those arrows to get to the data
@@ -504,7 +504,7 @@ you can get rid of.</p>
 
 <p>We&#8217;ve ditched all of that pointer chasing. Instead of skipping around in memory,
 we&#8217;re doing a straight crawl through three contiguous arrays.</p>
-<p><img src="images/data-locality-component-arrays.png" /></p>
+<p><img src="images/data-locality-component-arrays.png" alt="An array for each of three different kinds of components. Each array neatly packs its components together." /></p>
 <p>This pumps a solid stream of bytes right into the hungry maw of the CPU. In my
 testing, this change made the update loop fifty <em>times</em> faster than the previous
 version.</p>

@@ -137,7 +137,7 @@ instance</em> of the same class.</p>
 
 <p>Now consider how we&#8217;d set up an inheritance hierarchy for those classes if we
 weren&#8217;t using components. A first pass might look like:</p>
-<p><img src="images/component-uml.png" /></p>
+<p><img src="images/component-uml.png" alt="A class diagram. Zone has collision code and inherits from GameObject. Decoration also inherits from GameObject and has rendering code. Prop inherits from Zone but then has redundant rendering code." /></p>
 <p>We have a base <code>GameObject</code> class that has common stuff like position and
 orientation. <code>Zone</code> inherits from that and adds collision detection. Likewise,
 <code>Decoration</code> inherits from <code>GameObject</code> and adds rendering. <code>Prop</code> inherits from
@@ -158,7 +158,7 @@ way to reuse the collision and rendering code between the classes that need it
 without resorting to multiple inheritance. The only other option is to push
 everything up into <code>GameObject</code>, but then <code>Zone</code> is wasting memory on rendering
 data it doesn&#8217;t need and <code>Decoration</code> is doing the same with physics.</p>
-<p>Now, let&#8217;s try it with components. Our <span name="menu">subclasses disappear
+<p>Now, let&#8217;s try it with components. Our <span name="menu">subclasses</span> disappear
 completely. Instead, we have a single <code>GameObject</code> class and two component
 classes: <code>PhysicsComponent</code> and <code>GraphicsComponent</code>. A decoration is simply a
 <code>GameObject</code> with a <code>GraphicsComponent</code> but no <code>PhysicsComponent</code>. A zone is the

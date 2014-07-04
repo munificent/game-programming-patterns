@@ -58,7 +58,7 @@ pirate's shoulder is a parrot. The ship's local transform will position it in
 the sea. The crow's nest's transform positions it on the ship, and so on.
 
 <span name="pirate"></span>
-<img src="images/dirty-flag-pirate.png" />
+<img src="images/dirty-flag-pirate.png" alt="A pirate ship containing a crow's nest with a pirate in it with a parrot on his shoulder." />
 
 <aside name="pirate">
 
@@ -90,7 +90,7 @@ its parent chain starting at the root all the way down to the object, combining
 transforms as you go. In other words, the parrot's world transform is:
 
 <span name="degenerate"></span>
-<img src="images/dirty-flag-multiply.png" />
+<img src="images/dirty-flag-multiply.png" alt="The parrot's world position comes from multiplying the local positions for the ship, nest, pirate, and parrot." />
 
 <aside name="degenerate">
 
@@ -134,7 +134,7 @@ world transforms eagerly whenever a local transform changes, what ends up
 happening?
 
 <span name="stars"></span>
-<img src="images/dirty-flag-update-bad.png" />
+<img src="images/dirty-flag-update-bad.png" alt="Any time an object moves, the world coordinates are recalculated eagerly and redundantly." />
 
 <aside name="stars">
 
@@ -178,7 +178,7 @@ Hence: *a dirty flag*.
 If we apply this pattern and then move all of the objects in our previous
 example, the game ends up doing:
 
-<img src="images/dirty-flag-update-good.png" />
+<img src="images/dirty-flag-update-good.png" alt="By deferring until all moves are done, we only recalculate once." />
 
 That's the best you could hope to do: the world transform for each affected
 object is calculated exactly once. With just a single bit of data, this pattern
@@ -277,7 +277,7 @@ little bullet or star in your file's title bar is literally the dirty flag
 visualized. The primary data is the open document in memory, and the derived
 data is the file on disk.
 
-<img src="images/dirty-flag-title-bar.png" />
+<img src="images/dirty-flag-title-bar.png" alt="A window titlebar showing the little icon representing unsaved changes." />
 
 Many programs don't save to disk until either the document is closed or the
 application is exited. That's fine most of the time, but if you accidentally

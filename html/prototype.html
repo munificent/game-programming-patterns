@@ -68,11 +68,11 @@ of monster in the game&#8202;&mdash;&#8202;<code>Ghost</code>, <code>Demon</code
 monster in the game, we <em>could</em> brute-force it by having a spawner class for
 each monster class, leading to a parallel class hierarchy:</p>
 <p><span name="inherits-arrow"></span></p>
-<p><img src="images/prototype-hierarchies.png" /></p>
+<p><img src="images/prototype-hierarchies.png" alt="Parallel class hierarchies. Ghost, Demon, and Sorceror all inherit from Monster. GhostSpawner, DemonSpawner, and SorcerorSpawner inherit from Spawner." /></p>
 <aside name="inherits-arrow">
 
 <p>I had to dig up a dusty UML book to make this diagram. The <img
-src="images/arrow-inherits.png" class="arrow" /> means &#8220;inherits from&#8221;.</p>
+src="images/arrow-inherits.png" class="arrow" alt="A UML arrow." /> means &#8220;inherits from&#8221;.</p>
 </aside>
 
 <p>Implementing it would look like this:</p>
@@ -170,7 +170,7 @@ monster class. Instead, we define a single one:</p>
 <p>It internally holds a monster, a hidden one whose sole purpose is to be used by
 the spawner as a template to stamp out more monsters like it, sort of like a
 queen bee who never leaves the hive.</p>
-<p><img src="images/prototype-spawner.png" /></p>
+<p><img src="images/prototype-spawner.png" alt="A Spawner contains a prototype field referencing a Monster. It calls clone() on the prototype to create new monsters." /></p>
 <p>To create a ghost spawner, we create a prototypal ghost instance and
 then create a spawner holding that prototype:</p>
 <div class="codehilite"><pre><span class="n">Monster</span><span class="o">*</span> <span class="n">ghostPrototype</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Ghost</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
@@ -325,7 +325,7 @@ state on an object, you look in the memory of the instance itself. State is
 instance&#8217;s class, and then you look up the method <em>there</em>. Behavior is contained
 in the <em>class</em>. There&#8217;s always that level of indirection to get to a method,
 which means fields and methods are different.</p>
-<p><img src="images/prototype-class.png" /></p>
+<p><img src="images/prototype-class.png" alt="A Class contains a list of Methods. An Instance contains a list of Fields and a reference to its Class." /></p>
 <aside name="vtable">
 
 <p>For example, to invoke a virtual method in C++, you look in the instance for the
@@ -336,7 +336,7 @@ pointer to its vtable, then look up the method there.</p>
 object. An instance can contain both state and behavior. You can have a single
 object that has a method completely unique to it.</p>
 <p><span name="island"></span></p>
-<p><img src="images/prototype-object.png" /></p>
+<p><img src="images/prototype-object.png" alt="An Object contains a mixed list of Fields and Methods." /></p>
 <aside name="island">
 
 <p>No man is an island, but this object is.</p>
@@ -359,7 +359,7 @@ specially marked fields, which means you can do things like inherit parents or
 change them at runtime, leading to what&#8217;s called <em>dynamic inheritance</em>.</p>
 </aside>
 
-<p><img src="images/prototype-delegate.png" /></p>
+<p><img src="images/prototype-delegate.png" alt="An Object contains Fields and Methods and a reference to another object that it delegates to." /></p>
 <p>Parent objects let us reuse behavior (and state!) across multiple objects, so
 we&#8217;ve covered part of the utility of classes. The other key thing classes do is
 give us a way to create instances. When you need a new thingamabob, you can just
@@ -489,7 +489,7 @@ add methods to the prototype object. Something like this:</p>
 function. Since every object returned by <code>new Weapon()</code> delegates to
 <code>Weapon.prototype</code>, you can now call <code>sword.attack()</code> and it will call that
 function. It looks a bit like this:</p>
-<p><img src="images/prototype-weapon.png" /></p>
+<p><img src="images/prototype-weapon.png" alt="A Weapon object contains an attack() method and other methods. A Sword object contains fields and delegates to Weapon." /></p>
 <p>Let&#8217;s review:</p>
 <ul>
 <li>

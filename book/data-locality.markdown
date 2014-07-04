@@ -13,7 +13,7 @@ Chips *have* been getting faster (though even that's plateauing now), but the ha
 
 <span name="legend"></span>
 
-<img src="images/data-locality-chart.png" />
+<img src="images/data-locality-chart.png" alt="A chart showing processor and RAM speed from 1980 to 2010. Processor speed increases quickly, but RAM speed lags behind." />
 
 <aside name="legend">
 
@@ -139,7 +139,7 @@ automatically grabs a whole chunk of contiguous memory -- usually around 64 to
 128 bytes -- and puts it in the cache. This dollop of memory is called a *cache
 line*.
 
-<img src="images/data-locality-cache-line.png" />
+<img src="images/data-locality-cache-line.png" alt="A cache line showing the one byte requested along with the adjacent bytes that also get loaded into the cache." />
 
 If the <span name="pallet">next byte</span> of data you need happens to be in
 that chunk, the CPU reads it straight from the cache, which is *much* faster
@@ -233,7 +233,7 @@ costly synchronization of their caches.
 In other words, if your code is crunching on `Thing`, then `Another`, then
 `Also`, you want them laid out in memory like this:
 
-<img src="images/data-locality-things.png" />
+<img src="images/data-locality-things.png" alt="Thing, Another, and Also laid out directly next to each other in order in memory." />
 
 Note, these aren't *pointers* to `Thing`, `Another`, and `Also`. This is the
 actual data for them, in place, lined up one after the other. As soon as the CPU
@@ -382,7 +382,7 @@ organized.
 
 <span name="lines"></span>
 
-<img src="images/data-locality-pointer-chasing.png" />
+<img src="images/data-locality-pointer-chasing.png" alt="A tangled mess of objects strewn randomly through memory with pointers wiring them all together." />
 
 <aside name="lines">
 
@@ -448,7 +448,7 @@ you can get rid of.
 We've ditched all of that pointer chasing. Instead of skipping around in memory,
 we're doing a straight crawl through three contiguous arrays.
 
-<img src="images/data-locality-component-arrays.png" />
+<img src="images/data-locality-component-arrays.png" alt="An array for each of three different kinds of components. Each array neatly packs its components together." />
 
 This pumps a solid stream of bytes right into the hungry maw of the CPU. In my
 testing, this change made the update loop fifty *times* faster than the previous

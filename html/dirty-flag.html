@@ -71,7 +71,7 @@ mast is a crow&#8217;s nest. Hunched in that crow&#8217;s nest is a pirate. Clut
 pirate&#8217;s shoulder is a parrot. The ship&#8217;s local transform will position it in
 the sea. The crow&#8217;s nest&#8217;s transform positions it on the ship, and so on.</p>
 <p><span name="pirate"></span>
-<img src="images/dirty-flag-pirate.png" /></p>
+<img src="images/dirty-flag-pirate.png" alt="A pirate ship containing a crow's nest with a pirate in it with a parrot on his shoulder." /></p>
 <aside name="pirate">
 
 <p>Programmer art!</p>
@@ -96,7 +96,7 @@ transform</em>. To render an object, we need to know its <em>world transform</em
 its parent chain starting at the root all the way down to the object, combining
 transforms as you go. In other words, the parrot&#8217;s world transform is:</p>
 <p><span name="degenerate"></span>
-<img src="images/dirty-flag-multiply.png" /></p>
+<img src="images/dirty-flag-multiply.png" alt="The parrot's world position comes from multiplying the local positions for the ship, nest, pirate, and parrot." /></p>
 <aside name="degenerate">
 
 <p>In the degenerate case where the object has no parent, its local and world
@@ -131,7 +131,7 @@ parrot hops onto his head. We changed four local transforms. If we recalculate
 world transforms eagerly whenever a local transform changes, what ends up
 happening?</p>
 <p><span name="stars"></span>
-<img src="images/dirty-flag-update-bad.png" /></p>
+<img src="images/dirty-flag-update-bad.png" alt="Any time an object moves, the world coordinates are recalculated eagerly and redundantly." /></p>
 <aside name="stars">
 
 <p>You can see on the lines marked &#x2605; that we&#8217;re recalculating the parrot&#8217;s
@@ -166,7 +166,7 @@ entirely clear, the traditional name for this &#8220;out-of-date-ness&#8221; is 
 Hence: <em>a dirty flag</em>.</p>
 <p>If we apply this pattern and then move all of the objects in our previous
 example, the game ends up doing:</p>
-<p><img src="images/dirty-flag-update-good.png" /></p>
+<p><img src="images/dirty-flag-update-good.png" alt="By deferring until all moves are done, we only recalculate once." /></p>
 <p>That&#8217;s the best you could hope to do: the world transform for each affected
 object is calculated exactly once. With just a single bit of data, this pattern
 does a few things for us:</p>
@@ -255,7 +255,7 @@ pattern to save some state to a more persistent form.</p>
 little bullet or star in your file&#8217;s title bar is literally the dirty flag
 visualized. The primary data is the open document in memory, and the derived
 data is the file on disk.</p>
-<p><img src="images/dirty-flag-title-bar.png" /></p>
+<p><img src="images/dirty-flag-title-bar.png" alt="A window titlebar showing the little icon representing unsaved changes." /></p>
 <p>Many programs don&#8217;t save to disk until either the document is closed or the
 application is exited. That&#8217;s fine most of the time, but if you accidentally
 kick the power cable out, there goes your masterpiece.</p>

@@ -470,7 +470,7 @@ particle system object, how would it get one?
 
 ## See Also
 
- *  When you apply the <a class="pattern href="update-method.html">Update
+ *  When you apply the <a class="pattern" href="update-method.html">Update
     Method</a> pattern, your update method will very often also be a sandbox
     method.
 

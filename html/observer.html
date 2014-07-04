@@ -50,7 +50,7 @@ specific milestones like &#8220;Kill 100 Monkey Demons&#8221;, &#8220;Fall off a
 &#8220;Complete a Level Wielding Only a Dead Weasel&#8221;.</p>
 <aside name="weasel">
 
-<p><img src="images/observer-weasel-wielder.png" width="240" /></p>
+<p><img src="images/observer-weasel-wielder.png" width="240" alt="Achievement: Weasel Wielder" /></p>
 <p>I swear I had no double meaning in mind when I drew this.</p>
 </aside>
 
@@ -297,7 +297,7 @@ happened</em>.</p>
 <p>Now, when the physics engine does something noteworthy, it calls <code>notify()</code>
 like in the motivating example before. That walks the observer list and gives
 them all the heads up.</p>
-<p><img src="images/observer-list.png" /></p>
+<p><img src="images/observer-list.png" alt="A Subject containing a list of Observer pointers. The first two point to Achievements and Audio." /></p>
 <p>Pretty simple, right? Just one class that maintains a list of pointers to
 instances of some interface. It&#8217;s hard to believe that something so
 straightforward is the communication backbone of countless programs and app
@@ -390,7 +390,7 @@ concrete, stateful classes, so that&#8217;s generally a good thing.</p>
 allocation problem by threading the subject&#8217;s list <em>through the observers
 themselves</em>. Instead of the subject having a separate collection of pointers,
 the observer objects become nodes in a linked list:</p>
-<p><img src="images/observer-linked.png" /></p>
+<p><img src="images/observer-linked.png" alt="A linked list of Observers. Each has a next_ field pointing to the next one. A Subject has a head_ pointing to the first Observer." /></p>
 <p>To implement this, first we&#8217;ll get rid of the array in <code>Subject</code> and replace it
 with a pointer to the head of the list of observers:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Subject</span>
@@ -536,7 +536,7 @@ sketch it out and let you fill in the blanks&#8230;</p>
 list nodes won&#8217;t be the observer objects themselves. Instead, they&#8217;ll be
 separate little &#8220;list <span name="intrusive">node</span>&#8221; objects that contain a
 pointer to the observer and then a pointer to the next node in the list.</p>
-<p><img src="images/observer-nodes.png" /></p>
+<p><img src="images/observer-nodes.png" alt="A linked list of nodes. Each node has an observer_ field pointing to an Observer, and a next_ field pointing to the next node in the list. A Subject's head_ field points to the first node." /></p>
 <p>Since multiple nodes can all point to the same observer, that means an observer
 can be in more than one subject&#8217;s list at the same time. We&#8217;re back to being
 able to observe multiple subjects simultaneously.</p>

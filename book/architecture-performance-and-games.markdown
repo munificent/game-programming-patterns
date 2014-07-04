@@ -118,7 +118,7 @@ In short, the flow chart for programming is something like:
 
 <span name="life-cycle"></span>
 
-<img src="images/architecture-cycle.png" />
+<img src="images/architecture-cycle.png" alt="Get problem &rarr; Learn code &rarr; Code solution &rarr; Clean up &rarr; and back around to the beginning." />
 
 <aside name="life-cycle">
 

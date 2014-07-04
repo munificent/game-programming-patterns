@@ -41,12 +41,12 @@ each monster class, leading to a parallel class hierarchy:
 
 <span name="inherits-arrow"></span>
 
-<img src="images/prototype-hierarchies.png" />
+<img src="images/prototype-hierarchies.png" alt="Parallel class hierarchies. Ghost, Demon, and Sorceror all inherit from Monster. GhostSpawner, DemonSpawner, and SorcerorSpawner inherit from Spawner." />
 
 <aside name="inherits-arrow">
 
 I had to dig up a dusty UML book to make this diagram. The <img
-src="images/arrow-inherits.png" class="arrow" /> means "inherits from".
+src="images/arrow-inherits.png" class="arrow" alt="A UML arrow." /> means "inherits from".
 
 </aside>
 
@@ -83,7 +83,7 @@ It internally holds a monster, a hidden one whose sole purpose is to be used by
 the spawner as a template to stamp out more monsters like it, sort of like a
 queen bee who never leaves the hive.
 
-<img src="images/prototype-spawner.png" />
+<img src="images/prototype-spawner.png" alt="A Spawner contains a prototype field referencing a Monster. It calls clone() on the prototype to create new monsters." />
 
 To create a ghost spawner, we create a prototypal ghost instance and
 then create a spawner holding that prototype:
@@ -226,7 +226,7 @@ instance's class, and then you look up the method *there*. Behavior is contained
 in the *class*. There's always that level of indirection to get to a method,
 which means fields and methods are different.
 
-<img src="images/prototype-class.png" />
+<img src="images/prototype-class.png" alt="A Class contains a list of Methods. An Instance contains a list of Fields and a reference to its Class." />
 
 <aside name="vtable">
 
@@ -241,7 +241,7 @@ object that has a method completely unique to it.
 
 <span name="island"></span>
 
-<img src="images/prototype-object.png" />
+<img src="images/prototype-object.png" alt="An Object contains a mixed list of Fields and Methods." />
 
 <aside name="island">
 
@@ -269,7 +269,7 @@ change them at runtime, leading to what's called *dynamic inheritance*.
 
 </aside>
 
-<img src="images/prototype-delegate.png" />
+<img src="images/prototype-delegate.png" alt="An Object contains Fields and Methods and a reference to another object that it delegates to." />
 
 Parent objects let us reuse behavior (and state!) across multiple objects, so
 we've covered part of the utility of classes. The other key thing classes do is
@@ -419,7 +419,7 @@ function. Since every object returned by `new Weapon()` delegates to
 `Weapon.prototype`, you can now call `sword.attack()` and it will call that
 function. It looks a bit like this:
 
-<img src="images/prototype-weapon.png" />
+<img src="images/prototype-weapon.png" alt="A Weapon object contains an attack() method and other methods. A Sword object contains fields and delegates to Weapon." />
 
 Let's review:
 

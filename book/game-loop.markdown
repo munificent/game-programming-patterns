@@ -263,7 +263,7 @@ frame. As long as you can reliably do all of your game processing and rendering
 in less than that time, you can run at a steady frame rate. All you do is process
 the frame and then *wait* until it's time for the next one, like so:
 
-<img src="images/game-loop-simple.png"/>
+<img src="images/game-loop-simple.png" alt="A simple game loop flowchart. Process Input &rarr; Update Game &rarr; Render &rarr; Wait, then loop back to the beginning." />
 
 The code looks a bit like this:
 
@@ -404,7 +404,7 @@ compared to the real world. We then have an inner loop to update the game one
 fixed step at a time until it's caught up. Once we're caught up, we render and
 start over again. You can visualize it sort of like this:
 
-<img src="images/game-loop-fixed.png"/>
+<img src="images/game-loop-fixed.png" alt="A modified flowchart. Process Input &rarr; Update Game &rarr; Wait, then loop back to this step then &rarr; Render &rarr; Loop back to the beginning." />
 
 Note that the time step here isn't the *visible* frame rate any more.
 `MS_PER_UPDATE` is just the *granularity* we use to update the game. The shorter
@@ -440,14 +440,14 @@ between two updates.
 
 Here's a timeline:
 
-<img src="images/game-loop-timeline.png" />
+<img src="images/game-loop-timeline.png" alt="A timeline containing evenly spaced Updates and intermittent Renders." />
 
 As you can see, we update at a nice tight, fixed interval. Meanwhile, we render
 whenever we can. It's less frequent than updating, and isn't steady either. Both
 of those are OK. The lame part is that we don't always render right at the point
 of updating. Look at the third render time. It's right between two updates:
 
-<img src="images/game-loop-timeline-close.png" />
+<img src="images/game-loop-timeline-close.png" alt="Close-up of the timeline showing Renders falling between Update steps." />
 
 Imagine a bullet is flying across the screen. On the first update, it's on the
 left side. The second update moves it to the right side. The game is rendered at

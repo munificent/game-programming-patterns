@@ -84,7 +84,7 @@ B, we don&#8217;t need to check it again for B and A.</p>
 of units. To find a unit near some location, we have to walk the entire array.
 Now imagine we simplify our game a bit. Instead of a 2D battle<em>field</em>, imagine
 it&#8217;s a 1D battle<em>line</em>.</p>
-<p><img src="images/spatial-partition-battle-line.png" /></p>
+<p><img src="images/spatial-partition-battle-line.png" alt="A number line with Units positioned at different coordinates on it." /></p>
 <p>In that case, we could make things easier on ourselves by <em>sorting</em> the array of
 units by their position on the battleline. Once we do that, we can use something
 <span name="array">like</span> a <a href="http://en.wikipedia.org/wiki/Binary_search">binary
@@ -152,7 +152,7 @@ spatial partitions used in games.</p>
 grid of fixed-size squares onto it like a sheet of graph paper. Instead of
 storing our units in a single array, we put them in the cells of this grid. Each
 cell stores the list of units whose positions are within that cell&#8217;s boundary.</p>
-<p><img src="images/spatial-partition-grid.png" /></p>
+<p><img src="images/spatial-partition-grid.png" alt="A grid with Units occupying different cells. Some cells have multiple Units." /></p>
 <p>When we handle combat, we only consider units within the same cell. Instead of
 comparing each unit in the game with every other unit, we&#8217;ve <em>partitioned</em> the
 battlefield into a bunch of smaller mini-battlefields, each with many fewer
@@ -221,7 +221,7 @@ we&#8217;ll extend <code>Unit</code> with <code>next</code> and <code>prev</code
 
 <p>This lets us organize units into a <a href="http://en.wikipedia.org/wiki/Doubly_linked_list">doubly-linked
 list</a> instead of an array.</p>
-<p><img src="images/spatial-partition-linked-list.png" /></p>
+<p><img src="images/spatial-partition-linked-list.png" alt="A Cell pointing to a a doubly linked list of Units." /></p>
 <p>Each cell in the grid points to the first unit in the list of units within that
 cell, and each unit has pointers to the units before it and after it in the
 list. We&#8217;ll see why soon.</p>
@@ -426,7 +426,7 @@ match, we&#8217;ll do something more like:</p>
 
 <p>When range gets involved, there&#8217;s a corner case we need to consider: units in
 different cells may still be close enough to interact.</p>
-<p><img src="images/spatial-partition-adjacent.png" /></p>
+<p><img src="images/spatial-partition-adjacent.png" alt="Two Units in adjacent Cells are close enough to interact." /></p>
 <p>Here, B is within A&#8217;s attack radius even through their centerpoints are in
 different cells. To handle this, we will need to compare units not only in the
 same cell, but in neighboring cells too. To do this, first we&#8217;ll split the inner
@@ -495,7 +495,7 @@ unit&#8217;s attack radius, it will find the hit.</p>
 <aside name="neighbor">
 
 <p>The cell with the unit is <code>U</code>, and the neighboring cells it looks at are <code>X</code>.</p>
-<p><img src="images/spatial-partition-neighbors.png" width="240" /></p>
+<p><img src="images/spatial-partition-neighbors.png" width="240" alt="The set of neighbors for a Cell with the four being considered highlighted." /></p>
 </aside>
 
 <p>We only look at <em>half</em> of the neighbors for the same reason that the inner loop
@@ -679,7 +679,7 @@ recursively, until every square has a small number of objects in it. Since
 we only recursively subdivide squares that have a high population, this
 partitioning adapts to the set of objects, but the partitions don&#8217;t <em>move</em>.</p>
 <p>You can see the partitioning in action reading from left to right here:</p>
-<p><img src="images/spatial-partition-quadtree.png" /></p>
+<p><img src="images/spatial-partition-quadtree.png" alt="A quadtree." /></p>
 <ul>
 <li>
 <p><em>Objects can be added incrementally.</em> Adding a new object means finding

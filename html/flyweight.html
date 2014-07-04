@@ -82,7 +82,7 @@ individually model each tree in an entire forest.</p>
 </aside>
 
 <p><span name="trees"></span></p>
-<p><img src="images/flyweight-trees.png" /></p>
+<p><img src="images/flyweight-trees.png" alt="A row of trees, each of which has its own Mesh, Bark, Leaves, Params, and Position." /></p>
 <aside name="trees">
 
 <p>Note that the stuff in the small boxes is the same for each tree.</p>
@@ -120,7 +120,7 @@ tree in the world has a <em>reference</em> to that shared <code>TreeModel</code>
 
 
 <p>You can visualize it like this:</p>
-<p><img src="images/flyweight-tree-model.png" /></p>
+<p><img src="images/flyweight-tree-model.png" alt="A row of trees each with its own Params and Position, but pointing to a shared Model with a Mesh, Bark, and Leaves." /></p>
 <aside name="type">
 
 <p>This looks a lot like the <a href="type-object.html" class="pattern">Type
@@ -318,7 +318,7 @@ world be a grid of enums or Terrain objects, it will be a grid of <em>pointers</
 
 
 <p>Each tile that uses the same terrain will point to the same terrain instance.</p>
-<p><img src="images/flyweight-tiles.png" /></p>
+<p><img src="images/flyweight-tiles.png" alt="A row of tiles. Each tile points to either a shared Grass, River, or Hill object." /></p>
 <p>Since the terrain instances are used in multiple places, their lifetimes would
 be a little more complex to manage if you were to dynamically allocate them.
 Instead, we&#8217;ll just store them directly in the world:</p>

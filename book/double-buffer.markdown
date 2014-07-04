@@ -90,7 +90,7 @@ outpaces us and moves into pixels we haven't written yet. The result is
 
 <span name="tearing"></span>
 
-<img src="images/double-buffer-tearing.png" />
+<img src="images/double-buffer-tearing.png" alt="A series of images of an in-progress frame being rendered. A pointer writes pixels while another reads them. The reader outpaces the writer until it starts reading pixels that haven't been rendered yet." />
 
 <aside name="tearing">
 
@@ -250,7 +250,7 @@ by making a bunch of `draw()` calls on its buffer:
 
 Specifically, it draws this artistic masterpiece:
 
-<img src="images/double-buffer-face.png" width="240" />
+<img src="images/double-buffer-face.png" width="240" alt="A pixellated smiley face." />
 
 </aside>
 
@@ -347,7 +347,7 @@ big circle:
 The resulting stage is set up as shown in the following image. The arrows
 show who the actors are facing, and the numbers show their index in the stage's array.
 
-<img src="images/double-buffer-slaps-1.png" />
+<img src="images/double-buffer-slaps-1.png" alt="Boxes for Harry, Baldy, and Chump, in that order. Harry has an arrow pointing to Baldy, who has an arrow pointing to Chump, who has an arrow pointing back to Harry." />
 
 We'll slap Harry to get things going and see what happens when we start
 processing:
@@ -369,7 +369,7 @@ In a single frame, our initial slap on Harry has propagated through all of
 the comedians. Now, to mix things up a bit, let's say we reorder the comedians
 within the stage's array but leave them facing each other the same way.
 
-<img src="images/double-buffer-slaps-2.png" />
+<img src="images/double-buffer-slaps-2.png" alt="The same boxes as before with the same arrows, but now they are ordered Chump, Baldy, Harry." />
 
 We'll leave the rest of the stage setup alone, but we'll replace the chunk of code
 where we add the actors to the stage with this:

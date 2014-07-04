@@ -81,7 +81,7 @@ all examples where commands are a brilliant fit.</p>
 <p>Somewhere in every game is a chunk of code that reads in raw user input &#8212;
 button presses, keyboard events, mouse clicks, whatever. It takes each input and
 translates it to a meaningful action in the game:</p>
-<p><img src="images/command-buttons-one.png" /></p>
+<p><img src="images/command-buttons-one.png" alt="A controller, with A mapped to swapWeapon(), B mapped to lurch(), X mapped to jump(), and Y mapped to fireGun()." /></p>
 <p>A dead simple implementation looks like:</p>
 <p><span name="lurch"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">InputHandler</span><span class="o">::</span><span class="n">handleInput</span><span class="p">()</span>
@@ -183,7 +183,7 @@ Object</a>.</p>
 
 <p>Where each input used to directly call a function, now there&#8217;s a layer of
 indirection:</p>
-<p><img src="images/command-buttons-two.png" /></p>
+<p><img src="images/command-buttons-two.png" alt="A controller, with each button mapped to a corresponding 'button_' variable which in turn is mapped to a function." /></p>
 <p>This is the Command pattern in a nutshell. If you can see the merit of it
 already, consider the rest of this chapter a bonus.</p>
 <h2><a href="#directions-for-actors" name="directions-for-actors">Directions for Actors</a></h2>
@@ -276,7 +276,7 @@ class="pattern">Event Queue</a>.</p>
 </aside>
 
 <p><span name="stream"></span></p>
-<p><img src="images/command-stream.png" /></p>
+<p><img src="images/command-stream.png" alt="A pipe connecting AI to Actor." /></p>
 <aside name="stream">
 
 <p>Why did I feel the need to draw a picture of a &#8220;stream&#8221; for you? And why does it
@@ -458,7 +458,7 @@ already undone, then it becomes &#8220;redo&#8221; and we execute the command ag
 last command, we keep a list of commands and a reference to the &#8220;current&#8221; one.
 When the player executes a command, we append it to the list and point &#8220;current&#8221;
 at it.</p>
-<p><img src="images/command-undo.png" /></p>
+<p><img src="images/command-undo.png" alt="A stack of commands from older to newer. A 'current' arrow points to one command, an 'undo' arrow points to the previous one, and 'redo' points to the next." /></p>
 <p>When the player chooses &#8220;Undo&#8221;, we undo the current command and move the current
 pointer back. When they choose <span name="replay">&#8220;Redo&#8221;</span>, we advance the
 pointer

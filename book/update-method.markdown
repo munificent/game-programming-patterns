@@ -273,7 +273,7 @@ This simple loop increments the index of the object being updated each
 iteration. The left side of the illustration below shows what the array looks
 like while we're updating the heroine:
 
-<img src="images/update-method-remove.png"/>
+<img src="images/update-method-remove.png" alt="A list of entities during a removal. A pointer points to the second entity, Heroine. After the Foul Beast above it is removed, the pointer moves down while the Heroine moves up." />
 
 Since we're updating her, `i` is 1. She slays the foul beast so it gets removed
 from the array. The heroine shifts up to 0, and the hapless peasant shifts up to
@@ -427,7 +427,7 @@ like a separate data file or level editor.
 
 <span name="uml"></span>
 
-<img src="images/update-method-uml.png"/>
+<img src="images/update-method-uml.png" alt="A UML diagram. World has a collection of Entities, each of which has an update() method. Skeleton and Statue both inherit from Entity." />
 
 <aside name="uml">
 
@@ -584,7 +584,7 @@ collection that avoids them during your core game loop.
 
  *  Microsoft's [XNA](http://creators.xna.com/en-US/) platform uses this pattern
     both in the [`Game`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.update.aspx)
-    and [`GameComponent`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gamecomponent.update.aspx) 
+    and [`GameComponent`](http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gamecomponent.update.aspx)
     classes.
 
  *  The [Quintus](http://html5quintus.com/) JavaScript game engine uses this

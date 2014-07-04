@@ -90,14 +90,14 @@ execute. Say, for example, it supports arithmetic expressions like this:
 Then you take each piece of that expression, each rule in the language's
 grammar, and turn it into an *object*. The number literals will be objects:
 
-<img src="images/bytecode-numbers.png" />
+<img src="images/bytecode-numbers.png" alt="A series of number literal objects." />
 
 Basically just little wrappers around the raw value. The operators will be
 objects too, and they'll have references to their operands. If you take into
 account the parentheses and precedence, that expression <span
 name="magic">magically</span> turns into a little tree of objects like so:
 
-<img src="images/bytecode-ast.png" />
+<img src="images/bytecode-ast.png" alt="A syntax tree. The number literals are connected by operator objects." />
 
 <aside name="magic">
 
@@ -411,7 +411,7 @@ a few different primitives, so the range of enum values easily fits into a byte.
 This means a spell is just a list of <span name="byte">bytes</span> -- ergo
 "bytecode".
 
-<img src="images/bytecode-code.png" />
+<img src="images/bytecode-code.png" alt="A sequence of bytecode instructions: 0x00 HEALTH, 0x03 SOUND, 0x004 PARTICLES, ..." />
 
 <aside name="byte">
 
@@ -503,7 +503,7 @@ want to be able to have literals that cover your full numeric range.
 
 </aside>
 
-<img src="images/bytecode-literal.png" />
+<img src="images/bytecode-literal.png" alt="Binary encoding of a literal instruction: 0x05 (LITERAL) followed by 123 (the value)." />
 
 It reads the next <span name="single">byte</span> in the bytecode stream *as a
 number*, and pushes it onto the stack.
@@ -512,16 +512,16 @@ Let's string a few of these instructions together and watch the interpreter
 execute them to get a feel for how the stack works. We start with an empty stack
 and the interpreter pointing to the first instruction:
 
-<img src="images/bytecode-stack-1.png" />
+<img src="images/bytecode-stack-1.png" alt="Executing a bytecode sequence. The execution pointer points to the first literal instruction and the stack is empty." />
 
 First, it executes the first `INST_LITERAL`. That reads the next byte from the
 bytecode (`0`) and pushes it onto the stack:
 
-<img src="images/bytecode-stack-2.png" />
+<img src="images/bytecode-stack-2.png" alt="The next step. The literal 0 has been pushed onto the stack and the execution pointer is on the next literal." />
 
 Then it executes the second `INST_LITERAL`. That reads the `10` and pushes it:
 
-<img src="images/bytecode-stack-3.png" />
+<img src="images/bytecode-stack-3.png" alt="The next step. Now 10 has been pushed onto the stack and the execution pointer is at the Health instruction." />
 
 Finally, it executes `INST_SET_HEALTH`. That pops `10` and stores it in
 `amount`, then pops `0` and stores it in `wizard`. Then it calls `setHealth()`
@@ -706,13 +706,14 @@ kind of behavior you want them to create.
 
 <span name="text"></span>
 
-<img src="images/bytecode-ui.png" />
+<img src="images/bytecode-ui.png" alt="A mock-up of a little tree-based UI for authoring behavior." />
 
 <aside name="text">
 
-The scripting system I wrote for [Henry Hatsworth and the Puzzling Adventure](ht
-tp://en.wikipedia.org/wiki/Henry_Hatsworth_in_the_Puzzling_Adventure) worked
-like this.
+The scripting system I wrote for [Henry Hatsworth and the Puzzling
+Adventure][hatsworth] worked like this.
+
+[hatsworth]: http://en.wikipedia.org/wiki/Henry_Hatsworth_in_the_Puzzling_Adventure
 
 </aside>
 
