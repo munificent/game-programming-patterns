@@ -14,9 +14,9 @@ games use them.
 
 To see how they're useful, let's take a quick trip down memory lane. In the
 olden days of computer programming when everyone had <span
-name="beard">beards</span>, programs worked like your dishwasher: you dumped a
+name="beard">beards</span>, programs worked like your dishwasher. You dumped a
 load of code in, pushed a button, waited, and got results out. Done. These were
-*batch mode* programs: once the work was done, the program stopped.
+*batch mode* programs -- once the work was done, the program stopped.
 
 <aside name="beard">
 
@@ -24,8 +24,8 @@ Ada Lovelace and Rear Admiral Grace Hopper had honorary beards.
 
 </aside>
 
-You still see these today, though we thankfully don't have to write them on
-punch cards any more. Shell scripts, command line programs, and even the little
+You still see these today, though thankfully we don't have to write them on
+punch cards anymore. Shell scripts, command line programs, and even the little
 Python script that turns a pile of Markdown into this book are all batch mode
 programs.
 
@@ -33,7 +33,7 @@ programs.
 
 Eventually, programmers realized having to drop off a batch of code at the
 computing office and come back a few hours later for the results was a terribly
-slow way to get the bugs out of your program. They wanted immediate feedback.
+slow way to get the bugs out of a program. They wanted immediate feedback.
 *Interactive* programs were born. Some of the first interactive programs were
 games:
 
@@ -55,7 +55,7 @@ adventure game.
 </aside>
 
 You could have a live conversation with the program. It waited for your input,
-then would respond to you. Then you would reply back, taking turns just like you
+then it would respond to you. You would reply back, taking turns just like you
 learned to do in kindergarten. When it was your turn, it sat there doing
 nothing. Something like:
 
@@ -73,7 +73,7 @@ things simple.
 
 ### Event loops
 
-Modern graphic UI applications look surprisingly similar to old adventure games
+Modern graphic UI applications are surprisingly similar to old adventure games
 once you shuck their skin off. Your word processor usually just sits there doing
 nothing until you press a key or click something:
 
@@ -98,12 +98,12 @@ but too rudimentary for games.
 </aside>
 
 This is the first key part of a real game loop: *it processes user input, but
-doesn't wait* for it. The loop always keeps spinning:
+doesn't wait for it*. The loop always keeps spinning:
 
 ^code 3
 
 We'll refine this later, but the basic pieces are here. `processInput()` handles
-any user input that's happened since the last call. Then <span
+any user input that has happened since the last call. Then, <span
 name="update">`update()`</span> advances the game simulation one step. It runs
 AI and physics (usually in that order). Finally, `render()` draws the game so
 the player can see what happened.
@@ -124,7 +124,7 @@ the hand of their clock has <span name="tick">ticked</span> forward.
 
 <aside name="tick">
 
-The common terms for one crank of the game loop are "tick" or "frame".
+The common terms for one crank of the game loop are "tick" and "frame".
 
 </aside>
 
@@ -138,7 +138,7 @@ factors determine the frame rate. The first is *how much work it has to do each
 frame*. Complex physics, a bunch of game objects, and lots of graphic detail all
 will keep your CPU and GPU busy, and it will take longer to complete a frame.
 
-The other is *the speed of the underlying platform.* Faster chips churn through
+The second is *the speed of the underlying platform.* Faster chips churn through
 more code in the same amount of time. Multiple cores, GPUs, dedicated audio
 hardware, and the OS's scheduler all affect how much you get done in one tick.
 
@@ -158,8 +158,8 @@ itself would speed up or slow down.
 
 This is why old PCs used to have
 "[turbo](http://en.wikipedia.org/wiki/Turbo_button )" buttons. New PCs were
-faster and couldn't play old games because the game would run too fast. Turning
-the turbo button *off* would slow the machine down and make the game playable.
+faster and couldn't play old games because the games would run too fast. Turning
+the turbo button *off* would slow the machine down and make old games playable.
 
 </aside>
 
@@ -181,7 +181,7 @@ gameplay**.
 
 Using the wrong pattern can be worse than using no pattern at all, so this
 section is normally here to caution against over-enthusiasm. The goal of design
-patterns isn't just to cram as many into your codebase as you can.
+patterns isn't to cram as many into your codebase as you can.
 
 But this pattern is a bit different. I can say with pretty good confidence that
 you *will* use this pattern. If you're using a game <span
@@ -190,15 +190,15 @@ name="engine">engine</span>, you won't write it yourself, but it's still there.
 <aside name="engine">
 
 For me, this is the difference between an "engine" and a "library". With
-libraries you own the main game loop and call into the library. An engine owns
+libraries, you own the main game loop and call into the library. An engine owns
 the loop and calls into *your* code.
 
 </aside>
 
 You might think you won't need this if you're making a turn-based game. But even
 there, though the *game state* won't advance until the user takes their turn,
-the *visual* and *audible* state of the game usually does. Animation and music
-keep running even when it's "waiting" for you to take your turn.
+the *visual* and *audible* states of the game usually do. Animation and music
+keep running even when the game is "waiting" for you to take your turn.
 
 ## Keep in Mind
 
@@ -210,25 +210,25 @@ code, and be mindful of its efficiency.
 <aside name="percent">
 
 Made up statistics like this are why "real" engineers like mechanical and
-electrical don't take us seriously.
+electrical engineers don't take us seriously.
 
 </aside>
 
 ### You may need to coordinate with the platform's event loop
 
 If you're building your game on top of an OS or platform that has a graphic UI
-and event loop built in, then you have *two* application loops in play. They'll
+and an event loop built in, then you have *two* application loops in play. They'll
 need to play nice together.
 
-Sometimes, you can just take control and make your loop the only one. For
+Sometimes, you can take control and make your loop the only one. For
 example, if you're writing a game against the venerable Windows API, your
 `main()` can just have a game loop. Inside, you can call `PeekMessage()` to
 handle and dispatch events from the OS. Unlike `GetMessage()`, `PeekMessage()`
-doesn't block waiting for user input so your game loop will keep cranking.
+doesn't block waiting for user input, so your game loop will keep cranking.
 
 Other platforms don't let you opt out of the event loop so easily. If you're
 targeting a web browser, the event loop is deeply built into browser's execution
-model. There, the event loop will run the show and you'll use it as your game
+model. There, the event loop will run the show, and you'll use it as your game
 loop too. You'll call something like `requestAnimationFrame()` so that it will
 call back into your code and keep the game running.
 
@@ -238,7 +238,7 @@ For such a long introduction, the code for a game loop is actually pretty
 straightforward. We'll walk through a couple of variations and go over their
 good and bad points.
 
-The game loop drives AI, rendering and other game systems, but those aren't the
+The game loop drives AI, rendering, and other game systems, but those aren't the
 point of the pattern itself, so we'll just call into fictitious methods here.
 Actually implementing `render()`, `update()` and others is left as a
 (challenging!) exercise for the reader.
@@ -282,7 +282,7 @@ longer than 16ms to update and render the frame, your sleep time goes
 would be easier, but we don't.
 
 Instead, the game slows down. You can work around this by doing less work each
-frame: cut down on the graphics and razzle dazzle, or dumb down the AI. But that
+frame -- cut down on the graphics and razzle dazzle or dumb down the AI. But that
 impacts the quality of gameplay for all users, even ones on fast machines.
 
 ### One small step, one giant step
@@ -311,11 +311,11 @@ Each frame, we determine how much *real* time passed since the last game update
 (`elapsed`). When we update the game state, we pass that in. The engine is then
 responsible for advancing the game world forward by that amount of time.
 
-Say you've got a bullet shooting across the screen. With a fixed time step, each
-frame you'll move it according to its velocity. With a variable time step, you
+Say you've got a bullet shooting across the screen. With a fixed time step, in each
+frame, you'll move it according to its velocity. With a variable time step, you
 *scale that velocity by the elapsed time*. As the time step gets bigger, the
 bullet moves farther in each frame. That bullet will get across the screen in
-the *same* amount of *real* time, even if it's twenty small fast steps, or four
+the *same* amount of *real* time whether it's twenty small fast steps or four
 big slow ones.
 
 This looks like a winner:
@@ -332,10 +332,10 @@ of the trap we've set for ourselves:
 
 "Deterministic" means that every time you run the program, if you give it the
 same inputs, you get the exact same outputs back. As you can imagine, it's much
-easier to track down bugs in deterministic programs: find the inputs that caused
+easier to track down bugs in deterministic programs -- find the inputs that caused
 the bug the first time, and you can cause it every time.
 
-Computers are naturally deterministic: they follow programs mechanically.
+Computers are naturally deterministic; they follow programs mechanically.
 Non-determinism appears when the messy real world creeps in. For example,
 networking, the system clock, and thread scheduling all rely on bits of the
 external world outside of the program's control.
@@ -346,18 +346,18 @@ Say we've got a two-player networked game and Fred has some beast of a gaming
 machine while George is using his grandmother's antique PC. That aforementioned
 bullet is flying across both of their screens. On Fred's machine, the game is
 running super fast, so each time step is tiny. We cram, like, 50 frames in the
-second it takes the bullet to cross the screen. Poor George can only fit about
-five in.
+second it takes the bullet to cross the screen. Poor George's machine can only fit in about
+five frames.
 
-This means on Fred's machine, the physics engine updates the bullet's position
+This means that on Fred's machine, the physics engine updates the bullet's position
 50 times, but George's only does it five times. Most games use floating point
-numbers and those are subject to *rounding error*. Each time you add two
+numbers, and those are subject to *rounding error*. Each time you add two
 floating point numbers, the answer you get back can be a bit off. Fred's machine
 is doing ten times as many operations, so he'll accumulate a bigger error than
 George. The *same* bullet will end up in *different places* on their machines.
 
-This is just one nasty problem a variable time step can cause, but there's more.
-In order to run in real-time, game physics engines are approximations of the
+This is just one nasty problem a variable time step can cause, but there are more.
+In order to run in real time, game physics engines are approximations of the
 real laws of mechanics. To keep those approximations from <span
 name="blowup">blowing up</span>, damping is applied. That damping is carefully
 tuned to a certain time step. Vary that, and the physics gets unstable.
@@ -400,13 +400,13 @@ steps. The code looks a bit like:
 
 There's a few pieces here. At the beginning of each frame, we update `lag` based
 on how much real time passed. This measures how far the game's clock is behind
-compared to the real world. We then have an inner loop to update the game one
-fixed step at a time until it's caught up. Once we're caught up, we render and
+compared to the real world. We then have an inner loop to update the game, one
+fixed step at a time, until it's caught up. Once we're caught up, we render and
 start over again. You can visualize it sort of like this:
 
 <img src="images/game-loop-fixed.png" alt="A modified flowchart. Process Input &rarr; Update Game &rarr; Wait, then loop back to this step then &rarr; Render &rarr; Loop back to the beginning." />
 
-Note that the time step here isn't the *visible* frame rate any more.
+Note that the time step here isn't the *visible* frame rate anymore.
 `MS_PER_UPDATE` is just the *granularity* we use to update the game. The shorter
 this step is, the more processing time it takes to catch up to real time. The
 longer it is, the choppier the gameplay is. Ideally, you want it pretty short,
@@ -443,7 +443,7 @@ Here's a timeline:
 <img src="images/game-loop-timeline.png" alt="A timeline containing evenly spaced Updates and intermittent Renders." />
 
 As you can see, we update at a nice tight, fixed interval. Meanwhile, we render
-whenever we can. It's less frequent than updating, and isn't steady either. Both
+whenever we can. It's less frequent than updating, and it isn't steady either. Both
 of those are OK. The lame part is that we don't always render right at the point
 of updating. Look at the third render time. It's right between two updates:
 
@@ -451,9 +451,9 @@ of updating. Look at the third render time. It's right between two updates:
 
 Imagine a bullet is flying across the screen. On the first update, it's on the
 left side. The second update moves it to the right side. The game is rendered at
-a point in time right between those two updates, so the user expects to see that
+a point in time between those two updates, so the user expects to see that
 bullet in the center of the screen. With our current implementation, it will
-still just be on the left side. This means motion looks jagged or stuttery.
+still be on the left side. This means motion looks jagged or stuttery.
 
 Conveniently, we actually know *exactly* how far between update frames we are
 when we render: it's stored in `lag`. We bail out of the update loop when it's
@@ -482,14 +482,14 @@ frame. If we are halfway between frames, then we'll end up passing 0.5 to
 `render()`. So it draws the bullet half a frame ahead, at 220 pixels. Ta-da,
 smooth motion.
 
-Of course, it may turn out that that extrapolation is wrong. When we actually
+Of course, it may turn out that that extrapolation is wrong. When we
 calculate the next frame, we may discover the bullet hit an obstacle or slowed
 down or something. We rendered its position interpolated between where it was on
 the last frame and where we *think* it will be on the next frame. But we don't
 know that until we've actually done the full update with physics and AI.
 
 So the extrapolation is a bit of a guess and sometimes ends up wrong.
-Fortunately, though, those kinds of corrections aren't usually noticeable. At
+Fortunately, though, those kinds of corrections usually aren't noticeable. At
 least, they're less noticeable than the stuttering you get if you don't
 extrapolate at all.
 
@@ -541,16 +541,16 @@ instead of rolling your own.
 
      *  *You have to interface with the platform.* Application frameworks and
         operating systems usually expect to have a slice of time to process
-        events and do other work periodically. If you own your app's core loop,
+        events and do other work. If you own your app's core loop,
         it won't get any. You'll have to explicitly hand off control
         periodically to make sure the framework doesn't hang or get confused.
 
 ### How do you manage power consumption?
 
-This wasn't an issue five years ago. Games ran on things plugged into walls or
-dedicated handheld devices. But with the advent of smart phones, laptops, and
-mobile gaming, the odds are good you do care about this now. A game that runs
-beautifully but turns their phone into a space heater before running out of
+This wasn't an issue five years ago. Games ran on things plugged into walls or on
+dedicated handheld devices. But with the advent of smartphones, laptops, and
+mobile gaming, the odds are good that you do care about this now. A game that runs
+beautifully but turns players' phones into space heaters before running out of
 juice thirty minutes later is not a game that makes people happy.
 
 Now, you may need to think about making your game look great, but also use as
@@ -565,15 +565,15 @@ frame.
     tell the OS to sleep. Instead, any spare cycles will be spent cranking up
     the FPS or graphic fidelity.
 
-    This gives you the best possible gameplay experience but it'll use as much
-    power as it can. If the player's on a laptop, they'll have a nice lap
+    This gives you the best possible gameplay experience but, it will use as much
+    power as it can. If the player is on a laptop, they'll have a nice lap
     warmer.
 
- *  **Clamp the framerate:**
+ *  **Clamp the frame rate:**
 
     Mobile games are often more focused on the quality of gameplay than they are
-    maximizing the detail of the graphics. Many of these games will set an upper
-    limit on the framerate (usually 30 or 60 FPS). If the game loop is done
+    on maximizing the detail of the graphics. Many of these games will set an upper
+    limit on the frame rate (usually 30 or 60 FPS). If the game loop is done
     processing before that slice of time is spent, it will just sleep for the
     rest.
 
@@ -582,17 +582,17 @@ frame.
 
 ### How do you control gameplay speed?
 
-A game loop has two key pieces: non-blocking user input, and adapting to the
+A game loop has two key pieces: non-blocking user input and adapting to the
 passage of time. Input is straightforward. The magic is in how you deal with
-time. There are a near <span name="platform">infinite</span> number of platforms
-that games can run on and any single game may run on quite a few. How it
+time. There are a <span name="platform">near-infinite</span> number of platforms
+that games can run on, and any single game may run on quite a few. How it
 accommodates that variation is key.
 
 <aside name="platform">
 
 Game-making seems to be part of human nature, because every time we've built a
 machine that can do computing, one of the first things we've done is made games
-on it. The PDP-1 was a 2 kHz machine with only 4,096 words of memory yet Steve
+on it. The PDP-1 was a 2 kHz machine with only 4,096 words of memory, yet Steve
 Russell and co. managed to create Spacewar! on it.
 
 </aside>
@@ -611,7 +611,7 @@ Russell and co. managed to create Spacewar! on it.
  *  **Fixed time step with synchronization:**
 
     The next step up on the complexity ladder is running the game at a fixed
-    time step, but adding a delay or synchronization point at the end of the
+    time step but adding a delay or synchronization point at the end of the
     loop to keep the game from running too fast.
 
      *  *Still quite simple.* It's only one line of code more than the
@@ -628,7 +628,7 @@ Russell and co. managed to create Spacewar! on it.
      *  *The game doesn't play too fast.* This fixes half of the speed concerns
         of a fixed loop.
 
-     *  *The game can play too slow.* If it takes too long to update and render
+     *  *The game can play too slowly.* If it takes too long to update and render
         a game frame, playback will slow down. Because this style doesn't
         separate updating from rendering, it's likely to hit this sooner than
         more advanced options. Instead of just dropping *rendering* frames to
@@ -636,7 +636,7 @@ Russell and co. managed to create Spacewar! on it.
 
  *  **Variable time step:**
 
-    I'll put this in here as an option in the solution space, with the caveat
+    I'll put this in here as an option in the solution space with the caveat
     that most game developers I know recommend against it. It's good to remember
     *why* it's a bad idea, though.
 
@@ -650,8 +650,8 @@ Russell and co. managed to create Spacewar! on it.
 
  *  **Fixed update time step, variable rendering:**
 
-    The last option we covered in the sample code is the most complex but also
-    the most adaptable. It updates with a fixed time step, but can drop
+    The last option we covered in the sample code is the most complex, but also
+    the most adaptable. It updates with a fixed time step, but it can drop
     *rendering* frames if it needs to to catch up to the player's clock.
 
      *  *It adapts to playing both too slowly and too fast.* As long as the game
@@ -666,15 +666,15 @@ Russell and co. managed to create Spacewar! on it.
 
 ## See Also
 
- *  The classic article on game loops is Glenn Fiedler's ["Fix Your
-    Timestep"](http://gafferongames.com/game-physics/fix-your-timestep/). This
+ *  The classic article on game loops is Glenn Fiedler's "[Fix Your
+    Timestep](http://gafferongames.com/game-physics/fix-your-timestep/)". This
     chapter wouldn't be the same without it.
 
  *  Witters' article on [game
     loops](http://www.koonsolo.com/news/dewitters-gameloop/) is a close
     runner-up.
 
- *  The [Unity](http://unity3d.com/) framework has a complex game loop, detailed
+ *  The [Unity](http://unity3d.com/) framework has a complex game loop detailed
     in a wonderful illustration [here][unity].
 
 [unity]: http://www.richardfine.co.uk/2012/10/unity3d-monobehaviour-lifecycle/
