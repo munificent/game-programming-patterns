@@ -1,6 +1,12 @@
+2014-07-08 - email
+2014-07-07 - layout game loop
+2014-07-06 - merge in changes to game loop
+2014-07-05 - work on toc for epub
+2014-07-04 - work on styling for epub
 2014-07-03 - more work on format script for epub, alt text for images
 2014-07-02 - more work on epub
 2014-07-01 - start working on epub version
+2014-06-30 - finish double buffer
 2014-06-29 - sequencing patterns, start working on double buffer
 2014-06-28 - merge changes from lauren
 2014-06-27 - layout state

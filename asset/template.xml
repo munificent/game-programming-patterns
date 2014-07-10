@@ -13,6 +13,8 @@
   <!ENTITY rdquo   "&#8221;"> <!-- right double quotation mark,
                                       U+201D ISOnum -->
 
+<!ENTITY rarr     "&#8594;" ><!-- rightwards arrow, U+2192 ISOnum -->
+
 <!ENTITY nbsp   "&#160;"> <!-- no-break space = non-breaking space,
                                   U+00A0 ISOnum -->
 <!ENTITY iexcl  "&#161;"> <!-- inverted exclamation mark, U+00A1 ISOnum -->
