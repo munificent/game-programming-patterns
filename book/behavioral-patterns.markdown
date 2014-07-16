@@ -7,13 +7,13 @@ screenplay that tells each entity in your game what to do.
 Of course all code is "behavior", and all software is defining behavior, but
 what's different about games is often the *breadth* of it that you have to
 implement. While your word processor may have a long list of features, it pales
-next to the number of inhabitants, items, and quests in your average
+in comparison with the number of inhabitants, items, and quests in your average
 role-playing game.
 
-The patterns in this chapter help you define and refine a large quantity of
-behavior quickly, and maintainably. [Type Objects](type-object.html) create
+The patterns in this chapter help to quickly define and refine a large quantity of
+maintainable behavior. [Type Objects](type-object.html) create
 categories of behavior without the rigidity of defining an actual class. A
-[Subclass Sandbox](subclass-sandbox.html) gives you a safe set of primitives to
+[Subclass Sandbox](subclass-sandbox.html) gives you a safe set of primitives
 you can use to define a variety of behaviors. The most advanced option is
 [Bytecode](bytecode.html), which moves behavior out of code entirely and into
 data.

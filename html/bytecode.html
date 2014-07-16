@@ -46,13 +46,13 @@ platform. Games push hardware like nothing else, and we have to optimize
 relentlessly just to keep pace with the competition.</p>
 <p>To handle these high stability and performance requirements, we reach for
 heavyweight languages like C++ that have both low-level expressiveness to make
-the most of the hardware, and rich type systems to prevent or at least corral
+the most of the hardware and rich type systems to prevent or at least corral
 bugs.</p>
 <p>We pride ourselves on our skill at this, but it has its cost. Being a proficient
 programmer takes years of dedicated training, after which you must contend with
 the sheer scale of your codebase. Build times for large games can vary somewhere
 between &#8220;go get a coffee&#8221; and &#8220;go roast your own beans, hand-grind them, pull an
-espresso, foam some milk and practice your latte art in the froth&#8221;.</p>
+espresso, foam some milk, and practice your latte art in the froth&#8221;.</p>
 <p>On top of these challenges, games have one more nasty constraint: <em>fun</em>. Players
 demand a play experience that&#8217;s both novel and yet carefully balanced. That
 requires constant iteration, but if every tweak requires bugging an engineer to
@@ -65,10 +65,10 @@ define these spells in code, but that means an engineer has to be involved every
 time one is modified. When a designer wants to tweak a few numbers and get a
 feel for them, they have to recompile the entire game, reboot it, and get back
 into a fight.</p>
-<p>Like most games these days, we also need to be able to update it after it ships,
+<p>Like most games these days, we also need to be able to update the game after it ships,
 both to fix bugs and to add new content. If all of these spells are hard-coded,
 then updating them means patching the actual game executable.</p>
-<p>Let&#8217;s take things a bit farther and say that we also want to support <em>modding</em>.
+<p>Let&#8217;s take things a bit further and say that we also want to support <em>modding</em>.
 We want <em>users</em> to be able to create their own spells. If those are in code,
 that means every modder needs a full compiler toolchain to build the game, and
 we have to release the sources. Worse, if they have a bug in their spell, it can
@@ -76,9 +76,9 @@ crash the game on some other player&#8217;s machine.</p>
 <h3><a href="#data-&gt;-code" name="data-&gt;-code">Data &gt; code</a></h3>
 <p>It&#8217;s pretty clear that our engine&#8217;s implementation language isn&#8217;t the right fit.
 We need spells to be safely sandboxed from the core game. We want them to be
-easy to modify and reload, and physically separate from the rest of the
+easy to modify, easy to reload, and physically separate from the rest of the
 executable.</p>
-<p>I don&#8217;t know about you, but to me that sounds a lot like <em>data</em>. If we could
+<p>I don&#8217;t know about you, but to me that sounds a lot like <em>data</em>. If we can
 define our behavior in separate data files that the game engine loads and
 &#8220;executes&#8221; in some way, we can achieve all of our goals.</p>
 <p>We just need to figure out what &#8220;execute&#8221; means for data. How do you make some
@@ -96,24 +96,24 @@ execute. Say, for example, it supports arithmetic expressions like this:</p>
 </pre></div>
 
 
-<p>Then you take each piece of that expression, each rule in the language&#8217;s
+<p>Then, you take each piece of that expression, each rule in the language&#8217;s
 grammar, and turn it into an <em>object</em>. The number literals will be objects:</p>
 <p><img src="images/bytecode-numbers.png" alt="A series of number literal objects." /></p>
-<p>Basically just little wrappers around the raw value. The operators will be
+<p>Basically, they&#8217;re little wrappers around the raw value. The operators will be
 objects too, and they&#8217;ll have references to their operands. If you take into
 account the parentheses and precedence, that expression <span
 name="magic">magically</span> turns into a little tree of objects like so:</p>
 <p><img src="images/bytecode-ast.png" alt="A syntax tree. The number literals are connected by operator objects." /></p>
 <aside name="magic">
 
-<p>What &#8220;magic&#8221; is this? It&#8217;s simple: <em>parsing</em>. A parser takes a string of
+<p>What &#8220;magic&#8221; is this? It&#8217;s simple&#8202;&mdash;&#8202;<em>parsing</em>. A parser takes a string of
 characters and turns it into an <em>abstract syntax tree</em>, a collection of objects
 representing the grammatical structure of the text.</p>
 <p>Whip up one of these and you&#8217;ve got yourself half of a compiler.</p>
 </aside>
 
-<p>The interpreter pattern isn&#8217;t about <em>creating</em> that tree, it&#8217;s about <em>executing</em>
-it. The way it works is pretty clever. Each object in the tree is an expression,
+<p>The Interpreter pattern isn&#8217;t about <em>creating</em> that tree; it&#8217;s about <em>executing</em>
+it. The way it works is pretty clever. Each object in the tree is an expression
 or a subexpression. In true object-oriented fashion, we&#8217;ll let expressions
 evaluate themselves.</p>
 <p>First, we define a base interface that all expressions implement:</p>
@@ -126,7 +126,7 @@ evaluate themselves.</p>
 </pre></div>
 
 
-<p>Then we define a class that implements that for each kind of expression in our
+<p>Then, we define a class that implements this interface for each kind of expression in our
 language&#8217;s grammar. The simplest one is numbers:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">NumberExpression</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Expression</span>
 <span class="p">{</span>
@@ -146,10 +146,10 @@ language&#8217;s grammar. The simplest one is numbers:</p>
 </pre></div>
 
 
-<p>A literal number expression just evaluates to its value. Addition and
+<p>A literal number expression simply evaluates to its value. Addition and
 multiplication are a bit more complex because they contain subexpressions.
-Before they can evaluate themselves, they need to recursively evaluate those
-first. Like so:</p>
+Before they can evaluate themselves, they need to recursively evaluate the
+subexpressions. Like so:</p>
 <p><span name="addition"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">AdditionExpression</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Expression</span>
 <span class="p">{</span>
@@ -202,7 +202,7 @@ of tiny objects. That has some unpleasant consequences:</p>
 </li>
 <li>
 <p>Those objects and the pointers between them use a lot of <span
-    name="vtable">memory</span>. On a 32-bit machine that little arithmetic
+    name="vtable">memory</span>. On a 32-bit machine, that little arithmetic
     expression up there takes up at least 68 bytes, not including padding.</p>
 <aside name="vtable">
 
@@ -226,11 +226,11 @@ performance.</p>
 </ul>
 <p>Put those together, and what do they spell? S-L-O-W. There&#8217;s a reason most
 programming languages in wide use aren&#8217;t based on the Interpreter pattern. It&#8217;s
-just too slow, and uses up too much memory.</p>
+just too slow, and it uses up too much memory.</p>
 <h3><a href="#machine-code,-virtually" name="machine-code,-virtually">Machine code, virtually</a></h3>
 <p>Consider our game. When we run it, the player&#8217;s computer doesn&#8217;t traverse a
 bunch of C++ grammar tree structures at runtime. Instead, we compile it ahead of
-time to machine code and the CPU runs that. What&#8217;s machine code got going for
+time to machine code, and the CPU runs that. What&#8217;s machine code got going for
 it?</p>
 <ul>
 <li>
@@ -271,7 +271,7 @@ machine code on the fly.</p>
 
 <p>We&#8217;d call our little emulator a <span name="virtual"><em>virtual machine</em></span>
 (or &#8220;VM&#8221; for short), and the synthetic binary machine code it runs <em>bytecode</em>.
-It&#8217;s got the flexibility and ease of use of defining things in data, but better
+It&#8217;s got the flexibility and ease of use of defining things in data, but it has better
 performance than higher-level representations like the Interpreter pattern.</p>
 <aside name="virtual">
 
@@ -291,7 +291,7 @@ These are encoded as a <strong>sequence of bytes</strong>. A <strong>virtual mac
 these instructions one at a time, using a <strong>stack for intermediate values</strong>. By
 combining instructions, complex high-level behavior can be defined.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
-<p>This is the most complex pattern in this book, and not something to throw into
+<p>This is the most complex pattern in this book, and it&#8217;s not something to throw into
 your game lightly. Use it when you have a lot of behavior you need to define and
 your game&#8217;s implementation language isn&#8217;t a good fit because:</p>
 <ul>
@@ -308,7 +308,7 @@ your game&#8217;s implementation language isn&#8217;t a good fit because:</p>
 </li>
 </ul>
 <p>Of course, that list describes a bunch of your game. Who doesn&#8217;t want a faster
-iteration loop or more safety? However, that doesn&#8217;t come free. Bytecode is
+iteration loop or more safety? However, that doesn&#8217;t come for free. Bytecode is
 slower than native code, so it isn&#8217;t a good fit for performance-critical parts
 of your engine.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
@@ -339,7 +339,7 @@ away from you.</p>
 <p>Low-level bytecode instructions are great for performance, but a binary bytecode
 format is <em>not</em> what your users are going to author. One reason we&#8217;re moving
 behavior out of code is so that we can express it at a <em>higher</em> level. If C++ is
-too low level, making your users effectively write in <span
+too low-level, making your users effectively write in <span
 name="assembly">assembly language</span>&#8202;&mdash;&#8202;even one of your own design&#8202;&mdash;&#8202;isn&#8217;t
 an improvement!</p>
 <aside name="assembly">
@@ -353,10 +353,10 @@ the kind of instruction sets we&#8217;ll be discussing here.</p>
 
 <p>Much like the Gang of Four&#8217;s Interpreter pattern, it&#8217;s assumed that you also
 have some way to <em>generate</em> the bytecode. Usually, users author their behavior
-in some higher level format and a tool translates that to the bytecode that our
+in some higher-level format, and a tool translates that to the bytecode that our
 virtual machine understands. In other words, a compiler.</p>
 <p>I know, that sounds scary. That&#8217;s why I&#8217;m mentioning it here. If you don&#8217;t have
-the resources to build an authoring tool, then bytecode isn&#8217;t for you. But, as
+the resources to build an authoring tool, then bytecode isn&#8217;t for you. But as
 we&#8217;ll see later, it may not be as bad as you think.</p>
 <h3><a href="#you'll-miss-your-debugger" name="you'll-miss-your-debugger">You&#8217;ll miss your debugger</a></h3>
 <p>Programming is hard. We know what we want the machine to do, but we don&#8217;t always
@@ -433,8 +433,8 @@ operation you want to perform. We can enumerate them:</p>
 </pre></div>
 
 
-<p>To encode a spell in data, we just store an array of enum values. We&#8217;ve only got
-a few different primitives, so the range of enum values easily fits into a byte.
+<p>To encode a spell in data, we store an array of <code>enum</code> values. We&#8217;ve only got
+a few different primitives, so the range of <code>enum</code> values easily fits into a byte.
 This means a spell is just a list of <span name="byte">bytes</span>&#8202;&mdash;&#8202;ergo
 &#8220;bytecode&#8221;.</p>
 <p><img src="images/bytecode-code.png" alt="A sequence of bytecode instructions: 0x00 HEALTH, 0x03 SOUND, 0x004 PARTICLES, ..." /></p>
@@ -445,7 +445,7 @@ complicated rules for how they are decoded. Actual machine code on common chips
 like x86 is a good bit more complex.</p>
 <p>But a single byte is good enough for the <a href="http://en.wikipedia.org/wiki/Java_virtual_machine">Java Virtual
 Machine</a> and Microsoft&#8217;s
-<a href="http://en.wikipedia.org/wiki/Common_Language_Runtime">Common Language Runtime</a>
+<a href="http://en.wikipedia.org/wiki/Common_Language_Runtime">Common Language Runtime</a>,
 which forms the backbone of the .NET platform, and it&#8217;s good enough for us.</p>
 </aside>
 
@@ -498,26 +498,26 @@ We can wrap this in a little VM that executes an entire spell like so:</p>
 
 <p>Type that in and you&#8217;ll have written your first virtual machine. Unfortunately,
 it&#8217;s not very flexible. We can&#8217;t define a spell that touches the player&#8217;s
-opponent, or lowers a stat. We can only play one sound!</p>
+opponent or lowers a stat. We can only play one sound!</p>
 <p>To get something that starts to have the expressive feel of an actual language,
 we need to get parameters in here.</p>
 <h3><a href="#a-stack-machine" name="a-stack-machine">A stack machine</a></h3>
 <p>To execute a complex nested expression, you start with the innermost
-subexpressions. You calculate those and the results flow outward as arguments to
-the expressions that contain them until eventually the whole expression has been
+subexpressions. You calculate those, and the results flow outward as arguments to
+the expressions that contain them until eventually, the whole expression has been
 evaluated.</p>
 <p>The Interpreter pattern models this explicitly as a tree of nested objects, but
 we want the speed of a flat list of instructions. We still need to ensure
 results from subexpressions flow to the right surrounding expressions. But,
 since our data is flattened, we&#8217;ll have to use the <em>order</em> of the instructions
-to control that. We&#8217;ll do it the same way your CPU does: <span
+to control that. We&#8217;ll do it the same way your CPU does&#8202;&mdash;&#8202;<span
 name="stack-machine">with a stack</span>.</p>
 <aside name="stack-machine">
 
 <p>This architecture is unimaginatively called a <a href="http://en.wikipedia.org/wiki/Stack_machine"><em>stack
 machine</em></a>. Programming languages
 like <a href="http://en.wikipedia.org/wiki/Forth_(programming_language)">Forth</a>,
-<a href="http://en.wikipedia.org/wiki/PostScript">PostScript</a> and
+<a href="http://en.wikipedia.org/wiki/PostScript">PostScript</a>, and
 <a href="http://en.wikipedia.org/wiki/Factor_(programming_language)">Factor</a> expose this
 model directly to the user.</p>
 </aside>
@@ -540,8 +540,8 @@ model directly to the user.</p>
 
 
 <p>The VM maintains an internal stack of values. In our example, the only kinds of
-values our instructions work with are numbers, so we can just use a simple array
-of ints. Whenever a bit of data needs to work its way from one instruction to
+values our instructions work with are numbers, so we can use a simple array
+of <code>int</code>s. Whenever a bit of data needs to work its way from one instruction to
 another, it gets there through the stack.</p>
 <p>Like the name implies, values can be pushed onto or popped off of the stack, so
 let&#8217;s add a couple of methods for that:</p>
@@ -597,8 +597,8 @@ so:</p>
 <p>To get some values <em>onto</em> that stack, we need one more instruction: a literal.
 It represents a raw integer value. But where does <em>it</em> get its value from? How
 do we avoid some turtles-all-the-way-down infinite regress here?</p>
-<p>The trick is to take advantage of the fact that our instruction stream is just a
-sequence of bytes: we can stuff the number directly in the instruction stream.
+<p>The trick is to take advantage of the fact that our instruction stream is a
+sequence of bytes&#8202;&mdash;&#8202;we can stuff the number directly in the byte array.
 We define another instruction type for a number literal like so:</p>
 <div class="codehilite"><pre><span class="k">case</span> <span class="n">INST_LITERAL</span>:
 <span class="p">{</span>
@@ -612,14 +612,14 @@ We define another instruction type for a number literal like so:</p>
 
 <aside name="single">
 
-<p>Here, I&#8217;m just reading a single byte for the value to avoid the fiddly code
+<p>Here, I&#8217;m reading a single byte for the value to avoid the fiddly code
 required to decode a multiple-byte integer, but in a real implementation, you&#8217;d
 want to be able to have literals that cover your full numeric range.</p>
 </aside>
 
 <p><img src="images/bytecode-literal.png" alt="Binary encoding of a literal instruction: 0x05 (LITERAL) followed by 123 (the value)." /></p>
 <p>It reads the next <span name="single">byte</span> in the bytecode stream <em>as a
-number</em>, and pushes it onto the stack.</p>
+number</em> and pushes it onto the stack.</p>
 <p>Let&#8217;s string a few of these instructions together and watch the interpreter
 execute them to get a feel for how the stack works. We start with an empty stack
 and the interpreter pointing to the first instruction:</p>
@@ -627,16 +627,16 @@ and the interpreter pointing to the first instruction:</p>
 <p>First, it executes the first <code>INST_LITERAL</code>. That reads the next byte from the
 bytecode (<code>0</code>) and pushes it onto the stack:</p>
 <p><img src="images/bytecode-stack-2.png" alt="The next step. The literal 0 has been pushed onto the stack and the execution pointer is on the next literal." /></p>
-<p>Then it executes the second <code>INST_LITERAL</code>. That reads the <code>10</code> and pushes it:</p>
+<p>Then, it executes the second <code>INST_LITERAL</code>. That reads the <code>10</code> and pushes it:</p>
 <p><img src="images/bytecode-stack-3.png" alt="The next step. Now 10 has been pushed onto the stack and the execution pointer is at the Health instruction." /></p>
 <p>Finally, it executes <code>INST_SET_HEALTH</code>. That pops <code>10</code> and stores it in
-<code>amount</code>, then pops <code>0</code> and stores it in <code>wizard</code>. Then it calls <code>setHealth()</code>
+<code>amount</code>, then pops <code>0</code> and stores it in <code>wizard</code>. Then, it calls <code>setHealth()</code>
 with those parameters.</p>
 <p>Ta-da! We&#8217;ve got a spell that sets the player&#8217;s wizard&#8217;s health to ten points.
-Now we&#8217;ve got enough flexibility to define spells that set either wizard&#8217;s stats
+Now, we&#8217;ve got enough flexibility to define spells that set either wizard&#8217;s stats
 to whatever amounts we want. We can also play different sounds and spawn
 particles.</p>
-<p>But&#8230; this still just feels like a <em>data</em> format. We can&#8217;t, for example, raise
+<p>But&#8230; this still feels like a <em>data</em> format. We can&#8217;t, for example, raise
 a wizard&#8217;s health by half of their wisdom. Our designers want to be able to
 express <em>rules</em> for spells, not just <em>values</em>.</p>
 <h3><a href="#behavior-=-composition" name="behavior-=-composition">Behavior = composition</a></h3>
@@ -647,7 +647,7 @@ to feel like <em>behavior</em>, what we&#8217;re missing is <em>composition</em>
 values in interesting ways. For a simple example, they want spells that modify a
 stat <em>by</em> a certain amount instead of <em>to</em> a certain amount.</p>
 <p>That requires taking into account a stat&#8217;s current value. We have instructions
-for <em>writing</em> a stat, we just need to add a couple to <em>read</em> stats:</p>
+for <em>writing</em> a stat, but we need to add a couple to <em>read</em> stats:</p>
 <div class="codehilite"><pre><span class="k">case</span> <span class="n">INST_GET_HEALTH</span>:
 <span class="p">{</span>
   <span class="kt">int</span> <span class="n">wizard</span> <span class="o">=</span> <span class="n">pop</span><span class="p">();</span>
@@ -662,12 +662,12 @@ for <em>writing</em> a stat, we just need to add a couple to <em>read</em> stats
 
 
 <p>As you can see, these work with the stack in both directions. They pop a
-parameter to determine which wizard to get the stat for, then look up the stat&#8217;s
+parameter to determine which wizard to get the stat for, and then they look up the stat&#8217;s
 value and push that back onto the stack.</p>
 <p>This lets us write spells that copy stats around. We could create a spell that
-set a wizard&#8217;s agility to their wisdom, or a strange incantation that set one
+set a wizard&#8217;s agility to their wisdom or a strange incantation that set one
 wizard&#8217;s health to mirror his opponent&#8217;s.</p>
-<p>Better, but still quite limited. Next we need arithmetic. It&#8217;s time our baby VM
+<p>Better, but still quite limited. Next, we need arithmetic. It&#8217;s time our baby VM
 learned how to add 1 + 1. We&#8217;ll add a few more instructions. By now, you&#8217;ve
 probably got the hang of it and can guess how they look. I&#8217;ll just show
 addition:</p>
@@ -701,7 +701,7 @@ implicitly. Here&#8217;s how you could evaluate this by hand:</p>
 <li>Get the wizard&#8217;s current health and remember it.</li>
 <li>Get the wizard&#8217;s agility and remember it.</li>
 <li>Do the same for their wisdom.</li>
-<li>Get those last two and add them, and remember the result.</li>
+<li>Get those last two, add them, and remember the result.</li>
 <li>Divide that by two and remember the result.</li>
 <li>Recall the wizard&#8217;s health and add it to that result.</li>
 <li>Take that result and set the wizard&#8217;s health to that value.</li>
@@ -722,7 +722,7 @@ instructions compose, I&#8217;ve done that below.</p>
 <p>To show how the stack changes over time, we&#8217;ll walk through a sample execution
 where the wizard&#8217;s current stats are 45 health, 7 agility, and 11 wisdom. Next
 to each instruction is what the stack looks like after executing it and then a
-little comment explaining the instruction&#8217;s purpose.</p>
+little comment explaining the instruction&#8217;s purpose:</p>
 <div class="codehilite"><pre>LITERAL 0    [0]            # Wizard index
 LITERAL 0    [0, 0]         # Wizard index
 GET_HEALTH   [0, 45]        # getHealth()
@@ -739,8 +739,8 @@ SET_HEALTH   []             # Set health to result
 
 
 <p>If you watch the stack at each step, you can see how data flows through it
-almost like <span name="threshold">magic</span>. We push a <code>0</code> for the wizard
-index at the beginning and it just hangs around at the bottom of the stack until
+almost like <span name="threshold">magic</span>. We push <code>0</code> for the wizard
+index at the beginning, and it just hangs around at the bottom of the stack until
 we finally need it for the last <code>SET_HEALTH</code> at the end.</p>
 <aside name="threshold">
 
@@ -765,7 +765,7 @@ we can track how many we&#8217;ve executed and bail out if it goes over some lim
 <aside name="looping">
 
 <p>Controlling execution time isn&#8217;t necessary in our sample because we don&#8217;t have
-any instructions for looping. We could limit execution time just by limiting the
+any instructions for looping. We could limit execution time by limiting the
 total size of the bytecode. This also means our bytecode isn&#8217;t Turing-complete.</p>
 </aside>
 
@@ -778,7 +778,7 @@ but we&#8217;ve gone and created something <em>lower</em>-level than C++. It has
 performance and safety we want, but absolutely none of the designer-friendly
 usability.</p>
 <p>To fill that gap, we need some tooling. We need a program that lets users define
-the high-level behavior of a spell, then takes that and generates the
+the high-level behavior of a spell and then takes that and generates the
 appropriate low-level stack machine bytecode.</p>
 <p>That probably sounds way harder than making the VM. Many programmers were
 dragged through a compilers class in college and took away from it nothing but
@@ -801,7 +801,7 @@ let users define their behavior, especially if the people using it won&#8217;t b
 highly technical. Writing text that&#8217;s free of syntax errors is difficult for
 people who haven&#8217;t spent years getting used to a compiler yelling at them.</p>
 <p>Instead, you can build an app that lets users &#8220;script&#8221; by clicking and dragging
-little boxes or pulling down menu items, or whatever else makes sense for the
+little boxes, pulling down menu items, or whatever else makes sense for the
 kind of behavior you want them to create.</p>
 <p><span name="text"></span></p>
 <p><img src="images/bytecode-ui.png" alt="A mock-up of a little tree-based UI for authoring behavior." /></p>
@@ -813,7 +813,7 @@ Adventure</a> worked like this.</p>
 
 <p>The nice thing about this is that your UI can make it impossible for users to
 create <span name="errors">&#8220;invalid&#8221;</span> programs. Instead of vomiting error
-messages on them, you can just proactively disable buttons or provide default
+messages on them, you can proactively disable buttons or provide default
 values to ensure that the thing they&#8217;ve created is valid at all points in time.</p>
 <aside name="errors">
 
@@ -845,11 +845,11 @@ finish your game.</p>
 
 <h3><a href="#how-do-instructions-access-the-stack" name="how-do-instructions-access-the-stack">How do instructions access the stack?</a></h3>
 <p>Bytecode VMs come in two main flavors: stack-based and register-based. In a
-stack-based VM, instructions always work from the top of the stack, like our
+stack-based VM, instructions always work from the top of the stack, like in our
 sample code. For example, <code>INST_ADD</code> pops two values, adds them, and pushes the
 result.</p>
 <p>Register-based VMs still have a stack. The only difference is that instructions
-can read their inputs from deeper in it. Instead of <code>INST_ADD</code> always <em>popping</em>
+can read their inputs from deeper in the stack. Instead of <code>INST_ADD</code> always <em>popping</em>
 its operands, it has two indexes stored in the bytecode that identify where in
 the stack to read the operands from.</p>
 <ul>
@@ -888,7 +888,7 @@ the stack to read the operands from.</p>
     the instruction type, and the rest are arguments.</p>
 <aside name="lua">
 
-<p>Lua doesn&#8217;t specify their bytecode format and it changes from version to
+<p>The Lua folks don&#8217;t specify Lua&#8217;s bytecode format, and it changes from version to
 version. What I&#8217;m describing here is true as of Lua 5.1. For an
 absolutely amazing deep dive into Lua&#8217;s internals, read <a href="http://lu
 aforge.net/docman/83/98/ANoFrillsIntroToLua51VMInstructions.pdf">this</a>.</p>
@@ -905,13 +905,13 @@ aforge.net/docman/83/98/ANoFrillsIntroToLua51VMInstructions.pdf">this</a>.</p>
 </li>
 </ul>
 <p>So which should you do? My recommendation is to stick with a stack-based VM.
-They&#8217;re simpler to implement, and much simpler to generate code for.
+They&#8217;re simpler to implement and much simpler to generate code for.
 Register-based VMs got a reputation for being a bit faster after Lua converted
-to that style, but it depends <em>deeply</em> on your actual instructions and lots of
+to that style, but it depends <em>deeply</em> on your actual instructions and on lots of
 other details of your VM.</p>
 <h3><a href="#what-instructions-do-you-have" name="what-instructions-do-you-have">What instructions do you have?</a></h3>
 <p>Your instruction set defines the boundaries of what can and cannot be expressed
-in bytecode, and also has a big impact on the performance of your VM. Here&#8217;s a
+in bytecode, and it also has a big impact on the performance of your VM. Here&#8217;s a
 laundry list of the different kinds of instructions you may want:</p>
 <ul>
 <li>
@@ -922,7 +922,7 @@ laundry list of the different kinds of instructions you may want:</p>
 </li>
 <li>
 <p><strong>Internal primitives.</strong> These manipulate values inside the VM&#8202;&mdash;&#8202;things
-    like literals, arithmetic, comparison operators and instructions that juggle
+    like literals, arithmetic, comparison operators, and instructions that juggle
     the stack around.</p>
 </li>
 <li>
@@ -939,16 +939,16 @@ build all kinds of higher-level control flow using that.</p>
 <p><strong>Abstraction.</strong> If your users start defining a <em>lot</em> of stuff in data,
     eventually they&#8217;ll want to start reusing bits of bytecode instead of having
     to copy and paste it. You may want something like callable procedures.</p>
-<p>In its simplest form these aren&#8217;t much more complex than a jump. The only
+<p>In their simplest form, procedures aren&#8217;t much more complex than a jump. The only
 difference is that the VM maintains a second <em>return</em> stack. When it
 executes a &#8220;call&#8221; instruction, it pushes the current instruction index onto
-the return stack then jumps to the called bytecode. When it hits a &#8220;return&#8221;,
+the return stack and then jumps to the called bytecode. When it hits a &#8220;return&#8221;,
 the VM pops the index from the return stack and jumps back to it.</p>
 </li>
 </ul>
 <h3><a href="#how-are-values-represented" name="how-are-values-represented">How are values represented?</a></h3>
-<p>Our sample VM only works with one kind of value, integers. That makes it easy:
-the stack is just a stack of ints. A more full-featured VM will support
+<p>Our sample VM only works with one kind of value, integers. That makes it easy &#8212;
+the stack is just a stack of <code>int</code>s. A more full-featured VM will support
 different data types: strings, objects, lists, etc. You&#8217;ll have to decide how
 those are stored internally.</p>
 <ul>
@@ -960,7 +960,7 @@ those are stored internally.</p>
     type-checking.</p>
 </li>
 <li>
-<p><em>You can&#8217;t work with different data types.</em> The obvious downside.
+<p><em>You can&#8217;t work with different data types.</em> This is the obvious downside.
     Cramming different types into a single representation&#8202;&mdash;&#8202;think storing
     numbers as strings&#8202;&mdash;&#8202;is asking for pain.</p>
 </li>
@@ -968,8 +968,8 @@ those are stored internally.</p>
 </li>
 <li>
 <p><strong>A tagged variant:</strong></p>
-<p>This is the common representation for dynamically-typed languages. Every
-value has two pieces. The first is a type tag&#8202;&mdash;&#8202;an enum&#8202;&mdash;&#8202;that identifies
+<p>This is the common representation for dynamically typed languages. Every
+value has two pieces. The first is a type tag&#8202;&mdash;&#8202;an <code>enum</code>&#8202;&mdash;&#8202;that identifies
 what data type is being stored. The rest of the bits are then interpreted
 appropriately according to that type, like:</p>
 <div class="codehilite"><pre><span class="k">enum</span> <span class="n">ValueType</span>
@@ -996,7 +996,7 @@ appropriately according to that type, like:</p>
 <li>
 <p><em>Values know their type.</em> The nice thing about this representation is
     that you can check the type of a value at runtime. That&#8217;s important for
-    dynamic dispatch and ensuring you don&#8217;t try to perform operations on
+    dynamic dispatch and for ensuring that you don&#8217;t try to perform operations on
     types that don&#8217;t support it.</p>
 </li>
 <li>
@@ -1008,11 +1008,11 @@ appropriately according to that type, like:</p>
 </li>
 <li>
 <p><strong>An untagged union:</strong></p>
-<p>This uses a union like the previous form, but does <em>not</em> have a type tag
+<p>This uses a union like the previous form, but it does <em>not</em> have a type tag
 that goes along with it. You have a little blob of bits that could represent
 more than one type, and it&#8217;s up to you to ensure you don&#8217;t misinterpret
 them.</p>
-<p>This is how <span name="untyped">statically-typed</span> languages represent
+<p>This is how <span name="untyped">statically typed</span> languages represent
 things in memory. Since the type system ensures at compile time that you
 aren&#8217;t misinterpreting values, you don&#8217;t need to validate it at runtime.</p>
 <aside name="untyped">
@@ -1030,18 +1030,18 @@ that misinterprets a value&#8217;s type. Not for the faint of heart!</p>
 <li>
 <p><em>It&#8217;s fast.</em> Not having type tags implies you&#8217;re not spending cycles
     checking them at runtime either. This is one of the reasons
-    statically-typed languages tend to be faster than dynamic ones.</p>
+    statically typed languages tend to be faster than dynamic ones.</p>
 </li>
 <li>
 <p><em>It&#8217;s unsafe.</em> <span name="unsafe">This</span> is the real cost, of
-    course. A bad chunk of bytecode that causes you misinterpret a value and
+    course. A bad chunk of bytecode that causes you to misinterpret a value and
     treat a number like a pointer or vice versa can violate the security of
-    your game or crash.</p>
+    your game or make it crash.</p>
 <aside name="unsafe">
 
-<p>If your bytecode was compiled from a statically-typed language, you
+<p>If your bytecode was compiled from a statically typed language, you
 might think you&#8217;re safe here because the compiler won&#8217;t generate unsafe
-bytecode. That may be true, but remember malicious users may hand-craft
+bytecode. That may be true, but remember that malicious users may hand-craft
 evil bytecode without going through your compiler.</p>
 <p>That&#8217;s why, for example, the Java Virtual Machine has to do <em>bytecode
 verification</em> when it loads a program.</p>
@@ -1104,11 +1104,11 @@ methods for the various type tests and conversions, along the lines of:</p>
 <p><em>It&#8217;s verbose.</em> You have to define a separate class with all of the
     associated ceremonial verbiage for each data type. Note that in the
     previous examples, we showed the entire definition of <em>all</em> of the value
-    types. Here we only covered one!</p>
+    types. Here, we only cover one!</p>
 </li>
 <li>
 <p><em>It&#8217;s inefficient.</em> To get polymorphism, you have to go through a
-    pointer, which means even tiny values like booleans and numbers get
+    pointer, which means even tiny values like Booleans and numbers get
     wrapped in objects that are allocated on the heap. Every time you touch
     a value, you have to do a virtual method call.</p>
 <p>In something like the core of a virtual machine, small performance hits
@@ -1119,7 +1119,7 @@ problem is in our <em>values</em> instead of our <em>code</em>.</p>
 </ul>
 </li>
 </ul>
-<p>My recommendation: If you can stick with a single data type, do that. Otherwise,
+<p>My recommendation is that if you can stick with a single data type, do that. Otherwise,
 do a tagged union. That&#8217;s what almost every language interpreter in the world
 does.</p>
 <h3><a href="#how-is-the-bytecode-generated" name="how-is-the-bytecode-generated">How is the bytecode generated?</a></h3>
@@ -1142,7 +1142,7 @@ easier when you constrain the user interface to a string of characters.</p>
 <li>
 <p><em>You have to implement a parser.</em> Despite their reputation, this part is
     pretty easy. Either use a parser generator like ANTLR or Bison, or &#8212;
-    like I do&#8202;&mdash;&#8202;hand-roll a little recursive descent one and you&#8217;re good to
+    like I do&#8202;&mdash;&#8202;hand-roll a little recursive descent one, and you&#8217;re good to
     go.</p>
 </li>
 <li>
@@ -1156,11 +1156,11 @@ easier when you constrain the user interface to a string of characters.</p>
 <li>
 <p><em>It will likely turn off non-technical users.</em> We programmers like text
     files. Combined with powerful command-line tools, we think of them as
-    the LEGO blocks of computing: simple but easily composable in a million
+    the LEGO blocks of computing&#8202;&mdash;&#8202;simple, but easily composable in a million
     ways.</p>
-<p>Most non-programmers don&#8217;t think of text like that. To them, it feels
-like filling in tax forms for a robotic auditor that yells at them if
-they forget a single semicolon.</p>
+<p>Most non-programmers don&#8217;t think of plaintext like that. To them, text
+files feel like filling in tax forms for a robotic auditor that yells at
+them if they forget a single semicolon.</p>
 </li>
 </ul>
 </li>
@@ -1171,10 +1171,10 @@ they forget a single semicolon.</p>
 <p><em>You have to implement a user interface.</em> Buttons, clicks, drags, stuff
     like that. Some cringe at the idea of this, but I personally love it. If
     you go down this route, it&#8217;s important to treat designing the user
-    interface as a core part of doing your job well, and not just an
+    interface as a core part of doing your job well&#8202;&mdash;&#8202;not just an
     unpleasant task to be muddled through.</p>
 <p>Every little bit of extra work you do here will make your tool easier
-and more pleasant to use and that directly leads to better content in
+and more pleasant to use, and that directly leads to better content in
 your game. If you look behind many of the games you love, you&#8217;ll often
 find the secret was fun authoring tools.</p>
 </li>
@@ -1199,7 +1199,7 @@ prevent and handle errors.</p>
 <p>When you&#8217;re building a UI, you have to choose which framework to use,
 and many of those are specific to one OS. There are cross-platform UI
 toolkits too, but those often get ubiquity at the expense of
-familiarity: they feel equally weird on all of platforms.</p>
+familiarity&#8202;&mdash;&#8202;they feel equally weird on all of platforms.</p>
 </li>
 </ul>
 </li>
@@ -1212,7 +1212,7 @@ familiarity: they feel equally weird on all of platforms.</p>
     class="gof-pattern">Interpreter</a> pattern. Both give you a way to express
     composable behavior in terms of data.</p>
 <p>In fact, you&#8217;ll often end up using <em>both</em> patterns. The tool you use to
-generate bytecode will internally have a tree of objects that represents the
+generate bytecode will have an internal tree of objects that represents the
 code. This is exactly what the Interpreter pattern expects.</p>
 <p>In order to compile that to bytecode, you&#8217;ll recursively walk the tree, just
 like you do to interpret it with the Interpreter pattern. The <em>only</em>
@@ -1220,7 +1220,7 @@ difference is that instead of executing a primitive piece of behavior
 immediately, you output the bytecode instruction to perform that later.</p>
 </li>
 <li>
-<p>The <a href="http://www.lua.org/">Lua</a> programming language is the most widely-used
+<p>The <a href="http://www.lua.org/">Lua</a> programming language is the most widely used
     scripting language in games. It&#8217;s implemented internally as a very compact
     register-based bytecode VM.</p>
 </li>
