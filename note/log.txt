@@ -1,3 +1,5 @@
+2014-07-14 - layout update method
+2014-07-13 - merge update method changes
 2014-07-08 - email
 2014-07-07 - layout game loop
 2014-07-06 - merge in changes to game loop
