@@ -1038,7 +1038,7 @@ only option.
         When you're building a UI, you have to choose which framework to use,
         and many of those are specific to one OS. There are cross-platform UI
         toolkits too, but those often get ubiquity at the expense of
-        familiarity -- they feel equally weird on all of platforms.
+        familiarity -- they feel equally foreign on all of platforms.
 
 ## See Also
 

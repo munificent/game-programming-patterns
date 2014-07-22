@@ -1,3 +1,9 @@
+2014-07-20 - email
+2014-07-19 - start sketching cover illustration
+2014-07-18 - more cover comps
+2014-07-17 - finish bytecode
+2014-07-16 - layout behavioral patterns, start on bytecode
+2014-07-15 - merge bytecode changes
 2014-07-14 - layout update method
 2014-07-13 - merge update method changes
 2014-07-08 - email
