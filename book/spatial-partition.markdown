@@ -139,10 +139,10 @@ spatial partitions used in games.
 
 ### A sheet of graph paper
 
-Here's the basic idea: imagine the entire field of battle. Now superimpose a
-grid of fixed-size squares onto it like a sheet of graph paper. Instead of
-storing our units in a single array, we put them in the cells of this grid. Each
-cell stores the list of units whose positions are within that cell's boundary.
+Imagine the entire field of battle. Now superimpose a grid of fixed-size squares
+onto it like a sheet of graph paper. Instead of storing our units in a single
+array, we put them in the cells of this grid. Each cell stores the list of units
+whose positions are within that cell's boundary.
 
 <img src="images/spatial-partition-grid.png" alt="A grid with Units occupying different cells. Some cells have multiple Units." />
 
@@ -474,7 +474,7 @@ to solve.
         performance, but *consistent* performance: if each partition has the
         same number of objects, you ensure that all queries in the world will
         take about the same amount of time. When you need to maintain a stable
-        frame-rate, this consistency may be more important than raw performance.
+        frame rate, this consistency may be more important than raw performance.
 
      *  *It's more efficient to partition an entire set of objects at once.*
         When the *set* of objects affects where boundaries are, it's best to
@@ -491,8 +491,8 @@ to solve.
 
     <aside name="quad">
 
-    A quadtree partitions 2D space. Its 3D analogue is the *octree*: it takes a
-    *volume* and partitions it into eight *cubes*. Aside from the extra
+    A quadtree partitions 2D space. Its 3D analogue is the *octree*, which takes
+    a *volume* and partitions it into eight *cubes*. Aside from the extra
     dimension, it works the same as its flatter sibling.
 
     </aside>

@@ -164,17 +164,7 @@ namespace SpatialPartition
     class Unit
     {
     public:
-      //^unit-ctor
-      Unit(Grid* grid, double x, double y)
-      : grid_(grid),
-        x_(x),
-        y_(y),
-        prev_(NULL),
-        next_(NULL)
-      {
-        grid_->add(this);
-      }
-      //^unit-ctor
+      Unit(Grid* grid, double x, double y);
 
       // Previous code...
       //^omit
@@ -189,6 +179,18 @@ namespace SpatialPartition
       Unit* next_;
       //^omit
     };
+
+    //^unit-ctor
+    Unit::Unit(Grid* grid, double x, double y)
+    : grid_(grid),
+      x_(x),
+      y_(y),
+      prev_(NULL),
+      next_(NULL)
+    {
+      grid_->add(this);
+    }
+    //^unit-ctor
 
     //^add
     void Grid::add(Unit* unit)
@@ -389,9 +391,9 @@ namespace SpatialPartition
     //^grid-melee
     void Grid::handleMelee()
     {
-      for (int y = 0; y < NUM_CELLS; y++)
+      for (int x = 0; x < NUM_CELLS; x++)
       {
-        for (int x = 0; x < NUM_CELLS; x++)
+        for (int y = 0; y < NUM_CELLS; y++)
         {
           handleCell(cells_[x][y]);
         }

@@ -148,10 +148,10 @@ spatial partitions used in games.</p>
 </aside>
 
 <h3><a href="#a-sheet-of-graph-paper" name="a-sheet-of-graph-paper">A sheet of graph paper</a></h3>
-<p>Here&#8217;s the basic idea: imagine the entire field of battle. Now superimpose a
-grid of fixed-size squares onto it like a sheet of graph paper. Instead of
-storing our units in a single array, we put them in the cells of this grid. Each
-cell stores the list of units whose positions are within that cell&#8217;s boundary.</p>
+<p>Imagine the entire field of battle. Now superimpose a grid of fixed-size squares
+onto it like a sheet of graph paper. Instead of storing our units in a single
+array, we put them in the cells of this grid. Each cell stores the list of units
+whose positions are within that cell&#8217;s boundary.</p>
 <p><img src="images/spatial-partition-grid.png" alt="A grid with Units occupying different cells. Some cells have multiple Units." /></p>
 <p>When we handle combat, we only consider units within the same cell. Instead of
 comparing each unit in the game with every other unit, we&#8217;ve <em>partitioned</em> the
@@ -242,7 +242,7 @@ from scratch.</p>
 <p>The first thing we need to do is make sure new units are actually placed into
 the grid when they are created. We&#8217;ll make <code>Unit</code> handle this in its
 constructor:</p>
-<div class="codehilite"><pre><span class="n">Unit</span><span class="p">(</span><span class="n">Grid</span><span class="o">*</span> <span class="n">grid</span><span class="p">,</span> <span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">)</span>
+<div class="codehilite"><pre><span class="n">Unit</span><span class="o">::</span><span class="n">Unit</span><span class="p">(</span><span class="n">Grid</span><span class="o">*</span> <span class="n">grid</span><span class="p">,</span> <span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">)</span>
 <span class="o">:</span> <span class="n">grid_</span><span class="p">(</span><span class="n">grid</span><span class="p">),</span>
   <span class="n">x_</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
   <span class="n">y_</span><span class="p">(</span><span class="n">y</span><span class="p">),</span>
@@ -291,9 +291,9 @@ at each other. With this new grid, the main method for handling combat look like
 this:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Grid</span><span class="o">::</span><span class="n">handleMelee</span><span class="p">()</span>
 <span class="p">{</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">NUM_CELLS</span><span class="p">;</span> <span class="n">y</span><span class="o">++</span><span class="p">)</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">NUM_CELLS</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">NUM_CELLS</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">NUM_CELLS</span><span class="p">;</span> <span class="n">y</span><span class="o">++</span><span class="p">)</span>
     <span class="p">{</span>
       <span class="n">handleCell</span><span class="p">(</span><span class="n">cells_</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]);</span>
     <span class="p">}</span>
@@ -646,7 +646,7 @@ partition that optimizes for the specific set of objects in the world.</p>
     performance, but <em>consistent</em> performance: if each partition has the
     same number of objects, you ensure that all queries in the world will
     take about the same amount of time. When you need to maintain a stable
-    frame-rate, this consistency may be more important than raw performance.</p>
+    frame rate, this consistency may be more important than raw performance.</p>
 </li>
 <li>
 <p><em>It&#8217;s more efficient to partition an entire set of objects at once.</em>
@@ -665,8 +665,8 @@ best characteristics of both fixed partitions and adaptable ones: <span
 name="quad">quadtrees</span>.</p>
 <aside name="quad">
 
-<p>A quadtree partitions 2D space. Its 3D analogue is the <em>octree</em>: it takes a
-<em>volume</em> and partitions it into eight <em>cubes</em>. Aside from the extra
+<p>A quadtree partitions 2D space. Its 3D analogue is the <em>octree</em>, which takes
+a <em>volume</em> and partitions it into eight <em>cubes</em>. Aside from the extra
 dimension, it works the same as its flatter sibling.</p>
 </aside>
 
