@@ -26,7 +26,7 @@ which was often, we started over from the beginning.
 At the back of the stack of pages was a real monster: a program that took up
 several dense pages of code. It took a while before we worked up the courage
 to even try it, but it was irresistible -- the title above the listing was
-"Tunnels and Trolls." We had no idea what it did, but it sounded like a game,
+"Tunnels and Trolls". We had no idea what it did, but it sounded like a game,
 and what could be cooler than a computer game that you programmed yourself?
 
 We never did get it running, and after a year, we moved out of that classroom.
@@ -50,7 +50,7 @@ good chance this would be a herpetology book instead of a programming one.
 
 At first, the challenge was just getting something on screen. Then, it became
 figuring out how to write programs bigger than what would fit in my head. Instead
-of just reading about "How to Program in C++," I started trying to find books
+of just reading about "How to Program in C++", I started trying to find books
 about how to *organize* programs.
 
 Fast-forward several years, and a <span name="friend">friend</span> hands me a
@@ -168,7 +168,7 @@ attempt to do that for software.
 
 </aside>
 
-By calling this book "Game Programming Patterns," I'm not trying to imply that
+By calling this book "Game Programming Patterns", I'm not trying to imply that
 the Gang of Four's book is <span name="nongames">inapplicable</span> to games.
 On the contrary: the [Design Patterns Revisited](design-patterns-revisited.html)
 section of this book covers many of the patterns from *Design
