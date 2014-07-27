@@ -16,6 +16,7 @@
 - Italics for emphasis.
 - Quote block used for sentence long quotes but double quote ("") used for references what other people call something e.g. GoF call this the "subject".
 - Colon precedes block quote.
+- Punctuation appears outside quotation marks unless the punctuation is part of the quoted matter (logical punctuation).
 - Items in a numbered list are complete sentences with starting caps and ending period.
 - Use "Naïve" instead of "Naive".
 - Use smart quotes.
