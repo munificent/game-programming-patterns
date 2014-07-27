@@ -19,17 +19,17 @@ attack string. When the monster attacks our hero, that text will be shown to the
 user somehow. (We don't care how here.)
 
 The designers tell us that monsters come in a variety of different *breeds*,
-like "dragon" or "troll." Each breed describes a *kind* of monster that exists
+like "dragon" or "troll". Each breed describes a *kind* of monster that exists
 in the game, and there can be multiple monsters of the same breed running around
 in the dungeon at the same time.
 
-The breed determines a monster's starting health: dragons start off with more
-than trolls, making them harder to kill. It also determines the attack string:
+The breed determines a monster's starting health -- dragons start off with more
+than trolls, making them harder to kill. It also determines the attack string --
 all monsters of the same breed attack the same way.
 
 ### The typical OOP answer
 
-Given that game design, we fire up our text editor and start coding. According
+Given the above game design, we fire up our text editor and start coding. According
 to the design, a dragon <span name="isa">is a</span> kind of monster, a troll is
 another kind, and so on with the other breeds. Thinking object-oriented, that
 leads us to a `Monster` base class:
@@ -37,7 +37,7 @@ leads us to a `Monster` base class:
 <aside name="isa">
 
 This is the so-called "is-a" relationship. In conventional OOP thinking, since a
-dragon "is-a" monster, we model that by making Dragon a subclass of Monster. As
+dragon "is-a" monster, we model that by making `Dragon` a subclass of `Monster`. As
 we'll see, subclassing is only one way of enshrining a conceptual relation like
 that into code.
 
@@ -66,17 +66,17 @@ Exclamation points make everything more exciting!
 
 </aside>
 
-Each class derived from `Monster` passes in the starting health, and overrides
+Each class derived from `Monster` passes in the starting health and overrides
 `getAttack()` to return the attack string for that breed. Everything works as
-expected, and before long we've got our hero running around slaying a variety of
+expected, and before long, we've got our hero running around slaying a variety of
 beasties. We keep slinging code, and before we know it, we've got dozens of
 monster subclasses, from acidic slimes to zombie goats.
 
 Then, strangely, things start to bog down. Our designers ultimately want to have
 *hundreds* of breeds, and we find ourselves spending all of our time writing
-these little seven line subclasses and recompiling. It gets worse: the designers
+these little seven-line subclasses and recompiling. It gets worse -- the designers
 want to start tuning the breeds we've already coded. Our formerly productive
-work day degenerates to:
+workday degenerates to:
 
 1.  Get email from designer asking to change health of troll from
     48 to 52.
@@ -92,7 +92,7 @@ work day degenerates to:
 6.  Repeat.
 
 We spend the day frustrated because we've turned into data monkeys. Our
-designers are frustrated because it takes them forever just to get a simple
+designers are frustrated because it takes them forever to get a simple
 number tuned. What we need is the ability to change breed stats without having
 to recompile the whole game every time. Even better, we'd like designers to be
 able to create and tune breeds without *any* programmer intervention at all.
@@ -103,12 +103,12 @@ At a very high level, the problem we're trying to solve is pretty simple. We
 have a bunch of different monsters in the game, and we want to share certain
 attributes between them. A horde of monsters are beating on the hero, and we
 want some of them to use the same text for their attack. We define that by
-saying that all of those monsters are the same "breed," and that the breed
+saying that all of those monsters are the same "breed", and that the breed
 determines the attack string.
 
-We decided to implement this concept using inheritance, since it lines up with
-our intuition of classes: A dragon is a monster, and each dragon in the game is
-an instance of this dragon "class." Defining each breed as a subclass of an
+We decided to implement this concept using inheritance since it lines up with
+our intuition of classes. A dragon is a monster, and each dragon in the game is
+an instance of this dragon "class". Defining each breed as a subclass of an
 abstract base `Monster` class, and having each monster in the game be an
 instance of that derived breed class mirrors that. We end up with a class
 hierarchy like this:
@@ -127,7 +127,7 @@ from".
 Each instance of a monster in the game will be of one of the derived monster
 types. The more breeds we have, the bigger the class hierarchy. That's the
 problem of course: adding new breeds means adding new code, and each breed has
-to be compiled in as its own type.
+to be compiled as its own type.
 
 This works, but it isn't the only option. We could also architect our code so
 that each monster *has* a breed. Instead of subclassing `Monster` for each
@@ -152,16 +152,16 @@ same breed: starting health and the attack string.
 To associate monsters with breeds, we give each `Monster` instance a reference
 to a `Breed` object containing the information for that breed. To get the attack
 string, a monster just calls a method on its breed. The `Breed` class
-essentially defines a monster's "type." Each breed instance is an *object* that
+essentially defines a monster's "type". Each breed instance is an *object* that
 represents a different conceptual *type*, hence the name of the pattern: Type
 Object.
 
 What's especially powerful about this pattern is that now we can define new
-*types* of things without complicating the codebase at all: we've essentially
+*types* of things without complicating the codebase at all. We've essentially
 lifted a portion of the type system out of the hard-coded class hierarchy into
 data we can define at runtime.
 
-We can create hundreds of different breeds just by instantiating more instances
+We can create hundreds of different breeds by instantiating more instances
 of `Breed` with different values. If we create breeds by initializing them from
 data read from some configuration file, we have the ability to define new types
 of monsters completely in data. So easy, a designer could do it!
@@ -170,7 +170,7 @@ of monsters completely in data. So easy, a designer could do it!
 
 Define a **type object** class and a **typed object** class. Each type object
 instance represents a different logical type. Each typed object stores a
-**reference to the type object that describes its type.**
+**reference to the type object that describes its type**.
 
 Instance-specific data is stored in the typed object instance, and data or
 behavior that should be shared across all instances of the same conceptual type
@@ -183,11 +183,11 @@ having a fixed set of hard-coded subclasses.
 
 This pattern is useful anytime you need to define a variety of different "kinds"
 of things, but baking the kinds into your language's type system is too rigid.
-In particular, it's useful when either of these are true:
+In particular, it's useful when either of these is true:
 
  *  You don't know what types you will need up front. (For example, what if our
     game needed to support downloading content that contained new breeds of
-    monster?)
+    monsters?)
 
  *  You want to be able to modify or add new types without having to recompile
     or change code.
@@ -207,18 +207,18 @@ automatically. The data that defines each class is automatically compiled into
 the static memory segment of the executable and just works.
 
 With the Type Object pattern, we are now responsible for managing not only our
-monsters in memory, but also their *types*: we have to make sure all of the
+monsters in memory, but also their *types* -- we have to make sure all of the
 breed objects are instantiated and kept in memory as long as our monsters need
 them. Whenever we create a new monster, it's up to us to ensure that it's
 correctly initialized with a reference to a valid breed.
 
 We've freed ourselves from some of the limitations of the compiler, but the cost
-is we have to re-implement some of what it used to be doing for us.
+is that we have to re-implement some of what it used to be doing for us.
 
 <aside name="vtable">
 
 Under the hood, C++ virtual methods are implemented using something called a
-"virtual function table", or just "vtable." A vtable is a simple struct
+"virtual function table", or just "vtable". A vtable is a simple `struct`
 containing a set of function pointers, one for each virtual method in a class.
 There is one vtable in memory for each class. Each instance of a class has a
 pointer to the vtable for its class.
@@ -235,7 +235,7 @@ pattern applied to C, handled automatically by the compiler.
 
 ### It's harder to define *behavior* for each type
 
-With subclassing, you can override a method and do whatever you want to:
+With subclassing, you can override a method and do whatever you want to --
 calculate values procedurally, call other code, etc. The sky is the limit. We
 could define a monster subclass whose attack string changed based on the phase
 of the moon if we wanted to. (Handy for werewolves, I suppose.)
@@ -251,12 +251,12 @@ monster needed to use different AI algorithms, using this pattern becomes more
 challenging.
 
 There are a couple of ways we can get around this limitation. A simple solution
-is to have a fixed set of pre-defined behaviors, and then use data in the type
+is to have a fixed set of pre-defined behaviors and then use data in the type
 object to simply *select* one of them. For example, let's say our monster AI
 will always be either "stand still", "chase hero", or "whimper and cower in
 fear" (hey, they can't all be mighty dragons). We can define <span
-name="fn">functions</span> to implement each of those behaviors. Then we can
-associate an AI algorithm with a breed by simply having it store a pointer to
+name="fn">functions</span> to implement each of those behaviors. Then, we can
+associate an AI algorithm with a breed by having it store a pointer to
 the appropriate function.
 
 <aside name="fn">
@@ -268,7 +268,7 @@ type objects.
 
 Another more powerful solution is to actually support defining behavior
 completely in <span name="data">data</span>. The <a class="gof-pattern"
-href="http://c2.com/cgi-bin/wiki?InterpreterPattern">Interpreter</a>, and <a
+href="http://c2.com/cgi-bin/wiki?InterpreterPattern">Interpreter</a> and <a
 class="pattern" href="bytecode.html">Bytecode</a> patterns both let us build
 objects that represent behavior. If we read in a data file and use that to
 create a data structure for one of these patterns, we've moved the behavior's
@@ -305,7 +305,7 @@ health and the attack string. Let's see how monsters use it:
 When we construct a monster, we give it a reference to a breed object. This
 defines the monster's breed instead of the subclasses we were previously using.
 In the constructor, `Monster` uses the breed to determine its starting health.
-To get the attack string, the monster simply forwards the call to its breed.
+To get the attack string, the monster forwards the call to its breed.
 
 This very simple chunk of code is the core idea of the pattern. Everything from
 here on out is bonus.
@@ -314,7 +314,7 @@ here on out is bonus.
 
 With what we have now, we construct a monster directly and are responsible for
 passing in its breed. This is a bit backwards from how regular objects are
-instantiated in most OOP languages: we don't usually allocate a blank chunk of
+instantiated in most OOP languages -- we don't usually allocate a blank chunk of
 memory and then *give* it its class. Instead, we call a constructor function on
 the class itself, and it's responsible for giving us a new instance.
 
@@ -347,7 +347,7 @@ implementation, creating a monster looked like:
 There's another minor difference here. Because the sample code is in C++, we can
 use a handy little feature: *friend classes.*
 
-We've made `Monster`&rsquo;s constructor private which prevents anyone from
+We've made `Monster`&rsquo;s constructor private, which prevents anyone from
 calling it directly. Friend classes sidestep that restriction so `Breed` can
 still access it. This means the *only* way to create monsters is by going
 through `newMonster()`.
@@ -394,7 +394,7 @@ Just like we did with our original OOP solution, we can solve this using
 inheritance. Only, this time, instead of using our language's inheritance
 mechanism, we'll implement it ourselves within our type objects.
 
-To keep things simple, we'll just support single inheritance. In the same way
+To keep things simple, we'll only support single inheritance. In the same way
 that a class can have a parent base class, we'll allow a breed to have a parent
 breed:
 
@@ -404,13 +404,13 @@ When we construct a breed, we give it a parent that it inherits from. We can
 pass in `NULL` for a base breed that has no ancestors.
 
 To make this useful, a child breed needs to control which attributes are
-inherited from its parent and which it overrides and specifies itself. For our
+inherited from its parent and which attributes it overrides and specifies itself. For our
 example system, we'll say that a breed overrides the monster's health by having
-a non-zero value, and overrides the attack by having a non-`NULL` string.
+a non-zero value and overrides the attack by having a non-`NULL` string.
 Otherwise, the attribute will be inherited from its parent.
 
 There are two ways we can implement this. One is to handle the delegation
-dynamically, every time the attribute is requested, like this:
+dynamically every time the attribute is requested, like this:
 
 ^code 10
 
@@ -465,9 +465,9 @@ fields, the `Troll Archer` and `Troll Wizard` breeds inherit from the base
 Since both of them have zero for their health, they'll inherit it from the base
 `Troll` breed instead. This means now our designer can tune the health in
 `Troll` and all three breeds will be updated. As the number of breeds and the
-number of different attributes each breed has increases, this can be a big
+number of different attributes each breed has increase, this can be a big
 time-saver. Now, with a pretty small chunk of code, we have an open-ended system
-that puts control in our designer's hands and makes the best use of their time.
+that puts control in our designers' hands and makes the best use of their time.
 Meanwhile, we can get back to coding other features.
 
 ## Design Decisions
@@ -483,14 +483,14 @@ able to easily understand it. The simpler we can make it, the more usable it
 will be. So what we'll cover here is the well-trodden design space, and we'll
 leave the far reaches for the academics and explorers.
 
-### Is the Type Object encapsulated or exposed?
+### Is the type object encapsulated or exposed?
 
 In our sample implementation, `Monster` has a reference to a breed, but it
 doesn't publicly expose it. Outside code can't get directly at the monster's
 breed. From the codebase's perspective, monsters are essentially typeless, and
 the fact that they have breeds is an implementation detail.
 
-We can easily change this and allow Monster to return its Breed:
+We can easily change this and allow `Monster` to return its `Breed`:
 
 <span name="null"></span>
 
@@ -505,7 +505,7 @@ never be returned.
 </aside>
 
 Doing this changes the design of `Monster`. The fact that all monsters have
-breeds is now a publicly-visible part of its API. There are benefits with either
+breeds is now a publicly visible part of its API. There are benefits with either
 choice.
 
  *  **If the type object is encapsulated:**
@@ -540,7 +540,7 @@ choice.
         get to breeds directly, they wouldn't be able to call it.
 
      *  *The type object is now part of the object's public API.* In general,
-        narrow interfaces are easier to maintain than wide ones: the less you
+        narrow interfaces are easier to maintain than wide ones -- the less you
         expose to the rest of the codebase, the less complexity and maintenance
         you have to deal with. By exposing the type object, we widen the
         object's API to include everything the type object provides.
@@ -596,7 +596,7 @@ zombie one.
      *  *There's less object creation.* In our example, if the type can't
         change, we'll be forced to burn CPU cycles creating a new zombie
         monster, copying over any attributes from the original monster that need
-        to be preserved, and then deleting it. If we can simply change the type,
+        to be preserved, and then deleting it. If we can change the type,
         all that work gets replaced by a simple assignment.
 
      *  *We need to be careful that assumptions are met.* There's a fairly tight
@@ -617,7 +617,7 @@ zombie one.
         that needs sharing between your type objects, why make things hard on
         yourself?
 
-     *  *Can lead to duplicated effort.* I've yet to see an authoring system
+     *  *It can lead to duplicated effort.* I've yet to see an authoring system
         where designers *didn't* want some kind of inheritance. When you've got
         fifty different kinds of elves, having to tune their health by changing
         the same number in fifty different places *sucks*.
@@ -633,8 +633,8 @@ zombie one.
 
      *  *Looking up attributes is slower.* To get a given piece of data from a
         type object, we may now need to walk up the inheritance chain to find
-        the type that ultimately decides the value. If we're in performance
-        critical code, we may not want to spend time on this.
+        the type that ultimately decides the value. If we're in 
+        performance-critical code, we may not want to spend time on this.
 
  *  **Multiple inheritance:**
 

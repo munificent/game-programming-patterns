@@ -317,7 +317,7 @@ Method</a> pattern.
 </aside>
 
 Actors can also interact with each other, if by "interacting", we mean "they can
-slap each other around." When updating, the actor can call `slap()` on another
+slap each other around". When updating, the actor can call `slap()` on another
 actor to slap it and call `wasSlapped()` to determine if it has been slapped.
 
 The actors need a stage where they can interact, so let's build that:
