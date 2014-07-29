@@ -255,7 +255,7 @@ whatsoever.
 <aside name="include">
 
 Concretely, this means each source file for a subclass would only need a single
-`#include`: the one for its base class.
+`#include` -- the one for its base class.
 
 </aside>
 

@@ -29,7 +29,7 @@ all monsters of the same breed attack the same way.
 
 ### The typical OOP answer
 
-Given the above game design, we fire up our text editor and start coding. According
+With that game design in mind, we fire up our text editor and start coding. According
 to the design, a dragon <span name="isa">is a</span> kind of monster, a troll is
 another kind, and so on with the other breeds. Thinking object-oriented, that
 leads us to a `Monster` base class:
@@ -633,7 +633,7 @@ zombie one.
 
      *  *Looking up attributes is slower.* To get a given piece of data from a
         type object, we may now need to walk up the inheritance chain to find
-        the type that ultimately decides the value. If we're in 
+        the type that ultimately decides the value. If we're in
         performance-critical code, we may not want to spend time on this.
 
  *  **Multiple inheritance:**

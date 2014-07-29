@@ -1,3 +1,9 @@
+2014-07-26 - merge type object changes
+2014-07-25 - print table of contents
+2014-07-24 - email
+2014-07-23 - ebook table of contents
+2014-07-22 - layout subclass sandbox
+2014-07-21 - fix #234 and merge subclass sandbox changes
 2014-07-20 - email
 2014-07-19 - start sketching cover illustration
 2014-07-18 - more cover comps
