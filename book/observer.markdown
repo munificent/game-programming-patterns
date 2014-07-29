@@ -623,7 +623,7 @@ The observer pattern is a great way to let those mostly unrelated lumps talk to
 each other without them merging into one big lump. It's less useful *within* a
 single lump of code dedicated to one feature or aspect.
 
-That's why it fit our example well: achievements and physics are almost entirely
+That's why it fits our example well: achievements and physics are almost entirely
 unrelated domains, likely implemented by different people. We want the bare
 minimum of communication between them so that working on either one doesn't
 require much knowledge of the other.
