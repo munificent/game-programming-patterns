@@ -127,7 +127,7 @@ from".
 Each instance of a monster in the game will be of one of the derived monster
 types. The more breeds we have, the bigger the class hierarchy. That's the
 problem of course: adding new breeds means adding new code, and each breed has
-to be compiled as its own type.
+to be compiled in as its own type.
 
 This works, but it isn't the only option. We could also architect our code so
 that each monster *has* a breed. Instead of subclassing `Monster` for each
@@ -305,7 +305,7 @@ health and the attack string. Let's see how monsters use it:
 When we construct a monster, we give it a reference to a breed object. This
 defines the monster's breed instead of the subclasses we were previously using.
 In the constructor, `Monster` uses the breed to determine its starting health.
-To get the attack string, the monster forwards the call to its breed.
+To get the attack string, the monster simply forwards the call to its breed.
 
 This very simple chunk of code is the core idea of the pattern. Everything from
 here on out is bonus.
