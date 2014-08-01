@@ -652,7 +652,7 @@ zombie one.
         the system, users will need to understand how the inheritance graph is
         traversed and have the foresight to design an intelligent hierarchy.
 
-     *  Most C++ coding standards I see today tend to ban multiple inheritance,
+        Most C++ coding standards I see today tend to ban multiple inheritance,
         and Java and C# lack it completely. That's an acknowledgement of a sad
         fact: it's so hard to get it right that it's often best to not use it at
         all. While it's worth thinking about, it's rare that you'll want to use
