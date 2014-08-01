@@ -615,7 +615,7 @@ the program, don't use the Observer pattern to express that linkage. Prefer
 something more explicit.
 
 When you're hacking on some big program, you tend to have lumps of it that you
-work on all together. We've lots of terminology for this like "separation of
+work on all together. We have lots of terminology for this like "separation of
 concerns" and "coherence and cohesion" and "modularity", but it boils down to
 "this stuff goes together and doesn't go with this other stuff".
 
