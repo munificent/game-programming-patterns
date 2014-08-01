@@ -335,12 +335,17 @@ one heroine, but if we try to add two-player co-op and have two heroines on
 screen at the same time, we'll have problems.
 
 In that case, we have to <span name="fragment">create</span> a state
-object when we transition to it, like:
+object when we transition to it. This lets each FSM have its own instance of the state. Of course, if we're allocating a *new* state, that means we need to free the *current* one. We have to be careful here, since the code that's triggering the change is in a method in the current state. We don't want to delete `this` out from under ourselves.
+
+Instead, we'll allow `handleInput()` in `HeroineState` to optionally return a new state. When it does, `Heroine` will delete the old one and swap in the new one, like so:
+
+^code swap-instance
+
+That way, we don't delete the previous state until we've returned from its method. Now, the standing state can transition to ducking by creating a new instance:
 
 ^code duck
 
-This lets each FSM have its own instance of the state. When I can, I prefer to
-use static states since they don't burn memory and CPU cycles allocating objects
+When I can, I prefer to use static states since they don't burn memory and CPU cycles allocating objects
 each state change. For states that are more, uh, *stateful*, though, this is the
 way to go.
 

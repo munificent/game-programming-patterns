@@ -536,11 +536,7 @@ sense. For no particular reason, let&#8217;s put ours inside the base state clas
 
 <p>Each of those static fields is the one instance of that state that the game
 uses. To make the heroine jump, the standing state would do something like:</p>
-<div class="codehilite"><pre><span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="n">heroine</span><span class="p">.</span><span class="n">state_</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">HeroineState</span><span class="o">::</span><span class="n">jumping</span><span class="p">;</span>
-  <span class="n">heroine</span><span class="p">.</span><span class="n">setGraphics</span><span class="p">(</span><span class="n">IMAGE_JUMP</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="codehilite"><pre>
 </pre></div>
 
 
@@ -551,19 +547,37 @@ happens to be ducking. This may coincidentally work in our game if there&#8217;s
 one heroine, but if we try to add two-player co-op and have two heroines on
 screen at the same time, we&#8217;ll have problems.</p>
 <p>In that case, we have to <span name="fragment">create</span> a state
-object when we transition to it, like:</p>
-<div class="codehilite"><pre><span class="c1">// In StandingState:</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_DOWN</span><span class="p">)</span>
+object when we transition to it. This lets each FSM have its own instance of the state. Of course, if we&#8217;re allocating a <em>new</em> state, that means we need to free the <em>current</em> one. We have to be careful here, since the code that&#8217;s triggering the change is in a method in the current state. We don&#8217;t want to delete <code>this</code> out from under ourselves.</p>
+<p>Instead, we&#8217;ll allow <code>handleInput()</code> in <code>HeroineState</code> to optionally return a new state. When it does, <code>Heroine</code> will delete the old one and swap in the new one, like so:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="k">delete</span> <span class="n">heroine</span><span class="p">.</span><span class="n">state_</span><span class="p">;</span>
-  <span class="n">heroine</span><span class="p">.</span><span class="n">state_</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DuckingState</span><span class="p">();</span>
-  <span class="c1">// Other code...</span>
+  <span class="n">HeroineState</span><span class="o">*</span> <span class="n">state</span> <span class="o">=</span> <span class="n">state_</span><span class="o">-&gt;</span><span class="n">handleInput</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">state</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">delete</span> <span class="n">state_</span><span class="p">;</span>
+    <span class="n">state_</span> <span class="o">=</span> <span class="n">state</span><span class="p">;</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 
 
-<p>This lets each FSM have its own instance of the state. When I can, I prefer to
-use static states since they don&#8217;t burn memory and CPU cycles allocating objects
+<p>That way, we don&#8217;t delete the previous state until we&#8217;ve returned from its method. Now, the standing state can transition to ducking by creating a new instance:</p>
+<div class="codehilite"><pre><span class="n">HeroineState</span><span class="o">*</span> <span class="n">StandingState</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span>
+                                         <span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_DOWN</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="c1">// Other code...</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">DuckingState</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Stay in this state.</span>
+  <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>When I can, I prefer to use static states since they don&#8217;t burn memory and CPU cycles allocating objects
 each state change. For states that are more, uh, <em>stateful</em>, though, this is the
 way to go.</p>
 <aside name="fragment">

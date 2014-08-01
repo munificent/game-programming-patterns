@@ -429,29 +429,66 @@ namespace State
       int chargeTime_;
     };
     //^ducking-state
+  }
+
+  namespace InstancedStates
+  {
+    class Heroine;
+
+    class HeroineState
+    {
+    public:
+      virtual ~HeroineState() {}
+      virtual HeroineState* handleInput(Heroine& heroine, Input input)
+      {
+        return NULL;
+      }
+      virtual void update(Heroine& heroine) {}
+    };
+
+    class Heroine
+    {
+    public:
+      virtual void handleInput(Input input);
+
+    private:
+      HeroineState* state_;
+    };
+
+    class DuckingState : public HeroineState {};
+
+    //^swap-instance
+    void Heroine::handleInput(Input input)
+    {
+      HeroineState* state = state_->handleInput(*this, input);
+      if (state != NULL)
+      {
+        delete state_;
+        state_ = state;
+      }
+    }
+    //^swap-instance
 
     class StandingState : public HeroineState
     {
     public:
-      virtual void handleInput(Heroine& heroine, Input input) {
-        //^jump
-        if (input == PRESS_B)
-        {
-          heroine.state_ = &HeroineState::jumping;
-          heroine.setGraphics(IMAGE_JUMP);
-        }
-        //^jump
-        //^duck
-        // In StandingState:
-        if (input == PRESS_DOWN)
-        {
-          delete heroine.state_;
-          heroine.state_ = new DuckingState();
-          // Other code...
-        }
-        //^duck
-      }
+      virtual HeroineState* handleInput(Heroine& heroine, Input input);
     };
+
+    //^duck
+    HeroineState* StandingState::handleInput(Heroine& heroine,
+                                             Input input)
+    {
+      if (input == PRESS_DOWN)
+      {
+        // Other code...
+        return new DuckingState();
+      }
+
+      // Stay in this state.
+      return NULL;
+    }
+    //^duck
   }
 
   namespace StaticStateInstances
