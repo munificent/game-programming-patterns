@@ -20,8 +20,8 @@ Brilliant game ideas like this are why I'm a programmer and not a designer.
 </aside>
 
 Since the player controls him, that means reading controller input and
-translating that to motion. And, of course, he needs to interact with the level,
-so some physics and collision goes in there. Once that's done, he's got to show
+translating that input into motion. And, of course, he needs to interact with the level,
+so some physics and collision go in there. Once that's done, he's got to show
 up on screen, so toss in animation and rendering. He'll probably play some
 sounds too.
 
@@ -33,13 +33,13 @@ have the same domains as a business app, but the rule still applies.
 
 As much as possible, we don't want AI, physics, rendering, sound and other
 domains to know about each other, but now we've got all of that crammed into one
-class. We've seen where this road leads to: a 5,000 line dumping ground source
+class. We've seen where this road leads to: a 5,000-line dumping ground source
 file so big that only the bravest ninja coders on your team even dare to go in
 there.
 
-This is great job security for the few who can tame it, but hell for the rest of
+This is great job security for the few who can tame it, but it's hell for the rest of
 us. A class that big means even the most seemingly trivial changes can have
-far-reaching implications. Soon the class collects *bugs* faster than it
+far-reaching implications. Soon, the class collects *bugs* faster than it
 collects *features*.
 
 ### The Gordian knot
@@ -59,18 +59,18 @@ anything.
 While coupling like this sucks in *any* game, it's even worse on modern games
 that use concurrency. On multi-core hardware, it's vital that code is running on
 multiple threads simultaneously. One common way to split a game across threads
-is along domain boundaries: run AI on one core, sound on another, rendering on a
+is along domain boundaries -- run AI on one core, sound on another, rendering on a
 third, etc.
 
 Once you do that, it's critical that those domains stay decoupled in order to
 avoid deadlocks or other fiendish concurrency bugs. Having a single class with
 an `UpdateSounds()` method that must be called from one thread and a
-`RenderGraphics()` method that must be called from another is just begging for
+`RenderGraphics()` method that must be called from another is begging for
 those kinds of bugs to happen.
 
 </aside>
 
-These two problems compound each other: the class touches so many domains that
+These two problems compound each other; the class touches so many domains that
 every programmer will have to work on it, but it's so huge that doing so is a
 nightmare. If it gets bad enough, coders will start putting hacks in other parts
 of the codebase just to stay out of the hairball that this `Bjorn` class has
@@ -78,11 +78,11 @@ become.
 
 ### Cutting the knot
 
-We can solve this like Alexander the Great: with a sword. We'll take our
+We can solve this like Alexander the Great -- with a sword. We'll take our
 monolithic `Bjorn` class and slice it into separate parts along domain
 boundaries. For example, we'll take all of the code for handling user input and
 move it into a separate `InputComponent` class. `Bjorn` will then own an
-instance of this component. We repeat this process for each of the domains that
+instance of this component. We'll repeat this process for each of the domains that
 `Bjorn` touches.
 
 When we're done, we'll have moved almost everything out of `Bjorn`. All that
@@ -99,7 +99,7 @@ without needing to know anything about graphics and vice versa.
 
 In practice, the components will need to have *some* interaction between
 themselves. For example, the AI component may need to tell the physics component
-where Bjørn is trying to go. However, we can restrict this to just the
+where Bjørn is trying to go. However, we can restrict this to the
 components that *do* need to talk instead of just tossing them all in the same
 playpen together.
 
@@ -111,13 +111,13 @@ focused on our baker, but let's consider a couple of other kinds of objects in
 our game world. *Decorations* are things in the world the player sees but
 doesn't interact with: bushes, debris and other visual detail. *Props* are like
 decorations but can be touched: boxes, boulders, and trees. *Zones* are the
-opposite of decorations: invisible but interactive. They're useful for things
+opposite of decorations -- invisible but interactive. They're useful for things
 like triggering a cutscene when Bjørn enters an area.
 
 <aside name="inheritance">
 
 When object-oriented programming first hit the scene, inheritance was the
-shiniest tool in its toolbox. It was considered the ultimate code-reuse hammer
+shiniest tool in its toolbox. It was considered the ultimate code-reuse hammer,
 and coders swung it often. Since then, we've learned the hard way that it's a
 heavy hammer indeed. Inheritance has its uses, but it's often too cumbersome for
 simple code reuse.
@@ -129,7 +129,7 @@ instance* of the same class.
 
 </aside>
 
-Now consider how we'd set up an inheritance hierarchy for those classes if we
+Now, consider how we'd set up an inheritance hierarchy for those classes if we
 weren't using components. A first pass might look like:
 
 <img src="images/component-uml.png" alt="A class diagram. Zone has collision code and inherits from GameObject. Decoration also inherits from GameObject and has rendering code. Prop inherits from Zone but then has redundant rendering code." />
@@ -145,7 +145,7 @@ name="diamond">Deadly Diamond</span>.
 
 The "Deadly Diamond" occurs in class hierarchies with multiple inheritance where
 there are two different paths to the same base class. The pain that causes is a
-bit out of the scope of this book, but just understand that they named it
+bit out of the scope of this book, but understand that they named it
 "deadly" for a reason.
 
 </aside>
@@ -171,19 +171,19 @@ like you can only order combos. We need to have a separate class for each
 possible *combination* of features. To satisfy every customer, we would need
 dozens of combos.
 
-Components are &agrave; la carte dining: each customer can select just the
-dishes they want, and the menu is just a list of the dishes they can choose
+Components are &agrave; la carte dining -- each customer can select just the
+dishes they want, and the menu is a list of the dishes they can choose
 from.
 
 </aside>
 
 Components are basically plug-and-play for objects. They let us build complex
-entities with rich behavior by just plugging in different reusable component
+entities with rich behavior by plugging different reusable component
 objects into sockets on the entity. Think software Voltron.
 
 ## The Pattern
 
-A single **entity spans multiple domains**. To keep the domains isolated, the
+A **single entity spans multiple domains**. To keep the domains isolated, the
 code for each is placed in its own **<span name="component">component</span>
 class**. The entity is reduced to a simple **container of components**.
 
@@ -205,8 +205,8 @@ is.
 ## When to Use It
 
 Components are most commonly found within the core class that defines the
-entities in a game, but may be useful in other places as well. This pattern can
-be put to good use when any of these is true:
+entities in a game, but they may be useful in other places as well. This pattern can
+be put to good use when any of these are true:
 
  *  You have a class that touches multiple domains which you want to keep
     decoupled from each other.
@@ -214,12 +214,12 @@ be put to good use when any of these is true:
  *  A class is getting massive and hard to work with.
 
  *  You want to be able to define a variety of objects that share different
-    capabilities, but using inheritance doesn't let you pick just the parts you
+    capabilities, but using inheritance doesn't let you pick the parts you
     want to reuse precisely enough.
 
 ## Keep in Mind
 
-This pattern adds a good bit of complexity over simply making a class and
+The Component pattern adds a good bit of complexity over simply making a class and
 putting code in it. Each conceptual "object" becomes a cluster of objects that
 must be instantiated, initialized, and correctly wired together. Communication
 between the different components becomes more challenging, and controlling how
@@ -232,7 +232,7 @@ code reuse it enables, but take care to ensure you aren't over-engineering a
 Another consequence of using components is that you often have to hop through a
 level of indirection to get anything done. Given the container object, first you
 have to get the component you want, *then* you can do what you need. In <span
-name="perf">performance</span> critical inner loops, this pointer following may
+name="perf">performance</span>-critical inner loops, this pointer following may
 lead to poor performance.
 
 <aside name="perf">
@@ -254,11 +254,11 @@ like explaining how an engine works without mentioning fuel or oil.
 
 The Component pattern is a particularly hard one. You can't get a real feel for
 it without seeing some code for each of the domains that it decouples, so I'll
-have to sketch in a bit more of Bjørn's code than I'd like to. The pattern is
-really just the component *classes* themselves, but the code in them should help
-clarify what the classes are for. It's fake code -- it calls into other classes
-that aren't presented here -- but it should give you an idea of what we're going
-for.
+have to sketch in a bit more of Bjørn's code than I'd like. The pattern is
+really only the component *classes* themselves, but the code in them should
+help clarify what the classes are for. It's fake code -- it calls into other
+classes that aren't presented here -- but it should give you an idea of what
+we're going for.
 
 ### A monolithic class
 
@@ -290,7 +290,7 @@ screen.
 The sample implementation here is trivially simple. There's no gravity,
 animation, or any of the dozens of other details that make a character fun to
 play. Even so, we can see that we've got a single function that several
-different coders on our team will probably have to spend time in and it's
+different coders on our team will probably have to spend time in, and it's
 starting to get a bit messy. Imagine this scaled up to a thousand lines and you
 can get an idea of how painful it can become.
 
@@ -314,13 +314,13 @@ input directly in the `update()` method, now he delegates to the component:
 
 ^code 4
 
-We've only started but already we've gotten rid of some coupling: the main
+We've only started, but already we've gotten rid of some coupling -- the main
 `Bjorn` class no longer has any reference to `Controller`. This will come in
 handy later.
 
 ### Splitting out the rest
 
-Now let's go ahead and do the same cut and paste job on the physics and graphics
+Now, let's go ahead and do the same cut-and-paste job on the physics and graphics
 code. Here's our new `PhysicsComponent`:
 
 ^code 5
@@ -341,7 +341,7 @@ Not much:
 The `Bjorn` class now basically does two things: it holds the set of components
 that actually define it, and it holds the state that is shared across multiple
 domains. Position and velocity are still in the core `Bjorn` class for two
-reasons. First, they are "pan-domain" state: almost every component will make
+reasons. First, they are "pan-domain" state -- almost every component will make
 use of them, so it isn't clear which component *should* own them if we did want
 to push them down.
 
@@ -360,12 +360,12 @@ interface. We'll turn `InputComponent` into an abstract base class:
 
 ^code 8
 
-Then we'll take our existing user input handling code and push it down into a
+Then, we'll take our existing user input handling code and push it down into a
 class that implements that interface:
 
 ^code 9
 
-We'll change `Bjorn` to hold a pointer to the input component, instead of having
+We'll change `Bjorn` to hold a pointer to the input component instead of having
 an inline instance:
 
 ^code 10
@@ -376,18 +376,18 @@ use, like so:
 ^code 11
 
 This instance can be any concrete type that implements our abstract
-`InputComponent` interface. We pay a price for this: `update()` is now a virtual
+`InputComponent` interface. We pay a price for this -- `update()` is now a virtual
 method call, which is a little slower. What do we get in return for this cost?
 
 Most consoles require a game to support "demo mode." If the player sits at the
 main menu without doing anything, the game will start playing automatically,
 with the computer standing in for the player. This keeps the game from burning
-the main menu into your TV, and also makes the game look nicer when it's running
+the main menu into your TV and also makes the game look nicer when it's running
 on a kiosk in a store.
 
 Hiding the input component class behind an interface lets us get that working.
 We already have our concrete `PlayerInputComponent` that's normally used when
-playing the game. Now let's make another one:
+playing the game. Now, let's make another one:
 
 ^code 12
 
@@ -414,7 +414,7 @@ If you look at our `Bjorn` class now, you'll notice there's nothing really
 "Bjørn" about it -- it's just a component bag. In fact, it looks like a pretty
 good candidate for a base "game object" class that we can use for *every* object
 in the game. All we need to do is pass in *all* the components, and we can build
-any kind of object just by picking and choosing parts like Dr. Frankenstein.
+any kind of object by picking and choosing parts like Dr. Frankenstein.
 
 Let's take our two remaining concrete components -- physics and graphics -- and
 hide them behind interfaces like we did with input:
@@ -428,8 +428,8 @@ class that uses those interfaces:
 
 <aside name="id">
 
-Some component systems take this even farther. Instead of a `GameObject` that
-contains its components, the game entity is just an ID, a number. Then you
+Some component systems take this even further. Instead of a `GameObject` that
+contains its components, the game entity is just an ID, a number. Then, you
 maintain separate collections of components where each one knows the ID of the
 entity its attached to.
 
@@ -465,7 +465,7 @@ components, we can create all of the different kinds of objects our game needs.
 
 ## Design Decisions
 
-The most important design question you'll need to answer with this pattern is
+The most important design question you'll need to answer with this pattern is,
 "What set of components do I need?" The answer there is going to depend on the
 needs and genre of your game. The bigger and more complex your engine is, the
 more finely you'll likely want to slice your components.
@@ -507,12 +507,12 @@ we have to decide who puts the parts back together.
 ### How do components communicate with each other?
 
 Perfectly decoupled components that function in isolation is a nice ideal, but
-doesn't really work in practice. The fact that these components are part of the
+it doesn't really work in practice. The fact that these components are part of the
 *same* object implies that they are part of a larger whole and need to
 coordinate. That means communication.
 
 So how can the components talk to each other? There are a couple of options, but
-unlike most design "alternatives" in this book, these aren't exclusive: you will
+unlike most design "alternatives" in this book, these aren't exclusive -- you will
 likely support more than one at the same time in your designs.
 
  *  **By modifying the container object's state:**
@@ -537,14 +537,14 @@ likely support more than one at the same time in your designs.
 
      *  *It makes communication implicit and dependent on the order that
         components are processed.* In our sample code, the original monolithic
-        `update()` method had a very carefully laid out order of operations: the
+        `update()` method had a very carefully laid out order of operations. The
         user input modified the velocity, which was then used by the physics
         code to modify the position, which in turn was used by the rendering
         code to draw Bjørn at the right spot. When we split that code out into
         components, we were careful to preserve that order of operations.
 
         If we hadn't, we would have introduced <span name="pure">subtle</span>,
-        hard to track bugs. For example, if we'd updated the graphics component
+        hard-to-track bugs. For example, if we'd updated the graphics component
         *first*, we would wrongly render Bjørn at his position on the *last*
         frame, not this one. If you imagine several more components and lots
         more code, then you can get an idea of how hard it can be to avoid bugs
@@ -583,7 +583,7 @@ likely support more than one at the same time in your designs.
      *  *The two components are tightly coupled.* The downside of the
         free-for-all. We've basically taken a step back towards our monolithic
         class. It's not quite as bad as the original single class though, since
-        we're at least restricting the coupling to just the component pairs that
+        we're at least restricting the coupling to only the component pairs that
         need to interact.
 
  *  **By sending messages:**
@@ -607,10 +607,11 @@ likely support more than one at the same time in your designs.
         ^code 20
 
         <span name="queue">Now</span>, if a component has access to its
-        container, it can send messages to it which will in turn be rebroadcast
-        to all of its sibling components. (And back to itself for that matter;
-        be careful that you don't get stuck in a feedback loop!) This has a
-        couple of consequences:
+        container, it can send messages to the container, which will
+        rebroadcast the message to all of the contained components. (That
+        inclues the original component that sent the message; be careful that
+        you don't get stuck in a feedback loop!) This has a couple of
+        consequences:
 
         <aside name="queue">
 
@@ -629,7 +630,7 @@ likely support more than one at the same time in your designs.
         <aside name="mediator">
 
         The Gang of Four call this the <a class="gof-pattern"
-        href="http://c2.com/cgi-bin/wiki?MediatorPattern">Mediator</a> pattern:
+        href="http://c2.com/cgi-bin/wiki?MediatorPattern">Mediator</a> pattern --
         two or more objects communicate with each other indirectly by routing
         the message through an intermediate object. In this case, the container
         object itself is the mediator.
@@ -638,7 +639,7 @@ likely support more than one at the same time in your designs.
 
      *  *The container object is simple.* Unlike using shared state where the
         container object itself owns and knows about data used by the
-        components, here all it does is blindly pass the messages along. That
+        components, here, all it does is blindly pass the messages along. That
         can be useful for letting two components pass very domain-specific
         information between themselves without having that bleed into the
         container object.
@@ -648,8 +649,8 @@ is using a bit of all of them. Shared state is useful for the really basic stuff
 that you can take for granted that every object has -- things like position and
 size.
 
-Some domains are distinct but still closely related. Things like animation and
-rendering, user input and AI, physics and collision. If you have separate
+Some domains are distinct but still closely related. Think animation and
+rendering, user input and AI, or physics and collision. If you have separate
 components for each half of those pairs, you may find it easiest to just let
 them know directly about their other half.
 
@@ -657,7 +658,7 @@ Messaging is useful for "less important" communication. Its fire-and-forget
 nature is a good fit for things like having an audio component play a sound when
 a physics component sends a message that the object has collided with something.
 
-As always, I recommend you start simple, and then add in additional
+As always, I recommend you start simple and then add in additional
 communication paths if you need them.
 
 ## See Also
@@ -678,13 +679,13 @@ communication paths if you need them.
  *  This pattern bears resemblance to the Gang of Four's <a class="gof-pattern"
     href="http://c2.com/cgi-bin/wiki?StrategyPattern">Strategy</a> pattern. Both
     patterns are about taking part of an object's behavior and delegating it to
-    a separate subordinate object. The difference is that with the strategy
+    a separate subordinate object. The difference is that with the Strategy
     pattern, the separate "strategy" object is usually stateless -- it
-    encapsulates an algorithm but no data. It defines *how* an object behaves
+    encapsulates an algorithm, but no data. It defines *how* an object behaves,
     but not *what* it is.
 
     Components are a bit more self-important. They often hold state that
-    describes the object and help define its actual identity. However, the line
+    describes the object and helps define its actual identity. However, the line
     may blur. You may have some components that don't need any local state. In
     that case, you're free to use the same component *instance* across multiple
     container objects. At that point, it really is behaving more akin to a
