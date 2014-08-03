@@ -72,13 +72,13 @@ to your application.
 
 Most <span name="game-loop">games</span> aren't event-driven like this, but it
 is common for a game to have its own event queue as the backbone of its nervous
-system. You'll often hear "central" or "global" or "main" used to describe it.
+system. You'll often hear "central", "global", or "main" used to describe it.
 It's used for high level communication between game systems that want to stay
 decoupled.
 
 <aside name="game-loop">
 
-If you want to know *why* they aren't, crack open the <a href="game-loop.html"
+If you want to know *why* they aren't event-driven, crack open the <a href="game-loop.html"
 class="pattern">Game Loop</a> chapter.
 
 </aside>
@@ -90,8 +90,8 @@ to grab the loot!"
 
 <aside name="tutorial">
 
-Tutorial systems are a pain to implement gracefully and most players will spend
-only a fraction of their time using it, so it feels like they aren't worth the
+Tutorial systems are a pain to implement gracefully, and most players will spend
+only a fraction of their time using tutorials, so it feels like they aren't worth the
 effort. But that fraction where they *are* using the tutorial can be invaluable
 for easing the player into your game.
 
@@ -120,7 +120,7 @@ the AI field.
 <img src="images/event-queue-central.png" alt="A central event queue is read from and written to by the Combat and Tutorial code." />
 
 I thought about using this as the example for the rest of the chapter, but I'm
-not generally a fan of global systems. It is a common technique, but I don't
+not generally a fan of global systems. Using global systems is a common technique, but I don't
 want you to think that event queues *have* to be global.
 
 ### Say what?
@@ -140,7 +140,7 @@ volume:
 
 While I almost always shy away from the <a href="singleton.html"
 class="gof-pattern">Singleton</a> pattern, this is one of the places where it
-may fit. I'm doing a simpler approach and just making the method static.
+may fit. I'm doing a simpler approach and simply making the method static.
 
 </aside>
 
@@ -155,7 +155,7 @@ implemented elsewhere. Using it, we write our method like so:
 
 We check that in, create a few sound files, and start sprinkling `playSound()`
 calls through our codebase like some magical audio fairy. For example, in our UI
-code, when the selected menu item changes, we play a little bloop:
+code, we play a little bloop when the selected menu item changes:
 
 ^code menu-bloop
 
@@ -166,7 +166,7 @@ screen freezes for a few frames. We've hit our first issue:
     processed the request.**
 
 Our `playSound()` method is *synchronous* -- it doesn't return back to the
-caller until bleeps are coming out of the speakers. If a sound file has to be
+caller until bloops are coming out of the speakers. If a sound file has to be
 loaded from disc first, that may take a while.
 
 Ignoring that for now, we move on. In the AI code, we add a call to let out a
@@ -228,14 +228,14 @@ A **queue** stores a series of **notifications or requests** in first-in,
 first-out order. Sending a notification **enqueues the request and returns**.
 The request processor then **processes items from the queue** at a later time.
 
-Requests can be **handled directly**, or **routed to interested parties**. This
+Requests can be **handled directly** or **routed to interested parties**. This
 **decouples the sender from the receiver** both **statically** and **in time**.
 
 ## When to Use It
 
-If you just want to decouple *who* receives a message from its sender, patterns
+If you only want to decouple *who* receives a message from its sender, patterns
 like <a href="observer.html">Observer</a> and <a href="command.html">Command</a>
-will take care of you with less <span name="simple">complexity</span>. You only
+will take care of this with less <span name="simple">complexity</span>. You only
 need a queue when you want to decouple something *in time*.
 
 <aside name="simple">
@@ -254,9 +254,9 @@ at a convenient time in *its* run cycle. When you have a push model on one end
 and a pull model on the other, you need a buffer between them. That's what a
 queue provides that simpler decoupling patterns don't.
 
-Queues give control to the code that pulls from it: the receiver can delay
-processing, aggregate requests, or discard them entirely. But it does this by
-taking control *away* from the sender. All it can do is throw a request on the
+Queues give control to the code that pulls from it -- the receiver can delay
+processing, aggregate requests, or discard them entirely. But queues do this by
+taking control *away* from the sender. All the sender can do is throw a request on the
 queue and hope for the best. This makes queues a poor fit when the sender needs
 a response.
 
@@ -264,7 +264,7 @@ a response.
 
 Unlike some more modest patterns in this book, event queues are complex and tend
 to have a wide-reaching effect on the architecture of our games. That means
-you'll want to think hard about how -- or if -- you use it.
+you'll want to think hard about how -- or if -- you use an event queue.
 
 ### A central event queue is a global variable
 
@@ -286,8 +286,8 @@ how many frames until it eventually works its way to the front and gets
 processed.
 
 Meanwhile, the experience system wants to track the heroine's body count and
-reward her for her grisly efficiency. It receives these "entity died" events
-then determines the kind of entity slain and the difficulty of the kill so it
+reward her for her grisly efficiency. It receives each "entity died" event
+and determines the kind of entity slain and the difficulty of the kill so it
 can dish out an appropriate reward.
 
 That requires various pieces of state in the world. We need the entity that died
@@ -298,8 +298,8 @@ other nearby foes may have wandered off.
 
 When you receive an event, you have to be careful not to assume the *current*
 state of the world reflects how the world was *when the event was raised*. This
-means queued events tend to be more data heavy than in synchronous systems. With
-the latter, the notification can just say "something happened" and the receiver
+means queued events tend to be more data heavy than events in synchronous systems. With
+the latter, the notification can say "something happened" and the receiver
 can look around for the details. With a queue, those ephemeral details must be
 captured when the event is sent so they can be used later.
 
@@ -313,7 +313,7 @@ All event and message systems have to worry about cycles:
     response, it sends an event...
  5. Go to 2.
 
-When your messaging system is *synchronous*, you find cycles quickly: they
+When your messaging system is *synchronous*, you find cycles quickly -- they
 overflow the stack and crash your game. With a queue, the asynchrony unwinds the
 stack, so the game may keep running even though spurious events are <span
 name="log">sloshing</span> back and forth in there. A common rule to avoid this
@@ -328,7 +328,7 @@ A little debug logging in your event system is probably a good idea too.
 ## Sample Code
 
 We've already seen some code. It's not perfect, but it has the right basic
-functionality: the public API we want, and the right low level audio calls. All
+functionality -- the public API we want and the right low-level audio calls. All
 that's left for us to do now is fix its problems.
 
 The first is that our API *blocks*. When a piece of code plays a sound, it can't
@@ -347,7 +347,7 @@ play messages. Now, your <span name="prof">algorithms professor</span> would
 tell you to use some exciting data structure here like a [Fibonacci
 heap](http://en.wikipedia.org/wiki/Fibonacci_heap) or a [skip
 list](http://en.wikipedia.org/wiki/Skip_list), or, hell, at least a *linked*
-list. But, in practice, the best way to store a bunch of homogenous things is
+list. But in practice, the best way to store a bunch of homogenous things is
 almost always a plain old array:
 
 <aside name="prof">
@@ -374,7 +374,7 @@ So let's do that:
 
 ^code pending-array
 
-We can tune the array size to cover our worst case. To play a sound, we just
+We can tune the array size to cover our worst case. To play a sound, we
 slot a new message in there at the end:
 
 ^code array-play
@@ -394,9 +394,9 @@ class="pattern">Update Method</a> pattern.
 
 </aside>
 
-Now we just need to call that from somewhere convenient. What "convenient" means
+Now, we need to call that from somewhere convenient. What "convenient" means
 depends on your game. It may mean calling it from the main <a
-href="game-loop.html" class="pattern">Game Loop</a>, or from a dedicated audio
+href="game-loop.html" class="pattern">Game Loop</a> or from a dedicated audio
 thread.
 
 This works fine, but it does presume we can process *every* sound request in a
@@ -409,23 +409,23 @@ actual queue.
 ### A ring buffer
 
 There are a bunch of ways to implement queues, but my favorite is called a *ring
-buffer*. It preserves everything that's great about arrays, but lets us
+buffer*. It preserves everything that's great about arrays, but it lets us
 incrementally remove items from the front of the queue.
 
 Now, I know what you're thinking. If we remove items from the beginning of the
 array, don't we have to shift all of the remaining items over? Isn't that slow?
 
-This is why they made us learn linked lists: you can remove nodes from them
+This is why they made us learn linked lists -- you can remove nodes from them
 without having to shift things around. Well, it turns out you can implement a
 queue without any shifting in an array too. I'll walk you through it, but first
-let's get precise on some terms.
+let's get precise on some terms:
 
  *  The **head** of the queue is where requests are *read* from. The head is the
     oldest pending request.
 
  *  The **tail** is the other end. It's the slot in the array where the next
     enqueued request will be *written*. Note that it's just *past* the end of
-    the queue. You can think of it as a half-open range if that helps.
+    the queue. You can think of it as a half-open range, if that helps.
 
 Since `playSound()` appends new requests at the end of the array, the head
 starts at element zero and the tail grows to the right.
@@ -437,7 +437,7 @@ markers explicit in the class:
 
 ^code head-tail
 
-In the implementation of `playSound()`, `numPending_` has been replaced by
+In the implementation of `playSound()`, `numPending_` has been replaced with
 `tail_`, but otherwise it's the same:
 
 ^code tail-play
@@ -460,7 +460,7 @@ will be empty if the head and tail are the same index.
 Now we've got a queue -- we can add to the end and remove from the front.
 There's an obvious problem, though. As we run requests through the queue, the
 head and tail keep crawling to the right. Eventually, `tail_` will hit the end
-of the array and <span name="party">party time</span> is over. This is where it
+of the array, and <span name="party">party time</span> will be over. This is where it
 gets clever.
 
 <aside name="party">
@@ -473,8 +473,8 @@ Do you want party time to be over? No. You do not.
 
 Notice that while the tail is creeping forward, the *head* is too. That means
 we've got array elements at the *beginning* of the array that aren't being used
-any more. So what we do is wrap the tail back around to the beginning of the
-array when it runs off the end. That's why it's called a *ring* buffer: it acts
+anymore. So what we do is wrap the tail back around to the beginning of the
+array when it runs off the end. That's why it's called a *ring* buffer -- it acts
 like a circular array of cells.
 
 <img src="images/event-queue-ring.png" alt="The array wraps around and now the head can circle back to the beginning." />
@@ -485,19 +485,19 @@ the end:
 
 ^code ring-play
 
-Replacing `tail_++` with an increment modulo the array size wraps it back
+By replacing `tail_++` with an increment modulo, the array size wraps the tail back
 around. The other change is the assertion. We need to ensure the queue doesn't
 overflow. As long as there are fewer than `MAX_PENDING` requests in the queue,
-there will be a little gap of unused cells between the head and tail. If the
+there will be a little gap of unused cells between the head and the tail. If the
 queue fills up, those will be gone and, like some weird backwards Ouroboros, the
 tail will collide with the head and start overwriting it. The assertion ensures
-that doesn't happen.
+that this doesn't happen.
 
 In `update()`, we wrap the head around too:
 
 ^code ring-update
 
-There you go: a queue with <span name="capacity">no dynamic allocation</span>,
+There you go -- a queue with <span name="capacity">no dynamic allocation</span>,
 no copying elements around, and the cache-friendliness of a simple array.
 
 <aside name="capacity">
@@ -549,7 +549,7 @@ the queue gets full, we'll find more things to collapse.
 
 This pattern insulates the requester from knowing when the request gets
 processed, but when you treat the entire queue as a live data structure to be
-played with, then lag between request and processing can visibly affect
+played with, then lag between a request and processing can visibly affect
 behavior. Make sure you're OK with that before doing this.
 
 ### Spanning threads
@@ -600,7 +600,7 @@ burn CPU cycles until there's a request to process.
 
 Many games use event queues as a key part of their communication structure, and
 you can spend a ton of time designing all sorts of complex routing and filtering
-for messages. But, before you go off and build something like the Los Angeles
+for messages. But before you go off and build something like the Los Angeles
 telephone switchboard, I encourage you to start simple. Here's a few starter
 questions to consider:
 
@@ -676,11 +676,11 @@ distinguish these, and both styles are useful.
 
      *  *You don't have to worry about contention between listeners.* With
         multiple listeners, you have to decide if they *all* get every item
-        (broadcast) or if *each* item in the queue is parcelled out to *one*
+        (broadcast) or if *each* item in the queue is parceled out to *one*
         listener (something more like a work queue).
 
         In either case, the listeners may end up doing redundant work or
-        interfere with each other, and you have to think carefully about the
+        interfering with each other, and you have to think carefully about the
         behavior you want. With a single listener, that complexity disappears.
 
  *  **A broadcast queue:**
@@ -691,7 +691,7 @@ distinguish these, and both styles are useful.
      *  *Events can get dropped on the floor.* A corollary to the previous point
         is that if you have *zero* listeners, all zero of them see the event. In
         most broadcast systems, if there are no listeners at the point in time
-        that an event is processed, the event just gets discarded.
+        that an event is processed, the event gets discarded.
 
      *  *You may need to filter events.* Broadcast queues are often widely
         visible to much of the program, and you can end up with a bunch of
@@ -700,18 +700,18 @@ distinguish these, and both styles are useful.
 
         To cut that down to size, most broadcast event systems let a listener
         winnow down the set of events they receive. For example, they may say
-        they only want to receive mouse events, or events within a certain
+        they only want to receive mouse events or events within a certain
         region of the UI.
 
  *  **A work queue:**
 
     Like a broadcast queue, here you have multiple listeners too. The difference
     is that each item in the queue only goes to *one* of them. This is a common
-    pattern for parcelling out jobs to a pool of concurrently running threads.
+    pattern for parceling out jobs to a pool of concurrently running threads.
 
      *  *You have to schedule.* Since an item only goes to one listener, the
-        queue needs logic to figure out the best one to choose. This may be as
-        simple as round robin or random choice, or some more complex
+        queue needs logic to figure out the best listener to choose. This may be as
+        simple as round robin or random choice, or it could be some more complex
         prioritizing system.
 
 ### Who can write to the queue?
@@ -722,14 +722,15 @@ one-to-one, one-to-many, many-to-one, or many-to-many.
 
 <aside name="configs">
 
-You sometimes hear "fan-in" used to describe many-to-one communication systems,
+You sometimes hear "fan-in" used to describe many-to-one communication systems
 and "fan-out" for one-to-many.
 
 </aside>
 
  *  **With one writer:**
 
-    This style is most similar to the synchronous Observer pattern. You have one
+    This style is most similar to the synchronous <a href="observer.html"
+    class="gof-pattern">Observer</a> pattern. You have one
     privileged object that generates events that others can then receive.
 
      *  *You implicitly know where the event is coming from.* Since there's only
@@ -738,7 +739,7 @@ and "fan-out" for one-to-many.
 
      *  *You usually allow multiple readers.* You can have a
         one-sender-one-receiver queue, but that starts to feel less like the
-        communication system this pattern is about and more a vanilla queue data
+        communication system this pattern is about and more like a vanilla queue data
         structure.
 
  *  **With multiple writers:**
@@ -759,13 +760,13 @@ and "fan-out" for one-to-many.
 
 ### What is the lifetime of the objects in the queue?
 
-With a synchronous notification, execution doesn't return to the sender until
+With synchronous notification, execution doesn't return to the sender until
 all of the receivers have finished processing the message. That means the
 message itself can safely live in a local variable on the stack. With a queue,
 the message outlives the call that enqueues it.
 
 If you're using a garbage collected language, you don't need to worry about this
-too much. Stuff the message in the queue and it will stick around in memory as
+too much. Stuff the message in the queue, and it will stick around in memory as
 long as it's needed. In C or C++, it's up to you to ensure the object lives long
 enough.
 
@@ -801,7 +802,7 @@ enough.
     the queue. Instead of allocating the message itself, the sender requests a
     "fresh" one from the queue. The queue returns a reference to a message
     already in memory inside the queue, and the sender fills it in. When the
-    message gets processed, the receiver just refers to the same message in the
+    message gets processed, the receiver refers to the same message in the
     queue.
 
     <aside name="pool">
@@ -818,12 +819,12 @@ enough.
     class="gof-pattern">Observer</a> pattern.
 
  *  Like many patterns, event queues go by a number of aliases. One established
-    term is "message queue". It's usually referring to a higher level
+    term is "message queue". It's usually referring to a higher-level
     manifestation. Where our event queues are *within* an application, message
     queues are usually used for communicating *between* them.
 
     Another term is "publish/subscribe", sometimes abbreviated to "pubsub". Like
-    "message queue", it usually refers to larger distributed systems and less
+    "message queue", it usually refers to larger distributed systems unlike
     the humble coding pattern we're focused on.
 
  *  A [finite state machine](http://en.wikipedia.org/wiki/Finite-state_machine),
@@ -832,7 +833,7 @@ enough.
     want it to respond to those asynchronously, it makes sense to queue them.
 
     When you have a bunch of state machines sending messages to each other, each
-    with a little queue of pending inputs (called a *mailbox*) then you've
+    with a little queue of pending inputs (called a *mailbox*), then you've
     re-invented the [actor model](http://en.wikipedia.org/wiki/Actor_model) of
     computation.
 
