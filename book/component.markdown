@@ -282,8 +282,11 @@ just "the next version of Photoshop."
 
 ^code 1
 
-`Bjorn` has an `update()` method that gets called once per frame by the game. It
-reads the joystick to determine how to accelerate the baker. Then it resolves
+`Bjorn` has an `update()` method that gets called once per frame by the game:
+
+^code monolithic-update
+
+It reads the joystick to determine how to accelerate the baker. Then it resolves
 its new position with the physics engine. Finally, it draws Bjørn onto the
 screen.
 
@@ -561,20 +564,20 @@ likely support more than one at the same time in your designs.
 
  *  **By referring directly to each other:**
 
-     *  The idea here is that components that need to talk will have direct
-        references to each other without having to go through the container
-        object at all.
+    The idea here is that components that need to talk will have direct
+    references to each other without having to go through the container
+    object at all.
 
-        Let's say we want to let Bjørn jump. The graphics code needs to know if
-        he should be drawn using a jump sprite or not. It can determine this by
-        asking the physics engine if he's currently on the ground. An easy way
-        to do this is by letting the graphics component know about the physics
-        component directly:
+    Let's say we want to let Bjørn jump. The graphics code needs to know if
+    he should be drawn using a jump sprite or not. It can determine this by
+    asking the physics engine if he's currently on the ground. An easy way
+    to do this is by letting the graphics component know about the physics
+    component directly:
 
-        ^code 18
+    ^code 18
 
-        When we construct Bjørn's `GraphicsComponent`, we'll give it a reference
-        to his corresponding `PhysicsComponent`.
+    When we construct Bjørn's `GraphicsComponent`, we'll give it a reference
+    to his corresponding `PhysicsComponent`.
 
      *  *It's simple and fast.* Communication is a direct method call from one
         object to another. The component can call any method that is supported

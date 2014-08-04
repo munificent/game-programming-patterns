@@ -1,3 +1,5 @@
+2014-08-02 - layout component
+2014-08-01 - merge component changes
 2014-07-28 - email
 2014-07-27 - layout type object
 2014-07-26 - merge type object changes

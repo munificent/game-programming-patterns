@@ -272,37 +272,7 @@ just &#8220;the next version of Photoshop.&#8221;</p>
     <span class="n">x_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">y_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
   <span class="p">{}</span>
 
-  <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="c1">// Apply user input to hero&#39;s velocity.</span>
-    <span class="k">switch</span> <span class="p">(</span><span class="n">Controller</span><span class="o">::</span><span class="n">getJoystickDirection</span><span class="p">())</span>
-    <span class="p">{</span>
-      <span class="k">case</span> <span class="n">DIR_LEFT</span>:
-        <span class="n">velocity_</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
-        <span class="k">break</span><span class="p">;</span>
-
-      <span class="k">case</span> <span class="n">DIR_RIGHT</span>:
-        <span class="n">velocity_</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
-        <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Modify position by velocity.</span>
-    <span class="n">x_</span> <span class="o">+=</span> <span class="n">velocity_</span><span class="p">;</span>
-    <span class="n">world</span><span class="p">.</span><span class="n">resolveCollision</span><span class="p">(</span><span class="n">volume_</span><span class="p">,</span> <span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">,</span> <span class="n">velocity_</span><span class="p">);</span>
-
-    <span class="c1">// Draw the appropriate sprite.</span>
-    <span class="n">Sprite</span><span class="o">*</span> <span class="n">sprite</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">spriteStand_</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">velocity_</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="p">{</span>
-      <span class="n">sprite</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">spriteWalkLeft_</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">velocity_</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="p">{</span>
-      <span class="n">sprite</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">spriteWalkRight_</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="n">graphics</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="o">*</span><span class="n">sprite</span><span class="p">,</span> <span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">);</span>
-  <span class="p">}</span>
+  <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">);</span>
 
 <span class="nl">private:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">WALK_ACCELERATION</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -319,8 +289,42 @@ just &#8220;the next version of Photoshop.&#8221;</p>
 </pre></div>
 
 
-<p><code>Bjorn</code> has an <code>update()</code> method that gets called once per frame by the game. It
-reads the joystick to determine how to accelerate the baker. Then it resolves
+<p><code>Bjorn</code> has an <code>update()</code> method that gets called once per frame by the game:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Bjorn</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">// Apply user input to hero&#39;s velocity.</span>
+  <span class="k">switch</span> <span class="p">(</span><span class="n">Controller</span><span class="o">::</span><span class="n">getJoystickDirection</span><span class="p">())</span>
+  <span class="p">{</span>
+    <span class="k">case</span> <span class="n">DIR_LEFT</span>:
+    <span class="n">velocity_</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
+    <span class="k">break</span><span class="p">;</span>
+
+    <span class="k">case</span> <span class="n">DIR_RIGHT</span>:
+    <span class="n">velocity_</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
+    <span class="k">break</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Modify position by velocity.</span>
+  <span class="n">x_</span> <span class="o">+=</span> <span class="n">velocity_</span><span class="p">;</span>
+  <span class="n">world</span><span class="p">.</span><span class="n">resolveCollision</span><span class="p">(</span><span class="n">volume_</span><span class="p">,</span> <span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">,</span> <span class="n">velocity_</span><span class="p">);</span>
+
+  <span class="c1">// Draw the appropriate sprite.</span>
+  <span class="n">Sprite</span><span class="o">*</span> <span class="n">sprite</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">spriteStand_</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">velocity_</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">sprite</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">spriteWalkLeft_</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">velocity_</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">sprite</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">spriteWalkRight_</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">graphics</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="o">*</span><span class="n">sprite</span><span class="p">,</span> <span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>It reads the joystick to determine how to accelerate the baker. Then it resolves
 its new position with the physics engine. Finally, it draws Bj&oslash;rn onto the
 screen.</p>
 <p>The sample implementation here is trivially simple. There&#8217;s no gravity,
@@ -817,11 +821,9 @@ Haskell where there is no mutable state at all.</p>
 </li>
 <li>
 <p><strong>By referring directly to each other:</strong></p>
-<ul>
-<li>
 <p>The idea here is that components that need to talk will have direct
-    references to each other without having to go through the container
-    object at all.</p>
+references to each other without having to go through the container
+object at all.</p>
 <p>Let&#8217;s say we want to let Bj&oslash;rn jump. The graphics code needs to know if
 he should be drawn using a jump sprite or not. It can determine this by
 asking the physics engine if he&#8217;s currently on the ground. An easy way
@@ -862,7 +864,7 @@ component directly:</p>
 
 <p>When we construct Bj&oslash;rn&#8217;s <code>GraphicsComponent</code>, we&#8217;ll give it a reference
 to his corresponding <code>PhysicsComponent</code>.</p>
-</li>
+<ul>
 <li>
 <p><em>It&#8217;s simple and fast.</em> Communication is a direct method call from one
     object to another. The component can call any method that is supported

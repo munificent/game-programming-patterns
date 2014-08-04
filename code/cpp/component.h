@@ -77,40 +77,7 @@ namespace Monolithic
       x_(0), y_(0)
     {}
 
-    void update(World& world, Graphics& graphics)
-    {
-      // Apply user input to hero's velocity.
-      switch (Controller::getJoystickDirection())
-      {
-        case DIR_LEFT:
-          velocity_ -= WALK_ACCELERATION;
-          break;
-          
-        case DIR_RIGHT:
-          velocity_ += WALK_ACCELERATION;
-          break;
-          //^omit
-        case DIR_NONE: break; // Do nothing.
-          //^omit
-      }
-
-      // Modify position by velocity.
-      x_ += velocity_;
-      world.resolveCollision(volume_, x_, y_, velocity_);
-
-      // Draw the appropriate sprite.
-      Sprite* sprite = &spriteStand_;
-      if (velocity_ < 0)
-      {
-        sprite = &spriteWalkLeft_;
-      }
-      else if (velocity_ > 0)
-      {
-        sprite = &spriteWalkRight_;
-      }
-
-      graphics.draw(*sprite, x_, y_);
-    }
+    void update(World& world, Graphics& graphics);
 
   private:
     static const int WALK_ACCELERATION = 1;
@@ -125,6 +92,43 @@ namespace Monolithic
     Sprite spriteWalkRight_;
   };
   //^1
+    
+  //^monolithic-update
+  void Bjorn::update(World& world, Graphics& graphics)
+  {
+    // Apply user input to hero's velocity.
+    switch (Controller::getJoystickDirection())
+    {
+      case DIR_LEFT:
+      velocity_ -= WALK_ACCELERATION;
+      break;
+      
+      case DIR_RIGHT:
+      velocity_ += WALK_ACCELERATION;
+      break;
+      //^omit
+      case DIR_NONE: break; // Do nothing.
+      //^omit
+    }
+    
+    // Modify position by velocity.
+    x_ += velocity_;
+    world.resolveCollision(volume_, x_, y_, velocity_);
+    
+    // Draw the appropriate sprite.
+    Sprite* sprite = &spriteStand_;
+    if (velocity_ < 0)
+    {
+      sprite = &spriteWalkLeft_;
+    }
+    else if (velocity_ > 0)
+    {
+      sprite = &spriteWalkRight_;
+    }
+    
+    graphics.draw(*sprite, x_, y_);
+  }
+  //^monolithic-update
 }
 
 namespace SplitInputComponent
