@@ -243,8 +243,8 @@ handle that request. To fix that, we&#8217;ll decouple <em>receiving</em> a requ
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>A <strong>queue</strong> stores a series of <strong>notifications or requests</strong> in first-in,
 first-out order. Sending a notification <strong>enqueues the request and returns</strong>.
-The request processor then <strong>processes items from the queue</strong> at a later time.</p>
-<p>Requests can be <strong>handled directly</strong> or <strong>routed to interested parties</strong>. This
+The request processor then <strong>processes items from the queue</strong> at a later time.
+Requests can be <strong>handled directly</strong> or <strong>routed to interested parties</strong>. This
 <strong>decouples the sender from the receiver</strong> both <strong>statically</strong> and <strong>in time</strong>.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>If you only want to decouple <em>who</em> receives a message from its sender, patterns
@@ -852,13 +852,13 @@ method, any part of the codebase can add a request to the queue. &#8220;Global&#
 &#8220;central&#8221; event buses work like this too.</p>
 <ul>
 <li>
-<p><strong>You have to be more careful of cycles.</strong> Since anything can
+<p><em>You have to be more careful of cycles.</em> Since anything can
     potentially put something onto the queue, it&#8217;s easier to accidentally
     enqueue something in the middle of handling an event. If you aren&#8217;t
     careful, that may trigger a feedback loop.</p>
 </li>
 <li>
-<p><strong>You&#8217;ll likely want some reference to the sender in the event itself.</strong>
+<p><em>You&#8217;ll likely want some reference to the sender in the event itself.</em>
     When a listener gets an event, it doesn&#8217;t know who sent it, since it
     could be anyone. If that&#8217;s something they need to know, you&#8217;ll want to
     pack that into the event object so that the listener can use it.</p>

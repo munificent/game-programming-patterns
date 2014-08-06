@@ -16,23 +16,23 @@ the entire game.
 
 For our example, we'll consider audio. It doesn't have quite the reach of
 something lower-level like a memory allocator, but it still touches a bunch of
-game systems: A falling rock hits the ground with a crash (physics). A sniper
+game systems. A falling rock hits the ground with a crash (physics). A sniper
 NPC fires his rifle and a shot rings out (AI). The user selects a menu item with
 a beep of confirmation (user interface).
 
-Each of these places will need to be able to call into the audio system, with
+Each of these places will need to be able to call into the audio system with
 something like one of these:
 
 ^code 15
 
 Either gets us where we're trying to go, but we stumbled into some sticky
 coupling along the way. Every place in the game calling into our audio system
-directly references the concrete AudioSystem class and the mechanism for
+directly references the concrete `AudioSystem` class and the mechanism for
 accessing it -- either as a static class or a <a class="gof-pattern"
 href="singleton.html">singleton</a>.
 
-These callsites, of course, have to be coupled to *something* in order to make a
-sound play, but letting them poke directly at the concrete audio implementation
+These call sites, of course, have to be coupled to *something* in order to make a
+sound play, but letting them poke at the concrete audio implementation directly
 is like giving a hundred strangers directions to your house just so they can
 drop a letter on your doorstep. Not only is it a little bit *too* personal, it's
 a real pain when you move and you have to tell each person the new directions.
@@ -45,7 +45,7 @@ or some other "representation" of ourselves instead. By having callers go
 through the book to find us, we have *a convenient single place where we control
 how we're found.*
 
-This is the Service Locator pattern in a nutshell: it decouples code that needs
+This is the Service Locator pattern in a nutshell -- it decouples code that needs
 a service from both *who* it is (the concrete implementation type) and *where*
 it is (how we get to the instance of it).
 
@@ -59,14 +59,14 @@ it.
 
 ## When to Use It
 
-Anytime you make something globally accessible to every part of your program,
+Anytime you make something accessible to every part of your program,
 you're asking for trouble. That's the main problem with the <a
 class="gof-pattern" href="singleton.html">Singleton</a> pattern, and this
 pattern is no different. My simplest advice for when to use a service locator
 is: *sparingly*.
 
 Instead of using a global mechanism to give some code access to an object it
-needs, first consider *just passing the object to it*. That's dead simple, and
+needs, first consider *passing the object to it instead*. That's dead simple, and
 it makes the coupling completely obvious. That will cover most of your needs.
 
 *But...* there are some times when manually passing around an object is
@@ -81,7 +81,7 @@ through ten layers of methods just so one deeply nested call can get to it is
 adding needless complexity to your code.
 
 In those kinds of cases, this pattern can help. As we'll see, it functions as a
-more flexible, more configurable cousin of the singleton. When used <span
+more flexible, more configurable cousin of the Singleton pattern. When used <span
 name="well">well</span>, it can make your codebase more flexible with little
 runtime cost.
 
@@ -97,7 +97,7 @@ Singleton pattern with worse runtime performance.
 The core difficulty with a service locator is that it takes a dependency -- a
 bit of coupling between two pieces of code -- and defers wiring it up until
 runtime. This gives you flexibility, but the price you pay is that it's harder
-to understand what your dependencies are just by reading the code.
+to understand what your dependencies are by reading the code.
 
 ### The service actually has to be located
 
@@ -110,11 +110,11 @@ guarantee that we'll always get *some* service when you need it.
 ### The service doesn't know who is locating it
 
 Since the locator is globally accessible, any code in the game could be
-requesting a service and then poking at it. This means that service must be able
-to work correctly in any circumstance. For example, a class that expects to only
-be used during the simulation portion of the game loop and not during rendering
+requesting a service and then poking at it. This means that the service must be able
+to work correctly in any circumstance. For example, a class that expects to
+be used only during the simulation portion of the game loop and not during rendering
 may not work as a service -- it wouldn't be able to ensure that it's being used
-at the right time. So, if a class expects to only be used in a certain context,
+at the right time. So, if a class expects to be used only in a certain context,
 it's safest to avoid exposing it to the entire world with this pattern.
 
 ## Sample Code
@@ -159,26 +159,26 @@ define:
 The technique this uses is called *dependency injection*, an awkward bit of
 jargon for a very simple idea. Say you have one class that depends on another.
 In our case, our `Locator` class needs an instance of the `Audio` service.
-Normally, the locator would be responsible for constructing that itself.
+Normally, the locator would be responsible for constructing that instance itself.
 Dependency injection instead says that outside code is responsible for
 *injecting* that dependency into the object that needs it.
 
 </aside>
 
-The static `getAudio()` function does the locating -- we can call it from
-anywhere in the codebase and it will give us back an instance of our `Audio`
+The static `getAudio()` function does the locating. We can call it from
+anywhere in the codebase, and it will give us back an instance of our `Audio`
 service to use:
 
 ^code 5
 
-The way it "locates" is very simple: it relies on some outside code to register
-a service provider before any tries to use the service. When the game is
+The way it "locates" is very simple -- it relies on some outside code to register
+a service provider before anything tries to use the service. When the game is
 starting up, it calls some code like this:
 
 ^code 11
 
 The key part to notice here is that our `someGameCode()` function isn't aware of
-the concrete `ConsoleAudio` class, just the abstract `Audio` interface. Equally
+the concrete `ConsoleAudio` class; it only knows the abstract `Audio` interface. Equally
 important, not even the *locator* class is coupled to the concrete service
 provider. The *only* place in code that knows about the actual concrete class is
 the initialization function that registers the service.
@@ -200,10 +200,10 @@ If the calling code doesn't check that, we're going to crash the game.
 
 <aside name="temporal">
 
-I sometimes hear this called "temporal coupling": two separate pieces of code
+I sometimes hear this called "temporal coupling" -- two separate pieces of code
 that must be called in the right order for the program to work correctly. All
 stateful software has some degree of this, but as with other kinds of coupling,
-reducing it makes the codebase easier to manage.
+reducing temporal coupling makes the codebase easier to manage.
 
 </aside>
 
@@ -211,7 +211,7 @@ Fortunately, there's another design pattern called "Null Object" that we can use
 to address this. The basic idea is that in places where we would return `NULL`
 when we fail to find or create an object, we instead return a special object
 that implements the same interface as the desired object. Its implementation
-basically does nothing, but allows code that receives the object to safely
+basically does nothing, but it allows code that receives the object to safely
 continue on as if it had received a "real" one.
 
 To use this, we'll define another "null" service provider:
@@ -233,8 +233,8 @@ reference is a hint to users of the code that they can expect to always get a
 valid object back.
 
 The other thing to notice is that we're checking for `NULL` in the `provide()`
-function instead of the accessor. That requires us to call `initialize()` early
-on to make sure that the Locator initially correctly defaults to the null
+function instead of checking for the accessor. That requires us to call `initialize()` early
+on to make sure that the locator initially correctly defaults to the null
 provider. In return, it moves the branch out of `getAudio()`, which will save us
 a couple of cycles every time the service is accessed.
 
@@ -246,7 +246,7 @@ object.
 
 This is also useful for *intentionally* failing to find services. If we want to
 <span name="disable">disable</span> a system temporarily, we now have an easy
-way to do so: simply don't register a provider for the service and the locator
+way to do so: simply don't register a provider for the service, and the locator
 will default to a null provider.
 
 <aside name="disable">
@@ -262,7 +262,7 @@ your blood flowing in the morning.
 ### Logging decorator
 
 Now that our system is pretty robust, let's discuss another refinement this
-pattern lets us do: decorated services. I'll explain with an example.
+pattern lets us do -- decorated services. I'll explain with an example.
 
 During development, a little logging when interesting events occur can help you
 figure out what's going on under the hood of your game engine. If you're working
@@ -270,9 +270,9 @@ on AI, you'd like to know when an entity changes AI states. If you're the sound
 programmer, you may want a record of every sound as it plays so you can check
 that they trigger in the right order.
 
-The typical solution is to just litter the code with calls to some `log()`
-function. Unfortunately, that replaces one problem with another: now we have
-*too much* logging. The AI coder really doesn't care when sounds are playing,
+The typical solution is to litter the code with calls to some `log()`
+function. Unfortunately, that replaces one problem with another -- now we have
+*too much* logging. The AI coder doesn't care when sounds are playing,
 and the sound person doesn't care about AI state transitions, but now they both
 have to wade through each other's messages.
 
@@ -286,26 +286,26 @@ define another audio service provider implementation like this:
 ^code 12
 
 As you can see, it wraps another audio provider and exposes the same interface.
-It forwards the actual audio behavior to the inner provider, but also logs each
+It forwards the actual audio behavior to the inner provider, but it also logs each
 sound call. If a programmer wants to enable audio logging, they call this:
 
 ^code 13
 
-Now any calls to the audio service will be logged before continuing as before.
+Now, any calls to the audio service will be logged before continuing as before.
 And, of course, this plays nicely with our null service, so you can both
 *disable* audio and yet still log the sounds that it *would* play if sound were
 enabled.
 
 ## Design Decisions
 
-We've covered a typical implementation, but there's a couple of ways that it can
-vary, based on differing answers to a few core questions:
+We've covered a typical implementation, but there are a couple of ways that it can
+vary based on differing answers to a few core questions:
 
 ### How is the service located?
 
  *  **Outside code registers it:**
 
-    This is the mechanism our sample code uses to locate the service, and is the
+    This is the mechanism our sample code uses to locate the service, and it's the
     most common design I see in games:
 
      *  *It's fast and simple.* The `getAudio()` function simply returns a
@@ -316,11 +316,11 @@ vary, based on differing answers to a few core questions:
         accessing the game's controllers. We have two concrete providers: one
         for regular games and one for playing online. The online provider passes
         controller input over the network so that, to the rest of the game,
-        remote players appear to just be using local controllers.
+        remote players appear to be using local controllers.
 
         To make this work, the online concrete provider needs to know the IP
         address of the other remote player. If the locator itself was
-        constructing the object, how would it know what to pass in? The locator
+        constructing the object, how would it know what to pass in? The `Locator`
         class doesn't know anything about online at all, much less some other
         user's IP address.
 
@@ -361,7 +361,7 @@ vary, based on differing answers to a few core questions:
         unavailable.
 
      *  *You can't change the service easily.* This is the major downside. Since
-        the binding happens at build time, any time you want to change the
+        the binding happens at build time, anytime you want to change the
         service, you've got to recompile and restart the game.
 
  *  **Configure it at runtime:**
@@ -377,23 +377,23 @@ vary, based on differing answers to a few core questions:
     the type system at runtime. For example, we could find a class with a given
     name, find its constructor, and then invoke it to create an instance.
 
-    Dynamically-typed languages like Lisp, Smalltalk, and Python get this by
+    Dynamically typed languages like Lisp, Smalltalk, and Python get this by
     their very nature, but newer static languages like C# and Java also support
     it.
 
     </aside>
 
     Typically, this means loading a configuration file that identifies the
-    provider, then using reflection to instantiate that class at runtime. This
+    provider and then using reflection to instantiate that class at runtime. This
     does a few things for us:
 
      *  *We can swap out the service without recompiling.* This is a little more
-        flexible than a compile-time bound service, but not quite as flexible as
+        flexible than a compile-time-bound service, but not quite as flexible as
         a registered one where you can actually change the service while the
         game is running.
 
      *  *Non-programmers can change the service.* This is nice for when the
-        designers want to be able to turn certain game features on and off, but
+        designers want to be able to turn certain game features on and off but
         aren't comfortable mucking through source code. (Or, more likely, the
         *coders* aren't comfortable with them mucking through it.)
 
@@ -404,8 +404,8 @@ vary, based on differing answers to a few core questions:
 
         This is one of the reasons this model is appealing over in enterprise
         web-land: you can deploy a single app that works on different server
-        set-ups just by changing some configs. It's less useful in games.
-        Console hardware is pretty well standardized, and even PC games target a
+        setups just by changing some configs. It's less useful in games.
+        Console hardware is pretty well-standardized, and even PC games target a
         certain baseline specification.
 
      *  *It's complex.* Unlike the previous solutions, this one is pretty
@@ -422,7 +422,7 @@ vary, based on differing answers to a few core questions:
         CPU cycles on something that doesn't improve the player's game
         experience.
 
-### What happens if service could not be located?
+### What happens if the service can't be located?
 
  *  **Let the user handle it:**
 
@@ -433,11 +433,11 @@ vary, based on differing answers to a few core questions:
         failing to find a service a critical error that should halt the game.
         Others may be able to safely ignore it and continue. If the locator
         can't define a blanket policy that's correct for all cases, then passing
-        the failure down the line lets each callsite decide for itself what the
+        the failure down the line lets each call site decide for itself what the
         right response is.
 
      *  *Users of the service must handle the failure.* Of course, the corollary
-        to this is that each callsite *must* check for failure to find the
+        to this is that each call site *must* check for failure to find the
         service. If almost all of them handle failure the same way, that's a lot
         duplicate code spread throughout the codebase. If just one of the
         potentially hundreds of places that use the service fails to make that
@@ -470,7 +470,7 @@ vary, based on differing answers to a few core questions:
     caller is that I will not be passed `NULL`."
 
     Assertions help us track down bugs as soon as the game does something
-    unexpected, and not later when that error finally manifests as something
+    unexpected, not later when that error finally manifests as something
     visibly wrong to the user. They are fences in your codebase, corralling bugs
     so that they can't escape from the code that created them.
 
@@ -479,7 +479,7 @@ vary, based on differing answers to a few core questions:
     If the service isn't located, the game stops before any subsequent code
     tries to use it. The `assert()` call there doesn't solve the problem of
     failing to locate the service, but it does make it clear whose problem it
-    is. By asserting here, we say, "failing to locate a service is a bug in the
+    is. By asserting here, we say, "Failing to locate a service is a bug in the
     locator."
 
     So what does this do for us?
@@ -487,7 +487,7 @@ vary, based on differing answers to a few core questions:
      *  *Users don't need to handle a missing service.* Since a single service
         may be used in hundreds of places, this can be a significant code
         saving. By declaring it the locator's job to always provide a service,
-        we spare the users of it from having to pick up that slack.
+        we spare the users of the service from having to pick up that slack.
 
      *  *The game is going to halt if the service can't be found.* On the off
         chance that a service really can't be found, the game is going to halt.
@@ -515,7 +515,7 @@ vary, based on differing answers to a few core questions:
         missing service. Say the game uses a service to access some data and
         then make a decision based on it. If we've failed to register the real
         service and that code gets a null service instead, the game may not
-        behave like we want. <span name="null">It</span> will take some work to
+        behave how we want. <span name="null">It</span> will take some work to
         trace that issue back to the fact that a service wasn't there when we
         thought it would be.
 
@@ -534,7 +534,7 @@ chances of a service failing to be found by then are pretty slim.
 On a larger team, I encourage you to throw a null service in. It doesn't take
 much effort to implement, and can spare you from some downtime during
 development when a service isn't available. It also gives you an easy way to
-turn a service off if it's buggy or is just distracting you from what you're
+turn off a service if it's buggy or is just distracting you from what you're
 working on.
 
 ### What is the scope of the service?
@@ -558,9 +558,9 @@ There are advantages either way:
         one.
 
      *  *We lose control over where and when the service is used.* This is the
-        obvious cost of making something global: anything can get to it. The <a
+        obvious cost of making something global -- anything can get to it. The <a
         class="gof-pattern" href="singleton.html">Singleton</a> chapter has a
-        full cast of characters for the horrorshow that global scope can spawn.
+        full cast of characters for the horror show that global scope can spawn.
 
  *  **If access is restricted to a class:**
 
