@@ -227,7 +227,6 @@ handle that request. To fix that, we'll decouple *receiving* a request from
 A **queue** stores a series of **notifications or requests** in first-in,
 first-out order. Sending a notification **enqueues the request and returns**.
 The request processor then **processes items from the queue** at a later time.
-
 Requests can be **handled directly** or **routed to interested parties**. This
 **decouples the sender from the receiver** both **statically** and **in time**.
 
@@ -748,12 +747,12 @@ and "fan-out" for one-to-many.
     method, any part of the codebase can add a request to the queue. "Global" or
     "central" event buses work like this too.
 
-     *  **You have to be more careful of cycles.** Since anything can
+     *  *You have to be more careful of cycles.* Since anything can
         potentially put something onto the queue, it's easier to accidentally
         enqueue something in the middle of handling an event. If you aren't
         careful, that may trigger a feedback loop.
 
-     *  **You'll likely want some reference to the sender in the event itself.**
+     *  *You'll likely want some reference to the sender in the event itself.*
         When a listener gets an event, it doesn't know who sent it, since it
         could be anyone. If that's something they need to know, you'll want to
         pack that into the event object so that the listener can use it.
