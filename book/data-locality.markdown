@@ -28,7 +28,7 @@ by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony
 
 For your super-fast CPU to blow through a ream of calculations, it actually has to get the data out of main memory and into registers. As you can see, RAM hasn't been keeping up with increasing CPU speeds. Not even close.
 
-With today's hardware, it can take *hundreds* of cycles to fetch a byte of data from <span name="ram">RAM</span>. If most instructions need data, and it takes hundreds of cycles to get it, how is that our CPUs aren't sitting idle 99% of the time waiting for data?
+With today's hardware, it can take *hundreds* of cycles to fetch a byte of data from <span name="ram">RAM</span>. If most instructions need data, and it takes hundreds of cycles to get it, how is it that our CPUs aren't sitting idle 99% of the time waiting for data?
 
 Actually, they *are* stuck waiting on memory an astonishingly large fraction of time these days, but it's not as bad as it could be. To explain how, let's take a trip to the Land of Overly Long Analogies...
 
@@ -43,7 +43,7 @@ Or, at least, you *didn't*. As we'll see, RAM isn't so random access anymore.
 ### A data warehouse
 
 Imagine you're an accountant in a tiny little office. Your job is to request a
-box of papers then do some <span name="accountant">accountant</span>-y stuff
+box of papers and then do some <span name="accountant">accountant</span>-y stuff
 with them -- add up a bunch of numbers or something. You must do this for
 specific labeled boxes according to some arcane logic that only makes sense to
 other accountants.
@@ -66,7 +66,7 @@ employee of the month any time soon. This means that no matter how fast you are,
 you only get one box a day. The rest of the time, you just sit there and
 question the life decisions that led to this soul-sucking job.
 
-One day, a group of industrial designers show up. Their job is to improve the
+One day, a group of industrial designers shows up. Their job is to improve the
 efficiency of operations -- things like making assembly lines go faster. After
 watching you work for a few days, they notice a few things:
 
@@ -88,7 +88,7 @@ of reference*.
 They come up with a clever fix. Whenever you request a box from the warehouse
 guy, he'll grab an entire pallet of them. He gets the box you want and then some
 more boxes that are next to it. He doesn't know if you want those (and, given
-his work ethic, clearly doesn't care); he just takes as many as he can fit on
+his work ethic, clearly doesn't care); he simply takes as many as he can fit on
 the pallet.
 
 He loads the whole pallet and brings it to you. Disregarding concerns for
@@ -96,12 +96,12 @@ workplace safety, he drives the forklift right in and drops the pallet in the
 corner of your office.
 
 When you need a new box, now, the first thing you do is see if it's already on
-the pallet in your office. If it is, great! It just takes you a second to grab
-it and you're back to crunching numbers. If a pallet holds fifty boxes and you
+the pallet in your office. If it is, great! It only takes you a second to grab
+it and get back to crunching numbers. If a pallet holds fifty boxes and you
 got lucky and *all* of the boxes you need happen to be on it, you can churn
 through fifty times more work than you could before.
 
-But, if you need a box that's *not* on the pallet, you're back to square one.
+But if you need a box that's *not* on the pallet, you're back to square one.
 Since you can only fit one pallet in your office, your warehouse friend will
 have to take that one back and then bring you an entirely new one.
 
@@ -124,7 +124,7 @@ type of memory it uses (static RAM or "SRAM") is way more expensive.
 
 <aside name="caches">
 
-Modern hardware actually has multiple levels of caching, which is what they mean
+Modern hardware has multiple levels of caching, which is what they mean
 when you hear "L1", "L2", "L3", etc. Each level is larger but slower than the
 previous. For this chapter, we won't worry about the fact that memory is
 actually a [hierarchy](http://en.wikipedia.org/wiki/Memory_hierarchy), but it's
@@ -133,7 +133,7 @@ important to know.
 </aside>
 
 This little chunk of memory is called a *cache* (in particular, the chunk on the
-chip is your *L1 cache*) and in my belabored analogy, its part was played by the
+chip is your *L1 cache*), and in my belabored analogy, its part was played by the
 pallet of boxes. Whenever your chip needs a byte of data from RAM, it
 automatically grabs a whole chunk of contiguous memory -- usually around 64 to
 128 bytes -- and puts it in the cache. This dollop of memory is called a *cache
@@ -156,10 +156,10 @@ for "cache associativity" to feed your brain.
 
 </aside>
 
-When a cache miss occurs, the CPU *stalls*: it can't process the next
+When a cache miss occurs, the CPU *stalls* -- it can't process the next
 instruction because it needs data. It sits there, bored out of its mind for a
 few hundred cycles until the fetch completes. Our mission is to avoid that.
-Imagine you're trying to optimize some performance critical piece of game code
+Imagine you're trying to optimize some performance-critical piece of game code
 and it looks like this:
 
 ^code do-nothing
@@ -179,14 +179,14 @@ how much bloodshed it causes.
 When I got some stuff working, I was surprised. I knew it was a big deal, but
 there's nothing quite like seeing it with your own eyes. <span name="ymmv">I
 wrote two programs</span> that did the *exact same* computation. The only
-difference was how many cache misses they caused. The slow one was fifty *times*
+difference was how many cache misses they caused. The slow one was *fifty times*
 slower than the other.
 
 <aside name="ymmv">
 
-There's a lot of caveats here. In particular, different computers have different
-cache setups so my machine may be different from yours, and dedicated game
-consoles are very different from PCs which are quite different from mobile
+There are a lot of caveats here. In particular, different computers have different
+cache setups, so my machine may be different from yours, and dedicated game
+consoles are very different from PCs, which are quite different from mobile
 devices.
 
 Your mileage will vary.
@@ -195,8 +195,8 @@ Your mileage will vary.
 
 This was a real eye-opener to me. I'm used to thinking of performance being an
 aspect of *code*, not *data*. A byte isn't slow or fast, it's just some static
-thing sitting there. But, because of caching, *the way you organize data
-directly impacts performance.*
+thing sitting there. But because of caching, *the way you organize data
+directly impacts performance*.
 
 The challenge now is to wrap that up into something that fits into a chapter
 here. Optimization for cache usage is a huge topic. I haven't even touched on
@@ -207,7 +207,7 @@ write an entire <span name="book">book</span> on it.
 <aside name="book">
 
 In fact, someone *did* write a book on it: [*Data-Oriented
-Design*](http://www.dataorienteddesign.com/dodmain/) by Richard Fabian.
+Design*](http://www.dataorienteddesign.com/dodmain/), by Richard Fabian.
 
 </aside>
 
@@ -239,18 +239,18 @@ Note, these aren't *pointers* to `Thing`, `Another`, and `Also`. This is the
 actual data for them, in place, lined up one after the other. As soon as the CPU
 reads in `Thing`, it will start to get `Another` and `Also` too (depending on
 how big they are and how big a cache line is). When you start working on them
-next, they'll already be cached. Your chip is happy and you're happy.
+next, they'll already be cached. Your chip is happy, and you're happy.
 
 ## The Pattern
 
-Modern CPUs have **caches to speed up memory access.** These can access memory
+Modern CPUs have **caches to speed up memory access**. These can access memory
 **adjacent to recently accessed memory much quicker**. Take advantage of that to
 improve performance by **increasing data locality** -- keeping data in
-**contiguous memory in the order that you process it.**
+**contiguous memory in the order that you process it**.
 
 ## When to Use It
 
-Like most optimizations, the first guideline for using it is *when you have a
+Like most optimizations, the first guideline for using the Data Locality pattern is *when you have a
 performance problem.* Don't waste time applying this to some infrequently
 executed corner of your codebase. Optimizing code that doesn't need it just
 makes your life harder since the result is almost always more complex and less
@@ -267,7 +267,7 @@ sophisticated. You really want to see how many cache misses are occurring and
 where.
 
 Fortunately, there are <span name="cachegrind">profilers</span> out there that
-report it. It's worth spending the time to get one of these working and make
+report cache misses. It's worth spending the time to get one of these working and make
 sure you understand the (surprisingly complex) numbers it throws at you before
 you do major surgery on your data structures.
 
@@ -277,7 +277,7 @@ Unfortunately, most of those tools aren't cheap. If you're on a console dev
 team, you probably already have licenses for them.
 
 If not, an excellent free option is
-[cachegrind](http://valgrind.org/docs/manual/cg-manual.html). It runs your
+[Cachegrind](http://valgrind.org/docs/manual/cg-manual.html). It runs your
 program on top of a simulated CPU and cache hierarchy and then reports all of
 the cache interactions.
 
@@ -303,15 +303,15 @@ avoid.
 <aside name="virtual">
 
 The other half of interfaces is *virtual method calls*. Those require the CPU to
-look up an object's vtable, and then find the pointer to the actual method to
-call there. So, again, you're chasing pointers which can cause cache misses.
+look up an object's vtable and then find the pointer to the actual method to
+call there. So, again, you're chasing pointers, which can cause cache misses.
 
 </aside>
 
 In order to please this pattern, you will have to sacrifice some of your
 precious abstractions. The more you design your program around data locality,
-the more you will have to give up inheritance and interfaces, and the benefits
-those tools can provide. There's no silver bullet here, just challenging
+the more you will have to give up inheritance, interfaces, and the benefits
+those tools can provide. There's no silver bullet here, only challenging
 trade-offs. That's what makes it fun!
 
 ## Sample Code
@@ -328,7 +328,7 @@ keep in mind that the general technique can be applied anywhere it fits.
 Let's start with a <a href="game-loop.html" class="pattern">Game Loop</a> that
 processes a bunch of game entities. Those entities are decomposed into different
 domains -- AI, physics, and rendering -- using the <a href="component.html"
-class="pattern">Component</a> pattern. Here's the game entity class:
+class="pattern">Component</a> pattern. Here's the `GameEntity` class:
 
 ^code game-entity
 
@@ -348,7 +348,7 @@ by another name.
 ^code components
 
 The game maintains a big array of pointers to all of the entities in the world.
-Each spin of the game loop, we need to run the following, in this order:
+Each spin of the game loop, we need to run the following:
 
  1. Update the AI components for all of the entities.
 
@@ -360,12 +360,12 @@ Lots of game engines implement that like so:
 
 ^code game-loop
 
-Before you ever heard of a CPU cache, this looked totally innocuous. But by now
+Before you ever heard of a CPU cache, this looked totally innocuous. But by now,
 you've got an inkling that something isn't right here. This code isn't just
 thrashing the cache, it's taking it around back and beating it to a pulp. Watch
 what it's doing:
 
- 1. The array of game entities is *pointers* to them, so for each element in the
+ 1. The array of game entities is storing *pointers* to them, so for each element in the
     array, we have to traverse that pointer. That's a cache miss.
 
  2. Then the game entity has a pointer to the component. Another cache miss.
@@ -375,7 +375,7 @@ what it's doing:
  4. Now we go back to step one for *every component of every entity in the
     game*.
 
-The scary part is we have no idea how these objects are laid out in memory.
+The scary part is that we have no idea how these objects are laid out in memory.
 We're completely at the mercy of the memory manager. As entities get allocated
 and freed over time, the heap is likely to become increasingly randomly
 organized.
@@ -429,7 +429,7 @@ is.
 
 </aside>
 
-Let me just stress that these are arrays of *components* and not *pointers to
+Let me stress that these are arrays of *components* and not *pointers to
 components*. The data is all there, one byte after the other. The game loop can
 then walk these directly:
 
@@ -451,20 +451,19 @@ we're doing a straight crawl through three contiguous arrays.
 <img src="images/data-locality-component-arrays.png" alt="An array for each of three different kinds of components. Each array neatly packs its components together." />
 
 This pumps a solid stream of bytes right into the hungry maw of the CPU. In my
-testing, this change made the update loop fifty *times* faster than the previous
+testing, this change made the update loop *fifty times* faster than the previous
 version.
 
 Interestingly, we haven't lost much encapsulation here. Sure, the game loop is
 updating the components directly instead of going through the game entities, but
 it was doing that before to ensure they were processed in the right order. Even
 so, each component itself is still nicely encapsulated. It owns its own data and
-methods. We just changed the way it's used.
+methods. We simply changed the way it's used.
 
-This doesn't mean we need to get rid of `GameEntity` either. We can leave it
-just as it is with pointers to its components. They'll just point into those
+This doesn't mean we need to get rid of `GameEntity` either. We can leave it as it is with pointers to its components. They'll just point into those
 arrays. This is still useful for other parts of the game where you want to pass
 around a conceptual "game entity" and everything that goes with it. The
-important part is that the performance critical game loop sidesteps that and
+important part is that the performance-critical game loop sidesteps that and
 goes straight to the data.
 
 ### Packed data
@@ -495,14 +494,14 @@ something like this:
 
 We give `Particle` a flag to track whether its in use or not. In the update
 loop, we <span name="branch">check</span> that for each particle. That loads the
-flag into the cache, along with all of that particle's other data. If the
-particle *isn't* active, then we just skip over that to the next one. The rest
+flag into the cache along with all of that particle's other data. If the
+particle *isn't* active, then we skip over it to the next one. The rest
 of the particle's data that we loaded into the cache is a waste.
 
 The fewer active particles there are, the more we're skipping across memory. The
 more we do that, the more cache misses there are between actually doing useful
 work updating active particles. If the array is large and has *lots* of inactive
-particles in it, we're back to just thrashing the cache again.
+particles in it, we're back to thrashing the cache again.
 
 Having objects in a contiguous array doesn't solve much if the objects we're
 actually processing aren't contiguous in it. If it's littered with inactive
@@ -522,7 +521,7 @@ it's executing the instructions for that `if`, does it guess that the particle
 is active and start executing the code for the `update()` call, or does it guess
 that it isn't?
 
-To answer that, the chip does *branch prediction:* it sees which branches your
+To answer that, the chip does *branch prediction* -- it sees which branches your
 code previously took and guesses that it will do that again. But when the loop
 is constantly toggling between particles that are and aren't active, that
 prediction fails.
@@ -547,7 +546,7 @@ our update loop turns into this thing of beauty:
 Now we aren't skipping over *any* data. Every byte that gets sucked into the
 cache is a piece of an active particle that we actually need to process.
 
-Of course, I'm not saying you should actually quicksort the entire collection of
+Of course, I'm not saying you should quicksort the entire collection of
 particles every frame. That would more than eliminate the gains here. What we
 want to do is *keep* the array sorted.
 
@@ -564,8 +563,8 @@ To deactivate a particle, we just do the opposite:
 ^code deactivate-particle
 
 Lots of programmers (myself included) have developed allergies to moving things
-around in memory. Schlepping a bunch of bytes around *feels* heavyweight ,
-compared to just assigning a pointer. But when you add in the cost of
+around in memory. Schlepping a bunch of bytes around *feels* heavyweight
+compared to assigning a pointer. But when you add in the cost of
 *traversing* that pointer, it turns out that our intuition is sometimes wrong.
 In <span name="profile">some cases</span>, it's cheaper to push things around in
 memory if it helps you keep the cache full.
@@ -578,15 +577,15 @@ decisions.
 </aside>
 
 There's a neat consequence of keeping the particles *sorted* by their active
-state: We don't need to store an active flag in each particle at all. It can be
+state -- we don't need to store an active flag in each particle at all. It can be
 inferred by its position in the array and the `numActive_` counter. This makes
 our particle objects smaller, which means we can pack more in our cache lines,
 and that makes them even faster.
 
 It's not all rosy, though. As you can see from the API, we've lost a bit of
-object-orientation here. The `Particle` class no longer controls its own active
-state. You can't just call some `activate()` method on it since it doesn't know
-it's index. Instead, any code that wants to activate particles needs access to
+object orientation here. The `Particle` class no longer controls its own active
+state. You can't call some `activate()` method on it since it doesn't know
+its index. Instead, any code that wants to activate particles needs access to
 the particle *system*.
 
 In this case, I'm OK with `ParticleSystem` and `Particle` being tightly tied
@@ -599,7 +598,7 @@ particle system that will be spawning and killing particles anyway.
 
 OK, this is the last example of a simple technique for making your cache
 happier. Say we've got an AI component for some game entity. It has some state
-in it: the animation it's currently playing, a goal position its heading
+in it -- the animation it's currently playing, a goal position its heading
 towards, energy level, etc. -- stuff it checks and tweaks every single frame.
 Something like:
 
@@ -608,21 +607,21 @@ Something like:
 But it also has some state for rarer eventualities. It stores some data
 describing what loot it drops when it has an unfortunate encounter with the
 noisy end of a shotgun. That drop data is only used once in the entity's
-lifetime, right at its bitter end.
+lifetime, right at its bitter end:
 
 ^code loot-drop
 
 Assuming we followed the earlier patterns, when we update these AI components,
 we walk through a nice packed, contiguous array of data. But that data includes
 all of the loot drop information. That makes each component bigger, which
-reduces the number of them we can fit in a cache line. We get more cache misses
+reduces the number of components we can fit in a cache line. We get more cache misses
 because the total memory we walk over is larger. The loot data gets pulled into
-the cache for every component, every frame, even though we aren't even touching
+the cache for every component in every frame, even though we aren't even touching
 it.
 
 The solution for this is called "hot/cold splitting". The idea is to break our
-data structure into two separate pieces. The first holds the "hot" data: the
-state we need to touch every frame. The other piece is the "cold" data:
+data structure into two separate pieces. The first holds the "hot" data, the
+state we need to touch every frame. The other piece is the "cold" data,
 everything else that gets used less frequently.
 
 The hot piece is the *main* AI component. It's the one we need to use the most,
@@ -645,7 +644,7 @@ both pieces will be at the same index in their respective arrays.
 </aside>
 
 You can see how this starts to get fuzzy, though. In my example here, it's
-pretty obvious which data should be hot and cold, but it's rarely so clear cut.
+pretty obvious which data should be hot and cold, but it's rarely so clear-cut.
 What if you have fields that are used when an entity is in a certain mode but
 not in others? What if entities use a certain chunk of data only when they're in
 certain parts of the level?
@@ -657,13 +656,13 @@ to spend your effort.
 
 ## Design Decisions
 
-This pattern is really about a mindset: it's getting you to think about your
+This pattern is really about a mindset -- it's getting you to think about your
 data's arrangement in memory as a key part of your game's performance story. The
 actual concrete design space is wide open. You can let <span name="dod">data
 locality</span> affect your whole architecture, or maybe it's just a localized
 pattern you apply to a few core data structures.
 
-The biggest question you'll need to answer is when and where you apply this
+The biggest questions you'll need to answer are when and where you apply this
 pattern, but here are a couple of others that may come up.
 
 <aside name="dod">
@@ -676,14 +675,14 @@ calls this "data-oriented design".
 
 ### How do you handle polymorphism?
 
-Up to this point, we've avoided subclassing and virtual methods. We assumed we
+Up to this point, we've avoided subclassing and virtual methods. We have assumed we
 have nice packed arrays of *homogenous* objects. That way, we know they're all
-the exact same size. But polymorphism and dynamic dispatch are useful tools,
+the exact same size. But polymorphism and dynamic dispatch are useful tools
 too. How do we reconcile this?
 
  *  **Don't:**
 
-    The <span name="type">simplest</span> answer is to just avoid subclassing,
+    The <span name="type">simplest</span> answer is to avoid subclassing,
     or at least avoid it in places where you're optimizing for cache usage.
     Software engineer culture is drifting away from heavy use of inheritance
     anyway.
@@ -696,7 +695,7 @@ too. How do we reconcile this?
 
     </aside>
 
-     *  *It's safe and easy.* You know exactly what class you're dealing with
+     *  *It's safe and easy.* You know exactly what class you're dealing with,
         and all objects are obviously the same size.
 
      *  *It's faster.* Dynamic dispatch means looking up the method in the
@@ -718,7 +717,7 @@ too. How do we reconcile this?
      *  *It's inflexible.* Of course, the reason we use dynamic dispatch is
         because it gives us a powerful way to vary behavior between objects. If
         you want different entities in your game to have their own rendering
-        styles, or their own special moves and attacks, virtual methods are a
+        styles or their own special moves and attacks, virtual methods are a
         proven way to model that. Having to instead stuff all of that code into
         a single non-virtual method that does something like a big `switch` gets
         messy quickly.
@@ -726,18 +725,18 @@ too. How do we reconcile this?
  *  **Use separate arrays for each type:**
 
     We use polymorphism so that we can invoke behavior on an object whose type
-    we don't know. In other words, we have a mixed bag of stuff and we want each
+    we don't know. In other words, we have a mixed bag of stuff, and we want each
     object in there to do its own thing when we tell it to go.
 
-    But that just raises the question of why mix the bag to begin with? Instead,
-    why not just maintain separate homogenous collections for each type?
+    But that raises the question of why mix the bag to begin with? Instead,
+    why not maintain separate, homogenous collections for each type?
 
      *  *It keeps objects tightly packed.* Since each array only contains
         objects of one class, there's no padding or other weirdness.
 
      *  *You can statically dispatch.* Once you've got objects partitioned by
-        type, you don't actually need polymorphism at all any more. You can use
-        regular non-virtual method calls.
+        type, you don't need polymorphism at all any more. You can use
+        regular, non-virtual method calls.
 
      *  *You have to keep track of a bunch of collections.* If you have a lot of
         different object types, the overhead and complexity of maintaining
@@ -746,14 +745,14 @@ too. How do we reconcile this?
      *  *You have to be aware of every type*. Since you have to maintain
         separate collections for each type, you can't be decoupled from the
         *set* of classes. Part of the magic of polymorphism is that it's
-        *open-ended*: code that works with an interface can be completely
+        *open-ended* -- code that works with an interface can be completely
         decoupled from the potentially large set of types that implement that
         interface.
 
  *  **Use a collection of pointers:**
 
     If you weren't worried about caching, this is the natural solution. Just
-    have an array of pointers to some base class or interface type. All the
+    have an array of pointers to some base class or interface type. You get all the
     polymorphism you could want, and objects can be whatever size they want.
 
      *  *It's flexible.* The code that consumes the collection can work with
@@ -762,7 +761,7 @@ too. How do we reconcile this?
 
      *  *It's less cache-friendly.* Of course, the whole reason we're discussing
         other options here is because this means cache-unfriendly pointer
-        indirection. But, remember, if this code isn't performance critical,
+        indirection. But, remember, if this code isn't performance-critical,
         that's probably OK.
 
 ### How are game entities defined?
@@ -782,7 +781,7 @@ components?
     This is what our first example looked like. It's sort of the vanilla OOP
     solution. You've got a class for `GameEntity`, and it has pointers to the
     components it owns. Since they're just pointers, it's agnostic about where
-    and how those components are actually organized in memory.
+    and how those components are organized in memory.
 
      *  *You can store components in contiguous arrays.* Since the game entity
         doesn't care where its components are, you can organize them in a nice
@@ -814,7 +813,7 @@ components?
         and debug it, and there will be memory overhead for bookkeeping.
 
      *  *It's slower*. It's hard to beat traversing a raw pointer. There may be
-        some actual searching or hashing involved to get from an entity to one
+        some searching or hashing involved to get from an entity to one
         of its components.
 
      *  *You'll need access to the component "manager".* The basic idea is that
@@ -854,7 +853,7 @@ components?
     Some smart people realized all you need for that is an ID. Instead of the
     entity knowing its components, the components know their entity. Each
     component knows the ID of the entity that owns it. When the AI component
-    needs the physics component for its entity, it just asks for the physics
+    needs the physics component for its entity, it simply asks for the physics
     component with the same entity ID that it holds.
 
     Your entity *classes* disappear entirely, replaced by a glorified wrapper
@@ -866,7 +865,8 @@ components?
      *  *Entities are empty.* Of course, the downside of moving everything out
         of entities is that you *have* to move everything out of entities. You
         no longer have a place to put non-component-specific state or behavior.
-        This style doubles down on the component pattern.
+        This style doubles down on the <a href="component.html"
+    class="pattern">Component</a> pattern.
 
      *  *You don't have to manage their lifetime.* Since entities are just dumb
         value types, they don't need to be explicitly allocated and freed. An
@@ -877,10 +877,10 @@ components?
         component for some entity, you have to map an ID to an object. That
         process may be costly.
 
-        This time, though, it *is* performance critical. Components often
+        This time, though, it *is* performance-critical. Components often
         interact with their siblings during update, so you will need to find
         components frequently. One solution is to make the "ID" of an entity
-        just the index of the component in its array.
+        the index of the component in its array.
 
         If every entity has the same set of components, then your component
         arrays are completely parallel. The component in slot three of the AI
@@ -897,15 +897,15 @@ components?
 ## See Also
 
  *  Much of this chapter revolves around the <a href="component.html"
-    class="pattern">Component</a> pattern, and those are definitely one of the
-    most common data structures that get optimized for cache usage. In fact,
-    using the component pattern makes this optimization easier. Since entities
+    class="pattern">Component</a> pattern, and that pattern is definitely one of the
+    most common data structures that gets optimized for cache usage. In fact,
+    using the Component pattern makes this optimization easier. Since entities
     are updated one "domain" (AI, physics, etc.) at a time, splitting them out
-    into components lets you slice a bunch of entities into just the right
+    into components lets you slice a bunch of entities into the right
     pieces to be cache-friendly.
 
     But that doesn't mean you can *only* use this pattern with components! Any
-    time you have performance critical code that touches a lot of data, it's
+    time you have performance-critical code that touches a lot of data, it's
     important to think about locality.
 
  *  Tony Albrecht's <a href="http://research.scee.net/files/presentations/gcapau
@@ -913,7 +913,7 @@ components?
     class="pdf">"Pitfalls of Object-Oriented Programming"</a> is probably the
     most widely-read introduction to designing your game's data structures for
     cache-friendliness. It made a lot more people (including me!) aware of how
-    big a deal this is for performance.
+    big of a deal this is for performance.
 
  *  Around the same time, Noel Llopis wrote a [very influential blog
     post](http://gamesfromwithin.com/data-oriented-design) on the same topic.
