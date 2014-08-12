@@ -120,7 +120,7 @@ they haven&#8217;t changed is a waste.</p>
 <p>The obvious answer is to <em>cache</em> it. In each object, we store its local
 transform and its derived world transform. When we render, we only use the
 precalculated world transform. If the object never moves, the cached transform
-is always up-to-date and everything&#8217;s happy.</p>
+is always up to date and everything&#8217;s happy.</p>
 <p>When an object <em>does</em> move, the simple approach is to refresh its world
 transform right then. But don&#8217;t forget the hierarchy! When a parent moves, we
 have to recalculate its world transform <em>and all of its children&#8217;s,
@@ -413,7 +413,7 @@ parent chain to calculate world transforms because we calculate as we go while
 walking <em>down</em> the chain.</p>
 <p>We calculate the node&#8217;s world transform and store it in <code>world</code>, then we render
 the mesh, if we have one. Finally, we recurse into the child nodes, passing in
-<em>this</em> node&#8217;s world transform. All in all, it&#8217;s nice, tight, simple recursive
+<em>this</em> node&#8217;s world transform. All in all, it&#8217;s a tight, simple recursive
 method.</p>
 <p>To draw an entire scene graph, we kick off the process at the root node:</p>
 <div class="codehilite"><pre><span class="n">graph_</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">());</span>
@@ -446,7 +446,7 @@ First, we need to add two fields to <code>GraphNode</code>:</p>
 
 <p>The <code>world_</code> field caches the previously calculated world transform, and
 <code>dirty_</code>, of course, is the dirty flag. Note that the flag starts out <code>true</code>.
-When we create a new node, we haven&#8217;t calculated it&#8217;s world transform yet. At
+When we create a new node, we haven&#8217;t calculated its world transform yet. At
 birth, it&#8217;s already out of sync with the local transform.</p>
 <p>The only reason we need this pattern is because objects can <em>move</em>, so let&#8217;s add
 support for that:</p>
@@ -507,7 +507,7 @@ value.</p>
 be <code>true</code> if any node above this node in the parent chain was dirty. In much the
 same way that <code>parentWorld</code> updates the world transform incrementally as we
 traverse down the hierarchy, <code>dirty</code> tracks the dirtiness of the parent chain.</p>
-<p>This lets us avoid having to recursively set each child&#8217;s <code>dirty_</code> flag
+<p>This lets us avoid having to recursively mark each child&#8217;s <code>dirty_</code> flag
 in <code>setTransform()</code>. Instead, we pass the parent&#8217;s dirty flag down to its
 children when we render and look at that too to see if we need to recalculate
 the world transform.</p>
@@ -543,10 +543,10 @@ it, we&#8217;d have to do something different.</p>
 </li>
 <li>
 <p><strong>At well-defined checkpoints:</strong></p>
-<p>Sometimes, there is a point in time in the progression of the game where it&#8217;s
+<p>Sometimes, there is a point in time or in the progression of the game where it&#8217;s
 natural to do the deferred processing. For example,
 we may want to save the game only when the pirate sails into port. Or the
-sync point may not be part of the game mechanics. We may want to hide the
+sync point may not be part of the game mechanics. We may just want to hide the
 work behind a loading screen or a cut scene.</p>
 <ul>
 <li>
