@@ -607,7 +607,8 @@ on the ship this modification occurred.
     * *You end up processing unchanged data.* Add a single barrel to a deck
         and you'll have to send the whole thing to the server.
 
-    * *Less memory is used for storing dirty flags.*
+    * *Less memory is used for storing dirty flags.* Add ten barrels to a deck
+        and you only need a single bit to track them all.
 
     * *Less time is spent on fixed overhead.* When processing some changed data,
        there's often a bit of fixed work you have to do on top of handling the
