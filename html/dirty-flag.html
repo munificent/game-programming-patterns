@@ -30,7 +30,7 @@
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Avoid unnecessary work by deferring it until the result is needed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>&#8220;Flag&#8221; and &#8220;bit&#8221; are synonymous in programming: they both mean a single micron
+<p>&#8220;Flag&#8221; and &#8220;bit&#8221; are synonymous in programming&#8202;&mdash;&#8202;they both mean a single micron
 of data that can be in one of two states. We call those &#8220;true&#8221; and &#8220;false&#8221;, or
 sometimes &#8220;set&#8221; and &#8220;cleared&#8221;. I&#8217;ll use all of these interchangeably. &#8220;Dirty
 bit&#8221; is an equally <span name="specific">common</span> name for this pattern,
@@ -44,27 +44,27 @@ bit</a>.</p>
 <h3><a href="#locating-a-ship-at-sea" name="locating-a-ship-at-sea">Locating a ship at sea</a></h3>
 <p>Many games have something called a <em>scene graph</em>. This is a big data structure
 that contains all of the objects in the world. The rendering engine uses this to
-determine where on screen to draw stuff.</p>
+determine where to draw stuff on the screen.</p>
 <p>At its simplest, a scene graph is just a flat list of objects. Each object has a
-model or some other graphic primitive, and a <span
+model, or some other graphic primitive, and a <span
 name="transform"><em>transform</em></span>. The transform describes the object&#8217;s
-position, rotation, and scale in the world. To move or turn an object, we just
+position, rotation, and scale in the world. To move or turn an object, we simply
 change its transform.</p>
 <aside name="transform">
 
-<p>The mechanics of <em>how</em> this transform is stored and manipulated is unfortunately
+<p>The mechanics of <em>how</em> this transform is stored and manipulated are unfortunately
 out of scope here. The comically abbreviated summary is that it&#8217;s a 4x4 matrix.
-You can make a single transform that combines two transforms&#8202;&mdash;&#8202;for example
+You can make a single transform that combines two transforms&#8202;&mdash;&#8202;for example,
 translating and then rotating an object&#8202;&mdash;&#8202;by multiplying the two matrices.</p>
 <p>How and why that works is left as an exercise for the reader.</p>
 </aside>
 
 <p>When the renderer draws an object, it takes the object&#8217;s model, applies the
-transform to it, and then renders it there in the world. If we just had a scene
-<em>bag</em> and not a scene <em>graph</em> that would be it and life would be simple.</p>
+transform to it, and then renders it there in the world. If we had a scene
+<em>bag</em> and not a scene <em>graph</em>, that would be it, and life would be simple.</p>
 <p>However, most scene graphs are <span name="hierarchical"><em>hierarchical</em></span>.
 An object in the graph may have a parent object that it is anchored to. In that
-case, its transform is relative to the <em>parent&#8217;s</em> position, and isn&#8217;t its
+case, its transform is relative to the <em>parent&#8217;s</em> position and isn&#8217;t its
 absolute position in the world.</p>
 <p>For example, imagine our game world has a pirate ship at sea. Atop the ship&#8217;s
 mast is a crow&#8217;s nest. Hunched in that crow&#8217;s nest is a pirate. Clutching the
@@ -81,7 +81,7 @@ the sea. The crow&#8217;s nest&#8217;s transform positions it on the ship, and s
 If we change the local transform of the ship, the crow&#8217;s nest, pirate, and
 parrot go along for the ride. It would be a total <span
 name="slide">headache</span> if, when the ship moved, we had to manually adjust
-the transforms of everything on it to keep them from sliding off.</p>
+the transforms of all the objects on it to keep them from sliding off.</p>
 <aside name="slide">
 
 <p>To be honest, when you are at sea you <em>do</em> have to keep manually adjusting your
@@ -92,7 +92,7 @@ position to keep from sliding off. Maybe I should have chosen a drier example.</
 in the world. I&#8217;ll call the parent-relative transform the object&#8217;s <em>local
 transform</em>. To render an object, we need to know its <em>world transform</em>.</p>
 <h3><a href="#local-and-world-transforms" name="local-and-world-transforms">Local and world transforms</a></h3>
-<p>Calculating an object&#8217;s world transform is pretty straightforward: you just walk
+<p>Calculating an object&#8217;s world transform is pretty straightforward&#8202;&mdash;&#8202;you just walk
 its parent chain starting at the root all the way down to the object, combining
 transforms as you go. In other words, the parrot&#8217;s world transform is:</p>
 <p><span name="degenerate"></span>
@@ -104,11 +104,11 @@ transforms are equivalent.</p>
 </aside>
 
 <p>We need the world transform for every object in the world every frame, so even
-though it&#8217;s just a handful of matrix multiplications per model, it&#8217;s on the hot
+though there are only a handful of matrix multiplications per model, it&#8217;s on the hot
 code path where performance is critical. Keeping them up to date is tricky
 because when a parent object moves, that affects the world transform of itself
 and all of its children, recursively.</p>
-<p>The simplest approach is to just calculate transforms on the fly while
+<p>The simplest approach is to calculate transforms on the fly while
 rendering. Each frame, we recursively traverse the scene graph starting at the
 top of the hierarchy. For each object, we calculate its world transform right
 then and draw it.</p>
@@ -118,9 +118,9 @@ makes up the level. Recalculating their world transforms each frame even though
 they haven&#8217;t changed is a waste.</p>
 <h3><a href="#cached-world-transforms" name="cached-world-transforms">Cached world transforms</a></h3>
 <p>The obvious answer is to <em>cache</em> it. In each object, we store its local
-transform and its derived world transform. When we render, we just use the
+transform and its derived world transform. When we render, we only use the
 precalculated world transform. If the object never moves, the cached transform
-is always up to date and everything&#8217;s happy.</p>
+is always up-to-date and everything&#8217;s happy.</p>
 <p>When an object <em>does</em> move, the simple approach is to refresh its world
 transform right then. But don&#8217;t forget the hierarchy! When a parent moves, we
 have to recalculate its world transform <em>and all of its children&#8217;s,
@@ -143,7 +143,7 @@ That&#8217;s six pointless calculations that get thrown out before they are ever
 by the renderer. We calculated the parrot&#8217;s world transform <em>four</em> times, but it
 only got rendered once.</p>
 <p>The problem is that a world transform may depend on several local transforms.
-Since we recalculate immediately each time <em>one</em> of those changes, we end up
+Since we recalculate immediately each time <em>one</em> of the transforms changes, we end up
 recalculating the same transform multiple times when more than one of the local
 transforms it depends on changes in the same frame.</p>
 <h3><a href="#deferred-recalculation" name="deferred-recalculation">Deferred recalculation</a></h3>
@@ -154,21 +154,21 @@ transform just once after all of those modifications are done, right before we
 need it to render.</p>
 <aside name="decoupling">
 
-<p>It&#8217;s interesting how much of software architecture is just intentionally
+<p>It&#8217;s interesting how much of software architecture is intentionally
 engineering a little slippage.</p>
 </aside>
 
 <p>To do this, we add a flag to each object in the graph. When the local transform
 changes, we set it. When we need the object&#8217;s world transform, we check the
-flag. If it&#8217;s set, we calculate the world transform then and clear the flag. The
+flag. If it&#8217;s set, we calculate the world transform and then clear the flag. The
 flag represents, &#8220;Is the world transform out of date?&#8221; For reasons that aren&#8217;t
 entirely clear, the traditional name for this &#8220;out-of-date-ness&#8221; is &#8220;dirty&#8221;.
 Hence: <em>a dirty flag</em>.</p>
 <p>If we apply this pattern and then move all of the objects in our previous
 example, the game ends up doing:</p>
 <p><img src="images/dirty-flag-update-good.png" alt="By deferring until all moves are done, we only recalculate once." /></p>
-<p>That&#8217;s the best you could hope to do: the world transform for each affected
-object is calculated exactly once. With just a single bit of data, this pattern
+<p>That&#8217;s the best you could hope to do&#8202;&mdash;&#8202;the world transform for each affected
+object is calculated exactly once. With only a single bit of data, this pattern
 does a few things for us:</p>
 <ul>
 <li>
@@ -198,7 +198,7 @@ have a performance problem big enough to justify the added code complexity.</p>
 <em>synchronization</em>. In both cases, the process of going from the primary data to
 the derived data is time-consuming or otherwise costly.</p>
 <p>In our scene graph example, the process is slow because of the amount of math to
-perform. When using this pattern for synchronization on the other hand, it&#8217;s
+perform. When using this pattern for synchronization, on the other hand, it&#8217;s
 more often that the derived data is <em>somewhere else</em>&#8202;&mdash;&#8202;either on disk or over
 the network on another machine&#8202;&mdash;&#8202;and simply getting it from point A to point B
 is what&#8217;s expensive.</p>
@@ -212,13 +212,13 @@ is what&#8217;s expensive.</p>
     to the primary data, this pattern can&#8217;t help.</p>
 </li>
 <li>
-<p><strong>It should be hard to incrementally update.</strong> Let&#8217;s say the
+<p><strong>It should be hard to update incrementally.</strong> Let&#8217;s say the
     pirate ship in our game can only carry so much booty. We need to
     know the total weight of everything in the hold. We
     <em>could</em> use this pattern and have a dirty flag for the total weight. Every
     time we add or remove some loot, we set the flag. When we need the
     total, we add up all of the booty and clear the flag.</p>
-<p>But a simpler solution is to just <em>keep a running total</em>. When we add or
+<p>But a simpler solution is to <em>keep a running total</em>. When we add or
 remove an item, just add or remove its weight from the current total. If
 we can &#8220;pay as we go&#8221; like this and keep the derived data updated, then
 that&#8217;s often a better choice than using this pattern and calculating the
@@ -238,7 +238,7 @@ hacks.</p>
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <p>Even after you&#8217;ve convinced yourself this pattern is a good fit, there are a few
 wrinkles that can cause you some discomfort.</p>
-<h3><a href="#there-is-a-cost-to-deferring-too-long" name="there-is-a-cost-to-deferring-too-long">There is a cost to deferring too long</a></h3>
+<h3><a href="#there-is-a-cost-to-deferring-for-too-long" name="there-is-a-cost-to-deferring-for-too-long">There is a cost to deferring for too long</a></h3>
 <p>This pattern defers some slow work until the result is actually needed, but when
 it is, it&#8217;s often needed <em>right now</em>. But the reason we&#8217;re using this pattern to
 begin with is because calculating that result is slow!</p>
@@ -267,7 +267,7 @@ system too much by saving all the time.</p>
 
 <p>This mirrors the different garbage collection strategies in systems that
 automatically manage memory. Reference counting frees memory the second it&#8217;s no
-longer needed, but burns CPU time updating ref counts eagerly every time
+longer needed, but it burns CPU time updating ref counts eagerly every time
 references are changed.</p>
 <p>Simple garbage collectors defer reclaiming memory until it&#8217;s really needed, but
 the cost is the dreaded &#8220;GC pause&#8221; that can freeze your entire game until the
@@ -290,12 +290,12 @@ cache invalidation and naming things.&#8221;</p>
 </aside>
 
 <p>Miss it in one place, and your program will incorrectly use stale derived data.
-This leads to confused players and very hard to track down bugs. When you use
+This leads to confused players and bugs that are very hard to track down. When you use
 this pattern, you&#8217;ll have to take care that any code that modifies the primary
 state also sets the dirty flag.</p>
 <p>One way to mitigate this is by encapsulating modifications to the primary data
 behind some interface. If anything that can change the state goes through a
-single narrow API, you can set the dirty bit there and rest assured that it
+single narrow API, you can set the dirty flag there and rest assured that it
 won&#8217;t be missed.</p>
 <h3><a href="#you-have-to-keep-the-previous-derived-data-in-memory" name="you-have-to-keep-the-previous-derived-data-in-memory">You have to keep the previous derived data in memory</a></h3>
 <p><span name="sync"></span></p>
@@ -317,7 +317,7 @@ calculation every time you need the result.</p>
 memory for speed. In return for keeping the previously calculated data in
 memory, you avoid having to recalculate it when it hasn&#8217;t changed. This
 trade-off makes sense when the calculation is slow and memory is cheap. When
-you&#8217;ve got more time than memory on your hands, it&#8217;s better to just calculate it
+you&#8217;ve got more time than memory on your hands, it&#8217;s better to calculate it
 as needed.</p>
 <aside name="trade">
 
@@ -326,7 +326,7 @@ as needed.</p>
 </aside>
 
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
-<p>Let&#8217;s assume we&#8217;ve met the surprisingly long list of requirements, and see how
+<p>Let&#8217;s assume we&#8217;ve met the surprisingly long list of requirements and see how
 the pattern looks in code. As I mentioned before, the actual math behind
 transform matrices is beyond the humble aims of this book, so I&#8217;ll just
 encapsulate that in a class whose implementation you can presume exists
@@ -370,7 +370,7 @@ parent. It has a mesh which is the actual graphic for the object. (We&#8217;ll a
 <code>mesh_</code> to be <code>NULL</code> too to handle non-visual nodes that are used just to group
 their children.) Finally, each node has a possibly empty collection of child
 nodes.</p>
-<p>With this, a &#8220;scene graph&#8221; is really just a single root <code>GraphNode</code> whose
+<p>With this, a &#8220;scene graph&#8221; is really only a single root <code>GraphNode</code> whose
 children (and grandchildren, etc.) are all of the objects in the world:</p>
 <div class="codehilite"><pre><span class="n">GraphNode</span><span class="o">*</span> <span class="n">graph_</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GraphNode</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
 <span class="c1">// Add children to root graph node...</span>
@@ -378,7 +378,7 @@ children (and grandchildren, etc.) are all of the objects in the world:</p>
 
 
 <p>In order to render a scene graph, all we need to do is traverse that tree of
-nodes starting at the root and call the following function for each node&#8217;s mesh
+nodes, starting at the root, and call the following function for each node&#8217;s mesh
 with the right world transform:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="nf">renderMesh</span><span class="p">(</span><span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">Transform</span> <span class="n">transform</span><span class="p">);</span>
 </pre></div>
@@ -412,8 +412,8 @@ to combine that with its own local transform. We don&#8217;t have to walk <em>up
 parent chain to calculate world transforms because we calculate as we go while
 walking <em>down</em> the chain.</p>
 <p>We calculate the node&#8217;s world transform and store it in <code>world</code>, then we render
-the mesh if we have one. Finally, we recurse into the child nodes, passing in
-<em>this</em> node&#8217;s world transform. All in all, it&#8217;s nice tight, simple recursive
+the mesh, if we have one. Finally, we recurse into the child nodes, passing in
+<em>this</em> node&#8217;s world transform. All in all, it&#8217;s nice, tight, simple recursive
 method.</p>
 <p>To draw an entire scene graph, we kick off the process at the root node:</p>
 <div class="codehilite"><pre><span class="n">graph_</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">());</span>
@@ -421,7 +421,7 @@ method.</p>
 
 
 <h3><a href="#let's-get-dirty" name="let's-get-dirty">Let&#8217;s get dirty</a></h3>
-<p>So this code does the right thing&#8202;&mdash;&#8202;renders all the meshes in the right place
+<p>So this code does the right thing&#8202;&mdash;&#8202;it renders all the meshes in the right place
 &#8212; but it doesn&#8217;t do it efficiently. It&#8217;s calling <code>local_.combine(parentWorld)</code>
 on every node in the graph, every frame. Let&#8217;s see how this pattern fixes that.
 First, we need to add two fields to <code>GraphNode</code>:</p>
@@ -444,10 +444,10 @@ First, we need to add two fields to <code>GraphNode</code>:</p>
 </pre></div>
 
 
-<p>The <code>world_</code> field caches the previously-calculated world transform, and
+<p>The <code>world_</code> field caches the previously calculated world transform, and
 <code>dirty_</code>, of course, is the dirty flag. Note that the flag starts out <code>true</code>.
-When we create a new node, we haven&#8217;t calculated it&#8217;s world transform yet, so at
-birth it&#8217;s already out of sync with the local transform.</p>
+When we create a new node, we haven&#8217;t calculated it&#8217;s world transform yet. At
+birth, it&#8217;s already out of sync with the local transform.</p>
 <p>The only reason we need this pattern is because objects can <em>move</em>, so let&#8217;s add
 support for that:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">GraphNode</span><span class="o">::</span><span class="n">setTransform</span><span class="p">(</span><span class="n">Transform</span> <span class="n">local</span><span class="p">)</span>
@@ -459,10 +459,10 @@ support for that:</p>
 
 
 <p>The important part here is that it sets the dirty flag too. Are we forgetting
-anything? Right: the child nodes!</p>
+anything? Right&#8202;&mdash;&#8202;the child nodes!</p>
 <p>When a parent node moves, all of its children&#8217;s world coordinates are
-invalidated too. But here we aren&#8217;t setting their dirty flags. We <em>could</em> do
-that, but that&#8217;s recursive and slow. Instead we&#8217;ll do something clever when we
+invalidated too. But here, we aren&#8217;t setting their dirty flags. We <em>could</em> do
+that, but that&#8217;s recursive and slow. Instead, we&#8217;ll do something clever when we
 go to render. Let&#8217;s see:</p>
 <p><span name="branch"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">GraphNode</span><span class="o">::</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span> <span class="n">parentWorld</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">dirty</span><span class="p">)</span>
@@ -487,11 +487,11 @@ go to render. Let&#8217;s see:</p>
 <aside name="branch">
 
 <p>There&#8217;s a subtle assumption here that the <code>if</code> check is faster than a matrix
-multiply. Intuitively, you would think it is: surely testing a single bit is
+multiply. Intuitively, you would think it is; surely testing a single bit is
 faster than a bunch of floating point arithmetic.</p>
 <p>However, modern CPUs are fantastically complex. They rely heavily on
 <em>pipelining</em>&#8202;&mdash;&#8202;queueing up a series of sequential instructions. A branch like
-our <code>if</code> here can cause a <em>branch misprediction</em> and force the CPU lose cycles
+our <code>if</code> here can cause a <em>branch misprediction</em> and force the CPU to lose cycles
 refilling the pipeline.</p>
 <p>The <a href="data-locality.html" class="pattern">Data Locality</a> chapter has
 more about how modern CPUs try to go faster and how you can avoid tripping them
@@ -499,7 +499,7 @@ up like this.</p>
 </aside>
 
 <p>This is similar to the original na&iuml;ve implementation. The key changes are that
-we check to see if the node is dirty before calculating the world transform, and
+we check to see if the node is dirty before calculating the world transform and
 we store the result in a field instead of a local variable. When the node is
 clean, we skip <code>combine()</code> completely and use the old but still correct <code>world_</code>
 value.</p>
@@ -507,8 +507,8 @@ value.</p>
 be <code>true</code> if any node above this node in the parent chain was dirty. In much the
 same way that <code>parentWorld</code> updates the world transform incrementally as we
 traverse down the hierarchy, <code>dirty</code> tracks the dirtiness of the parent chain.</p>
-<p>This lets us avoid having to actually recursively set each child&#8217;s <code>dirty_</code> flag
-in <code>setTransform()</code>. Instead, we just pass the parent&#8217;s dirty flag down to its
+<p>This lets us avoid having to recursively set each child&#8217;s <code>dirty_</code> flag
+in <code>setTransform()</code>. Instead, we pass the parent&#8217;s dirty flag down to its
 children when we render and look at that too to see if we need to recalculate
 the world transform.</p>
 <p>The end result here is exactly what we want: changing a node&#8217;s local transform
@@ -536,17 +536,17 @@ it, we&#8217;d have to do something different.</p>
 <li>
 <p><em>If the calculation is time-consuming, it can cause a noticeable pause.</em>
     Postponing the work until the player is expecting to see the result can
-    affect their gameplay experience. Often, it&#8217;s fast enough that this
+    affect their gameplay experience. It&#8217;s often fast enough that this
     isn&#8217;t a problem, but if it is, you&#8217;ll have to do the work earlier.</p>
 </li>
 </ul>
 </li>
 <li>
 <p><strong>At well-defined checkpoints:</strong></p>
-<p>Sometimes there is a point in time or the progression of the game where it&#8217;s
+<p>Sometimes, there is a point in time in the progression of the game where it&#8217;s
 natural to do the deferred processing. For example,
 we may want to save the game only when the pirate sails into port. Or the
-sync point may not be part of the game mechanics. We may just want to hide the
+sync point may not be part of the game mechanics. We may want to hide the
 work behind a loading screen or a cut scene.</p>
 <ul>
 <li>
@@ -579,7 +579,7 @@ when a program receives user input and when it responds is <a href="http://en.wi
 <ul>
 <li>
 <p><em>You can tune how often the work is performed.</em> By adjusting the timer
-    interval you can ensure it happens as frequently (or infrequently) as
+    interval, you can ensure it happens as frequently (or infrequently) as
     you want.</p>
 </li>
 <li>
