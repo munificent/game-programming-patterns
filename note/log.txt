@@ -1,3 +1,8 @@
+2014-08-15 - email, set up group for translators
+2014-08-14 - finish dirty flag, renumber front matter
+2014-08-13 - start laying out dirty flag
+2014-08-12 - rescan illustrations
+2014-08-11 - merge dirty flag
 2014-08-10 - figure out which illustrations need rescanning
 2014-08-09 - email (1 :( )
 2014-08-08 - layout data locality
