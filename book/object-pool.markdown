@@ -10,7 +10,7 @@ of allocating and freeing them individually.*
 
 We're working on the visual effects for our game. When the hero casts a spell,
 we want a shimmer of sparkles to burst across the screen. This calls for a
-*particle system*: an engine that spawns little sparkly graphics and animates
+*particle system*, an engine that spawns little sparkly graphics and animates
 them until they wink out of existence.
 
 Since a single wave of the wand could cause hundreds of particles to be spawned,
@@ -20,11 +20,11 @@ need to make sure that creating and destroying these particles doesn't cause
 
 ### The curse of fragmentation
 
-Programming for a game console like the XBox 360 is closer to embedded
+Programming for a game console like the Xbox 360 is closer to embedded
 programming than conventional PC programming in many ways. Like embedded
 programming, console games must run continuously for a very long time without
-crashing or leaking memory and efficient compacting memory managers are rarely
-available. In this environment memory fragmentation is deadly.
+crashing or leaking memory, and efficient compacting memory managers are rarely
+available. In this environment, memory fragmentation is deadly.
 
 Fragmentation means the free space in our heap is <span
 name="park">broken</span> into smaller pieces of memory instead of one large
@@ -32,7 +32,7 @@ open block. The *total* memory available may be large, but the largest
 *contiguous* region might be painfully small. Say we've got fourteen bytes free,
 but it's fragmented into two seven-byte pieces with a chunk of in-use memory
 between them. If we try to allocate a twelve-byte object, we'll fail. No more
-sparklies onscreen.
+sparklies on screen.
 
 <aside name="park">
 
@@ -48,7 +48,7 @@ free space is *fragmented* into bits of open curb between half a dozen cars.
 
 <aside name="heap">
 
-Here's how a heap becomes fragmented, and how it can cause an allocation to fail
+Here's how a heap becomes fragmented and how it can cause an allocation to fail
 even where there's theoretically enough memory available.
 
 </aside>
@@ -61,20 +61,20 @@ and filled-in crevices, ultimately hosing the game completely.
 
 Most console makers require games to pass "soak tests" where they leave the game
 running in demo mode for several days. If the game crashes, they don't allow it
-to ship. While soak tests sometimes fail because of a rarely-occurring bug, it's
+to ship. While soak tests sometimes fail because of a rarely occurring bug, it's
 usually creeping fragmentation or memory leakage that brings the game down.
 
 </aside>
 
 ### The best of both worlds
 
-Because of fragmentation, and because allocation may be slow, games are very
-careful about when and how they manage memory. A simple solution is often best:
-grab a big chunk of memory when the game starts and don't free it until the game
+Because of fragmentation and because allocation may be slow, games are very
+careful about when and how they manage memory. A simple solution is often best --
+grab a big chunk of memory when the game starts, and don't free it until the game
 ends. But this is a pain for systems where we need to create and destroy things
 while the game is running.
 
-An object pool gives us the best of both worlds: to the memory manager, we're
+An object pool gives us the best of both worlds. To the memory manager, we're
 just allocating one big hunk of memory up front and not freeing it while the
 game is playing. To the users of the pool, we can freely allocate and deallocate
 objects to our heart's content.
@@ -82,20 +82,20 @@ objects to our heart's content.
 ## The Pattern
 
 Define a **pool** class that maintains a collection of **reusable objects**.
-Each object supports an **"in use" query** to tell if it is currently "alive."
+Each object supports an **"in use" query** to tell if it is currently "alive".
 When the pool is initialized, it creates the entire collection of objects up
 front (usually in a single contiguous allocation) and initializes them all to
 the "not in use" state.
 
 When you want a new object, ask the pool for one. It finds an available object,
-initializes it to "in use" and returns it. When the object is no longer needed,
+initializes it to "in use", and returns it. When the object is no longer needed,
 it is set back to the "not in use" state. This way, objects can be freely
 created and destroyed without needing to allocate memory or other resources.
 
 ## When to Use It
 
 This pattern is used widely in games for obvious things like game entities and
-visual effects, but also for less visible data structures such as currently
+visual effects, but it is also used for less visible data structures such as currently
 playing sounds. Use Object Pool when:
 
  *  You need to frequently create and destroy objects.
@@ -110,7 +110,7 @@ playing sounds. Use Object Pool when:
 
 ## Keep in Mind
 
-You normally rely on a garbage collector or just `new` and `delete` to handle
+You normally rely on a garbage collector or `new` and `delete` to handle
 memory management for you. By using an object pool, you're saying, "I know
 better how these bytes should be handled." That means the onus is on you to deal
 with this pattern's limitations.
@@ -124,14 +124,14 @@ smaller pool frees up memory that could be used for other fun stuff.
 
 ### Only a fixed number of objects can be active at any one time
 
-In some ways this is a good thing. Partitioning memory into separate pools for
+In some ways, this is a good thing. Partitioning memory into separate pools for
 different types of objects ensures that, for example, a huge sequence of
 explosions won't cause your particle system to eat *all* of the available
 memory, preventing something more critical like a new enemy from being created.
 
 Nonetheless, this also means being prepared for the possibility that your
 attempt to reuse an object from the pool will fail because they are all in use.
-There are a few common strategies to handle this.
+There are a few common strategies to handle this:
 
  *  *Prevent it outright.* This is the most common "fix": tune the pool sizes so
     that they never overflow regardless of what the user does. For pools of
@@ -154,7 +154,7 @@ There are a few common strategies to handle this.
 
  *  *Forcibly kill an existing object.* Consider a pool for currently playing
     sounds, and assume you want to start a new sound but the pool is full. You
-    do *not* want to simply ignore the new sound: the user will notice if their
+    do *not* want to simply ignore the new sound -- the user will notice if their
     magical wand swishes dramatically *sometimes* and stay stubbornly silent
     other times. A better solution is to find the quietest sound already playing
     and replace that with our new sound. The new sound will mask the audible
@@ -165,7 +165,7 @@ There are a few common strategies to handle this.
 
  *  *Increase the size of the pool.* If your game lets you be a bit more
     flexible with memory, you may be able to increase the size of the pool at
-    runtime, or create a second overflow pool. If you do grab more memory in
+    runtime or create a second overflow pool. If you do grab more memory in
     either of these ways, consider whether or not the pool should contract to
     its previous size when the additional capacity is no longer needed.
 
@@ -228,7 +228,7 @@ the memory manager will usually deal with fragmentation for you. But pools are
 still useful there to avoid the cost of allocation and deallocation, especially
 on mobile devices with slower CPUs and simpler garbage collectors.
 
-If you do use an object pool there, beware of a potential conflict. Since the
+If you do use an object pool in concert with a garbage collector, beware of a potential conflict. Since the
 pool doesn't actually deallocate objects when they're no longer in use, they
 remain in memory. If they contain references to *other* objects, it will prevent
 the collector from reclaiming those too. To avoid this, when a pooled object is
@@ -237,7 +237,7 @@ no longer in use, clear any references it has to other objects.
 ## Sample Code
 
 Real-world particle systems will often apply gravity, wind, friction, and other
-physical effects. Our much simpler sample will just move particles in a straight
+physical effects. Our much simpler sample will only move particles in a straight
 line for a certain number of frames and then kill the particle. Not exactly film
 caliber, but it should illustrate how to use an object pool.
 
@@ -246,15 +246,15 @@ particle class:
 
 ^code 1
 
-The default constructor initializes the particle to "not in use." A later call
+The default constructor initializes the particle to "not in use". A later call
 to `init()` initializes the particle to a live state.
 
 Particles are animated over time using the unsurprisingly named `animate()`
 function, which should be called once per frame.
 
 The pool needs to know which particles are available for reuse. It gets this
-from the particle's `inUse()` function. It takes advantage of the fact that
-particles have a limited lifetime, and uses the `_framesLeft` variable to
+from the particle's `inUse()` function. This function takes advantage of the fact that
+particles have a limited lifetime and uses the `_framesLeft` variable to
 discover which particles are in use without having to store a separate flag.
 
 The pool class is also simple:
@@ -275,7 +275,7 @@ class="pattern">Update Method</a> pattern.
 The particles themselves are simply stored in a fixed-size array in the class.
 In this sample implementation, the pool size is hardcoded in the class
 declaration, but this could be defined externally by using a dynamic array of a
-given size, or using a value template parameter.
+given size or by using a value template parameter.
 
 Creating a new particle is straightforward:
 
@@ -286,7 +286,7 @@ find it, we initialize it and we're done. Note that in this implementation, if
 there aren't any available particles, we simply don't create a new one.
 
 That's all there is to a simple particle system, aside from rendering the
-particles, of course. We can now create a pool, and create some particles using
+particles, of course. We can now create a pool and create some particles using
 it. The particles will automatically deactivate themselves when their lifetime
 has expired.
 
@@ -307,7 +307,7 @@ algorithms class.
 
 If we don't want to waste time *finding* free particles, the obvious answer is
 to not lose track of them. We could store a separate list of pointers to each
-unused particle. Then, when we need to create a particle, we just remove the
+unused particle. Then, when we need to create a particle, we remove the
 first pointer from the list and reuse the particle it points to.
 
 Unfortunately, this would require us to maintain an entire separate array with
@@ -316,7 +316,7 @@ create the pool, *all* particles are unused, so the list would initially have a
 pointer to every object in the pool.
 
 It would be nice to fix our performance problems *without* sacrificing any
-memory. Conveniently, there is some memory already lying around we can borrow:
+memory. Conveniently, there is some memory already lying around that we can borrow --
 the data for the unused particles themselves.
 
 When a particle isn't in use, most of its state is irrelevant. Its position and
@@ -326,7 +326,7 @@ other bits can be reused. Here's a revised particle:
 
 ^code 4
 
-We've gotten all of the member variables except for `framesLeft_` and moved them
+We've moved all of the member variables except for `framesLeft_`
 into a `live` struct inside a `state_` <span name="union">union</span>. This
 struct holds the particle's state when it's being animated. When the particle is
 unused, the other case of the union, the `next` member, is used. It holds a
@@ -336,7 +336,7 @@ pointer to the next available particle after this one.
 
 Unions don't seem to be used that often these days, so the syntax may be
 unfamiliar to you. If you're on a game team, you've probably got a "memory
-guru," that beleaguered compatriot whose job it is to come up with a solution
+guru", that beleaguered compatriot whose job it is to come up with a solution
 when the game has inevitably blown its memory budget. Ask them about unions.
 They'll know all about them and other fun bit-packing tricks.
 
@@ -344,7 +344,7 @@ They'll know all about them and other fun bit-packing tricks.
 
 We can use these pointers to build a linked list that chains together every
 unused particle in the pool. We have the list of available particles we need,
-but didn't need to use any additional memory. Instead, we cannibalize the memory
+but we didn't need to use any additional memory. Instead, we cannibalize the memory
 of the dead particles themselves to store the list.
 
 This clever technique is called a [*free
@@ -360,7 +360,7 @@ list should thread through the entire pool. The pool constructor sets that up:
 
 ^code 6
 
-Now to create a new particle, we just jump directly to the <span
+Now to create a new particle, we jump directly to the <span
 name="first">first</span> available one:
 
 <aside name="first">
@@ -377,7 +377,7 @@ up the ghost in that frame:
 
 ^code particle-animate
 
-When that happens, we just thread it back onto the list:
+When that happens, we simply thread it back onto the list:
 
 ^code 8
 
@@ -406,7 +406,7 @@ objects.
 
      *  *You can ensure that the objects can only be created by the pool.* In
         C++, a simple way to do this is to make the pool class a friend of the
-        object class, and then make the object's constructor private.
+        object class and then make the object's constructor private.
 
         ^code 10
 
@@ -428,7 +428,7 @@ objects.
         reusable pool class.
 
      *  *The "in use" state must be tracked outside the objects.* The simplest
-        way to do this is by creating a separate bit field.
+        way to do this is by creating a separate bit field:
 
         ^code 11
 
@@ -456,12 +456,12 @@ outside.
 
      *  *The pool's interface can be simpler.* Instead of offering multiple
         functions to cover each way an object can be initialized, the pool can
-        simply return a reference to the new object.
+        simply return a reference to the new object:
 
         ^code 13
 
         The caller can then initialize the object by calling any method the
-        object exposes.
+        object exposes:
 
         ^code 14
 
@@ -469,7 +469,7 @@ outside.
         The previous example assumes that `create()` will always successfully
         return a pointer to an object. If the pool is full, though, it may
         return `NULL` instead. To be safe, you'll need to check for that before
-        you try to initialize the object.
+        you try to initialize the object:
 
         ^code 15
 
@@ -478,7 +478,7 @@ outside.
  *  This looks a lot like the <a class="gof-pattern" href="flyweight.html">
     Flyweight</a> pattern. Both maintain a collection of reusable objects. The
     difference is what "reuse" means. Flyweight objects are reused by sharing
-    the same instance between multiple owners *simultaneously*. It avoids
+    the same instance between multiple owners *simultaneously*. The Flyweight pattern avoids
     *duplicate* memory usage by using the same object in multiple contexts.
 
     The objects in a pool get reused too, but only over time. "Reuse" in the
