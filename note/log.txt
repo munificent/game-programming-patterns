@@ -1,3 +1,4 @@
+2014-08-16 - merge object pool changes
 2014-08-15 - email, set up group for translators
 2014-08-14 - finish dirty flag, renumber front matter
 2014-08-13 - start laying out dirty flag

@@ -536,7 +536,11 @@ sense. For no particular reason, let&#8217;s put ours inside the base state clas
 
 <p>Each of those static fields is the one instance of that state that the game
 uses. To make the heroine jump, the standing state would do something like:</p>
-<div class="codehilite"><pre>
+<div class="codehilite"><pre><span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">heroine</span><span class="p">.</span><span class="n">state_</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">HeroineState</span><span class="o">::</span><span class="n">jumping</span><span class="p">;</span>
+  <span class="n">heroine</span><span class="p">.</span><span class="n">setGraphics</span><span class="p">(</span><span class="n">IMAGE_JUMP</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 
 

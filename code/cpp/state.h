@@ -376,6 +376,7 @@ namespace State
     {
       //^omit
       friend class StandingState;
+      friend class JumpingState;
       //^omit
     public:
       virtual void handleInput(Input input)
@@ -511,9 +512,29 @@ namespace State
     };
     //^heroine-static-states
 
+    class Heroine
+    {
+      friend class JumpingState;
+    public:
+      void setGraphics(Animate animate) {}
+    private:
+      HeroineState* state_;
+    };
+
     class StandingState : public HeroineState {};
     class DuckingState : public HeroineState {};
-    class JumpingState : public HeroineState {};
+    class JumpingState : public HeroineState {
+      void handleInput(Heroine& heroine, Input input)
+      {
+        //^jump
+        if (input == PRESS_B)
+        {
+          heroine.state_ = &HeroineState::jumping;
+          heroine.setGraphics(IMAGE_JUMP);
+        }
+        //^jump
+      }
+    };
     class DivingState : public HeroineState {};
   }
 
