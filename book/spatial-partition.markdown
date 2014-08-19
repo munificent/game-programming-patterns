@@ -28,12 +28,12 @@ can start to be a performance bottleneck.
 
 Say we're making a real-time strategy game. Opposing armies with hundreds of
 units will clash together on the field of battle. Warriors need to know which
-nearby enemy to swing their blade at. The naïve way to handle this is by looking
+nearby enemy to swing their blades at. The naïve way to handle this is by looking
 at every pair of units and seeing how close they are to each other:
 
 ^code pairwise
 
-Here we have a doubly-nested loop where each loop is walking <span
+Here we have a doubly nested loop where each loop is walking <span
 name="all">all</span> of the units on the battlefield. That means the number of
 pairwise tests we have to perform each frame increases with the *square* of the
 number of units. Each additional unit we add has to be compared to *all* of the
@@ -54,13 +54,13 @@ In Big-O terms, though, this is still *O(n&sup2;)*.
 
 The problem we're running into is that there's no underlying order to the array
 of units. To find a unit near some location, we have to walk the entire array.
-Now imagine we simplify our game a bit. Instead of a 2D battle*field*, imagine
+Now, imagine we simplify our game a bit. Instead of a 2D battle*field*, imagine
 it's a 1D battle*line*.
 
 <img src="images/spatial-partition-battle-line.png" alt="A number line with Units positioned at different coordinates on it." />
 
 In that case, we could make things easier on ourselves by *sorting* the array of
-units by their position on the battleline. Once we do that, we can use something
+units by their positions on the battleline. Once we do that, we can use something
 <span name="array">like</span> a [binary
 search](http://en.wikipedia.org/wiki/Binary_search) to find nearby units without
 having to scan the entire array.
@@ -68,8 +68,8 @@ having to scan the entire array.
 <aside name="array">
 
 A binary search has *O(log n)* complexity, which means find all battling units
-goes from *O(n&sup2;)* to *O(n log n)*. Something like a [*pigeonhole
-sort*](http://en.wikipedia.org/wiki/Pigeonhole_sort) could get that down to
+goes from *O(n&sup2;)* to *O(n log n)*. Something like a [pigeonhole
+sort](http://en.wikipedia.org/wiki/Pigeonhole_sort) could get that down to
 *O(n)*.
 
 </aside>
@@ -84,7 +84,7 @@ For a set of **objects**, each has a **position in space**. Store them in a
 **spatial data structure** that organizes the objects by their positions. This
 data structure lets you **efficiently query for objects at or near a location**.
 When an object's position changes, **update the spatial data structure** so that
-it can continue to find it.
+it can continue to find the object.
 
 ## When to Use It
 
@@ -123,11 +123,11 @@ proposition.
 
 ## Sample Code
 
-The nature of patterns is that they *vary*: each implementation will be a bit
-different and spatial partitions are no exception. Unlike other patterns,
+The nature of patterns is that they *vary* -- each implementation will be a bit
+different, and spatial partitions are no exception. Unlike other patterns,
 though, many of these <span name="variations">variations</span> are
 well-documented. Academia likes publishing papers that prove performance gains.
-Since I just care about the concept behind the pattern, I'm going to show you
+Since I only care about the concept behind the pattern, I'm going to show you
 the simplest spatial partition: a *fixed grid*.
 
 <aside name="variations">
@@ -139,7 +139,7 @@ spatial partitions used in games.
 
 ### A sheet of graph paper
 
-Imagine the entire field of battle. Now superimpose a grid of fixed-size squares
+Imagine the entire field of battle. Now, superimpose a grid of fixed-size squares
 onto it like a sheet of graph paper. Instead of storing our units in a single
 array, we put them in the cells of this grid. Each cell stores the list of units
 whose positions are within that cell's boundary.
@@ -153,7 +153,7 @@ units.
 
 ### A grid of linked units
 
-OK, let's get coding. First, some prep work. Here's our basic unit class:
+OK, let's get coding. First, some prep work. Here's our basic `Unit` class:
 
 ^code unit-simple
 
@@ -171,7 +171,7 @@ we'll extend `Unit` with `next` and `prev` pointers:
 
 ^code unit-linked
 
-This lets us organize units into a [doubly-linked
+This lets us organize units into a [doubly linked
 list](http://en.wikipedia.org/wiki/Doubly_linked_list) instead of an array.
 
 <img src="images/spatial-partition-linked-list.png" alt="A Cell pointing to a a doubly linked list of Units." />
@@ -224,7 +224,7 @@ after the new unit.
 ### A clash of swords
 
 Once all of the units are nestled in their cells, we can let them start hacking
-at each other. With this new grid, the main method for handling combat look like
+at each other. With this new grid, the main method for handling combat looks like
 this:
 
 ^code grid-melee
@@ -237,22 +237,22 @@ cell then handles its combat like so:
 
 Aside from the pointer shenanigans to deal with walking a linked list, note that
 this is exactly <span name="nested">like</span> our original naïve method for
-handling combat: it compares each pair of units to see if they're in the same
+handling combat. It compares each pair of units to see if they're in the same
 position.
 
 The only difference is that we no longer have to compare *all* of the units in
-the battle to each other, just the ones close enough to be in the same cell.
+the battle to each other -- just the ones close enough to be in the same cell.
 That's the heart of the optimization.
 
 <aside name="nested">
 
 From a simple analysis, it looks like we've actually made the performance
-*worse*. We've gone from a doubly-nested loop over the units to a
-*triply*-nested loop over the cells and then the units. The trick here is that
+*worse*. We've gone from a doubly nested loop over the units to a
+*triply* nested loop over the cells and then the units. The trick here is that
 the two inner loops are now over a smaller number of units, which is enough to
 cancel out the cost of the outer loop over the cells.
 
-However, that does depend a bit on the granularity of our cells: make them too
+However, that does depend a bit on the granularity of our cells. Make them too
 small and that outer loop can start to matter.
 
 </aside>
@@ -284,7 +284,7 @@ If the unit *has* left its current cell, we remove it from that cell's linked
 list and then add it back to the grid. Like with adding a new unit, that will
 insert the unit in the linked list for its new cell.
 
-This is why we're using a doubly-linked list: we can very quickly add and remove
+This is why we're using a doubly linked list -- we can very quickly add and remove
 units from lists by setting a few pointers. With lots of units moving around
 each frame, that can be important.
 
@@ -337,17 +337,16 @@ The cell with the unit is `U`, and the neighboring cells it looks at are `X`.
 </aside>
 
 We only look at *half* of the neighbors for the same reason that the inner loop
-starts *after* the current unit: to avoid comparing each pair of units twice.
+starts *after* the current unit --  to avoid comparing each pair of units twice.
 Consider what would happen if we did check all eight neighboring cells.
 
 Let's say we have two units in adjacent cells close enough to hit each other,
-like the previous example. If, for each unit, we looked at all eight cells
-surrounding it, here's what would happen:
+like the previous example. Here's what would happen if we looked at all eight cells surrounding each unit:
 
- 1. When we are finding hits for A, we would look at its neighbor on the right
+ 1. When finding hits for A, we would look at its neighbor on the right
     and find B. So we'd register an attack between A and B.
 
- 2. Then, when we are finding hits for B, we would look at its neighbor on the
+ 2. Then, when finding hits for B, we would look at its neighbor on the
     *left* and find A. So we'd register a *second* attack between A and B.
 
 Only looking at half of the neighboring cells fixes that. *Which* half we look
@@ -390,7 +389,7 @@ programmer.
         <aside name="simpler">
 
         This is a design point I mention in almost every chapter, and for good
-        reason: whenever you can, take the simpler option. Much of software
+        reason. Whenever you can, take the simpler option. Much of software
         engineering is fighting against complexity.
 
         </aside>
@@ -425,8 +424,8 @@ programmer.
 
 ### Does the partitioning depend on the set of objects?
 
-In our sample code, the grid spacing was fixed beforehand and we slotted units
-into cells. Other partitioning schemes are adaptable: they pick partition
+In our sample code, the grid spacing was fixed beforehand, and we slotted units
+into cells. Other partitioning schemes are adaptable -- they pick partition
 boundaries based on the actual set of objects and where they are in the world.
 
 The goal is have a *balanced* partitioning where each region has roughly the
@@ -457,7 +456,7 @@ to solve.
 
         </aside>
 
-     *  *The partitions can be imbalanced.* Of course the downside of this
+     *  *The partitions can be imbalanced.* Of course, the downside of this
         rigidity is that you have less control over your partitions being evenly
         distributed. If objects clump together, you get worse performance there
         while wasting memory in the empty areas.
@@ -529,14 +528,14 @@ to solve.
 
      *  *The partitions are balanced.* Since any given square will have less
         than some fixed maximum number of objects, even when objects are
-        clustered together you don't have single partitions with a huge pile of
+        clustered together, you don't have single partitions with a huge pile of
         objects in them.
 
 ### Are objects only stored in the partition?
 
 You can treat your spatial partition as *the* place where the objects in your
 game live, or you can consider it just a secondary cache to make look-up faster
-while also having another collection that holds the list of objects directly.
+while also having another collection that directly holds the list of objects.
 
  *  **If it is the only place objects are stored:**
 

@@ -47,7 +47,7 @@ can start to be a performance bottleneck.</p>
 <h3><a href="#units-on-the-field-of-battle" name="units-on-the-field-of-battle">Units on the field of battle</a></h3>
 <p>Say we&#8217;re making a real-time strategy game. Opposing armies with hundreds of
 units will clash together on the field of battle. Warriors need to know which
-nearby enemy to swing their blade at. The na&iuml;ve way to handle this is by looking
+nearby enemy to swing their blades at. The na&iuml;ve way to handle this is by looking
 at every pair of units and seeing how close they are to each other:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="nf">handleMelee</span><span class="p">(</span><span class="n">Unit</span><span class="o">*</span> <span class="n">units</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">numUnits</span><span class="p">)</span>
 <span class="p">{</span>
@@ -65,7 +65,7 @@ at every pair of units and seeing how close they are to each other:</p>
 </pre></div>
 
 
-<p>Here we have a doubly-nested loop where each loop is walking <span
+<p>Here we have a doubly nested loop where each loop is walking <span
 name="all">all</span> of the units on the battlefield. That means the number of
 pairwise tests we have to perform each frame increases with the <em>square</em> of the
 number of units. Each additional unit we add has to be compared to <em>all</em> of the
@@ -82,19 +82,19 @@ B, we don&#8217;t need to check it again for B and A.</p>
 <h3><a href="#drawing-battle-lines" name="drawing-battle-lines">Drawing battle lines</a></h3>
 <p>The problem we&#8217;re running into is that there&#8217;s no underlying order to the array
 of units. To find a unit near some location, we have to walk the entire array.
-Now imagine we simplify our game a bit. Instead of a 2D battle<em>field</em>, imagine
+Now, imagine we simplify our game a bit. Instead of a 2D battle<em>field</em>, imagine
 it&#8217;s a 1D battle<em>line</em>.</p>
 <p><img src="images/spatial-partition-battle-line.png" alt="A number line with Units positioned at different coordinates on it." /></p>
 <p>In that case, we could make things easier on ourselves by <em>sorting</em> the array of
-units by their position on the battleline. Once we do that, we can use something
+units by their positions on the battleline. Once we do that, we can use something
 <span name="array">like</span> a <a href="http://en.wikipedia.org/wiki/Binary_search">binary
 search</a> to find nearby units without
 having to scan the entire array.</p>
 <aside name="array">
 
 <p>A binary search has <em>O(log n)</em> complexity, which means find all battling units
-goes from <em>O(n&sup2;)</em> to <em>O(n log n)</em>. Something like a <a href="http://en.wikipedia.org/wiki/Pigeonhole_sort"><em>pigeonhole
-sort</em></a> could get that down to
+goes from <em>O(n&sup2;)</em> to <em>O(n log n)</em>. Something like a <a href="http://en.wikipedia.org/wiki/Pigeonhole_sort">pigeonhole
+sort</a> could get that down to
 <em>O(n)</em>.</p>
 </aside>
 
@@ -106,7 +106,7 @@ is about applying that idea to spaces that have more than one dimension.</p>
 <strong>spatial data structure</strong> that organizes the objects by their positions. This
 data structure lets you <strong>efficiently query for objects at or near a location</strong>.
 When an object&#8217;s position changes, <strong>update the spatial data structure</strong> so that
-it can continue to find it.</p>
+it can continue to find the object.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>This is a common pattern for storing both live, moving game objects and also the
 static art and geometry of the game world. Sophisticated games often have
@@ -135,11 +135,11 @@ structures. Like many optimizations, it trades memory for speed. If you&#8217;re
 shorter on memory than you are on clock cycles, that may be a losing
 proposition.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
-<p>The nature of patterns is that they <em>vary</em>: each implementation will be a bit
-different and spatial partitions are no exception. Unlike other patterns,
+<p>The nature of patterns is that they <em>vary</em>&#8202;&mdash;&#8202;each implementation will be a bit
+different, and spatial partitions are no exception. Unlike other patterns,
 though, many of these <span name="variations">variations</span> are
 well-documented. Academia likes publishing papers that prove performance gains.
-Since I just care about the concept behind the pattern, I&#8217;m going to show you
+Since I only care about the concept behind the pattern, I&#8217;m going to show you
 the simplest spatial partition: a <em>fixed grid</em>.</p>
 <aside name="variations">
 
@@ -148,7 +148,7 @@ spatial partitions used in games.</p>
 </aside>
 
 <h3><a href="#a-sheet-of-graph-paper" name="a-sheet-of-graph-paper">A sheet of graph paper</a></h3>
-<p>Imagine the entire field of battle. Now superimpose a grid of fixed-size squares
+<p>Imagine the entire field of battle. Now, superimpose a grid of fixed-size squares
 onto it like a sheet of graph paper. Instead of storing our units in a single
 array, we put them in the cells of this grid. Each cell stores the list of units
 whose positions are within that cell&#8217;s boundary.</p>
@@ -158,7 +158,7 @@ comparing each unit in the game with every other unit, we&#8217;ve <em>partition
 battlefield into a bunch of smaller mini-battlefields, each with many fewer
 units.</p>
 <h3><a href="#a-grid-of-linked-units" name="a-grid-of-linked-units">A grid of linked units</a></h3>
-<p>OK, let&#8217;s get coding. First, some prep work. Here&#8217;s our basic unit class:</p>
+<p>OK, let&#8217;s get coding. First, some prep work. Here&#8217;s our basic <code>Unit</code> class:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Unit</span>
 <span class="p">{</span>
   <span class="k">friend</span> <span class="k">class</span> <span class="nc">Grid</span><span class="p">;</span>
@@ -219,7 +219,7 @@ we&#8217;ll extend <code>Unit</code> with <code>next</code> and <code>prev</code
 </pre></div>
 
 
-<p>This lets us organize units into a <a href="http://en.wikipedia.org/wiki/Doubly_linked_list">doubly-linked
+<p>This lets us organize units into a <a href="http://en.wikipedia.org/wiki/Doubly_linked_list">doubly linked
 list</a> instead of an array.</p>
 <p><img src="images/spatial-partition-linked-list.png" alt="A Cell pointing to a a doubly linked list of Units." /></p>
 <p>Each cell in the grid points to the first unit in the list of units within that
@@ -287,7 +287,7 @@ the front of that list. If there is already a list of units there, we link it in
 after the new unit.</p>
 <h3><a href="#a-clash-of-swords" name="a-clash-of-swords">A clash of swords</a></h3>
 <p>Once all of the units are nestled in their cells, we can let them start hacking
-at each other. With this new grid, the main method for handling combat look like
+at each other. With this new grid, the main method for handling combat looks like
 this:</p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">Grid</span><span class="o">::</span><span class="n">handleMelee</span><span class="p">()</span>
 <span class="p">{</span>
@@ -328,19 +328,19 @@ cell then handles its combat like so:</p>
 
 <p>Aside from the pointer shenanigans to deal with walking a linked list, note that
 this is exactly <span name="nested">like</span> our original na&iuml;ve method for
-handling combat: it compares each pair of units to see if they&#8217;re in the same
+handling combat. It compares each pair of units to see if they&#8217;re in the same
 position.</p>
 <p>The only difference is that we no longer have to compare <em>all</em> of the units in
-the battle to each other, just the ones close enough to be in the same cell.
+the battle to each other&#8202;&mdash;&#8202;just the ones close enough to be in the same cell.
 That&#8217;s the heart of the optimization.</p>
 <aside name="nested">
 
 <p>From a simple analysis, it looks like we&#8217;ve actually made the performance
-<em>worse</em>. We&#8217;ve gone from a doubly-nested loop over the units to a
-<em>triply</em>-nested loop over the cells and then the units. The trick here is that
+<em>worse</em>. We&#8217;ve gone from a doubly nested loop over the units to a
+<em>triply</em> nested loop over the cells and then the units. The trick here is that
 the two inner loops are now over a smaller number of units, which is enough to
 cancel out the cost of the outer loop over the cells.</p>
-<p>However, that does depend a bit on the granularity of our cells: make them too
+<p>However, that does depend a bit on the granularity of our cells. Make them too
 small and that outer loop can start to matter.</p>
 </aside>
 
@@ -407,7 +407,7 @@ position and we&#8217;re done.</p>
 <p>If the unit <em>has</em> left its current cell, we remove it from that cell&#8217;s linked
 list and then add it back to the grid. Like with adding a new unit, that will
 insert the unit in the linked list for its new cell.</p>
-<p>This is why we&#8217;re using a doubly-linked list: we can very quickly add and remove
+<p>This is why we&#8217;re using a doubly linked list&#8202;&mdash;&#8202;we can very quickly add and remove
 units from lists by setting a few pointers. With lots of units moving around
 each frame, that can be important.</p>
 <h3><a href="#at-arm's-length" name="at-arm's-length">At arm&#8217;s length</a></h3>
@@ -499,18 +499,17 @@ unit&#8217;s attack radius, it will find the hit.</p>
 </aside>
 
 <p>We only look at <em>half</em> of the neighbors for the same reason that the inner loop
-starts <em>after</em> the current unit: to avoid comparing each pair of units twice.
+starts <em>after</em> the current unit&#8202;&mdash;&#8202; to avoid comparing each pair of units twice.
 Consider what would happen if we did check all eight neighboring cells.</p>
 <p>Let&#8217;s say we have two units in adjacent cells close enough to hit each other,
-like the previous example. If, for each unit, we looked at all eight cells
-surrounding it, here&#8217;s what would happen:</p>
+like the previous example. Here&#8217;s what would happen if we looked at all eight cells surrounding each unit:</p>
 <ol>
 <li>
-<p>When we are finding hits for A, we would look at its neighbor on the right
+<p>When finding hits for A, we would look at its neighbor on the right
     and find B. So we&#8217;d register an attack between A and B.</p>
 </li>
 <li>
-<p>Then, when we are finding hits for B, we would look at its neighbor on the
+<p>Then, when finding hits for B, we would look at its neighbor on the
     <em>left</em> and find A. So we&#8217;d register a <em>second</em> attack between A and B.</p>
 </li>
 </ol>
@@ -549,7 +548,7 @@ programmer.</p>
 <aside name="simpler">
 
 <p>This is a design point I mention in almost every chapter, and for good
-reason: whenever you can, take the simpler option. Much of software
+reason. Whenever you can, take the simpler option. Much of software
 engineering is fighting against complexity.</p>
 </aside>
 
@@ -592,8 +591,8 @@ little partitions to walk, there is a single big one.</p>
 </li>
 </ul>
 <h3><a href="#does-the-partitioning-depend-on-the-set-of-objects" name="does-the-partitioning-depend-on-the-set-of-objects">Does the partitioning depend on the set of objects?</a></h3>
-<p>In our sample code, the grid spacing was fixed beforehand and we slotted units
-into cells. Other partitioning schemes are adaptable: they pick partition
+<p>In our sample code, the grid spacing was fixed beforehand, and we slotted units
+into cells. Other partitioning schemes are adaptable&#8202;&mdash;&#8202;they pick partition
 boundaries based on the actual set of objects and where they are in the world.</p>
 <p>The goal is have a <em>balanced</em> partitioning where each region has roughly the
 same number of objects in order to get the best performance. Consider in our
@@ -626,7 +625,7 @@ re-sort the tree and shuffle a bunch of nodes around.</p>
 
 </li>
 <li>
-<p><em>The partitions can be imbalanced.</em> Of course the downside of this
+<p><em>The partitions can be imbalanced.</em> Of course, the downside of this
     rigidity is that you have less control over your partitions being evenly
     distributed. If objects clump together, you get worse performance there
     while wasting memory in the empty areas.</p>
@@ -701,7 +700,7 @@ threshold, you can collapse those subdivisions.</p>
 <li>
 <p><em>The partitions are balanced.</em> Since any given square will have less
     than some fixed maximum number of objects, even when objects are
-    clustered together you don&#8217;t have single partitions with a huge pile of
+    clustered together, you don&#8217;t have single partitions with a huge pile of
     objects in them.</p>
 </li>
 </ul>
@@ -710,7 +709,7 @@ threshold, you can collapse those subdivisions.</p>
 <h3><a href="#are-objects-only-stored-in-the-partition" name="are-objects-only-stored-in-the-partition">Are objects only stored in the partition?</a></h3>
 <p>You can treat your spatial partition as <em>the</em> place where the objects in your
 game live, or you can consider it just a secondary cache to make look-up faster
-while also having another collection that holds the list of objects directly.</p>
+while also having another collection that directly holds the list of objects.</p>
 <ul>
 <li>
 <p><strong>If it is the only place objects are stored:</strong></p>
