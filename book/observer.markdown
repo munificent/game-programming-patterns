@@ -83,11 +83,11 @@ entirely decoupled. But in architecture, we're most often trying to make systems
 </aside>
 
 The achievement system registers itself so that whenever the physics code sends
-a notification, the achievement receives it. It can then check to see if the
-falling body is our less-than-graceful hero, and if his perch prior to this new,
-unpleasant encounter with classical mechanics was a bridge. If so, it unlocks
-the proper achievement with associated fireworks and fanfare, and it does all of
-this with no involvement from the physics code.
+a notification, the achievement system receives it. It can then check to see if
+the falling body is our less-than-graceful hero, and if his perch prior to this
+new, unpleasant encounter with classical mechanics was a bridge. If so, it
+unlocks the proper achievement with associated fireworks and fanfare, and it
+does all of this with no involvement from the physics code.
 
 <span name="tear">In fact</span>, we can change the set of achievements or tear
 out the entire achievement system without touching a line of the physics engine.
