@@ -1,286 +1,270 @@
-^title Dirty Flag
+^title Грязный флаг
 ^section Низкоуровневая оптимизация
 
-## Intent
+## Общая мысль
 
-*Avoid unnecessary work by deferring it until the result is needed.*
+*Избегайте ненужной работы. Когда понадобиться -- тогда и выполните.*
 
-## Motivation
+## Предыстория
 
-"Flag" and "bit" are synonymous in programming: they both mean a single micron of data that can be in one of two states. We call those "true" and "false", or sometimes "set" and "cleared". I'll use all of these interchangeably. "Dirty bit" is an equally <span name="specific">common</span> name for this pattern, but I figured I'd stick with the name that didn't seem as prurient.
+"Флаг" и "бит" являются практически синонимами в программировании: они оба могут находится только в оодном и двух состояний. Можно назвать их "правда" или "ложь", иногда "установлен" и "очищен". Я буду использовать оба варианта. Так что текущую главу можно было назвать <span name="specific">"Грязный бит"</span>, но я решил использовать более нейтральный вариант.
 
 <aside name="specific">
 
-Wikipedia's editors don't have my level of self-control and went with [dirty bit](http://en.wikipedia.org/wiki/Dirty_bit).
+Авторы википедии менее щепетильны, чем я, и выбрали [грязный бит](http://en.wikipedia.org/wiki/Dirty_bit).
 
 </aside>
 
-### Locating a ship at sea
+### Как найти лодку в море
 
-Many games have something called a *scene graph*. This is a big data structure that contains all of the objects in the world. The rendering engine uses this to determine where on screen to draw stuff.
+Множество игр занимаются построение *графа сцены*. Это такая большая структура, в которой находятся все объекты игры. Рендерер использует его, чтобы определить что где рисовать.
 
-At its simplest, a scene graph is just a flat list of objects. Each object has a model or some other graphic primitive, and a <span name="transform">*transform*</span>. The transform describes the object's position, rotation, and scale in the world. To move or turn an object, we just change its transform.
+В простом случае, граф -- это плоский список объектов. У каждого объекта есть модель или другой графический примитив, и <span name="transform">*матрицу трансформации*</span>. Трансформация описывает координаты объекта, поворот и масштабирование. Чтобы передвинуть или повернуть объект, мы просто меняем его трансформацию.
 
 <aside name="transform">
 
-The mechanics of *how* this transform is stored and manipulated is unfortunately out of scope here. The comically abbreviated summary is that it's a 4x4 matrix. You can make a single transform that combines two transforms -- for example translating and then rotating an object -- by multiplying the two matrices.
+Детали того, *как* хранить трансформацию, и как ей манипулировать, выходят за рамки разговора, к сожалению. Смешно сказать, но это действительно матрица 4 на 4. Чтобы применить две трансформации к объекту -- например, передвинуть и потом повернуть -- достаточно перемножить две матрицы. 
 
-How and why that works is left as an exercise for the reader.
+Почему и как это работает -- домашнее задание для читателей.
 
 </aside>
 
-When the renderer draws an object, it takes the object's model, applies the transform to it, and then renders it there in the world. If we just had a scene *bag* and not a scene *graph* that would be it and life would be simple.
+Когда рендерер рисует объект, он берет модель объекта, накладывает на него транформацию, и затем рисует эту модель. И если не вспоминать про *граф* сцены, то на этом все заканчивается и жизнь становится проста, как два пальца.  
 
-However, most scene graphs are <span name="hierarchical">*hierarchical*</span>. An object in the graph may have a parent object that it is anchored to. In that case, its transform is relative to the *parent's* position, and isn't its absolute position in the world.
+К сожалению, большинство графов будут иметь <span name="hierarchical">*иерарархию*</span>. У объекта в графе есть родитель, к котором он прикреплен. В этом случае, на трансформацию объекта надо ещё наложить трансформацию родителя, чтобы получить правильные координаты при рисовании.
 
-For example, imagine our game world has a pirate ship at sea. Atop the ship's mast is a crow's nest. Hunched in that crow's nest is a pirate. Clutching the pirate's shoulder is a parrot. The ship's local transform will position it in the sea. The crow's nest's transform positions it on the ship, and so on.
+Допустим, мы рисуем пиратский корабль в море. Пусть на верху мачты есть бочка, в ней сидит пират, и на плече у него -- попугай. Трансформация корабля описывает его положение в море. Трансформация бочки описывает её положение на корабле, и так далее. 
 
 <span name="pirate"></span>
 <img src="images/dirty-flag-pirate.png" />
 
 <aside name="pirate">
 
-Programmer art!
+Осторожно, рисовал программист!
 
 </aside>
 
-This way, when a parent object moves, its children move with it automatically. If we change the local transform of the ship, the crow's nest, pirate, and parrot go along for the ride. It would be a total <span name="slide">headache</span> if, when the ship moved, we had to manually adjust the transforms of everything on it to keep them from sliding off.
+Когда родительский объект двигается, автоматически двигаются и все его дети. И если мы поменяем локальную трансформацию корабля, то бочка, старый пират и попугай должны передвинуться вместе с ним. И было бы <span name="slide">глупо</span>, если бы мы вручную меняли трансформации всех объектов, которые находятся на корабле, чтобы ничего не разъехалось.    
 
 <aside name="slide">
 
-To be honest, when you are at sea you *do* have to keep manually adjusting your position to keep from sliding off. Maybe I should have chosen a drier example.
+Честно говоря, когда вы в море, то *приходится* самому двигаться, чтобы не вывалится за борт. Может быть стоит придумать более честный пример.
 
 </aside>
 
-But to actually draw the parrot on screen, we need to know its absolute position in the world. I'll call the parent-relative transform the object's *local transform*. To render an object, we need to know its *world transform*.
+Но когда мы непосредственно приступили к рисованию попугая, нам нужны его абсолютные координаты. Будем называть *локальной трансформацией* трансформацию относительно родительского объекта. А для того чтобы рисовать, будем вычислять абсолютную, или *мировую трансформацию*.
+ 
+### Локальная и мировая трансформация
 
-### Local and world transforms
-
-Calculating an object's world transform is pretty straightforward: you just walk its parent chain starting at the root all the way down to the object, combining transforms as you go. In other words, the parrot's world transform is:
+Сделать это несложно: надо подниматься по цепочке родителей вверх до самого конца, а затем спускаться обратно, накладывая трансформации друг на друга поочередно. Тогда мировая трансформация попугая будет:
 
 <span name="degenerate"></span>
 <img src="images/dirty-flag-multiply.png" />
 
 <aside name="degenerate">
 
-In the degenerate case where the object has no parent, its local and world transforms are equivalent.
+В частном случае, когда у объекта нет родителя, его локальная и мировая трансформация -- совпадают.
 
 </aside>
 
-We need the world transform for every object in the world every frame, so even though it's just a handful of matrix multiplications per model, it's on the hot code path where performance is critical. Keeping them up-to-date is tricky because when a parent object moves, that affects the world transform of itself and all of its children, recursively.
+Нам нужна эта мировая трансформация каждую отрисовку, так что операции с матрицами могут стать занозой в заднице. Поддерживать их в актуальном состоянии непросто, потому что когда родительский объект двигается, это влияет и на него, и на всех его детей рекурсивно. 
 
-The simplest approach is to just calculate transforms on the fly while rendering. Each frame, we recursively traverse the scene graph starting at the top of the hierarchy. For each object, we calculate its world transform right then and draw it.
+Очевидный вариант -- это вычислять трансформации прямо при рисовании. Каждую отрисовку мы будем спускаться по графу, начиная с самого верха, и вычислять мировую трансформацию для каждого объекта. А потом рисовать его.
 
-But this is terribly wasteful of our precious CPU juice! Many objects in the world are *not* moving every frame. Think of all of the static geometry that makes up the level. Recalculating their world transforms each frame even though they haven't changed is a waste.
+Этот вариант ужасен до невозможности. На практике, большинство объектов не передвигаются -- вспомните про статические объекты, из которых состоит уровень. Нет необходимости делать лишнюю работу и вычислять их координаты каждый раз.
 
-### Cached world transforms
+### Используем кэш
 
-The obvious answer is to *cache* it. In each object, we store its local transform and its derived world transform. When we render, we just use the precalculated world transform. If the object never moves, that's always up to date and everything's happy.
+Очевидный подход -- кэшировать трансформации. В каждом объекте мы будем хранить локальную и мировую трансформацию. При отрисовке мы используем мировую трансформацию, которая уже вычислена. И если объект не двигается, то она всегда актуальна -- и все довольны.
 
-When an object *does* move, the simple approach is to refresh its world transform right then. But don't forget the hierarchy! When a parent moves, we have to recalculate its world transform *and all of its children's, recursively*.
+Что делать, если объект *передвинули*? Можно сразу же пересчитать мировую трансофрмацию. Только у нас же иерархия! Когда двигается родитель, нужно пересчитать его трансформацию и *всех его детей, рекурсивно*.
 
-Imagine some busy gameplay. In a single frame, the ship gets tossed on the ocean, the crow's nest rocks in the wind, the pirate leans to the edge, and the parrot hops onto his head. We changed four local transforms. If we recalculate world transforms eagerly whenever a local transform changes, what ends up happening?
+Представьте, что у нас довольно сложная игра. В каждом цикле корабль толкают волны, бочка раскачивается на ветру, пирата постоянно тошнит, а попугай прыгает через голову. И тут мы меняем четыре локальных трансформации. Если мы сразу же начнем пересчитывать мировые, то во что это выльется?
 
 <span name="stars"></span>
 <img src="images/dirty-flag-update-bad.png" />
 
 <aside name="stars">
 
-You can see on the lines marked &#x2605; that we're recalculating the parrot's
-world transform *four* times when we only need the result of the final one.
+Если посмотреть на линии, отмеченные &#x2605;, то можно увидеть, что мы *четыре* раза пересчитывали попугая, хотя будем использовать только результаты последнего пересчета.
 
 </aside>
 
-We only moved four objects, but we did *ten* world transform calculations. That's six pointless calculations that get thrown out before they are ever used by the renderer. We calculated the parrot's world transform *four* times, but it only got rendered once.
+Мы всего лишь передвинули четыре объекта, а пришлось пересчитать *десять* мировых трансформаций. Шесть бесполезных вычислений будут выкинуты, потому что их результат нам не интересен. Мы четыре раза пересчитали попугая, хотя он был нарисован всего один раз.
 
-The problem is that a world transform may depend on several local transforms. Since we recalculate immediately each time *one* of those changes, we end up recalculating the same transform multiple times when more than one of the local transforms it depends on changes in the same frame.
+Проблемы в том, что мировая трансформация зависит от нескольких локальных. Мы начинали перерасчет сразу после того, как изменилась хотя бы одна из них. В результат пришлось пересчитать мировую трансформацию для одного и того же объекта столько раз, сколько локальных трансформаций родителей изменилось.
 
-### Deferred recalculation
+### Отложенные вычисления
 
-We'll solve this by <span name="decoupling">decoupling</span> changing local transforms from updating the world transforms. This lets us change a bunch of local transforms in a single batch and *then* recalculate the affected world transform once after all of those modifications are done, right before we need it to render.
+Мы можем решить эту проблему, если <span name="decoupling">разделим</span> обновление локальной и мировой трансформации. Это позволит изменять набор локальных трансформаций одних махом, и *затем* пересчитать те мировые трансформации, которые это затронуло, прямо перед отрисовкой.
 
 <aside name="decoupling">
 
-It's interesting how much of software architecture is just intentionally engineering a little slippage.
+Занимательно -- столько архитектур основано на маленьких хитростях!
 
 </aside>
 
-To do this, we add a flag to each object in the graph. When the local transform changes, we set it. When we need the object's world transform, we check the flag. If it's set, we calculate the world transform then and clear the flag. The flag represents, "Is the world transform out of date?" For reasons that aren't entirely clear, the traditional name for this "out-of-date-ness" is "dirty". Hence: *a dirty flag*.
+Мы добавим флажок к каждому объекту в графе. Когда будет менятся локальная трансформация, мы его выставим. И когда нам понадобиться мировая, мы будем проверять этот флаг. Если он выставлен, то мы пересчитаем мировую трансформацию и очистим флаг. Этот флаг как бы говорит нам "нужно обновлять матрицы?" По причинам, которые не совсем ясны, обычное название для таких "уже неточных" данных -- это "грязные" (dirty). Вот и получился *грязный флаг*.
 
-If we apply this pattern and then move all of the objects in our previous example, the game ends up doing:
+Если мы применим этот подход, и повторим пример с четырьмя объектами, то в результате увидим:
 
 <img src="images/dirty-flag-update-good.png" />
 
-That's the best you could hope to do: the world transform for each affected object is calculated exactly once. With just a single bit of data, this pattern does a few things for us:
+Это лучшее, на что можно было бы надется: мировая трансформация для каждого тронутого объекта вычисляется только один раз. С помощью одного бита, это паттерн сделал несколько вещей:
 
-1. It collapses modifications to multiple local transforms along an object's parent chain into a single recalculation on the object.
-2. It avoids recalculation on objects that didn't move.
-3. And a minor bonus: if an object gets removed before it's rendered, it doesn't calculate its world transform at all.
+1. Множество изменений локальных трансформаций он превратил в одно вычисление для каждого объекта.
+2. Избавляет от необходимости пересчитывать статические объекты.
+3. И мини-бонус: если объект удалили до того, как он был нарисован, то у него ничего не вычисляется вообще.
 
-## The Pattern
+## Общий подход
 
-A set of **primary data** changes over time. A set of **derived data** is determined from this using some **expensive process**. A **"dirty" flag** tracks when the derived data is out of sync with the primary data. It is **set when the primary data changes**. When the derived data is requested, if the flag is set **it is processed then and the flag is cleared.** Otherwise, the previous **cached derived data** is used.
+Есть набор **основных данных**, который меняется постоянно. И есть **вторичные данные**, которые вычисляются из основных с помощью некоторого **дорогого процесса**. **Грязный флаг** обозначает актуальность вторичных данных и **их соответствие основным**. Когда запрашиваются вторичные данные -- проверяется флаг.  Если флаг поднят, необходимо **рассчитать вторичные данные заново и очистить флаг**. Если опущен -- можно использовать закэшированные вторичные данные, рассчитаные ранее.
 
-## When to Use It
+## Когда это использовать
 
-Compared to some other patterns in this book, this one solves a pretty specific problem. Also, like most optimizations, you should only reach for it when you have a performance problem big enough to justify the added code complexity.
+По сравнению с другими паттернами в этой книге, этот решает довольно специфическую задачу. Нужно понимать, что любая борьба за производительность выливается в усложнение кода. Так что проблема должна быть достаточно большой, чтобы компенсировать выросшую сложность.
 
-Dirty flags are applied to two kinds of work: *calculation* and *synchronization*. In both cases, the process of going from the primary data to the derived data is time-consuming or otherwise costly.
+"Грязный флаг" применим к двум процессам: *вычисления* и *синхронизация*. В обоих случаях, процесс перевод первичных данных во вторичные выполняется долго или дорог по другим причинам .
 
-In our scene graph example, the process is slow because of the amount of math to perform. When using this pattern for synchronization on the other hand, it's more often that the derived data is *somewhere else* -- either on disk or over the network on another machine -- and simply getting it from point A to point B is what's expensive.
+В нашем примере с графом сцены вычисления медленные, потому что там много математики. При задаче синхронизации проблема чаще заключается в том, что вторичные данные находятся *где-то далеко* -- на диске или в сети на другой машине -- и дорога сама доставка данных из пункта A в пункт B.
 
-There are a couple of other requirements too:
+Вот ещё пара требований:
 
- *  **The primary data has to change more often than the derived data is used.**
-    This pattern works by avoiding processing derived data when a subsequent
-    primary data change would invalidate it before it gets used. If you find
-    yourself always needing that derived data after every single modification
-    to the primary data, this pattern can't help.
+ *  **Первичные данные изменяются чаще, чем ипользуются вторичные.**
+    Паттерн работает за счет избегания работы с вторичными данными до того как они понадобятся, если изменились первичные. Если есть жесткая необходимость обновить вторичные данные сразу же после изменения основных -- этот паттерн не для вас. 
+   
+ *  **Трудно реализовать инкрементальное обновление.** 
+    Допустим, наш пиратский корабль может только возить товары. И нам нужно знать вес груза в трюмах. Мы *можем* использовать этот паттерн и указать флагом на общий вес. Каждый раз, когда мы добавляем или убираем сундук, мы поднимаем флажок. Когда нам нужен общий вес, мы складываем все сундуки вместе и опускаем флаг.
 
- *  **It should be hard to incrementally update.** Let's say the
-    pirate ship in our game can only carry so much booty. We need to
-    know the total weight of everything in the hold. We
-    *could* use this pattern and have a dirty flag for the total weight. Every
-    time we add or remove some loot, we set the flag. When we need the
-    total, we add up all of the booty and clear the flag.
+    Есть решение проще -- просто *обновлять сумму*. Когда мы добавляем или убираем вес, можно просто прибавлять или вычитать это число из общего веса. Если мы можем пренебречь затратами на подобную работу, и при этом поддержать актуальность первичных данных, то это выгодное решение. 
 
-    But a simpler solution is to just *keep a running total*. When we add or
-    remove an item, just add or remove its weight from the current total. If
-    we can "pay as we go" like this and keep the derived data updated, then
-    that's often a better choice than using this pattern and calculating the
-    derived data from scratch when needed.
-
-All of this makes it sound like dirty flags are never appropriate, but
-you'll find a place here or there where they help.
-<span name="hacks">Searching</span> your
-average game codebase for the word "dirty" will often
-turn up uses of this pattern.
+Из всего этого кажется, что техникой грязного флага тяжело воспользоваться. Но можно найти место, где её применить. Если <span name="hacks">поискать</span> слово "dirty" в коде  игры средней сложности, то подобные примеры легко найдутся.      
 
 <aside name="hacks">
 
-From my research, it also turns up a lot of comments apologizing for "dirty" hacks.
+По опыту, там найдутся и комментарии с извинениями за "грязный" хак.
 
 </aside>
 
-## Keep in Mind
+## Особенности
 
-Even after you've convinced yourself this pattern is a good fit, there are a few wrinkles that can cause you some discomfort.
+Даже если вы решились на использование этого паттерна, надо быть готовым к моментам, который доставят некоторый дискомфорт.  
 
-### There is a cost to deferring too long
+### Затраты на чрезмерно отложенные вычисления
 
-This pattern defers some slow work until the result is actually needed, but when it is, it's often needed *right now*. But the reason we're using this pattern to begin with is because calculating that result is slow!
+Мы откладываем затратные вычисления до момента, когда результаты действительно понадобятся. А когда они становяться нужными, они нужны *практически сразу*. Но ведь из-за этого всё и завертелось -- потому что вычисления медленные!
 
-This isn't a problem in our example because we can still calculate world coordinates fast enough to fit within a frame, but you can imagine other cases where the work you're doing is a big chunk that takes noticeable time to chew through. If the game doesn't *start* chewing until right when the player expects to see the result, that can cause an unpleasant visible <span name="gc">pause</span>.
+В нашем примере, это не проблема, потому что перевод локальной трансформации в мировую быстр достаточно, чтобы не задерживать отрисовку. Однако, легко представить другие ситуации, когда вычисления вызовут паузу, заметную невооруженным взглядом. И если игрок не получит результат этих вычислений сразу же, это будет весьма неприятная <span name="gc">пауза</span>. 
 
-Another problem with deferring is that if something goes wrong, you may fail to do the work at all. This can be particularly problematic when you're using this pattern to save some state to a more persistent form.
-
-For example, text editors know if your document has "unsaved changes". That little bullet or star in your file's title bar is literally the dirty flag visualized. The primary data is the open document in memory, and the derived data is the file on disk.
+Ещё одна трудность -- если что-то пойдет не так в процессе вычислений, то восстановиться после такой ошибки тяжело. В случае, если вы используете отложенные вычисления, чтобы сохранить состояние куда-нибудь, то это может добавить головной боли. 
+  
+Например, текстовые редакторы не сразу сохраняют файл на диск. Как правило, маленькая звездочка в заголовке окна наглядно показывает "грязный флаг". Здесь первичные данные -- это открытый в редакторе документ, а вторичные -- байты на диске.
 
 <img src="images/dirty-flag-title-bar.png" />
 
-Many programs don't save to disk until either the document is closed or the application is exited. That's fine most of the time, but if you accidentally kick the power cable out, there goes your masterpiece.
+Часть программ не сохраняют изменения на диск до тех пор, пока приложение или документ не закроются. Это нормально, но если неожиданно выдернуть питание, то шедевр не увидит своих фанатов. 
 
-Editors that auto-save a backup in the background are compensating specifically for this shortcoming. The frequency that it auto-saves is the point it chose on the continuum between not losing too much work when a crash occurs and not thrashing the file system too much by saving all the time.
+Функция автоматического бэкапа в редакторах компенсирует этот недостаток. Частота автосохранения -- это выбранный компромисс между "не потерять слишком много, если все накроется" и "экономить время и не утруждать винчестер лишней работой".  
 
 <aside name="gc">
 
-This mirrors the different garbage collection strategies in systems that automatically manage memory. Reference counting frees memory the second it's no longer needed, but burns CPU time updating ref counts eagerly every time references are changed.
+Это похоже на трудности, с которыми сталкиваются стратегии сборки мусора в системах с автоматическим управлением памятью. Счетчик ссылок поможет освободить память сразу же, как только она становиться не нужна, но тратит время на собственное обновление. 
 
-Simple garbage collectors defer reclaiming memory until it's really needed, but the cost is the dreaded "GC pause" that can freeze your entire game until the collector is done scouring the heap.
+Простейшие сборщики откладывают освобождение памяти до тех пор, пока она реально не понадобится. Но эта пауза на уборку может повесить всю игру, пока мусорщик не закончит ревизию памяти. 
 
-In between the two are more complex systems like deferred ref-counting and incremental GC that reclaim memory less eagerly than pure ref-counting but more eagerly than stop-the-world collectors.
+Есть ещё варианты между этими крайностями. Например, отложенный подсчет ссылок или инкрементальный сборщик, который не ставит весь процесс на паузу, хотя собирает память менее интенсивно, чем прямые счетчики.
 
 </aside>
 
-### You have to make sure to set the flag *every* time the state changes
+### Не забывайте выставлять флажок *каждый раз*, когда состояние изменилось
 
-Since the derived data is calculated from the primary data, it's essentially a cache. Whenever you have cached data, the trickiest aspect of it is <span name="cache">*cache invalidation*</span> -- correctly noting when the cache is out of sync with its source data. In this pattern, that means setting the dirty flag when *any* primary data changes.
+Так как вторичные данные вычисляются из основных, это практически кэш. А где появляется кэш, то там появляется и <span name="cache">*инвалидация кэша*</span> -- внимательное слежение за актуальнойстью данных в кэше. В текущем паттерне, это означает своевременное выставление флажка сразу же, как *что-то* поменялось в основных данных.
 
 <aside name="cache">
 
-Phil Karlton famously said, "There are only two hard things in Computer Science: cache invalidation and naming things."
-
+Фил Карлтон верно подметил, что "есть только два трудных момента в компьютерном искусстве: инвалидация кэша и придумывание имен".
+ 
 </aside>
 
-Miss it in one place, and your program will incorrectly use stale derived data. This leads to confused players and very hard to track down bugs. When you use this pattern, you'll have to take care that any code that modifies the primary state also sets the dirty flag.
+Стоит пропустить всего одно место, и программа начнет использовать устаревшие данные. Это ведет к конфузу у игроков и трудно отслеживаемым ошибкам. Когда используете этот паттерн, убедитесь, что грязный флаг выставляется после любого изменения в первичных данных. 
 
-One way to mitigate this is by encapsulating modifications to the primary data behind some interface. If anything that can change the state goes through a single narrow API, you can set the dirty bit there and rest assured that it won't be missed.
+Одним из способов следить за этой моментом является применение интерфейса для модификаций первичных данных. Если все изменения проходят через одну и ту же точку, то можно выставлять этот флаг там и забыть об этой проблеме на долгое время.
 
-### You have to keep the previous derived data in memory
+### На хранение вторичных данных требуется память
 
 <span name="sync"></span>
 
-When the derived data is needed and the dirty flag *isn't* set, it uses the previously calculated data. This is obvious, but that does imply that you have to keep that derived data around in memory in case you end up needing it later.
+Когда вторичные данные понадобятся, и грязный флаг *не* поднят, то используются уже вычисленные результаты. Это очевидно, но это вынуждает хранить эти рузельтаты в памяти постоянно, так как они могут понадобиться позже.
 
 <aside name="sync">
 
-This isn't much of an issue when you're using this pattern to synchronize the primary state to some other place. In that case, the derived data isn't usually in memory at all.
-
+Это не относится к ситуации, когда вы синхронизируете данные в какое-то другое место. В этом случае, вторичные данные могут быть вообще не в памяти.
+ 
 </aside>
 
-If you weren't using this pattern, you could calculate the derived data on the fly whenever you needed it, then discard it when you were done. That avoids the expense of keeping it cached in memory at the cost of having to do that calculation every time you need the result.
+Если бы мы не использовали грязный флаг, то просто вычисляли бы вторичные данные каждый раз, когда они понадобятся, и уничтожали сразу после использования. Это помогает избежать затрат на хранение их в памяти ценой постоянных вычислений.
 
-Like many optimizations, then, this pattern <span name="trade">trades</span> memory for speed. In return for keeping the previously calculated data in memory, you avoid having to recalculate it when it hasn't changed. This trade-off makes sense when the calculation is slow and memory is cheap. When you've got more time than memory on your hands, it's better to just calculate it as needed.
+Тут, как и везде, мы <span name="trade">платим</span> памятью за скорость. В обмен за хранение вычисленных результатов в памяти, вы получаете возможность не тратить время на повторые вычисления, если ничего не изменилось. Этот обмен имеет смысл, если вычисления дороги, а память -- дешева. Если у вас времени больше, чем памяти, то выгоднее  каждый раз пересчитывать. 
 
 <aside name="trade">
 
-Conversely, compression algorithms make the opposite trade-off: they optimize *space* at the expense of the processing time needed to decompress.
+Алгоритмы сжатия предлагают противоположный обмен: они оптимизируют *место* для хранения данных, цена -- время на их распаковку.   
 
 </aside>
 
-## Sample Code
+## Примеры
 
-Let's assume we've met the surprisingly long list of requirements, and see how the pattern looks in code. As I mentioned before, the actual math behind transform matrices is beyond the humble aims of this book, so I'll just encapsulate that in a class whose implementation you can presume exists somewhere out in the æther:
+Давайте предположим, что у нас необычно длинный список требований, и посмотрим как наш паттерн будет смотреться в коде. Как я говорил, настоящая математика всяких матриц находится за пределами этой книги. Поэтому я спрячу всю логику в абстрактный класс, не раскрывая деталей реализации:
 
 ^code transform
 
-The only operation we need here is `combine()` so that we can get an object's world transform by combining all of the local transforms along its parent chain. It also has a method to get an "origin" transform -- basically an identity matrix that means no translation, rotation, or scaling at all.
+Единственная операция, которая нам понадобиться, это `combine()`. Она выдает нам мировую трансформацию, комбинируя все локальные сверху вниз. Так же есть метод `origin()`, который возвращает единичную матрицу, без всяких трансляций, вращений и так далее. 
 
-Next, we'll sketch out the class for an object in the scene graph. This is the bare minimum we need *before* applying this pattern:
+Теперь придумаем класс, который будет объектом в нашем графе сцены. Это самый минимум, который нам нужен *перед* применением паттерна:
 
 ^code graph-node
 
-Each node has a local transform which describes where it is relative to its parent. It has a mesh which is the actual graphic for the object. (We'll allow `mesh_` to be `NULL` too to handle non-visual nodes that are used just to group their children.) Finally, each node has a possibly empty collection of child nodes.
+У каждой ноды есть локальная трансформация, которая описывает её положение относительно родительской. Ещё у неё есть `mesh_` -- это реальная графика для объекта (`mesh_` может быть `NULL`, если это невизуальная нода, которая нужна для группировки остальных). Наконец, у каждой ноды есть список дочерних нод, возможно, пустой.
 
-With this, a "scene graph" is really just a single root `GraphNode` whose children (and grandchildren, etc.) are all of the objects in the world:
+Со всем этим, граф сцены -- это просто единственная корневая `GraphNode`, чьи дети (внуки, и так далее) являются объектами мира:
 
 ^code scene-graph
 
-In order to render a scene graph, all we need to do is traverse that tree of nodes starting at the root and call the following function for each node's mesh with the right world transform:
+Чтобы отрисовать граф, нам нужно пройтись по всему дереву нод, начиная с корня и вызвать следующую функцию для графики каждой ноды с правильной мировой трансформацией:
 
 ^code render
 
-We won't implement this here, but if we did, it would do whatever magic the renderer needs to draw that mesh at the given location in the world. If we can call that correctly and efficiently on every node in the scene graph, we're happy.
+Мы не будем её реализовывать. Но если бы стали, то там бы была всякая магия, связанная с рисованием меша в данной точке пространства. Если мы сможем вызвать эту функцию правильно и быстро для каждой ноды в графе -- мы выполним нашу задачу.
 
-### An unoptimized traversal
+### Неоптимальный подход
 
-To get our hands dirty, let's throw together a basic traversal for rendering the scene graph that calculates the world positions on the fly. It won't be optimal, but it will be simple. We'll add a new method to `GraphNode`:
+Будем пачкать руки. Начнем с простого обхода, который вычисляет мировую трансформацию на лету. Это не будет оптимально, зато просто. Добавим новый метод к `GraphNode`:
 
 ^code render-on-fly
 
-We pass the world transform of the node's parent into this using `parentWorld`. With that, all that's left to get the correct world transform of *this* node is to combine that with its own local transform. We don't have to walk *up* the parent chain to calculate world transforms because we calculate as we go while walking *down* the chain.
+Будем передавать мировую трансформацию родительской ноды используя `parentWorld`. Тогда, чтобы получить трансофрмацию для *текущей* ноды, надо просто скомбинировать родительскую мировую и локальную трансформации. Не придется ползти *вверх*  по цепи родителей, чтобы высчитать мировую трансформацию, потому что мы получаем её последовательно спускаясь сверху *вниз*. 
 
-We calculate the node's world transform and store it in `world`, then we render the mesh if we have one. Finally, we recurse into the child nodes, passing in *this* node's world transform. All in all, it's nice tight, simple recursive method.
+Затем сохраним мировую трансофрмацию ноды в переменную `world` для хранения и отрисум меш, если он есть. Наконец, мы проделаем то же самое для дочерних нод, передавая туда мировую трансформацию *текущей* ноды. Вот и получился простой рекурсивный алгоритм.
 
-To draw an entire scene graph, we kick off the process at the root node:
+Чтобы нарисовать всю сцену, запустим эту функцию для корневой ноды:
 
 ^code render-root
 
-### Let's get dirty
+### Добавим флаг
 
-So this code does the right thing -- renders all the meshes in the right place -- but it doesn't do it efficiently. It's calling `local_.combine(parentWorld)` on every node in the graph, every frame. Let's see how this pattern fixes that. First, we need to add two fields to `GraphNode`:
+Итак, этот код делает верную штуку -- рисует все объекты в правильном месте -- но не совсем оптимально. Он вызывает `local_.combine(parentWorld)` для каждой ноды в графе, для каждого кадра. Посмотрим, как наш паттерн это изменит. Во-первых, мы добавим два поля в `GraphNode`:
 
 ^code dirty-graph-node
 
-The `world_` field caches the previously-calculated world transform, and `dirty_`, of course, is the dirty flag. Note that the flag starts out `true`. When we create a new node, we haven't calculated it's world transform yet, so at birth it's already out of sync with the local transform.
+Поле `world_` кэширует текущее, вычисленное значение мировой трансформации, а `dirty_` -- это и есть грязный флаг. Заметим, что изначально он выставлен в `true`. Это значит, что когда мы создаем новую ноду, её мировая трансформация ещё не рассчитана.
 
-The only reason we need this pattern is because objects can *move*, so let's add support for that:
+Единственная причина, по который нам нужен паттерн "грязный флаг", это то, что объекты движутся. Поэтому добавим поддержку для этого:
 
 ^code set-transform
 
-The important part here is that it sets the dirty flag too. Are we forgetting anything? Right: the child nodes!
+Важно что здесь мы выставляем флаг в `true`. Что-нибудь забыли? Правильно: дочерние ноды! 
 
-When a parent node moves, all of its children's world coordinates are invalidated too. But here we aren't setting their dirty flags. We *could* do that, but that's recursive and slow. Instead we'll do something clever when we go to render. Let's see:
+Когда родительская нода двигается, все трансформации её дочерних элементов становятся невалидными. Но здесь мы не меняем их флаги. Мы *могли бы* это сделать, но это рекурсивно и медленно. Вместо этого мы используем другую идею в процедуре рисования. Вот смотрите:
 
 <span name="branch"></span>
 
@@ -288,138 +272,96 @@ When a parent node moves, all of its children's world coordinates are invalidate
 
 <aside name="branch">
 
-There's a subtle assumption here that the `if` check is faster than a matrix multiply. Intuitively, you would think it is: surely testing a single bit is faster than a bunch of floating point arithmetic.
+Это основано на явном предположении, что проверка `if` выполняется быстрее, чем перемножение матриц.
 
-However, modern CPUs are fantastically complex. They rely heavily on *pipelining* -- queueing up a series of sequential instructions. A branch like our `if` here can cause a *branch misprediction* and force the CPU lose cycles refilling the pipeline.
+Однако, современные процессоры фантастически сложны. В них широко используются *конвейеры*. Условный переход, как наш `if`, можем вызвать сбой предсказания и трату циклов на перезагрузку конвейера.
 
-The <a href="data-locality.html" class="pattern">Data Locality</a> chapter has more about how modern CPUs try to go faster and how you can avoid tripping them up like this.
+В главе <a href="data-locality.html" class="pattern">Компактность данных</a> написано больше о том, как процессоры стараются работать быстрее и как можно избежать подобных ловушек.
 
 </aside>
 
-This is similar to the original naïve implementation. The key changes are that we check to see if the node is dirty before calculating the world transform, and we store the result in a field instead of a local variable. When the node is clean, we skip `combine()` completely and use the old but still correct `world_` value.
+Это похоже на первоначальную примитивную реализацию. Ключевое изменение здесь в том, что мы проверяем нужно ли обновлять мировую трансформацию для ноды. И мы сохраняем результат её вычисления в поле класса вместо локальный переменной. Если трансформация ноды актуальна, мы можем пропустить вызов `combine()` совсем и использовать старое, но все ещё валидное значение.
 
-The <span name="clever">clever</span> bit is that `dirty` parameter. That will be `true` if any node above this node in the parent chain was dirty. In much the same way that `parentWorld` updates the world transform incrementally as we traverse down the hierarchy, `dirty` tracks the dirtiness of the parent chain.
+Тут используется <span name="clever">хитрый</span> параметр `dirty`. Он будет `true`, если какая-то нода выше текущей была грязной. `dirty` говорит нам, была ли  обновлена трансформация `parentWorld` при обходе графа сверху вниз.
 
-This lets us avoid having to actually recursively set each child's `dirty_` flag in `setTransform()`. Instead, we just pass the parent's dirty flag down to its children when we render and look at that too to see if we need to recalculate the world transform.
+Это позволяет избежать установку флага `dirty_` рекурсивно для всех дочерних нод в `setTransform()`. Вместо этого, мы просто передаем родительский грязный флаг к дочерним элементам во время отрисовки и следим за ним, чтобы понять -- надо ли обновлять мировую трансформацию.
 
-The end result here is exactly what we want: changing a node's local transform is just a couple of assignments, and rendering the world calculates the exact minimum number of world transforms that have changed since the last frame.
+В конечном результате получается то, что нужно: изменение локальной трансформации ноды приводит только к изменению пары свойств. А отрисовка графа пересчитывает минимум трансформаций, которые изменились за последнее время.
 
 <aside name="clever">
 
-Note that this clever trick only works because `render()` is the *only* thing in `GraphNode` that needs an up-to-date world transform. If other things accessed it, we'd have to do something different.
+Это трюк работает, потому что `render()` *единственное* место в `GraphNode`, которой нужна актуальная мировая трансформация. Если она потребуется в других местах, то надо придумывать что-то иное.
 
 </aside>
 
-## Design Decisions
+## Выбор архитектуры
 
-This pattern is fairly specific, so there are only a couple of knobs to twiddle:
+Этот паттерн весьма прост, осталось ли принять пару решений:
 
-### When is the dirty flag cleaned?
+### Когда очищать флаг?
 
-* **When the result is needed:**
+* **Когда нужен результат:**
 
-    * *It avoids doing calculation entirely if the result is never used.* For
-        primary data that changes much more frequently than the derived data is
-        accessed, this can be a big win.
+    * *Это убирает необходимость вычислений вообще, если результат никогда не нужен.* Получаем огромный выигрыш, если первичные данные изменяются гораздо чаще, чем нужны вторичные.
 
-    * *If the calculation is time-consuming, it can cause a noticeable pause.*
-        Postponing the work until the player is expecting to see the result can
-        affect their gameplay experience. Often, it's fast enough that this
-        isn't a problem, but if it is, you'll have to do the work earlier.
+    * *Если вычисления занимают много времени, это может вызвать значительную паузу.* Можно получить неприятный результат, если отложить вычисления до момента, когда они понадобятся игроку. Часто всего это не будет проблемой, если они достаточно быстры. Но если нет, то придется сделать эту работу заранее.
 
-* **At well-defined checkpoints:**
+* **В точно определенных точках:**
 
-    Sometimes there is a point in time or the progression of the game where it's
-    natural to do the deferred processing. For example,
-    we may want to save the game only when the pirate sails into port. Or the
-    sync point may not be part of the game mechanics. We may just want to hide the
-    work behind a loading screen or a cut scene.
+    Иногда есть точка во времени или прогрессе игры, где вполне естественно произвести отложенные вычисления. Например, мы можем сохранить игру, когда пиратский корабль входит в порт. Или, если точка синхронизации не является частью игры, можно спрятать работу за экраном загрузки или видеовставкой.
 
-    * *Doing the work doesn't impact the user experience.* Unlike the previous
-      option, you can often give something to
-        distract the player while the game is busy processing.
+    * *Вычисления происходят незаметно для игрока.* В отличие от предыдущего варианта, можно придумать что-нибудь, чтобы отвлечь игрока, пока игра плотно занята своим делом.
+    
+    * *Тяжелее понять, когда именно будет произведена работа.* Это не совсем согласуется с предыдущим моментом. Даже если будет маленькая вероятность произвести необходимую работу, надо убедиться, что игра этим воспользуется.
 
-    * *You lose control over when the work happens.* This is sort of the
-        opposite of the earlier point. You have micro-scale control over when you
-        process, and can make sure the game handles it gracefully.
+        Но что *невозможно* предугадать, так это то, действительно ли игрок подойдет к точке синхронизации или выполнятся какие-либо другие условия, которые вы поставили. Если он потеряется в пространстве или игра зациклится, то вычисления будут отложены намного дольше, чем вы будете ожидать. 
+        
+* **В фоне:**
 
-        What you *can't* do is ensure the player actually makes it to the
-        checkpoint or meets whatever criteria you've defined. If they get lost
-        or the game gets in a weird state, you can end up deferring
-        longer than you expect.
-
-* **In the background:**
-
-    Usually, you start a fixed <span name="hysteresis">timer</span>
-    on the first modification and then process all of the changes that happen
-    between then and when the timer fires.
-
+    Обычно это означает, что стартует <span name="hysteresis">таймер</span> после первой модификации данных и в нем обрабатывают те изменения, которые произошли.
+    
     <aside name="hysteresis">
 
-    The term in human-computer interaction for in intentional delay between
-    when a program receives user input and when it responds is [*hysteresis*](http://en.wikipedia.org/wiki/Hysteresis).
+    Придумали термин, который описывает задержку между действиями пользователя и моментом получения результатов -- [*гистерезис*](http://ru.wikipedia.org/wiki/Гистерезис). 
 
     </aside>
 
-    * *You can tune how often the work is performed.* By adjusting the timer
-        interval you can ensure it happens as frequently (or infrequently) as
-        you want.
+    * *Можно настроить частоту вызова таймера.* Меняя интервал таймера, можно быть уверенным, что работа производится достаточно часто (или редко).
+    
+    * *Делается больше ненужной работы.* Если меняется малая часть данных, то таймеру придется пропускать большие куски, прежде чем он доберется до реальной работы.
+    
+    * *Необходима поддержка асинхронности.* Обработка данных в фоне предполагает, что игрок имеет возможность продолжать играть, как будто ни в чем не бывало. Это значит, что нужно будет использовать треды или другой вариант одновременных вычислений, чтобы игра не останавливалась.
+    
+        Поскольку игрок, вероятно, будет продолжать менять данные, которые вы обрабатываете в фоне, придется задуматься и о синхронизации доступа к данным.
 
-    * *You can do more redundant work.* If the primary state only changes a
-        tiny amount during the timer's run, you can end up processing a large
-        chunk of mostly unchanged data.
+### Какова область действия флага?
 
-    * *You need support for doing work asynchronously.*
-        Processing the data "in the background" implies that the player can
-        keep doing whatever it is that they're doing at the same time. That
-        means you'll likely need threading or some other kind of concurrency
-        support so that the game can work on the data while it's still
-        being played.
+Представим нашу пиратскую игру, которая дает возможность игроку построить и улучшить свой пиратский корабль. Корабли автоматически сохраняются онлайн, чтобы игрок имел возможность продолжить игру с того места, где остановился в прошлый раз. Мы используем грязный флаг для выяснения, какие палубы были обновлены, чтобы послать изменения на сервер. Каждый блок данных, посылаемый на сервер, содержит информацию о изменениях и немного метаданных, которые говорят о том, в какой части корабля эти изменения произошли.
 
-        Since the player is likely interacting with
-        the same primary state that you're processing, you'll need to think
-        about making that safe for concurrent modification too.
+* **В случае узкой области:**
 
-### How fine-grained is your dirty tracking?
+    Скажем, вы используете флаг для каждой доски на палубе.
 
-Imagine our pirate game lets players build and customize their pirate ship. Ships are automatically saved online so the player can resume where they left off. We're using dirty flags to determine which decks of the ship have been fitted and need to be sent to the server. Each chunk of data we send to the server contains some modified ship data and a bit of metadata describing where on the ship this modification occurred.
+    * *Будут обрабатываться только те данные, которые изменились.* Вы пошлете на сервер только те части корабля, которые были реально изменены игроком.
 
-* **If it's more fine-grained:**
+* **Если увеличить область:**
 
-    Say you slap a dirty flag on each tiny plank of each deck.
-
-    * *You only process data that actually changed.* You'll send exactly the
-        facets of the ship that were modified to the server.
-
-* **If it's more coarse-grained:**
-
-    Alternatively, we could associate a dirty bit with each deck.
-    Changing anything on it marks the entire deck <span name="swab">dirty</span>.
+    Также можно присоединить флаг к целой палубе. Если на ней что-то изменились, мы помечаем <span name="swab">грязной</span> целую палубу.
 
     <aside name="swab">
 
-    I could make some terrible joke about it needing to be swabbed here, but
-    I'll refrain.
+    Тут можно было вставить шутку про грязную палубу и швабру, но я воздержусь.
 
     </aside>
 
-    * *You end up processing unchanged data.* Add a single barrel to a deck
-        and you'll have to send the whole thing to the server.
+    * *В итоге будут посылаться не только измененные данные.* Добавьте одну маленькую бочку на палубу, и палуба целиком отправиться на сервер.
 
-    * *Less memory is used for storing dirty flags.*
+    * *Меньше памяти уйдет на флаги.*
 
-    * *Less time is spent on fixed overhead.* When processing some changed data,
-       there's often a bit of fixed work you have to do on top of handling the
-       data itself. In the example here, that's the metadata required to
-       identify where on the ship the changed data is. The bigger your
-       processing chunks, the fewer of them there are, which means the less
-       overhead you have.
+    * *Меньше вспомогательной работы.* Когда обрабатываются измененные данные, всегда есть доля фиксированной работы, которую приходится делать, чтобы обработать поступившие изменения. В нашем примере, это может быть получение метаданных о месте, где произошли изменения. Чем больше область изменений, тем меньше апдейтов уйдет на сервер, таким образом экономится время на дополнительную работу.
 
-## See Also
+## Дополнительно
 
-*   This pattern is common outside of games in browser-side web frameworks like
-    [Angular](http://angularjs.org/). They use dirty
-    flags to track which data has been changed in the browser and needs to
-    be pushed up to the server.
+* Этот паттерн широко используется в браузерных играх на клиентской стороне. Например, [Angular](http://angularjs.org/). Там используется грязный флаг, чтобы отследить данные, которые изменились на клиенте, и которые нужно отправить на сервер.
 
-* Physics engines track which objects are in motion and which are resting. Since a resting body won't move until an impulse is applied to it, they don't need processing until they get touched. This "is moving" bit is a dirty flag to note which objects have had forces applied and need to have their physics resolved.
+* Физические движки так отличают объекты, которые движутся, от статических. Поскольку статическое тело не двигается, пока на него не действуют другие силы, их не нужно постоянно просчитывать. Этот "я-двигаюсь" флаг является примером грязного флага, который указывает на то, были ли приложены к телу силы и нужно ли рассчитать их действие.

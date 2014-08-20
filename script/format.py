@@ -47,7 +47,7 @@ CHAPTERS = [
   (u"Service Locator", u"Service Locator"),
   (u"Optimization Patterns", u'Низкоуровневая оптимизация'),
   (u"Data Locality", u"Data Locality"),
-  (u"Dirty Flag", u"Dirty Flag"),
+  (u"Dirty Flag", u"Грязный флаг"),
   (u"Object Pool", u"Object Pool"),
   (u"Spatial Partition", u"Spatial Partition")
 ]
