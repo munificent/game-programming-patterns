@@ -327,7 +327,7 @@ an instance of our <code>Log</code> class to every single function clutters the 
 signature and distracts from the intent of the code.</p>
 <p>The obvious fix is to make our <code>Log</code> class a singleton. Every function can then
 go straight to the class itself to get an instance. But when we do that, we
-inadvertently acquire a strange little restriction. All of the sudden, we can no
+inadvertently acquire a strange little restriction. All of a sudden, we can no
 longer create more than one logger.</p>
 <p>At first, this isn&#8217;t a problem. We&#8217;re writing only a single log file, so we only
 need one instance anyway. Then, deep in the development cycle, we run into
