@@ -517,12 +517,14 @@ namespace State
       friend class JumpingState;
     public:
       void setGraphics(Animate animate) {}
+      void changeState(HeroineState* state) {}
     private:
       HeroineState* state_;
     };
 
     class StandingState : public HeroineState {};
     class DuckingState : public HeroineState {};
+
     class JumpingState : public HeroineState {
       void handleInput(Heroine& heroine, Input input)
       {
@@ -538,6 +540,42 @@ namespace State
     class DivingState : public HeroineState {};
   }
 
+  namespace EnterActionsBefore
+  {
+    class HeroineState {};
+
+    class Heroine
+    {
+      friend class JumpingState;
+    public:
+      void setGraphics(Animate animate) {}
+      void changeState(HeroineState* state) {}
+    };
+
+    class StandingState : public HeroineState {};
+    class DuckingState : public HeroineState {
+    public:
+      HeroineState* handleInput(Heroine& heroine, Input input);
+    };
+
+    //^enter-standing-before
+    HeroineState* DuckingState::handleInput(Heroine& heroine,
+                                            Input input)
+    {
+      if (input == RELEASE_DOWN)
+      {
+        heroine.setGraphics(IMAGE_STAND);
+        return new StandingState();
+      }
+
+      // Other code...
+      //^omit
+      return NULL;
+      //^omit
+    }
+    //^enter-standing-before
+  }
+
   namespace EnterActions
   {
     class Heroine;
@@ -547,67 +585,70 @@ namespace State
     public:
       virtual ~HeroineState() {}
       virtual void enter(Heroine& heroine) {}
-      virtual void handleInput(Heroine& heroine, Input input) {}
-      virtual void update(Heroine& heroine) {}
+      virtual HeroineState* handleInput(Heroine& heroine, Input input)
+      {
+        return NULL;
+      }
     };
 
     class Heroine
     {
     public:
+      void handleInput(Input input);
       void setGraphics(Animate animate) {}
-      void superBomb() {}
-      void changeState(HeroineState* state);
     private:
       HeroineState* state_;
-      double yVelocity_;
     };
 
-    //^ducking-with-enter
+    //^standing-with-enter
+    class StandingState : public HeroineState
+    {
+    public:
+      virtual void enter(Heroine& heroine)
+      {
+        heroine.setGraphics(IMAGE_STAND);
+      }
+
+      // Other code...
+    };
+    //^standing-with-enter
+
+    //^change-state
+    void Heroine::handleInput(Input input)
+    {
+      HeroineState* state = state_->handleInput(*this, input);
+      if (state != NULL)
+      {
+        delete state_;
+        state_ = state;
+
+        // Call the enter action on the new state.
+        state_->enter(*this);
+      }
+    }
+    //^change-state
+
     class DuckingState : public HeroineState
     {
     public:
-      //^omit
-      DuckingState()
-      : chargeTime_(0)
-      {}
+      virtual HeroineState* handleInput(Heroine& heroine, Input input);
+    };
 
-      //^omit
-      virtual void enter(Heroine& heroine)
+    //^enter-standing
+    HeroineState* DuckingState::handleInput(Heroine& heroine,
+                                            Input input)
+    {
+      if (input == RELEASE_DOWN)
       {
-        chargeTime_ = 0;
-        heroine.setGraphics(IMAGE_DUCK);
+        return new StandingState();
       }
 
       // Other code...
       //^omit
-    private:
-      int chargeTime_;
+      return NULL;
       //^omit
-    };
-    //^ducking-with-enter
-
-    //^change-state
-    void Heroine::changeState(HeroineState* state)
-    {
-      delete state_;
-      state_ = state;
-      state_->enter(*this);
     }
-    //^change-state
-
-    class StandingState : public HeroineState
-    {
-    public:
-      virtual void handleInput(Heroine& heroine, Input input)
-      {
-        //^enter-ducking
-        if (input == PRESS_DOWN)
-        {
-          heroine.changeState(new DuckingState());
-        }
-        //^enter-ducking
-      }
-    };
+    //^enter-standing
   }
 
   namespace Concurrent

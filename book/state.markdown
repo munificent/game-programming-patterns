@@ -359,36 +359,35 @@ The <a href="object-pool.html" class="pattern">Object Pool</a> pattern can help.
 ## Enter and Exit Actions
 
 The goal of the State pattern is to encapsulate all of the behavior and data for
-one state in a single class. We've done that pretty well, but there's still a
-loose end. We moved handling user input and updating the charge time into
-`DuckingState`, but there's a bit of ducking-specific code left outside. Over in
-the standing state, when we *start* ducking, it does some initialization:
+one state in a single class. We're partway there, but we still have
+some loose ends.
 
-^code start-ducking
+When the heroine changes state, we also switch her sprite. Right now, that code is owned by the state she's switching *from*. When she goes from ducking to standing, the ducking state sets her image:
 
-The ducking state should take care of resetting the charge time (after
-all, it's the object that has that field) and playing the animation. We can
+^code enter-standing-before
+
+What we really want is each state to control its own graphics. We can
 handle that by giving the state an *entry action*:
 
-^code ducking-with-enter
+^code standing-with-enter
 
-Back in `Heroine`, we wrap changing the state in a little convenience method
-that calls that on the new state:
+Back in `Heroine`, we modify the code for handling state changes to call that
+on the new state:
 
 ^code change-state
 
-In the standing code we use it like:
+This lets us simplify the ducking code to:
 
-^code enter-ducking
+^code enter-standing
 
-Now ducking really is encapsulated. One particularly nice thing about entry
-actions is that they run when you enter the state regardless of which state
-you're coming *from*.
+All it does is switch to standing and the standing state takes care of
+the graphics. Now our states really are encapsulated. One particularly nice thing
+about entry actions is that they run when you enter the state regardless of
+which state you're coming *from*.
 
 Most real-world state graphs have multiple transitions into the same state. For
-example, maybe our heroine can fire her weapon while standing, ducking, and
-jumping. That means you end up duplicating some code everywhere that transition
-occurs. Entry actions give you a place to consolidate that.
+example, our heroine will also end up standing after she lands a jump or dive. That means we would end up duplicating some code everywhere that transition
+occurs. Entry actions give us a place to consolidate that.
 
 We can, of course, also extend this to support an *exit action*. This is just a
 method we call on the state we're *leaving* right before we switch to the new
