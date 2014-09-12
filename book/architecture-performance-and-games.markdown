@@ -186,7 +186,7 @@ extensibility should be engineered in so future changes are easier to make.
 
 People get really excited about this. They envision future developers (or just
 their future self) stepping into the codebase and finding it open-ended,
-powerful, and just beckoning to be extended. They imagine the One Game Engine To
+powerful, and just beckoning to be extended. They imagine The One Game Engine To
 Rule Them All.
 
 But this is where it starts to get tricky. Whenever you add a layer of

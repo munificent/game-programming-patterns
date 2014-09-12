@@ -226,7 +226,7 @@ isn't being accessed during modification.
 ## Sample Code
 
 Now that we've got the theory, let's see how it works in practice. We'll write a
-very bare-bones graphics system that lets us draw pixels on a frame buffer. In
+very bare-bones graphics system that lets us draw pixels on a framebuffer. In
 most consoles and PCs, the video driver provides this low-level part of the
 graphics system, but implementing it by hand here will let us see what's going on.
 First up is the buffer itself:
@@ -427,12 +427,11 @@ small change in `Stage`:
 ^code 12
 
 The `update()` function now updates all of the actors and *then* swaps
-all of their states.
-
-The end result of this is that an actor will only see a slap in the
-frame *after* it was actually slapped. This way, the actors will behave the
-same no matter their order in the stage's array. As far as the user or any
-outside code can tell, all of the actors update simultaneously within a frame.
+all of their states. The end result of this is that an actor will only see a
+slap in the frame *after* it was actually slapped. This way, the actors will
+behave the same no matter their order in the stage's array. As far as the user
+or any outside code can tell, all of the actors update simultaneously within a
+frame.
 
 ## Design Decisions
 
@@ -560,4 +559,4 @@ index.
  *  <p>You can find the Double Buffer pattern in use in almost every graphics
     API out there. For example, OpenGL has `swapBuffers()`, Direct3D has "swap
     chains", and Microsoft's XNA framework swaps the framebuffers within its
-    `endDraw()` function.</p>
+    `endDraw()` method.</p>

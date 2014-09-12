@@ -247,10 +247,9 @@ particle class:
 ^code 1
 
 The default constructor initializes the particle to "not in use". A later call
-to `init()` initializes the particle to a live state.
-
-Particles are animated over time using the unsurprisingly named `animate()`
-function, which should be called once per frame.
+to `init()` initializes the particle to a live state. Particles are animated
+over time using the unsurprisingly named `animate()` function, which should be
+called once per frame.
 
 The pool needs to know which particles are available for reuse. It gets this
 from the particle's `inUse()` function. This function takes advantage of the fact that

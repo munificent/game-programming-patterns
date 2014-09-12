@@ -395,7 +395,7 @@ class="pattern">Update Method</a> pattern.
 
 Now, we need to call that from somewhere convenient. What "convenient" means
 depends on your game. It may mean calling it from the main <a
-href="game-loop.html" class="pattern">Game Loop</a> or from a dedicated audio
+href="game-loop.html" class="pattern">game loop</a> or from a dedicated audio
 thread.
 
 This works fine, but it does presume we can process *every* sound request in a

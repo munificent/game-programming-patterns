@@ -374,7 +374,7 @@ href="object-pool.html">Object Pool</a> pattern to control where in memory our
 objects end up.
 
 Defining a "constructor" function in `Breed` gives us a place to put that logic.
-Instead of simply calling `new`, the `newMonster` function can pull the memory
+Instead of simply calling `new`, the `newMonster()` function can pull the memory
 from a pool or custom heap before passing control off to `Monster` for
 initialization. By putting this logic inside `Breed`, in the *only* function
 that has the ability to create monsters, we ensure that all monsters go through

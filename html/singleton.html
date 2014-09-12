@@ -641,10 +641,10 @@ find it.</p>
 <p>We can reduce the number of global classes by piggybacking on existing ones
 like that. Instead of making singletons out of <code>Log</code>, <code>FileSystem</code>, and
 <code>AudioPlayer</code>, do this:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">World</span>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Game</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
-  <span class="k">static</span> <span class="n">World</span><span class="o">&amp;</span> <span class="n">instance</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">instance_</span><span class="p">;</span> <span class="p">}</span>
+  <span class="k">static</span> <span class="n">Game</span><span class="o">&amp;</span> <span class="n">instance</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">instance_</span><span class="p">;</span> <span class="p">}</span>
 
   <span class="c1">// Functions to set log_, et. al. ...</span>
 
@@ -653,7 +653,7 @@ like that. Instead of making singletons out of <code>Log</code>, <code>FileSyste
   <span class="n">AudioPlayer</span><span class="o">&amp;</span> <span class="n">getAudioPlayer</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="o">*</span><span class="n">audioPlayer_</span><span class="p">;</span> <span class="p">}</span>
 
 <span class="nl">private:</span>
-  <span class="k">static</span> <span class="n">World</span> <span class="n">instance_</span><span class="p">;</span>
+  <span class="k">static</span> <span class="n">Game</span> <span class="n">instance_</span><span class="p">;</span>
 
   <span class="n">Log</span>         <span class="o">*</span><span class="n">log_</span><span class="p">;</span>
   <span class="n">FileSystem</span>  <span class="o">*</span><span class="n">fileSystem_</span><span class="p">;</span>
@@ -662,9 +662,9 @@ like that. Instead of making singletons out of <code>Log</code>, <code>FileSyste
 </pre></div>
 
 
-<p>With this, only <code>World</code> is globally available. Functions can get to the
+<p>With this, only <code>Game</code> is globally available. Functions can get to the
 other systems <span name="demeter">through</span> it:</p>
-<div class="codehilite"><pre><span class="n">World</span><span class="o">::</span><span class="n">instance</span><span class="p">().</span><span class="n">getAudioPlayer</span><span class="p">().</span><span class="n">play</span><span class="p">(</span><span class="n">VERY_LOUD_BANG</span><span class="p">);</span>
+<div class="codehilite"><pre><span class="n">Game</span><span class="o">::</span><span class="n">instance</span><span class="p">().</span><span class="n">getAudioPlayer</span><span class="p">().</span><span class="n">play</span><span class="p">(</span><span class="n">VERY_LOUD_BANG</span><span class="p">);</span>
 </pre></div>
 
 
@@ -674,20 +674,20 @@ other systems <span name="demeter">through</span> it:</p>
 better than a giant pile of singletons.</p>
 </aside>
 
-<p>If, later, the architecture is changed to support multiple <code>World</code> instances
+<p>If, later, the architecture is changed to support multiple <code>Game</code> instances
 (perhaps for streaming or testing purposes), <code>Log</code>, <code>FileSystem</code>, and
 <code>AudioPlayer</code> are all unaffected&#8202;&mdash;&#8202;they won&#8217;t even know the difference. The
-downside with this, of course, is that more code ends up coupled to <code>World</code>
+downside with this, of course, is that more code ends up coupled to <code>Game</code>
 itself. If a class just needs to play sound, our example still requires it
 to know about the world in order to get to the audio player.</p>
-<p>We solve this with a hybrid solution. Code that already knows about World
+<p>We solve this with a hybrid solution. Code that already knows about <code>Game</code>
 can simply access <code>AudioPlayer</code> directly from it. For code that doesn&#8217;t, we
 provide access to <code>AudioPlayer</code> using one of the other options described
 here.</p>
 </li>
 <li>
 <p><strong>Get it from a Service Locator.</strong> So far, we&#8217;re assuming the global class
-    is some regular concrete class like <code>World</code>. Another option is to define a
+    is some regular concrete class like <code>Game</code>. Another option is to define a
     class whose sole reason for being is to give global access to objects. This
     common pattern is called a <a class="pattern"
     href="service-locator.html">Service Locator</a> and gets its own chapter.</p>

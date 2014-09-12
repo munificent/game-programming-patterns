@@ -110,24 +110,22 @@ namespace Version1
 
   Audio *Locator::service_;
 
-  //^11
   void initGame()
   {
+    //^11
     ConsoleAudio *audio = new ConsoleAudio();
     Locator::provide(audio);
+    //^11
   }
-  //^11
 
-  //^5
   void someGameCode()
   {
-    //^omit
     int VERY_LOUD_BANG = 0;
-    //^omit
+    //^5
     Audio *audio = Locator::getAudio();
     audio->playSound(VERY_LOUD_BANG);
+    //^5
   }
-  //^5
 }
 
 // design decisions / compile time

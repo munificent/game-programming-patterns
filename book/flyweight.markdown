@@ -323,7 +323,7 @@ maintainable style.
     href="http://en.wikipedia.org/wiki/Factory_method_pattern" class="gof-
     pattern">Factory Method</a> pattern.
 
-    In order to return a previously created flyweight, you'll have to keep track
+ *  In order to return a previously created flyweight, you'll have to keep track
     of the pool of ones that you've already instantiated. As the name implies,
     that means that an <a href="object-pool.html" class="pattern">Object
     Pool</a> might be a helpful place to store them.

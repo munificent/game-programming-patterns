@@ -215,7 +215,7 @@ afford two buffers, you may have to look into other ways to ensure your state
 isn&#8217;t being accessed during modification.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>Now that we&#8217;ve got the theory, let&#8217;s see how it works in practice. We&#8217;ll write a
-very bare-bones graphics system that lets us draw pixels on a frame buffer. In
+very bare-bones graphics system that lets us draw pixels on a framebuffer. In
 most consoles and PCs, the video driver provides this low-level part of the
 graphics system, but implementing it by hand here will let us see what&#8217;s going on.
 First up is the buffer itself:</p>
@@ -572,32 +572,27 @@ reading, and the next state is used for writing.</p>
 before clearing the swap state, it copies the next state into the
 current one, making it the new current state. This also requires a
 small change in <code>Stage</code>:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Stage</span>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Stage</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>
 <span class="p">{</span>
-  <span class="kt">void</span> <span class="n">update</span><span class="p">()</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_ACTORS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_ACTORS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-    <span class="p">{</span>
-      <span class="n">actors_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">();</span>
-    <span class="p">}</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_ACTORS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-    <span class="p">{</span>
-      <span class="n">actors_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">swap</span><span class="p">();</span>
-    <span class="p">}</span>
+    <span class="n">actors_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">();</span>
   <span class="p">}</span>
 
-  <span class="c1">// Previous Stage code...</span>
-<span class="p">};</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_ACTORS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">actors_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">swap</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 
 
 <p>The <code>update()</code> function now updates all of the actors and <em>then</em> swaps
-all of their states.</p>
-<p>The end result of this is that an actor will only see a slap in the
-frame <em>after</em> it was actually slapped. This way, the actors will behave the
-same no matter their order in the stage&#8217;s array. As far as the user or any
-outside code can tell, all of the actors update simultaneously within a frame.</p>
+all of their states. The end result of this is that an actor will only see a
+slap in the frame <em>after</em> it was actually slapped. This way, the actors will
+behave the same no matter their order in the stage&#8217;s array. As far as the user
+or any outside code can tell, all of the actors update simultaneously within a
+frame.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>Double Buffer is pretty straightforward, and the examples we&#8217;ve seen so far
 cover most of the variations you&#8217;re likely to encounter. There are two main
@@ -747,7 +742,7 @@ actor&#8217;s state will be swapped.</p>
 <li><p>You can find the Double Buffer pattern in use in almost every graphics
     API out there. For example, OpenGL has <code>swapBuffers()</code>, Direct3D has &#8220;swap
     chains&#8221;, and Microsoft&#8217;s XNA framework swaps the framebuffers within its
-    <code>endDraw()</code> function.</p></li>
+    <code>endDraw()</code> method.</p></li>
 </ul>
 <nav>
   <span class="prev">&larr; <a href="sequencing-patterns.html">Previous Chapter</a></span>

@@ -516,7 +516,7 @@ the CPU busy, instructions are *pipelined* so that the subsequent instructions
 start processing before the first one finishes.
 
 To do that, the CPU has to guess which instructions it will be executing next.
-In straight line code, that's easy, but with flow control, it's harder. While
+In straight line code, that's easy, but with control flow, it's harder. While
 it's executing the instructions for that `if`, does it guess that the particle
 is active and start executing the code for the `update()` call, or does it guess
 that it isn't?

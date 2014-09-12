@@ -308,7 +308,7 @@ namespace UseServiceLocator
   
   ParticleSystem particles;
   
-  class ServiceLocator
+  class Locator
   {
   public:
     static ParticleSystem& getParticles() { return particles; }
@@ -320,7 +320,7 @@ namespace UseServiceLocator
   protected:
     void spawnParticles(ParticleType type, int count)
     {
-      ParticleSystem& particles = ServiceLocator::getParticles();
+      ParticleSystem& particles = Locator::getParticles();
       particles.spawn(type, count);
     }
     

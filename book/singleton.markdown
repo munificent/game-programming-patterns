@@ -493,7 +493,7 @@ other ways our codebase can get access to an object:
 
     ^code 11
 
-    With this, only `World` is globally available. Functions can get to the
+    With this, only `Game` is globally available. Functions can get to the
     other systems <span name="demeter">through</span> it:
 
     ^code 12
@@ -505,20 +505,20 @@ other ways our codebase can get access to an object:
 
     </aside>
 
-    If, later, the architecture is changed to support multiple `World` instances
+    If, later, the architecture is changed to support multiple `Game` instances
     (perhaps for streaming or testing purposes), `Log`, `FileSystem`, and
     `AudioPlayer` are all unaffected -- they won't even know the difference. The
-    downside with this, of course, is that more code ends up coupled to `World`
+    downside with this, of course, is that more code ends up coupled to `Game`
     itself. If a class just needs to play sound, our example still requires it
     to know about the world in order to get to the audio player.
 
-    We solve this with a hybrid solution. Code that already knows about World
+    We solve this with a hybrid solution. Code that already knows about `Game`
     can simply access `AudioPlayer` directly from it. For code that doesn't, we
     provide access to `AudioPlayer` using one of the other options described
     here.
 
  *  **Get it from a Service Locator.** So far, we're assuming the global class
-    is some regular concrete class like `World`. Another option is to define a
+    is some regular concrete class like `Game`. Another option is to define a
     class whose sole reason for being is to give global access to objects. This
     common pattern is called a <a class="pattern"
     href="service-locator.html">Service Locator</a> and gets its own chapter.

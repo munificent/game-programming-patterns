@@ -597,7 +597,7 @@ modern CPUs, a single &#8220;instruction&#8221; actually takes several clock cyc
 the CPU busy, instructions are <em>pipelined</em> so that the subsequent instructions
 start processing before the first one finishes.</p>
 <p>To do that, the CPU has to guess which instructions it will be executing next.
-In straight line code, that&#8217;s easy, but with flow control, it&#8217;s harder. While
+In straight line code, that&#8217;s easy, but with control flow, it&#8217;s harder. While
 it&#8217;s executing the instructions for that <code>if</code>, does it guess that the particle
 is active and start executing the code for the <code>update()</code> call, or does it guess
 that it isn&#8217;t?</p>

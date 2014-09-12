@@ -284,35 +284,30 @@ namespace BufferedSlapstick
   };
   //^11
 
-  //^12
   class Stage
   {
-    //^omit
   public:
     void add(Actor* actor, int index) { actors_[index] = actor; }
-
-    //^omit
-    void update()
-    {
-      for (int i = 0; i < NUM_ACTORS; i++)
-      {
-        actors_[i]->update();
-      }
-
-      for (int i = 0; i < NUM_ACTORS; i++)
-      {
-        actors_[i]->swap();
-      }
-    }
-
-    // Previous Stage code...
-    //^omit
+    void update();
   private:
     static const int NUM_ACTORS = 3;
 
     Actor* actors_[NUM_ACTORS];
-    //^omit
   };
+
+  //^12
+  void Stage::update()
+  {
+    for (int i = 0; i < NUM_ACTORS; i++)
+    {
+      actors_[i]->update();
+    }
+    
+    for (int i = 0; i < NUM_ACTORS; i++)
+    {
+      actors_[i]->swap();
+    }
+  }
   //^12
 
   class Comedian : public Actor

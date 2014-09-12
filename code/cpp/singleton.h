@@ -319,10 +319,10 @@ namespace Singleton10
   };
 
   //^11
-  class World
+  class Game
   {
   public:
-    static World& instance() { return instance_; }
+    static Game& instance() { return instance_; }
 
     // Functions to set log_, et. al. ...
 
@@ -331,7 +331,7 @@ namespace Singleton10
     AudioPlayer& getAudioPlayer() { return *audioPlayer_; }
 
   private:
-    static World instance_;
+    static Game instance_;
 
     Log         *log_;
     FileSystem  *fileSystem_;
@@ -339,13 +339,13 @@ namespace Singleton10
   };
   //^11
 
-  World World::instance_ = World();
+  Game Game::instance_ = Game();
 
   void foo()
   {
     int VERY_LOUD_BANG = 0;
     //^12
-    World::instance().getAudioPlayer().play(VERY_LOUD_BANG);
+    Game::instance().getAudioPlayer().play(VERY_LOUD_BANG);
     //^12
   }
 }

@@ -498,8 +498,8 @@ We define another instruction type for a number literal like so:
 <aside name="single">
 
 Here, I'm reading a single byte for the value to avoid the fiddly code
-required to decode a multiple-byte integer, but in a real implementation, you'd
-want to be able to have literals that cover your full numeric range.
+required to decode a multiple-byte integer, but in a real implementation, you'll
+want to support literals that cover your full numeric range.
 
 </aside>
 
@@ -710,7 +710,7 @@ kind of behavior you want them to create.
 
 <aside name="text">
 
-The scripting system I wrote for [Henry Hatsworth and the Puzzling
+The scripting system I wrote for [Henry Hatsworth in the Puzzling
 Adventure][hatsworth] worked like this.
 
 [hatsworth]: http://en.wikipedia.org/wiki/Henry_Hatsworth_in_the_Puzzling_Adventure

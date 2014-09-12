@@ -362,9 +362,9 @@ rows out.
 There's a relatively short list of well-defined spatial partitioning data
 structures, and one option would be to go through them one at a time here.
 Instead, I tried to organize this by their essential characteristics. My hope is
-that once you do learn about quadtrees and BSPs and the like, this will help you
-understand *how* and *why* they work and why you might choose one over the
-other.
+that once you do learn about quadtrees and binary space partitions (BSPs) and
+the like, this will help you understand *how* and *why* they work and why you
+might choose one over the other.
 
 ### Is the partition hierarchical or flat?
 

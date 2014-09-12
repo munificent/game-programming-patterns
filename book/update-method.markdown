@@ -572,7 +572,7 @@ collection that avoids them during your core game loop.
 
  *  This pattern, along with <a href="game-loop.html"
     class="pattern">Game Loop</a> and <a href="component.html"
-    class="pattern">Component</a>, is part of a triinity that often forms the nucleus of a game engine.
+    class="pattern">Component</a>, is part of a trinity that often forms the nucleus of a game engine.
 
  *  When you start caring about the cache performance of updating a bunch of
     entities or components in a loop each frame, the <a

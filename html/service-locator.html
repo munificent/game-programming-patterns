@@ -205,22 +205,16 @@ Dependency injection instead says that outside code is responsible for
 <p>The static <code>getAudio()</code> function does the locating. We can call it from
 anywhere in the codebase, and it will give us back an instance of our <code>Audio</code>
 service to use:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">someGameCode</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="n">Audio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="n">Locator</span><span class="o">::</span><span class="n">getAudio</span><span class="p">();</span>
-  <span class="n">audio</span><span class="o">-&gt;</span><span class="n">playSound</span><span class="p">(</span><span class="n">VERY_LOUD_BANG</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="codehilite"><pre><span class="n">Audio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="n">Locator</span><span class="o">::</span><span class="n">getAudio</span><span class="p">();</span>
+<span class="n">audio</span><span class="o">-&gt;</span><span class="n">playSound</span><span class="p">(</span><span class="n">VERY_LOUD_BANG</span><span class="p">);</span>
 </pre></div>
 
 
 <p>The way it &#8220;locates&#8221; is very simple&#8202;&mdash;&#8202;it relies on some outside code to register
 a service provider before anything tries to use the service. When the game is
 starting up, it calls some code like this:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">initGame</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="n">ConsoleAudio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConsoleAudio</span><span class="p">();</span>
-  <span class="n">Locator</span><span class="o">::</span><span class="n">provide</span><span class="p">(</span><span class="n">audio</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="codehilite"><pre><span class="n">ConsoleAudio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConsoleAudio</span><span class="p">();</span>
+<span class="n">Locator</span><span class="o">::</span><span class="n">provide</span><span class="p">(</span><span class="n">audio</span><span class="p">);</span>
 </pre></div>
 
 

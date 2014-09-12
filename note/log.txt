@@ -1,3 +1,28 @@
+2014-09-11 - redo enter actions in state
+2014-09-10 - proofread through half of state
+2014-09-09 - proofread through flyweight
+2014-09-08 - cover!
+2014-09-07 - print!
+2014-09-06 - finish front matter
+2014-09-05 - acknowledgements
+2014-09-04 - more index revision, grep styles
+2014-09-03 - more index revision, grep styles
+2014-09-02 - index last three chapters, and revise index!
+2014-09-01 - index data locality
+2014-08-31 - index component, event queue, and service locator
+2014-08-30 - index subclass sandbox and type object
+2014-08-29 - index update method and bytecode
+2014-08-28 - index double buffer and game loop
+2014-08-27 - clean up indexes so far
+2014-08-26 - index singleton and state
+2014-08-25 - index flyweight, observer, prototype
+2014-08-24 - index intro, architecture, command
+2014-08-23 - start working on index
+2014-08-22 - fix all the cross refs
+2014-08-21 - work on cross references
+2014-08-20 - clean up blank pages, fix bugs, pay lauren
+2014-08-19 - layout spatial partition (last chapter!)
+2014-08-18 - fix #253, merge spatial partition, layout object pool
 2014-08-17 - fix #252
 2014-08-16 - merge object pool changes
 2014-08-15 - email, set up group for translators

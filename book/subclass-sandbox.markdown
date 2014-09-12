@@ -459,8 +459,8 @@ particle system object, how would it get one?
     in the state that the base class needs before it needs it. That places the
     burden of initialization on the surrounding code. Another option is to let
     the base class handle it by pulling in the state it needs. One way to do
-    that is by using a <a class="pattern" href="service-locator.html">Service
-    Locator</a>:
+    that is by using the <a class="pattern" href="service-locator.html">Service
+    Locator</a> pattern:
 
     ^code 12
 

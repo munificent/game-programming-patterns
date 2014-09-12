@@ -613,8 +613,8 @@ We define another instruction type for a number literal like so:</p>
 <aside name="single">
 
 <p>Here, I&#8217;m reading a single byte for the value to avoid the fiddly code
-required to decode a multiple-byte integer, but in a real implementation, you&#8217;d
-want to be able to have literals that cover your full numeric range.</p>
+required to decode a multiple-byte integer, but in a real implementation, you&#8217;ll
+want to support literals that cover your full numeric range.</p>
 </aside>
 
 <p><img src="images/bytecode-literal.png" alt="Binary encoding of a literal instruction: 0x05 (LITERAL) followed by 123 (the value)." /></p>
@@ -807,7 +807,7 @@ kind of behavior you want them to create.</p>
 <p><img src="images/bytecode-ui.png" alt="A mock-up of a little tree-based UI for authoring behavior." /></p>
 <aside name="text">
 
-<p>The scripting system I wrote for <a href="http://en.wikipedia.org/wiki/Henry_Hatsworth_in_the_Puzzling_Adventure">Henry Hatsworth and the Puzzling
+<p>The scripting system I wrote for <a href="http://en.wikipedia.org/wiki/Henry_Hatsworth_in_the_Puzzling_Adventure">Henry Hatsworth in the Puzzling
 Adventure</a> worked like this.</p>
 </aside>
 

@@ -627,14 +627,14 @@ memory.</p>
 in the state that the base class needs before it needs it. That places the
 burden of initialization on the surrounding code. Another option is to let
 the base class handle it by pulling in the state it needs. One way to do
-that is by using a <a class="pattern" href="service-locator.html">Service
-Locator</a>:</p>
+that is by using the <a class="pattern" href="service-locator.html">Service
+Locator</a> pattern:</p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
 <span class="nl">protected:</span>
   <span class="kt">void</span> <span class="n">spawnParticles</span><span class="p">(</span><span class="n">ParticleType</span> <span class="n">type</span><span class="p">,</span> <span class="kt">int</span> <span class="n">count</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="n">ParticleSystem</span><span class="o">&amp;</span> <span class="n">particles</span> <span class="o">=</span> <span class="n">ServiceLocator</span><span class="o">::</span><span class="n">getParticles</span><span class="p">();</span>
+    <span class="n">ParticleSystem</span><span class="o">&amp;</span> <span class="n">particles</span> <span class="o">=</span> <span class="n">Locator</span><span class="o">::</span><span class="n">getParticles</span><span class="p">();</span>
     <span class="n">particles</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">type</span><span class="p">,</span> <span class="n">count</span><span class="p">);</span>
   <span class="p">}</span>
 
