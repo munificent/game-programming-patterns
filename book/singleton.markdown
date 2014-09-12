@@ -241,7 +241,7 @@ signature and distracts from the intent of the code.
 
 The obvious fix is to make our `Log` class a singleton. Every function can then
 go straight to the class itself to get an instance. But when we do that, we
-inadvertently acquire a strange little restriction. All of the sudden, we can no
+inadvertently acquire a strange little restriction. All of a sudden, we can no
 longer create more than one logger.
 
 At first, this isn't a problem. We're writing only a single log file, so we only
