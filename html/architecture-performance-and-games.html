@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="introduction.html">Previous Chapter</a></span>
+  <span class="next"><a href="design-patterns-revisited.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Architecture, Performance, and Games</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="introduction.html">Introduction</a></span></h1>
 <p>Before we plunge headfirst into a pile of patterns, I thought it might help to
@@ -93,7 +98,7 @@ your primate brain.</p>
 </aside>
 
 <p>We tend to gloss over this step, but it&#8217;s often the most time-consuming part of
-programming. If you think paging some data from RAM into disk is slow, try
+programming. If you think paging some data from disk into RAM is slow, try
 paging it into a simian cerebrum over a pair of optical nerves.</p>
 <p>Once you&#8217;ve got all the right context into your wetware, you think for a bit and
 figure out your solution. There can be a lot of back and forth here, but often
@@ -109,7 +114,7 @@ some cleanup to do.</p>
 code, but a large fraction of the codebase is perfectly testable.</p>
 <p>I won&#8217;t get on a soapbox here, but I&#8217;ll ask you to consider doing more automated
 testing if you aren&#8217;t already. Don&#8217;t you have better things to do than manually
-test stuff over and over again?</p>
+validate stuff over and over again?</p>
 </aside>
 
 <p>You jammed a bit more code into your game, but you don&#8217;t want the next person to
@@ -135,9 +140,9 @@ find strategies to reduce the volume of it. This book has an entire section on
 Patterns</em> is about the same idea.</p>
 <p>You can define &#8220;decoupling&#8221; a bunch of ways, but I think if two pieces of code
 are coupled, it means you can&#8217;t understand one without understanding the other.
-If you <em>de</em>couple them, you can reason about either side independently. That&#8217;s
+If you <em>de</em>-couple them, you can reason about either side independently. That&#8217;s
 great because if only one of those pieces is relevant to your problem, you just
-need to load it into your monkey brain and not the other half too.</p>
+need to load <em>it</em> into your monkey brain and not the other half too.</p>
 <p>To me, this is a key goal of software architecture: <strong>minimize the amount of
 knowledge you need to have in-cranium before you can make progress.</strong></p>
 <p>The later stages come into play too, of course. Another definition of decoupling
@@ -199,7 +204,7 @@ extension points.</p>
 code that does something. When you need to make a change, sure, there&#8217;s probably
 an interface there to help, but good luck finding it. In theory, all of this
 decoupling means you have less code to understand before you can extend it, but
-the layers of abstraction themselves end up filling up your mental scratch disk.</p>
+the layers of abstraction themselves end up filling your mental scratch disk.</p>
 <p>Codebases like this are what turn people <em>against</em> software architecture, and
 design patterns in particular. It&#8217;s easy to get so wrapped up in the code itself
 that you lose sight of the fact that you&#8217;re trying to ship a <em>game</em>. The siren
@@ -429,7 +434,7 @@ about that nagging little &#8220;game only runs at 1 FPS&#8221; problem.</p>
 <nav>
   <span class="prev">&larr; <a href="introduction.html">Previous Chapter</a></span>
   <span class="next"><a href="design-patterns-revisited.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

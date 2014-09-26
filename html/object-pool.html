@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="dirty-flag.html">Previous Chapter</a></span>
+  <span class="next"><a href="spatial-partition.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Object Pool</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="optimization-patterns.html">Optimization Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
@@ -40,11 +45,10 @@ our system needs to be able to create them very quickly. More importantly, we
 need to make sure that creating and destroying these particles doesn&#8217;t cause
 <em>memory fragmentation</em>.</p>
 <h3><a href="#the-curse-of-fragmentation" name="the-curse-of-fragmentation">The curse of fragmentation</a></h3>
-<p>Programming for a game console like the Xbox 360 is closer to embedded
-programming than conventional PC programming in many ways. Like embedded
-programming, console games must run continuously for a very long time without
-crashing or leaking memory, and efficient compacting memory managers are rarely
-available. In this environment, memory fragmentation is deadly.</p>
+<p>Programming for a game console or mobile device is closer to embedded
+programming than conventional PC programming in many ways. Memory is scarce,
+users expect games to be rock solid, and efficient compacting memory managers
+are rarely available. In this environment, memory fragmentation is deadly.</p>
 <p>Fragmentation means the free space in our heap is <span
 name="park">broken</span> into smaller pieces of memory instead of one large
 open block. The <em>total</em> memory available may be large, but the largest
@@ -161,7 +165,7 @@ scenario.</p>
 <p><em>Forcibly kill an existing object.</em> Consider a pool for currently playing
     sounds, and assume you want to start a new sound but the pool is full. You
     do <em>not</em> want to simply ignore the new sound&#8202;&mdash;&#8202;the user will notice if their
-    magical wand swishes dramatically <em>sometimes</em> and stay stubbornly silent
+    magical wand swishes dramatically <em>sometimes</em> and stays stubbornly silent
     other times. A better solution is to find the quietest sound already playing
     and replace that with our new sound. The new sound will mask the audible
     cutoff of the previous sound.</p>
@@ -711,7 +715,7 @@ expectation that an object will be shared within its lifetime.</p>
 <nav>
   <span class="prev">&larr; <a href="dirty-flag.html">Previous Chapter</a></span>
   <span class="next"><a href="spatial-partition.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

@@ -1,3 +1,18 @@
+2014-09-26 - finish applying proofreading, tweak other web stuff
+2014-09-25 - apply proofreading to web of six chapters, top nav
+2014-09-24 - more kdp and bowker stuff, description, cover
+2014-09-23 - fill in stuff on createspace and kdp
+2014-09-22 - finish proofreading
+2014-09-21 - apply proofreading through type object
+2014-09-20 - apply proofreading through game loop
+2014-09-19 - apply proofreading through observer
+2014-09-18 - proofread last three chapters!
+2014-09-17 - proofread data locality
+2014-09-16 - proofread through service locator
+2014-09-15 - proofread through component
+2014-09-14 - proofread through bytecode
+2014-09-13 - proofread through double buffer
+2014-09-12 - update enter actions in print version
 2014-09-11 - redo enter actions in state
 2014-09-10 - proofread through half of state
 2014-09-09 - proofread through flyweight

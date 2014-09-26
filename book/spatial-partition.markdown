@@ -3,14 +3,14 @@
 
 ## Intent
 
-*Efficiently locate nearby objects by storing them in a data structure organized
+*Efficiently locate objects by storing them in a data structure organized
 by their positions.*
 
 ## Motivation
 
 Games let us visit other worlds, but those worlds typically aren't so different
 from our own. They often share the same basic physics and tangibility of our
-world. This is why they can feel real despite being crafted of mere bits and
+universe. This is why they can feel real despite being crafted of mere bits and
 pixels.
 
 One bit of fake reality that we'll focus on here is *location*. Game worlds have
@@ -211,7 +211,7 @@ This `add()` method is defined like so:
 
 <aside name="floor">
 
-Dividing by the cell size maps world coordinates to cell space. Then, casting to
+Dividing by the cell size converts world coordinates to cell space. Then, casting to
 an `int` truncates the fractional part so we get the cell index.
 
 </aside>
@@ -277,8 +277,8 @@ the grid, which then does:
 ^code grid-move
 
 That's a mouthful of code, but it's pretty straightforward. The first bit checks
-to see if we've crossed a cell boundary at all. If not, we can update the unit's
-position and we're done.
+to see if we've crossed a cell boundary at all. If not, all we need to do is
+update the unit's position and we're done.
 
 If the unit *has* left its current cell, we remove it from that cell's linked
 list and then add it back to the grid. Like with adding a new unit, that will

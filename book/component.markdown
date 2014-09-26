@@ -250,7 +250,7 @@ One of the biggest challenges for me in writing this book is figuring out how to
 isolate each pattern. Many design patterns exist to contain code that itself
 isn't part of the pattern. In order to distill the pattern down to its essence,
 I try to cut as much of that out as possible, but at some point it becomes a bit
-like explaining how an engine works without mentioning fuel or oil.
+like explaining how to organize a closet without showing any clothes.
 
 The Component pattern is a particularly hard one. You can't get a real feel for
 it without seeing some code for each of the domains that it decouples, so I'll

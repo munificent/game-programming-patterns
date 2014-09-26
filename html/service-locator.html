@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="event-queue.html">Previous Chapter</a></span>
+  <span class="next"><a href="optimization-patterns.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Service Locator</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="decoupling-patterns.html">Decoupling Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
@@ -33,7 +38,7 @@ concrete class that implements it.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
 <p>Some objects or systems in a game tend to get around, visiting almost every
 corner of the codebase. It&#8217;s hard to find a part of the game that <em>won&#8217;t</em> need a
-memory allocator, logging, the file system, or random numbers at some point.
+memory allocator, logging, or random numbers at some point.
 Systems like those can be thought of as <em>services</em> that need to be available to
 the entire game.</p>
 <p>For our example, we&#8217;ll consider audio. It doesn&#8217;t have quite the reach of
@@ -218,11 +223,11 @@ starting up, it calls some code like this:</p>
 </pre></div>
 
 
-<p>The key part to notice here is that our <code>someGameCode()</code> function isn&#8217;t aware of
+<p>The key part to notice here is that the code that calls <code>playSound()</code> isn&#8217;t aware of
 the concrete <code>ConsoleAudio</code> class; it only knows the abstract <code>Audio</code> interface. Equally
 important, not even the <em>locator</em> class is coupled to the concrete service
 provider. The <em>only</em> place in code that knows about the actual concrete class is
-the initialization function that registers the service.</p>
+the initialization code that provides the service.</p>
 <p>There&#8217;s one more level of decoupling here: the <code>Audio</code> interface isn&#8217;t aware of
 the fact that it&#8217;s being accessed in most places through a service locator. As
 far as it knows, it&#8217;s just a regular abstract base class. This is useful because
@@ -519,9 +524,10 @@ does a few things for us:</p>
     simultaneously.</p>
 <p>This is one of the reasons this model is appealing over in enterprise
 web-land: you can deploy a single app that works on different server
-setups just by changing some configs. It&#8217;s less useful in games.
-Console hardware is pretty well-standardized, and even PC games target a
-certain baseline specification.</p>
+setups just by changing some configs. Historically, this was less
+useful in games since console hardware is pretty well-standardized, but
+as more games target a heaping hodgepodge of mobile devices, this is
+becoming more relevant.</p>
 </li>
 <li>
 <p><em>It&#8217;s complex.</em> Unlike the previous solutions, this one is pretty
@@ -573,7 +579,6 @@ service, it just returns <code>NULL</code>. This implies:</p>
 compile-time, but that doesn&#8217;t mean we can&#8217;t <em>declare</em> that availability is
 part of the runtime contract of the locator. The simplest way to do this is
 with an assertion:</p>
-<p><span name="assert"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Locator</span>
 <span class="p">{</span>
 <span class="nl">public:</span>
@@ -590,30 +595,17 @@ with an assertion:</p>
 </pre></div>
 
 
-<aside name="assert">
-
-<p>An <em>assertion</em> function is a way of embedding a contract into your code.
-When <code>assert()</code> is called, it evaluates the expression passed to it. If it
-evaluates to <code>true</code>, then it does nothing and lets the game continue. If it
-evaluates to <code>false</code>, it immediately halts the game at that point. In a
-debug build, it will usually bring up the debugger or at least print out the
-file and line number where the assertion failed.</p>
-<p>An <code>assert()</code> means, &#8220;I assert that this should always be true. If it&#8217;s not,
-that&#8217;s a bug and I want to stop <em>now</em> so you can fix it.&#8221; This lets you
-define contracts between regions of code. If a function asserts that one of
-its arguments is not <code>NULL</code>, that says, &#8220;The contract between me and the
-caller is that I will not be passed <code>NULL</code>.&#8221;</p>
-<p>Assertions help us track down bugs as soon as the game does something
-unexpected, not later when that error finally manifests as something
-visibly wrong to the user. They are fences in your codebase, corralling bugs
-so that they can&#8217;t escape from the code that created them.</p>
-</aside>
-
 <p>If the service isn&#8217;t located, the game stops before any subsequent code
-tries to use it. The <code>assert()</code> call there doesn&#8217;t solve the problem of
+tries to use it. The <span name="assert"><code>assert()</code></span> call there doesn&#8217;t solve the problem of
 failing to locate the service, but it does make it clear whose problem it
 is. By asserting here, we say, &#8220;Failing to locate a service is a bug in the
 locator.&#8221;</p>
+<aside name="assert">
+
+<p>The <a href="singleton.html" class="pattern">Singleton</a> chapter
+explains the <code>assert()</code> function if you&#8217;ve never seen it before.</p>
+</aside>
+
 <p>So what does this do for us?</p>
 <ul>
 <li>
@@ -760,7 +752,7 @@ get used more widely like logging should be global.</p>
 <nav>
   <span class="prev">&larr; <a href="event-queue.html">Previous Chapter</a></span>
   <span class="next"><a href="optimization-patterns.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

@@ -24,6 +24,9 @@ nav {
   nav .next {
     float: right; }
 
+nav.top {
+  margin-top: 0; }
+
 .page {
   background: #fbfaf8;
   max-width: 640px;
@@ -164,6 +167,9 @@ aside {
     font: normal 13px "Source Code Pro", Menlo, Consolas, Monaco, monospace; }
   aside img {
     padding: 0; }
+
+aside + aside {
+  margin-top: 10px; }
 
 .index h1 {
   border: none; }
@@ -417,7 +423,7 @@ footer {
 
   nav {
     margin: 20px -18px 0 -18px;
-    padding: 10px 18px;
+    padding: 6px 18px;
     font-size: 13px; }
 
   footer {

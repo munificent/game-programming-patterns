@@ -44,6 +44,10 @@ nav {
   }
 }
 
+nav.top {
+  margin-top: 0;
+}
+
 .page {
   background: hsl(40, 30%, 98%);
   max-width: 640px;
@@ -246,6 +250,10 @@ aside {
   img {
     padding: 0;
   }
+}
+
+aside + aside {
+  margin-top: 10px;
 }
 
 // The front page gets a bit of special styling.
@@ -538,7 +546,7 @@ footer {
 
   nav {
     margin: 20px -18px 0 -18px;
-    padding: 10px 18px;
+    padding: 6px 18px;
     font-size: 13px;
   }
 

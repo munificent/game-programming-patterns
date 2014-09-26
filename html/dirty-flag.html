@@ -25,23 +25,16 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="data-locality.html">Previous Chapter</a></span>
+  <span class="next"><a href="object-pool.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Dirty Flag</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="optimization-patterns.html">Optimization Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Avoid unnecessary work by deferring it until the result is needed.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>&#8220;Flag&#8221; and &#8220;bit&#8221; are synonymous in programming&#8202;&mdash;&#8202;they both mean a single micron
-of data that can be in one of two states. We call those &#8220;true&#8221; and &#8220;false&#8221;, or
-sometimes &#8220;set&#8221; and &#8220;cleared&#8221;. I&#8217;ll use all of these interchangeably. &#8220;Dirty
-bit&#8221; is an equally <span name="specific">common</span> name for this pattern,
-but I figured I&#8217;d stick with the name that didn&#8217;t seem as prurient.</p>
-<aside name="specific">
-
-<p>Wikipedia&#8217;s editors don&#8217;t have my level of self-control and went with <a href="http://en.wikipedia.org/wiki/Dirty_bit">dirty
-bit</a>.</p>
-</aside>
-
-<h3><a href="#locating-a-ship-at-sea" name="locating-a-ship-at-sea">Locating a ship at sea</a></h3>
 <p>Many games have something called a <em>scene graph</em>. This is a big data structure
 that contains all of the objects in the world. The rendering engine uses this to
 determine where to draw stuff on the screen.</p>
@@ -64,12 +57,12 @@ transform to it, and then renders it there in the world. If we had a scene
 <em>bag</em> and not a scene <em>graph</em>, that would be it, and life would be simple.</p>
 <p>However, most scene graphs are <span name="hierarchical"><em>hierarchical</em></span>.
 An object in the graph may have a parent object that it is anchored to. In that
-case, its transform is relative to the <em>parent&#8217;s</em> position and isn&#8217;t its
+case, its transform is relative to the <em>parent&#8217;s</em> position and isn&#8217;t an
 absolute position in the world.</p>
 <p>For example, imagine our game world has a pirate ship at sea. Atop the ship&#8217;s
 mast is a crow&#8217;s nest. Hunched in that crow&#8217;s nest is a pirate. Clutching the
-pirate&#8217;s shoulder is a parrot. The ship&#8217;s local transform will position it in
-the sea. The crow&#8217;s nest&#8217;s transform positions it on the ship, and so on.</p>
+pirate&#8217;s shoulder is a parrot. The ship&#8217;s local transform positions the ship in
+the sea. The crow&#8217;s nest&#8217;s transform positions the nest on the ship, and so on.</p>
 <p><span name="pirate"></span>
 <img src="images/dirty-flag-pirate.png" alt="A pirate ship containing a crow's nest with a pirate in it with a parrot on his shoulder." /></p>
 <aside name="pirate">
@@ -141,7 +134,7 @@ world transform <em>four</em> times when we only need the result of the final on
 <p>We only moved four objects, but we did <em>ten</em> world transform calculations.
 That&#8217;s six pointless calculations that get thrown out before they are ever used
 by the renderer. We calculated the parrot&#8217;s world transform <em>four</em> times, but it
-only got rendered once.</p>
+is only rendered once.</p>
 <p>The problem is that a world transform may depend on several local transforms.
 Since we recalculate immediately each time <em>one</em> of the transforms changes, we end up
 recalculating the same transform multiple times when more than one of the local
@@ -158,12 +151,24 @@ need it to render.</p>
 engineering a little slippage.</p>
 </aside>
 
-<p>To do this, we add a flag to each object in the graph. When the local transform
+<p>To do this, we add a <em>flag</em> to each object in the graph. &#8220;Flag&#8221; and &#8220;bit&#8221; are
+synonymous in programming&#8202;&mdash;&#8202;they both mean a single micron of data that can be
+in one of two states. We call those &#8220;true&#8221; and &#8220;false&#8221;, or sometimes &#8220;set&#8221; and
+&#8220;cleared&#8221;. I&#8217;ll use all of these interchangeably.</p>
+<p>When the local transform
 changes, we set it. When we need the object&#8217;s world transform, we check the
 flag. If it&#8217;s set, we calculate the world transform and then clear the flag. The
 flag represents, &#8220;Is the world transform out of date?&#8221; For reasons that aren&#8217;t
 entirely clear, the traditional name for this &#8220;out-of-date-ness&#8221; is &#8220;dirty&#8221;.
-Hence: <em>a dirty flag</em>.</p>
+Hence: <em>a dirty flag</em>. &#8220;Dirty bit&#8221; is an equally
+<span name="specific">common</span> name for this pattern, but I figured I&#8217;d
+stick with the name that didn&#8217;t seem as prurient.</p>
+<aside name="specific">
+
+<p>Wikipedia&#8217;s editors don&#8217;t have my level of self-control and went with <a href="http://en.wikipedia.org/wiki/Dirty_bit">dirty
+bit</a>.</p>
+</aside>
+
 <p>If we apply this pattern and then move all of the objects in our previous
 example, the game ends up doing:</p>
 <p><img src="images/dirty-flag-update-good.png" alt="By deferring until all moves are done, we only recalculate once." /></p>
@@ -225,7 +230,7 @@ that&#8217;s often a better choice than using this pattern and calculating the
 derived data from scratch when needed.</p>
 </li>
 </ul>
-<p>All of this makes it sound like dirty flags are never appropriate, but you&#8217;ll
+<p>This makes it sound like dirty flags are rarely appropriate, but you&#8217;ll
 find a place here or there where they help. <span name="hacks">Searching</span>
 your average game codebase for the word &#8220;dirty&#8221; will often turn up uses of this
 pattern.</p>
@@ -501,7 +506,7 @@ up like this.</p>
 <p>This is similar to the original na&iuml;ve implementation. The key changes are that
 we check to see if the node is dirty before calculating the world transform and
 we store the result in a field instead of a local variable. When the node is
-clean, we skip <code>combine()</code> completely and use the old but still correct <code>world_</code>
+clean, we skip <code>combine()</code> completely and use the old-but-still-correct <code>world_</code>
 value.</p>
 <p>The <span name="clever">clever</span> bit is that <code>dirty</code> parameter. That will
 be <code>true</code> if any node above this node in the parent chain was dirty. In much the
@@ -572,7 +577,7 @@ on the first modification and then process all of the changes that happen
 between then and when the timer fires.</p>
 <aside name="hysteresis">
 
-<p>The term in human-computer interaction for in intentional delay between
+<p>The term in human-computer interaction for an intentional delay between
 when a program receives user input and when it responds is <a href="http://en.wikipedia.org/wiki/Hysteresis"><em>hysteresis</em></a>.</p>
 </aside>
 
@@ -665,7 +670,7 @@ I&#8217;ll refrain.</p>
 <nav>
   <span class="prev">&larr; <a href="data-locality.html">Previous Chapter</a></span>
   <span class="next"><a href="object-pool.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

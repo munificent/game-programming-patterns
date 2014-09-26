@@ -214,7 +214,6 @@ namespace CommandPattern
       //^get-move
       Command* handleInput()
       {
-        // Get the selected unit...
         Unit* unit = getSelectedUnit();
 
         if (isPressed(BUTTON_UP)) {

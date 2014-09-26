@@ -632,7 +632,7 @@ zombie one.
         simplicity.
 
      *  *Looking up attributes is slower.* To get a given piece of data from a
-        type object, we may now need to walk up the inheritance chain to find
+        type object, we might need to walk up the inheritance chain to find
         the type that ultimately decides the value. If we're in
         performance-critical code, we may not want to spend time on this.
 

@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="game-loop.html">Previous Chapter</a></span>
+  <span class="next"><a href="behavioral-patterns.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Update Method</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="sequencing-patterns.html">Sequencing Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
@@ -163,7 +168,7 @@ abstract <code>update()</code> method. The game loop maintains a collection of o
 it doesn&#8217;t know their concrete types. All it knows is that they can be updated.
 This separates each object&#8217;s behavior both from the game loop and from the other
 objects.</p>
-<p>Each frame, the game loop walks the collection and calls <code>update()</code> on each
+<p>Once per frame, the game loop walks the collection and calls <code>update()</code> on each
 object. This gives each one a chance to perform one frame&#8217;s worth of behavior.
 By calling it on all objects every frame, they all behave <span
 name="simultaneously">simultaneously</span>.</p>
@@ -745,7 +750,7 @@ collection that avoids them during your core game loop.</p>
 <nav>
   <span class="prev">&larr; <a href="game-loop.html">Previous Chapter</a></span>
   <span class="next"><a href="behavioral-patterns.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

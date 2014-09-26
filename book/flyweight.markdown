@@ -24,7 +24,7 @@ thousands of polygons. Even if you have enough *memory* to describe that forest,
 in order to render it, that data has to make its way over the bus from the CPU
 to the GPU.
 
-Each tree has a bunch of data associated with it:
+Each tree has a bunch of bits associated with it:
 
 * A mesh of polygons that define the shape of the trunk, branches, and greenery.
 * Textures for the bark and leaves.
@@ -113,7 +113,7 @@ In both APIs, you provide two streams of data. The first is the blob of common
 data that will be rendered multiple times -- the mesh and textures in our
 arboreal example. The second is the list of instances and their parameters that
 will be used to vary that first chunk of data each time it's drawn. With a
-single draw call, an entire forest appears.
+single draw call, an entire forest grows.
 
 <aside name="hardware">
 
@@ -250,7 +250,7 @@ Instead, we'll just store them directly in the world:
 
 ^code world-terrain
 
-Then we could use those to paint the ground like this:
+Then we can use those to paint the ground like this:
 
 <span name="generate"></span>
 

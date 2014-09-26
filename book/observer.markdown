@@ -55,7 +55,7 @@ let us sully their beautiful mathematics with something as pedestrian as
 
 </aside>
 
-What we'd like, as always, is to have all the code concerned with one aspect of
+What we'd like, as always, is to have all the code concerned with one facet of
 the game nicely lumped in one place. The challenge is that achievements are
 triggered by a bunch of different aspects of gameplay. How can that work without
 coupling the achievement code to all of them?
@@ -112,7 +112,7 @@ through it quickly.
 ### The observer
 
 We'll start with the nosy class that wants to know when another object does
-something interesting. These nosy objects are defined by this interface:
+something interesting. These inquisitive objects are defined by this interface:
 
 <span name="signature"></span>
 
@@ -162,7 +162,7 @@ list:
 
 That allows outside code to control who receives notifications. The subject
 communicates with the observers, but it isn't *coupled* to them. In our example,
-no line of physics code will mention achievements. Yet, it can still notify the
+no line of physics code will mention achievements. Yet, it can still talk to the
 achievements system. That's the clever part about this pattern.
 
 It's also important that the subject has a *list* of observers instead of a
@@ -235,7 +235,7 @@ frameworks.
 
 But the Observer pattern isn't without its detractors. When I've asked other
 game programmers what
-they think about this pattern, I hear a few common complaints. Let's see what we
+they think about this pattern, they bring up a few complaints. Let's see what we
 can do to address them, if anything.
 
 ## "It's Too Slow"
@@ -267,7 +267,7 @@ class="pattern">Event Queue</a>.
 But, now that you've seen how the pattern is actually implemented, you know that
 isn't the case. Sending a notification is simply walking a list and calling some
 virtual methods. Granted, it's a *bit* slower than a statically dispatched
-method, but that cost is negligible in all but the most performance-critical
+call, but that cost is negligible in all but the most performance-critical
 code.
 
 I find this pattern fits best outside of hot code paths anyway, so you can
@@ -284,7 +284,7 @@ methods. A slow observer can block a subject.
 
 This sounds scary, but in practice, it's not the end of the world. It's just
 something you have to be aware of. UI programmers -- who've been doing
-event-based programming like this for ages -- have an established motto for this:
+event-based programming like this for ages -- have a time-worn motto for this:
 "stay off the UI thread".
 
 If you're responding to an event synchronously, you need to finish and return
@@ -325,7 +325,7 @@ added and removed. That memory churn spooks some people.
 
 Of course, the first thing to notice is that it only allocates memory when
 observers are being wired up. *Sending* a notification requires no memory
-allocation whatsoever -- it's just a method call. If you wire up your observers
+allocation whatsoever -- it's just a method call. If you hook up your observers
 at the start of the game and don't mess with them much, the amount of allocation
 is minimal.
 
@@ -355,7 +355,7 @@ Then we'll extend `Observer` with a pointer to the next observer in the list:
 
 ^code linked-observer
 
-We're also making `Subject` a friend here. The subject owns the API for adding
+We're also making `Subject` a friend class here. The subject owns the API for adding
 and removing observers, but the list it will be managing is now inside the
 `Observer` class itself. The simplest way to give it the ability to poke at that
 list is by making it a friend.
@@ -394,7 +394,7 @@ handling for removing the very first node, like you see here. There's a more
 elegant solution using a pointer to a pointer.
 
 I didn't do that here because it confuses at least half the people I show it to.
-It's a worthwhile exercise for you to do though: It helps you really think in
+It's a worthwhile exercise for you to do, though: It helps you really think in
 terms of pointers.
 
 </aside>

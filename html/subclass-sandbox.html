@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="bytecode.html">Previous Chapter</a></span>
+  <span class="next"><a href="type-object.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Subclass Sandbox</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="behavioral-patterns.html">Behavioral Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
@@ -34,8 +39,8 @@ base class.</em></p>
 <p>Every kid has dreamed of being a superhero, but unfortunately, cosmic rays are
 in short supply here on Earth. Games that let you pretend to be a superhero are
 the closest approximation. Because our game designers have never learned to say,
-&#8220;no&#8221;, <em>our</em> superhero game is planning to have dozens, if not hundreds, of
-different superpowers that heroes may have.</p>
+&#8220;no&#8221;, <em>our</em> superhero game aims to feature dozens, if not hundreds, of
+different superpowers that heroes may choose from.</p>
 <p>Our plan is that we&#8217;ll have a <code>Superpower</code> base class. Then, we&#8217;ll have a <span
 name="lots">derived</span> class that implements each superpower. We&#8217;ll divvy up
 the design doc among our team of programmers and get coding. When we&#8217;re done,
@@ -327,7 +332,7 @@ it doesn&#8217;t have a lot of detailed mechanics. That means you&#8217;ll be ma
 interesting choices each time you apply it. Here are some questions to consider.</p>
 <h3><a href="#what-operations-should-be-provided" name="what-operations-should-be-provided">What operations should be provided?</a></h3>
 <p>This is the biggest question. It deeply affects how this pattern feels and how
-well it works. At the minimum end of the spectrum, the base class doesn&#8217;t
+well it works. At the minimal end of the spectrum, the base class doesn&#8217;t
 provide <em>any</em> operations. It just has a sandbox method. To implement it, you&#8217;ll
 have to call into systems outside of the base class. If you take that angle,
 it&#8217;s probably not even fair to say you&#8217;re using this pattern.</p>
@@ -651,8 +656,7 @@ one by outside code, it fetches one itself from the service locator.</p>
 <ul>
 <li>
 <p>When you apply the <a class="pattern" href="update-method.html">Update
-    Method</a> pattern, your update method will very often also be a sandbox
-    method.</p>
+    Method</a> pattern, your update method will often also be a sandbox method.</p>
 </li>
 <li>
 <p>This pattern is a role reversal of the <a class="gof-pattern"
@@ -674,7 +678,7 @@ one by outside code, it fetches one itself from the service locator.</p>
 <nav>
   <span class="prev">&larr; <a href="bytecode.html">Previous Chapter</a></span>
   <span class="next"><a href="type-object.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

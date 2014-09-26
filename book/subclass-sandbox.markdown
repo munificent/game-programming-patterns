@@ -11,8 +11,8 @@ base class.*
 Every kid has dreamed of being a superhero, but unfortunately, cosmic rays are
 in short supply here on Earth. Games that let you pretend to be a superhero are
 the closest approximation. Because our game designers have never learned to say,
-"no", *our* superhero game is planning to have dozens, if not hundreds, of
-different superpowers that heroes may have.
+"no", *our* superhero game aims to feature dozens, if not hundreds, of
+different superpowers that heroes may choose from.
 
 Our plan is that we'll have a `Superpower` base class. Then, we'll have a <span
 name="lots">derived</span> class that implements each superpower. We'll divvy up
@@ -242,7 +242,7 @@ interesting choices each time you apply it. Here are some questions to consider.
 ### What operations should be provided?
 
 This is the biggest question. It deeply affects how this pattern feels and how
-well it works. At the minimum end of the spectrum, the base class doesn't
+well it works. At the minimal end of the spectrum, the base class doesn't
 provide *any* operations. It just has a sandbox method. To implement it, you'll
 have to call into systems outside of the base class. If you take that angle,
 it's probably not even fair to say you're using this pattern.
@@ -470,8 +470,7 @@ particle system object, how would it get one?
 ## See Also
 
  *  When you apply the <a class="pattern" href="update-method.html">Update
-    Method</a> pattern, your update method will very often also be a sandbox
-    method.
+    Method</a> pattern, your update method will often also be a sandbox method.
 
  *  This pattern is a role reversal of the <a class="gof-pattern"
     href="http://en.wikipedia.org/wiki/Template_method_pattern">Template

@@ -23,6 +23,7 @@ PINK = '\033[91m'
 YELLOW = '\033[33m'
 
 CHAPTERS = [
+  "Acknowledgements",
   "Introduction",
   "Architecture, Performance, and Games",
   "Design Patterns Revisited",
@@ -54,6 +55,7 @@ CHAPTERS = [
 # URLs for hyperlinks to chapters. Note that the order is significant here.
 # The index in this list + 1 is the chapter's number in the table of contents.
 CHAPTER_HREFS = [
+  "acknowledgements.html",
   "introduction.html",
   "architecture-performance-and-games.html",
   "command.html",
@@ -119,6 +121,7 @@ def format_file(path, nav, skip_up_to_date):
     return
 
   title = ''
+  title_html = ''
   section = ''
   isoutline = False
 
@@ -138,6 +141,10 @@ def format_file(path, nav, skip_up_to_date):
 
         if command == 'title':
           title = args
+          title_html = title
+
+          # Remove any discretionary hyphens from the title.
+          title = title.replace('&shy;', '')
         elif command == 'section':
           section = args
         elif command == 'code':
@@ -196,7 +203,7 @@ def format_file(path, nav, skip_up_to_date):
     output = template
     output = output.replace("{{title}}", title_text)
     output = output.replace("{{section_header}}", section_header)
-    output = output.replace("{{header}}", title)
+    output = output.replace("{{header}}", title_html)
     output = output.replace("{{body}}", body)
     output = output.replace("{{prev}}", prev_link)
     output = output.replace("{{next}}", next_link)
@@ -326,7 +333,6 @@ def title_to_file(title):
 
 def make_prev_next(title):
   """Generate the links that thread through the chapters."""
-
   chapter_index = CHAPTERS.index(title)
   prev_link = ""
   next_link = ""

@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="double-buffer.html">Previous Chapter</a></span>
+  <span class="next"><a href="update-method.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Game Loop</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="sequencing-patterns.html">Sequencing Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
@@ -229,8 +234,8 @@ doesn&#8217;t block waiting for user input, so your game loop will keep cranking
 <p>Other platforms don&#8217;t let you opt out of the event loop so easily. If you&#8217;re
 targeting a web browser, the event loop is deeply built into browser&#8217;s execution
 model. There, the event loop will run the show, and you&#8217;ll use it as your game
-loop too. You&#8217;ll call something like <code>requestAnimationFrame()</code> so that it will
-call back into your code and keep the game running.</p>
+loop too. You&#8217;ll call something like <code>requestAnimationFrame()</code> and it will
+call back into your code to keep the game running.</p>
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>For such a long introduction, the code for a game loop is actually pretty
 straightforward. We&#8217;ll walk through a couple of variations and go over their
@@ -329,8 +334,7 @@ frame, you&#8217;ll move it according to its velocity. With a variable time step
 <em>scale that velocity by the elapsed time</em>. As the time step gets bigger, the
 bullet moves farther in each frame. That bullet will get across the screen in
 the <em>same</em> amount of <em>real</em> time whether it&#8217;s twenty small fast steps or four
-big slow ones.</p>
-<p>This looks like a winner:</p>
+big slow ones. This looks like a winner:</p>
 <ul>
 <li>
 <p>The game plays at a consistent rate on different hardware.</p>
@@ -569,7 +573,7 @@ dedicated handheld devices. But with the advent of smartphones, laptops, and
 mobile gaming, the odds are good that you do care about this now. A game that runs
 beautifully but turns players&#8217; phones into space heaters before running out of
 juice thirty minutes later is not a game that makes people happy.</p>
-<p>Now, you may need to think about making your game look great, but also use as
+<p>Now, you may need to think not only about making your game look great, but also use as
 little CPU as possible. There will likely be an <em>upper</em> bound to performance
 where you let the CPU sleep if you&#8217;ve done all the work you need to do in a
 frame.</p>
@@ -606,7 +610,7 @@ accommodates that variation is key.</p>
 <p>Game-making seems to be part of human nature, because every time we&#8217;ve built a
 machine that can do computing, one of the first things we&#8217;ve done is made games
 on it. The PDP-1 was a 2 kHz machine with only 4,096 words of memory, yet Steve
-Russell and co. managed to create Spacewar! on it.</p>
+Russell and friends managed to create Spacewar! on it.</p>
 </aside>
 
 <ul>
@@ -716,7 +720,7 @@ the most adaptable. It updates with a fixed time step, but it can drop
 <nav>
   <span class="prev">&larr; <a href="double-buffer.html">Previous Chapter</a></span>
   <span class="next"><a href="update-method.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

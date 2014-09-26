@@ -75,7 +75,9 @@ namespace Singleton2
     virtual char* readFile(char* path) = 0;
     virtual void  writeFile(char* path, char* contents) = 0;
   };
-
+  //^2
+  
+  //^derived-file-systems
   class PS3FileSystem : public FileSystem
   {
   public:
@@ -109,7 +111,7 @@ namespace Singleton2
       // Use Nintendo file IO API...
     }
   };
-  //^2
+  //^derived-file-systems
 }
 
 namespace Singleton3

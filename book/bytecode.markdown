@@ -125,7 +125,7 @@ language's grammar. The simplest one is numbers:
 
 A literal number expression simply evaluates to its value. Addition and
 multiplication are a bit more complex because they contain subexpressions.
-Before they can evaluate themselves, they need to recursively evaluate the
+Before they can evaluate themselves, they need to recursively evaluate their
 subexpressions. Like so:
 
 <span name="addition"></span>
@@ -150,7 +150,7 @@ you!
 
 </aside>
 
-It's a <span name="ruby">beautiful</span>, simple pattern, but is has some
+It's a <span name="ruby">beautiful</span>, simple pattern, but it has some
 problems. Look up at the illustration. What do you see? Lots of little boxes,
 and lots of arrows between them. Code is represented as a sprawling fractal tree
 of tiny objects. That has some unpleasant consequences:
@@ -248,7 +248,7 @@ implemented using it.
 ## The Pattern
 
 An **instruction set** defines the low-level operations that can be performed.
-These are encoded as a **sequence of bytes**. A **virtual machine** executes
+A series of instructions is encoded as a **sequence of bytes**. A **virtual machine** executes
 these instructions one at a time, using a **stack for intermediate values**. By
 combining instructions, complex high-level behavior can be defined.
 
@@ -335,9 +335,7 @@ we'll see later, it may not be as bad as you think.
 Programming is hard. We know what we want the machine to do, but we don't always
 communicate that correctly -- we write bugs. To help find and fix those, we've
 amassed a pile of tools to understand what our code is doing wrong, and how to
-right it.
-
-We have debuggers, static analyzers, decompilers, etc. All of those tools are
+right it. We have debuggers, static analyzers, decompilers, etc. All of those tools are
 designed to work with some existing language: either machine code or something
 higher level.
 
@@ -408,7 +406,7 @@ operation you want to perform. We can enumerate them:
 
 To encode a spell in data, we store an array of `enum` values. We've only got
 a few different primitives, so the range of `enum` values easily fits into a byte.
-This means a spell is just a list of <span name="byte">bytes</span> -- ergo
+This means the code for a spell is just a list of <span name="byte">bytes</span> -- ergo
 "bytecode".
 
 <img src="images/bytecode-code.png" alt="A sequence of bytecode instructions: 0x00 HEALTH, 0x03 SOUND, 0x004 PARTICLES, ..." />
@@ -852,7 +850,7 @@ laundry list of the different kinds of instructions you may want:
 
 ### How are values represented?
 
-Our sample VM only works with one kind of value, integers. That makes it easy --
+Our sample VM only works with one kind of value, integers. That makes answering this easy --
 the stack is just a stack of `int`s. A more full-featured VM will support
 different data types: strings, objects, lists, etc. You'll have to decide how
 those are stored internally.
@@ -1000,7 +998,7 @@ only option.
         ways.
 
         Most non-programmers don't think of plaintext like that. To them, text
-        files feel like filling in tax forms for a robotic auditor that yells at
+        files feel like filling in tax forms for an angry robotic auditor that yells at
         them if they forget a single semicolon.
 
  *  **If you define a graphical authoring tool:**
@@ -1031,7 +1029,7 @@ only option.
 
         <aside name="lines">
 
-        Except for line endings. *Sigh...*
+        Except for line endings. And encodings.
 
         </aside>
 

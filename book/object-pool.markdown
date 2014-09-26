@@ -20,11 +20,10 @@ need to make sure that creating and destroying these particles doesn't cause
 
 ### The curse of fragmentation
 
-Programming for a game console like the Xbox 360 is closer to embedded
-programming than conventional PC programming in many ways. Like embedded
-programming, console games must run continuously for a very long time without
-crashing or leaking memory, and efficient compacting memory managers are rarely
-available. In this environment, memory fragmentation is deadly.
+Programming for a game console or mobile device is closer to embedded
+programming than conventional PC programming in many ways. Memory is scarce,
+users expect games to be rock solid, and efficient compacting memory managers
+are rarely available. In this environment, memory fragmentation is deadly.
 
 Fragmentation means the free space in our heap is <span
 name="park">broken</span> into smaller pieces of memory instead of one large
@@ -155,7 +154,7 @@ There are a few common strategies to handle this:
  *  *Forcibly kill an existing object.* Consider a pool for currently playing
     sounds, and assume you want to start a new sound but the pool is full. You
     do *not* want to simply ignore the new sound -- the user will notice if their
-    magical wand swishes dramatically *sometimes* and stay stubbornly silent
+    magical wand swishes dramatically *sometimes* and stays stubbornly silent
     other times. A better solution is to find the quietest sound already playing
     and replace that with our new sound. The new sound will mask the audible
     cutoff of the previous sound.

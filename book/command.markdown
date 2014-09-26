@@ -13,7 +13,7 @@ Four has a predictably abstruse description:
 I think we can all agree that that's a terrible sentence. First of all, it
 mangles whatever metaphor it's trying to establish. Outside of the weird world
 of software where words can mean anything, a "client" is a *person* -- someone
-you do business with. Last I checked, people can't be "parameterized".
+you do business with. Last I checked, human beings can't be "parameterized".
 
 Then, the rest of that sentence is just a list of stuff you could maybe possibly
 use the pattern for. Not very illuminating unless your use case happens to be in
@@ -233,7 +233,7 @@ making a networked multi-player game.
 
 ## Undo and Redo
 
-The last example is the most well-known use of this pattern. If a command object
+The final example is the most well-known use of this pattern. If a command object
 can *do* things, it's a small step for it to be able to *undo* them. Undo is
 used in some strategy games where you can roll back moves that you didn't like.
 It's *de rigueur* in tools that people use to *create* games. The <span
@@ -338,7 +338,7 @@ pointer
 and then execute that command. If they choose a new command after undoing some,
 everything in the list after the current command is discarded.
 
-The first time I implemented this in a level editor, I felt like a wizard. I was
+The first time I implemented this in a level editor, I felt like a genius. I was
 astonished at how straightforward it was and how well it worked. It takes
 discipline to make sure every data modification goes through a command, but once
 you do that, the rest is easy.

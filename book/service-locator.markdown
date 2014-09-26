@@ -10,7 +10,7 @@ concrete class that implements it.*
 
 Some objects or systems in a game tend to get around, visiting almost every
 corner of the codebase. It's hard to find a part of the game that *won't* need a
-memory allocator, logging, the file system, or random numbers at some point.
+memory allocator, logging, or random numbers at some point.
 Systems like those can be thought of as *services* that need to be available to
 the entire game.
 
@@ -177,11 +177,11 @@ starting up, it calls some code like this:
 
 ^code 11
 
-The key part to notice here is that our `someGameCode()` function isn't aware of
+The key part to notice here is that the code that calls `playSound()` isn't aware of
 the concrete `ConsoleAudio` class; it only knows the abstract `Audio` interface. Equally
 important, not even the *locator* class is coupled to the concrete service
 provider. The *only* place in code that knows about the actual concrete class is
-the initialization function that registers the service.
+the initialization code that provides the service.
 
 There's one more level of decoupling here: the `Audio` interface isn't aware of
 the fact that it's being accessed in most places through a service locator. As
@@ -404,9 +404,10 @@ vary based on differing answers to a few core questions:
 
         This is one of the reasons this model is appealing over in enterprise
         web-land: you can deploy a single app that works on different server
-        setups just by changing some configs. It's less useful in games.
-        Console hardware is pretty well-standardized, and even PC games target a
-        certain baseline specification.
+        setups just by changing some configs. Historically, this was less
+        useful in games since console hardware is pretty well-standardized, but
+        as more games target a heaping hodgepodge of mobile devices, this is
+        becoming more relevant.
 
      *  *It's complex.* Unlike the previous solutions, this one is pretty
         heavyweight. You have to create some configuration system, possibly
@@ -450,37 +451,20 @@ vary based on differing answers to a few core questions:
     part of the runtime contract of the locator. The simplest way to do this is
     with an assertion:
 
-    <span name="assert"></span>
-
     ^code 4
 
-    <aside name="assert">
-
-    An *assertion* function is a way of embedding a contract into your code.
-    When `assert()` is called, it evaluates the expression passed to it. If it
-    evaluates to `true`, then it does nothing and lets the game continue. If it
-    evaluates to `false`, it immediately halts the game at that point. In a
-    debug build, it will usually bring up the debugger or at least print out the
-    file and line number where the assertion failed.
-
-    An `assert()` means, "I assert that this should always be true. If it's not,
-    that's a bug and I want to stop *now* so you can fix it." This lets you
-    define contracts between regions of code. If a function asserts that one of
-    its arguments is not `NULL`, that says, "The contract between me and the
-    caller is that I will not be passed `NULL`."
-
-    Assertions help us track down bugs as soon as the game does something
-    unexpected, not later when that error finally manifests as something
-    visibly wrong to the user. They are fences in your codebase, corralling bugs
-    so that they can't escape from the code that created them.
-
-    </aside>
-
     If the service isn't located, the game stops before any subsequent code
-    tries to use it. The `assert()` call there doesn't solve the problem of
+    tries to use it. The <span name="assert">`assert()`</span> call there doesn't solve the problem of
     failing to locate the service, but it does make it clear whose problem it
     is. By asserting here, we say, "Failing to locate a service is a bug in the
     locator."
+
+    <aside name="assert">
+
+    The <a href="singleton.html" class="pattern">Singleton</a> chapter
+    explains the `assert()` function if you've never seen it before.
+
+    </aside>
 
     So what does this do for us?
 

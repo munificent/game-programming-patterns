@@ -112,18 +112,18 @@ of that family.
 
 The <span name="adventure">gist</span> is:
 
- *  You have a fixed *set of states* that the machine can be in. For our
+ *  **You have a fixed *set of states* that the machine can be in.** For our
     example, that's standing, jumping, ducking, and diving.
 
- *  The machine can only be in *one* state at a time. Our heroine can't be
+ *  **The machine can only be in *one* state at a time.** Our heroine can't be
     jumping and standing simultaneously. In fact, preventing that is one reason
     we're going to use an FSM.
 
- *  A sequence of *inputs* or *events* is sent to the machine. In our example,
+ *  **A sequence of *inputs* or *events* is sent to the machine.** In our example,
     that's the raw button presses and releases.
 
- *  Each state has a *set of transitions*, each associated with an input and
-    pointing to a state. When an input comes in, if it matches a transition for
+ *  **Each state has a *set of transitions*, each associated with an input and
+    pointing to a state.** When an input comes in, if it matches a transition for
     the current state, the machine changes to the state that transition points
     to.
 
@@ -409,9 +409,9 @@ A finite state machine isn't even *Turing complete*. Automata theory describes
 computation using a series of abstract models, each more complex than the
 previous. A *Turing machine* is one of the most expressive models.
 
-"Turing complete" means a system (usually a programming language) is expressive
+"Turing complete" means a system (usually a programming language) is powerful
 enough to implement a Turing machine in it, which means all Turing complete
-languages are, in some ways, equally expressive. FSMs are not expressive enough
+languages are, in some ways, equally expressive. FSMs are not flexible enough
 to be in that club.
 
 </aside>
@@ -556,7 +556,7 @@ fire from transition into that when the fire button is pressed.
 
 <aside name="shared">
 
-Since this is behavior duplicated across several states, this may also be a good
+Since this behavior is duplicated across several states, it may also be a good
 place to use a hierarchical state machine to reuse that code.
 
 </aside>
@@ -600,7 +600,7 @@ were in before.
 
 Even with those common extensions to state machines, they are still pretty
 limited. The trend these days in game AI is more toward exciting things like
-[behavior trees][] and [planning systems][]. If AI is what you're interested in,
+*[behavior trees][]* and *[planning systems][]*. If complex AI is what you're interested in,
 all this chapter has done is whet your appetite. You'll want to read other books
 to satisfy it.
 

@@ -83,7 +83,7 @@ It's weird to think that this is literally an OCR process.
 </aside>
 
 We tend to gloss over this step, but it's often the most time-consuming part of
-programming. If you think paging some data from RAM into disk is slow, try
+programming. If you think paging some data from disk into RAM is slow, try
 paging it into a simian cerebrum over a pair of optical nerves.
 
 Once you've got all the right context into your wetware, you think for a bit and
@@ -103,7 +103,7 @@ code, but a large fraction of the codebase is perfectly testable.
 
 I won't get on a soapbox here, but I'll ask you to consider doing more automated
 testing if you aren't already. Don't you have better things to do than manually
-test stuff over and over again?
+validate stuff over and over again?
 
 </aside>
 
@@ -137,9 +137,9 @@ Patterns* is about the same idea.
 
 You can define "decoupling" a bunch of ways, but I think if two pieces of code
 are coupled, it means you can't understand one without understanding the other.
-If you *de*couple them, you can reason about either side independently. That's
+If you *de*-couple them, you can reason about either side independently. That's
 great because if only one of those pieces is relevant to your problem, you just
-need to load it into your monkey brain and not the other half too.
+need to load *it* into your monkey brain and not the other half too.
 
 To me, this is a key goal of software architecture: **minimize the amount of
 knowledge you need to have in-cranium before you can make progress.**
@@ -216,7 +216,7 @@ It takes you forever to trace through all of that scaffolding to find some real
 code that does something. When you need to make a change, sure, there's probably
 an interface there to help, but good luck finding it. In theory, all of this
 decoupling means you have less code to understand before you can extend it, but
-the layers of abstraction themselves end up filling up your mental scratch disk.
+the layers of abstraction themselves end up filling your mental scratch disk.
 
 Codebases like this are what turn people *against* software architecture, and
 design patterns in particular. It's easy to get so wrapped up in the code itself

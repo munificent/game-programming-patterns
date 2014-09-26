@@ -54,7 +54,7 @@ Implementing it would look like this:
 
 ^code spawner-classes
 
-Unless you get paid by the line of code, this obviously is not a fun way
+Unless you get paid by the line of code, this is obviously not a fun way
 to hack this together. Lots of classes, lots of boilerplate, lots of redundancy,
 lots of duplication, lots of repeating myself...
 
@@ -374,10 +374,10 @@ version of JavaScript was created in ten days.
 But, despite that, I believe that JavaScript in practice has more in common with
 class-based languages than with prototypal ones. One hint that JavaScript has
 taken steps away from Self is that the core operation in a prototype-based
-language, *cloning*, is nowhere to be seen. There is no method to clone an
-object in JavaScript.
+language, *cloning*, is nowhere to be seen.
 
-The closest it has is `Object.create()`, which lets you create a new object that
+There is no method to clone an object in JavaScript. The closest it has is
+`Object.create()`, which lets you create a new object that
 delegates to an existing one. Even that wasn't added until ECMAScript 5,
 fourteen years after JavaScript came out. Instead of cloning, let me walk you
 through the typical way you define types and create objects in JavaScript. You

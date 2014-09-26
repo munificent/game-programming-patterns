@@ -118,12 +118,16 @@ It's got some other nice features too:
 *   **You can subclass the singleton.** This is a powerful but often overlooked
     capability. Let's say we need our file system wrapper to be cross-platform.
     To make this work, we want it to be an abstract interface for a file system
-    with subclasses that implement the interface for each platform. Here are the
-    basic classes:
+    with subclasses that implement the interface for each platform. Here is the
+    base class:
 
     ^code 2
 
-    Now we turn `FileSystem` into a singleton:
+    Then we define derived classes for a couple of platforms:
+
+    ^code derived-file-systems
+
+    Next, we turn `FileSystem` into a singleton:
 
     ^code 3
 
@@ -259,8 +263,8 @@ design limitation is entrenched in every single call site that uses it:
     Log::instance().write("Some event.");
 
 In order to make our `Log` class support multiple instantiation (like it
-originally did), we'll have to fix both the class itself and every single call
-site that uses it. Our convenient access isn't so convenient anymore.
+originally did), we'll have to fix both the class itself and every line of code
+that mentions it. Our convenient access isn't so convenient anymore.
 
 <aside name="worse">
 
@@ -282,7 +286,7 @@ first time a sound plays, that could be in the middle of an action-packed part
 of the game, causing visibly dropped frames and stuttering gameplay.
 
 Likewise, games generally need to closely control how memory is laid out in the
-heap to avoid memory <span name="fragment">fragmentation</span>. If our audio
+heap to avoid <span name="fragment">fragmentation</span>. If our audio
 system allocates a chunk of heap when it initializes, we want to know *when*
 that initialization is going to happen, so that we can control *where* in the
 heap that memory will live.
@@ -387,6 +391,8 @@ of abstraction.
 We want a way to ensure single instantiation *without* providing global access.
 There are a couple of ways to accomplish this. Here's one:
 
+<span name="assert"></span>
+
 ^code 6
 
 This class allows anyone to construct it, but it will assert and fail if you try to
@@ -394,6 +400,28 @@ construct more than one instance. As long as the right code creates the instance
 first, then we've ensured no other code can either get at that instance or
 create their own. The class ensures the single instantiation requirement it
 cares about, but it doesn't dictate how the class should be used.
+
+<aside name="assert">
+
+An *assertion* function is a way of embedding a contract into your code.
+When `assert()` is called, it evaluates the expression passed to it. If it
+evaluates to `true`, then it does nothing and lets the game continue. If it
+evaluates to `false`, it immediately halts the game at that point. In a
+debug build, it will usually bring up the debugger or at least print out the
+file and line number where the assertion failed.
+
+An `assert()` means, "I assert that this should always be true. If it's not,
+that's a bug and I want to stop *now* so you can fix it." This lets you
+define contracts between regions of code. If a function asserts that one of
+its arguments is not `NULL`, that says, "The contract between me and the
+caller is that I will not be passed `NULL`."
+
+Assertions help us track down bugs as soon as the game does something
+unexpected, not later when that error finally manifests as something
+visibly wrong to the user. They are fences in your codebase, corralling bugs
+so that they can't escape from the code that created them.
+
+</aside>
 
 The downside with this implementation is that the check to prevent multiple
 instantiation is only done at *runtime*. The Singleton pattern, in contrast,

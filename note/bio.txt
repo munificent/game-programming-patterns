@@ -1,0 +1,3 @@
+Robert Nystrom has programmed professionally for twenty years, about half of which is in games. During his eight years at Electronic Arts, he worked on behemoths like Madden and smaller titles like Henry Hatsworth in the Puzzling Adventure. He's shipped games on the PC, GameCube, PS2, XBox, X360, and DS, but is most proud of the tools and shared libraries he created for others to build on. He loves seeing usable, beautiful code magnify the creative ability of others.
+
+Robert lives with his wife and two daughters in Seattle where you are most likely to find him cooking for his friends and plying them with good beer.

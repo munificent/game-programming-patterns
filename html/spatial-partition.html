@@ -25,15 +25,20 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="object-pool.html">Previous Chapter</a></span>
+  
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Spatial Partition</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="optimization-patterns.html">Optimization Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
-<p><em>Efficiently locate nearby objects by storing them in a data structure organized
+<p><em>Efficiently locate objects by storing them in a data structure organized
 by their positions.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
 <p>Games let us visit other worlds, but those worlds typically aren&#8217;t so different
 from our own. They often share the same basic physics and tangibility of our
-world. This is why they can feel real despite being crafted of mere bits and
+universe. This is why they can feel real despite being crafted of mere bits and
 pixels.</p>
 <p>One bit of fake reality that we&#8217;ll focus on here is <em>location</em>. Game worlds have
 a sense of <em>space</em>, and objects are somewhere in that space. This manifests
@@ -277,7 +282,7 @@ constructor:</p>
 
 <aside name="floor">
 
-<p>Dividing by the cell size maps world coordinates to cell space. Then, casting to
+<p>Dividing by the cell size converts world coordinates to cell space. Then, casting to
 an <code>int</code> truncates the fractional part so we get the cell index.</p>
 </aside>
 
@@ -402,8 +407,8 @@ the grid, which then does:</p>
 
 
 <p>That&#8217;s a mouthful of code, but it&#8217;s pretty straightforward. The first bit checks
-to see if we&#8217;ve crossed a cell boundary at all. If not, we can update the unit&#8217;s
-position and we&#8217;re done.</p>
+to see if we&#8217;ve crossed a cell boundary at all. If not, all we need to do is
+update the unit&#8217;s position and we&#8217;re done.</p>
 <p>If the unit <em>has</em> left its current cell, we remove it from that cell&#8217;s linked
 list and then add it back to the grid. Like with adding a new unit, that will
 insert the unit in the linked list for its new cell.</p>
@@ -767,7 +772,7 @@ use case.</p>
 <nav>
   <span class="prev">&larr; <a href="object-pool.html">Previous Chapter</a></span>
   
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

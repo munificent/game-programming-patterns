@@ -229,8 +229,8 @@ doesn't block waiting for user input, so your game loop will keep cranking.
 Other platforms don't let you opt out of the event loop so easily. If you're
 targeting a web browser, the event loop is deeply built into browser's execution
 model. There, the event loop will run the show, and you'll use it as your game
-loop too. You'll call something like `requestAnimationFrame()` so that it will
-call back into your code and keep the game running.
+loop too. You'll call something like `requestAnimationFrame()` and it will
+call back into your code to keep the game running.
 
 ## Sample Code
 
@@ -316,9 +316,7 @@ frame, you'll move it according to its velocity. With a variable time step, you
 *scale that velocity by the elapsed time*. As the time step gets bigger, the
 bullet moves farther in each frame. That bullet will get across the screen in
 the *same* amount of *real* time whether it's twenty small fast steps or four
-big slow ones.
-
-This looks like a winner:
+big slow ones. This looks like a winner:
 
  *  The game plays at a consistent rate on different hardware.
 
@@ -553,7 +551,7 @@ mobile gaming, the odds are good that you do care about this now. A game that ru
 beautifully but turns players' phones into space heaters before running out of
 juice thirty minutes later is not a game that makes people happy.
 
-Now, you may need to think about making your game look great, but also use as
+Now, you may need to think not only about making your game look great, but also use as
 little CPU as possible. There will likely be an *upper* bound to performance
 where you let the CPU sleep if you've done all the work you need to do in a
 frame.
@@ -593,7 +591,7 @@ accommodates that variation is key.
 Game-making seems to be part of human nature, because every time we've built a
 machine that can do computing, one of the first things we've done is made games
 on it. The PDP-1 was a 2 kHz machine with only 4,096 words of memory, yet Steve
-Russell and co. managed to create Spacewar! on it.
+Russell and friends managed to create Spacewar! on it.
 
 </aside>
 

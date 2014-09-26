@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="flyweight.html">Previous Chapter</a></span>
+  <span class="next"><a href="prototype.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Observer</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="design-patterns-revisited.html">Design Patterns Revisited</a></span></h1>
 <p>You can&#8217;t throw a rock at a computer without hitting an application built using
@@ -68,7 +73,7 @@ let us sully their beautiful mathematics with something as pedestrian as
 <em>gameplay</em>.</p>
 </aside>
 
-<p>What we&#8217;d like, as always, is to have all the code concerned with one aspect of
+<p>What we&#8217;d like, as always, is to have all the code concerned with one facet of
 the game nicely lumped in one place. The challenge is that achievements are
 triggered by a bunch of different aspects of gameplay. How can that work without
 coupling the achievement code to all of them?</p>
@@ -125,7 +130,7 @@ guess from the previous description, but to keep things easy on you, I&#8217;ll 
 through it quickly.</p>
 <h3><a href="#the-observer" name="the-observer">The observer</a></h3>
 <p>We&#8217;ll start with the nosy class that wants to know when another object does
-something interesting. These nosy objects are defined by this interface:</p>
+something interesting. These inquisitive objects are defined by this interface:</p>
 <p><span name="signature"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Observer</span>
 <span class="p">{</span>
@@ -222,7 +227,7 @@ list:</p>
 
 <p>That allows outside code to control who receives notifications. The subject
 communicates with the observers, but it isn&#8217;t <em>coupled</em> to them. In our example,
-no line of physics code will mention achievements. Yet, it can still notify the
+no line of physics code will mention achievements. Yet, it can still talk to the
 achievements system. That&#8217;s the clever part about this pattern.</p>
 <p>It&#8217;s also important that the subject has a <em>list</em> of observers instead of a
 single one. It makes sure that observers aren&#8217;t implicitly coupled to <em>each
@@ -304,7 +309,7 @@ straightforward is the communication backbone of countless programs and app
 frameworks.</p>
 <p>But the Observer pattern isn&#8217;t without its detractors. When I&#8217;ve asked other
 game programmers what
-they think about this pattern, I hear a few common complaints. Let&#8217;s see what we
+they think about this pattern, they bring up a few complaints. Let&#8217;s see what we
 can do to address them, if anything.</p>
 <h2><a href="#"it's-too-slow"" name=""it's-too-slow"">&#8220;It&#8217;s Too Slow&#8221;</a></h2>
 <p>I hear this a lot, often from programmers who don&#8217;t actually know the details of
@@ -330,7 +335,7 @@ class="pattern">Event Queue</a>.</p>
 <p>But, now that you&#8217;ve seen how the pattern is actually implemented, you know that
 isn&#8217;t the case. Sending a notification is simply walking a list and calling some
 virtual methods. Granted, it&#8217;s a <em>bit</em> slower than a statically dispatched
-method, but that cost is negligible in all but the most performance-critical
+call, but that cost is negligible in all but the most performance-critical
 code.</p>
 <p>I find this pattern fits best outside of hot code paths anyway, so you can
 usually afford the dynamic dispatch. Aside from that, there&#8217;s virtually no
@@ -343,7 +348,7 @@ own work until all of the observers have returned from their notification
 methods. A slow observer can block a subject.</p>
 <p>This sounds scary, but in practice, it&#8217;s not the end of the world. It&#8217;s just
 something you have to be aware of. UI programmers&#8202;&mdash;&#8202;who&#8217;ve been doing
-event-based programming like this for ages&#8202;&mdash;&#8202;have an established motto for this:
+event-based programming like this for ages&#8202;&mdash;&#8202;have a time-worn motto for this:
 &#8220;stay off the UI thread&#8221;.</p>
 <p>If you&#8217;re responding to an event synchronously, you need to finish and return
 control as quickly as possible so that the UI doesn&#8217;t lock up. When you have
@@ -376,7 +381,7 @@ a dynamically allocated collection that grows and shrinks as observers are
 added and removed. That memory churn spooks some people.</p>
 <p>Of course, the first thing to notice is that it only allocates memory when
 observers are being wired up. <em>Sending</em> a notification requires no memory
-allocation whatsoever&#8202;&mdash;&#8202;it&#8217;s just a method call. If you wire up your observers
+allocation whatsoever&#8202;&mdash;&#8202;it&#8217;s just a method call. If you hook up your observers
 at the start of the game and don&#8217;t mess with them much, the amount of allocation
 is minimal.</p>
 <p>If it&#8217;s still a problem, though, I&#8217;ll walk through a way to implement adding and
@@ -423,7 +428,7 @@ with a pointer to the head of the list of observers:</p>
 </pre></div>
 
 
-<p>We&#8217;re also making <code>Subject</code> a friend here. The subject owns the API for adding
+<p>We&#8217;re also making <code>Subject</code> a friend class here. The subject owns the API for adding
 and removing observers, but the list it will be managing is now inside the
 <code>Observer</code> class itself. The simplest way to give it the ability to poke at that
 list is by making it a friend.</p>
@@ -483,7 +488,7 @@ you.</p>
 handling for removing the very first node, like you see here. There&#8217;s a more
 elegant solution using a pointer to a pointer.</p>
 <p>I didn&#8217;t do that here because it confuses at least half the people I show it to.
-It&#8217;s a worthwhile exercise for you to do though: It helps you really think in
+It&#8217;s a worthwhile exercise for you to do, though: It helps you really think in
 terms of pointers.</p>
 </aside>
 
@@ -770,7 +775,7 @@ me, those are often the two most important criteria for a solution.</p>
 <nav>
   <span class="prev">&larr; <a href="flyweight.html">Previous Chapter</a></span>
   <span class="next"><a href="prototype.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

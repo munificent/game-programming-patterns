@@ -7,21 +7,6 @@
 
 ## Motivation
 
-"Flag" and "bit" are synonymous in programming -- they both mean a single micron
-of data that can be in one of two states. We call those "true" and "false", or
-sometimes "set" and "cleared". I'll use all of these interchangeably. "Dirty
-bit" is an equally <span name="specific">common</span> name for this pattern,
-but I figured I'd stick with the name that didn't seem as prurient.
-
-<aside name="specific">
-
-Wikipedia's editors don't have my level of self-control and went with [dirty
-bit](http://en.wikipedia.org/wiki/Dirty_bit).
-
-</aside>
-
-### Locating a ship at sea
-
 Many games have something called a *scene graph*. This is a big data structure
 that contains all of the objects in the world. The rendering engine uses this to
 determine where to draw stuff on the screen.
@@ -49,13 +34,13 @@ transform to it, and then renders it there in the world. If we had a scene
 
 However, most scene graphs are <span name="hierarchical">*hierarchical*</span>.
 An object in the graph may have a parent object that it is anchored to. In that
-case, its transform is relative to the *parent's* position and isn't its
+case, its transform is relative to the *parent's* position and isn't an
 absolute position in the world.
 
 For example, imagine our game world has a pirate ship at sea. Atop the ship's
 mast is a crow's nest. Hunched in that crow's nest is a pirate. Clutching the
-pirate's shoulder is a parrot. The ship's local transform will position it in
-the sea. The crow's nest's transform positions it on the ship, and so on.
+pirate's shoulder is a parrot. The ship's local transform positions the ship in
+the sea. The crow's nest's transform positions the nest on the ship, and so on.
 
 <span name="pirate"></span>
 <img src="images/dirty-flag-pirate.png" alt="A pirate ship containing a crow's nest with a pirate in it with a parrot on his shoulder." />
@@ -146,7 +131,7 @@ world transform *four* times when we only need the result of the final one.
 We only moved four objects, but we did *ten* world transform calculations.
 That's six pointless calculations that get thrown out before they are ever used
 by the renderer. We calculated the parrot's world transform *four* times, but it
-only got rendered once.
+is only rendered once.
 
 The problem is that a world transform may depend on several local transforms.
 Since we recalculate immediately each time *one* of the transforms changes, we end up
@@ -168,12 +153,26 @@ engineering a little slippage.
 
 </aside>
 
-To do this, we add a flag to each object in the graph. When the local transform
+To do this, we add a *flag* to each object in the graph. "Flag" and "bit" are
+synonymous in programming -- they both mean a single micron of data that can be
+in one of two states. We call those "true" and "false", or sometimes "set" and
+"cleared". I'll use all of these interchangeably.
+
+When the local transform
 changes, we set it. When we need the object's world transform, we check the
 flag. If it's set, we calculate the world transform and then clear the flag. The
 flag represents, "Is the world transform out of date?" For reasons that aren't
 entirely clear, the traditional name for this "out-of-date-ness" is "dirty".
-Hence: *a dirty flag*.
+Hence: *a dirty flag*. "Dirty bit" is an equally
+<span name="specific">common</span> name for this pattern, but I figured I'd
+stick with the name that didn't seem as prurient.
+
+<aside name="specific">
+
+Wikipedia's editors don't have my level of self-control and went with [dirty
+bit](http://en.wikipedia.org/wiki/Dirty_bit).
+
+</aside>
 
 If we apply this pattern and then move all of the objects in our previous
 example, the game ends up doing:
@@ -238,7 +237,7 @@ There are a couple of other requirements too:
     that's often a better choice than using this pattern and calculating the
     derived data from scratch when needed.
 
-All of this makes it sound like dirty flags are never appropriate, but you'll
+This makes it sound like dirty flags are rarely appropriate, but you'll
 find a place here or there where they help. <span name="hacks">Searching</span>
 your average game codebase for the word "dirty" will often turn up uses of this
 pattern.
@@ -481,7 +480,7 @@ up like this.
 This is similar to the original naïve implementation. The key changes are that
 we check to see if the node is dirty before calculating the world transform and
 we store the result in a field instead of a local variable. When the node is
-clean, we skip `combine()` completely and use the old but still correct `world_`
+clean, we skip `combine()` completely and use the old-but-still-correct `world_`
 value.
 
 The <span name="clever">clever</span> bit is that `dirty` parameter. That will
@@ -552,7 +551,7 @@ This pattern is fairly specific, so there are only a couple of knobs to twiddle:
 
     <aside name="hysteresis">
 
-    The term in human-computer interaction for in intentional delay between
+    The term in human-computer interaction for an intentional delay between
     when a program receives user input and when it responds is [*hysteresis*](http://en.wikipedia.org/wiki/Hysteresis).
 
     </aside>

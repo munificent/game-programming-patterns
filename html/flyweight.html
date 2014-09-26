@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="command.html">Previous Chapter</a></span>
+  <span class="next"><a href="observer.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Flyweight</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="design-patterns-revisited.html">Design Patterns Revisited</a></span></h1>
 <p>The fog lifts, revealing a majestic old growth forest. Ancient hemlocks,
@@ -45,7 +50,7 @@ every sixtieth of a second.</p>
 thousands of polygons. Even if you have enough <em>memory</em> to describe that forest,
 in order to render it, that data has to make its way over the bus from the CPU
 to the GPU.</p>
-<p>Each tree has a bunch of data associated with it:</p>
+<p>Each tree has a bunch of bits associated with it:</p>
 <ul>
 <li>A mesh of polygons that define the shape of the trunk, branches, and greenery.</li>
 <li>Textures for the bark and leaves.</li>
@@ -150,7 +155,7 @@ rendering</em></a>.</p>
 data that will be rendered multiple times&#8202;&mdash;&#8202;the mesh and textures in our
 arboreal example. The second is the list of instances and their parameters that
 will be used to vary that first chunk of data each time it&#8217;s drawn. With a
-single draw call, an entire forest appears.</p>
+single draw call, an entire forest grows.</p>
 <aside name="hardware">
 
 <p>The fact that this API is implemented directly by the graphics card means the
@@ -341,7 +346,7 @@ Instead, we&#8217;ll just store them directly in the world:</p>
 </pre></div>
 
 
-<p>Then we could use those to paint the ground like this:</p>
+<p>Then we can use those to paint the ground like this:</p>
 <p><span name="generate"></span></p>
 <div class="codehilite"><pre><span class="kt">void</span> <span class="n">World</span><span class="o">::</span><span class="n">generateTerrain</span><span class="p">()</span>
 <span class="p">{</span>
@@ -453,7 +458,7 @@ pattern">Factory Method</a> pattern.</p>
 <nav>
   <span class="prev">&larr; <a href="command.html">Previous Chapter</a></span>
   <span class="next"><a href="observer.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

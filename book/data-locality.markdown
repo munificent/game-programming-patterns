@@ -262,12 +262,12 @@ this won't help.
 
 The cheap way to profile is to manually add a bit of instrumentation that checks
 how much time has elapsed between two points in the code, hopefully using a
-precise timer. To catch cache misses, you'll want something a little more
+precise timer. To catch poor cache usage, you'll want something a little more
 sophisticated. You really want to see how many cache misses are occurring and
 where.
 
 Fortunately, there are <span name="cachegrind">profilers</span> out there that
-report cache misses. It's worth spending the time to get one of these working and make
+report this. It's worth spending the time to get one of these working and make
 sure you understand the (surprisingly complex) numbers it throws at you before
 you do major surgery on your data structures.
 
@@ -325,7 +325,7 @@ keep in mind that the general technique can be applied anywhere it fits.
 
 ### Contiguous arrays
 
-Let's start with a <a href="game-loop.html" class="pattern">Game Loop</a> that
+Let's start with a <a href="game-loop.html" class="pattern">game loop</a> that
 processes a bunch of game entities. Those entities are decomposed into different
 domains -- AI, physics, and rendering -- using the <a href="component.html"
 class="pattern">Component</a> pattern. Here's the `GameEntity` class:
@@ -644,7 +644,8 @@ both pieces will be at the same index in their respective arrays.
 </aside>
 
 You can see how this starts to get fuzzy, though. In my example here, it's
-pretty obvious which data should be hot and cold, but it's rarely so clear-cut.
+pretty obvious which data should be hot and cold, but in a real game it's
+rarely so clear-cut.
 What if you have fields that are used when an entity is in a certain mode but
 not in others? What if entities use a certain chunk of data only when they're in
 certain parts of the level?

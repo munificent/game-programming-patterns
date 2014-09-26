@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="sequencing-patterns.html">Previous Chapter</a></span>
+  <span class="next"><a href="game-loop.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Double Buffer</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="sequencing-patterns.html">Sequencing Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
@@ -56,7 +61,7 @@ at a time. It sweeps across each row of pixels from left to right and then
 moves down to the next row. When it reaches the bottom right corner, it scans
 back up to the top left and starts all over again. It does this so fast &#8212;
 around sixty times a second&#8202;&mdash;&#8202;that our eyes can&#8217;t see the scanning. To us, it&#8217;s
-a single static field of colored pixels, an image.</p>
+a single static field of colored pixels&#8202;&mdash;&#8202;an image.</p>
 <aside name="scan">
 
 <p>This explanation is, err, &#8220;simplified&#8221;. If you&#8217;re a low-level hardware person
@@ -119,7 +124,7 @@ by analogy.</p>
 and scene two starts, we need to change the stage setting. If we have the
 stagehands run on after the scene and start dragging props around, the illusion
 of a coherent place will be broken. We could dim the lights while we do that
-(which of course, is what real theaters do), but the audience still knows
+(which, of course, is what real theaters do), but the audience still knows
 <em>something</em> is going on. We want there to be no gap in time between scenes.</p>
 <p>With a bit of real estate, we come up with this clever solution: we build
 <span name="stage"><em>two</em></span> stages set up so the audience can see both. Each
@@ -204,8 +209,8 @@ are a couple of caveats, though.</p>
 <h3><a href="#the-swap-itself-takes-time" name="the-swap-itself-takes-time">The swap itself takes time</a></h3>
 <p>Double-buffering requires a <em>swap</em> step once the state is done being modified.
 That operation must be atomic&#8202;&mdash;&#8202;no code can access <em>either</em> state while they
-are being swapped. Often, the swap is as quick as assigning a pointer, but if it
-takes longer than it does to modify the state to begin with, then we haven&#8217;t
+are being swapped. Often, this is as quick as assigning a pointer, but if it
+takes longer to swap than it does to modify the state to begin with, then we haven&#8217;t
 helped ourselves at all.</p>
 <h3><a href="#we-have-to-have-two-buffers" name="we-have-to-have-two-buffers">We have to have two buffers</a></h3>
 <p>The other consequence of this pattern is increased memory usage. As its name implies, the
@@ -747,7 +752,7 @@ actor&#8217;s state will be swapped.</p>
 <nav>
   <span class="prev">&larr; <a href="sequencing-patterns.html">Previous Chapter</a></span>
   <span class="next"><a href="game-loop.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

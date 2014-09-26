@@ -65,7 +65,7 @@ input and when your app gets around to calling `getNextEvent()`. That
 <img src="images/event-queue-loop.png" alt="An event queue. The operating system enqueues Shift, Down, Up, and Click events, and the getNextEvent() function dequeues them." />
 
 When user input comes in, the OS adds it to a queue of unprocessed events. When
-you call `getNextEvent()`, it pulls the oldest event off the queue and hands it
+you call `getNextEvent()`, that pulls the oldest event off the queue and hands it
 to your application.
 
 ### Central event bus
@@ -99,7 +99,7 @@ invaluable for easing the player into your game.
 
 Your gameplay and combat code are likely complex enough as it is. The last thing
 you want to do is stuff a bunch of checks for triggering tutorials in there.
-Instead, some games have a central event queue. Any game system can send to it,
+Instead, you could have a central event queue. Any game system can send to it,
 so the combat code can add an "enemy died" event every time you slay a foe.
 
 <span name="blackboard">Likewise</span>, any game system can *receive* events
@@ -120,12 +120,12 @@ the AI field.
 <img src="images/event-queue-central.png" alt="A central event queue is read from and written to by the Combat and Tutorial code." />
 
 I thought about using this as the example for the rest of the chapter, but I'm
-not generally a fan of global systems. Using them is a common technique, but I don't
-want you to think that event queues *have* to be global.
+not generally a fan of big global systems. Event queues don't have to be for
+communicating across the entire game engine. They can be just as useful within a single class or domain.
 
 ### Say what?
 
-Instead, let's add sound to our game. Humans are mainly visual animals, but
+So, instead, let's add sound to our game. Humans are mainly visual animals, but
 hearing is deeply connected to our emotions and our sense of physical space. The
 right simulated echo can make a black screen feel like an enormous cavern, and a
 well-timed violin adagio can make your heartstrings hum in sympathetic
@@ -140,7 +140,8 @@ volume:
 
 While I almost always shy away from the <a href="singleton.html"
 class="gof-pattern">Singleton</a> pattern, this is one of the places where it
-may fit. I'm taking a simpler approach and just making the method static.
+may fit since the machine likely only has one set of speakers. I'm taking a
+simpler approach and just making the method static.
 
 </aside>
 
@@ -167,7 +168,8 @@ screen freezes for a few frames. We've hit our first issue:
 
 Our `playSound()` method is *synchronous* -- it doesn't return back to the
 caller until bloops are coming out of the speakers. If a sound file has to be
-loaded from disc first, that may take a while.
+loaded from disc first, that may take a while. In the meantime, the rest of the
+game is frozen.
 
 Ignoring that for now, we move on. In the AI code, we add a call to let out a
 wail of anguish when an enemy takes damage from the player. Nothing warms a
@@ -316,7 +318,7 @@ When your messaging system is *synchronous*, you find cycles quickly -- they
 overflow the stack and crash your game. With a queue, the asynchrony unwinds the
 stack, so the game may keep running even though spurious events are <span
 name="log">sloshing</span> back and forth in there. A common rule to avoid this
-is to avoid sending events from within an event handler.
+is to avoid *sending* events from within code that's *handling* one.
 
 <aside name="log">
 
@@ -342,7 +344,7 @@ until later.
 ^code play-message
 
 Next, we need to give `Audio` some storage space to keep track of these pending
-play messages. Now, your <span name="prof">algorithms professor</span> would
+play messages. Now, your <span name="prof">algorithms professor</span> might
 tell you to use some exciting data structure here like a [Fibonacci
 heap](http://en.wikipedia.org/wiki/Fibonacci_heap) or a [skip
 list](http://en.wikipedia.org/wiki/Skip_list), or, hell, at least a *linked*
@@ -607,7 +609,7 @@ questions to consider:
 
 I've used "event" and "message" interchangeably so far because it mostly doesn't
 matter. You get the same decoupling and aggregation abilities regardless of what
-you're stuffing in the queue.
+you're stuffing in the queue, but there are some conceptual differences.
 
  *  **If you queue events:**
 
@@ -785,7 +787,7 @@ enough.
  *  **Share ownership:**
 
     These days, now that even C++ programmers are more comfortable with garbage
-    collection, <span name="shared">shared</span> ownership is more typical.
+    collection, <span name="shared">shared</span> ownership is more acceptable.
     With this, the message sticks around as long as anything has a reference to
     it and is automatically freed when forgotten.
 

@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="observer.html">Previous Chapter</a></span>
+  <span class="next"><a href="singleton.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Prototype</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="design-patterns-revisited.html">Design Patterns Revisited</a></span></h1>
 <p>The first time I heard the word &#8220;prototype&#8221; was in <em>Design Patterns</em>. Today, it
@@ -105,7 +110,7 @@ src="images/arrow-inherits.png" class="arrow" alt="A UML arrow." /> means &#8220
 </pre></div>
 
 
-<p>Unless you get paid by the line of code, this obviously is not a fun way
+<p>Unless you get paid by the line of code, this is obviously not a fun way
 to hack this together. Lots of classes, lots of boilerplate, lots of redundancy,
 lots of duplication, lots of repeating myself&#8230;</p>
 <p>The Prototype pattern offers a solution. The key idea is that <em>an object can
@@ -448,9 +453,9 @@ version of JavaScript was created in ten days.</p>
 <p>But, despite that, I believe that JavaScript in practice has more in common with
 class-based languages than with prototypal ones. One hint that JavaScript has
 taken steps away from Self is that the core operation in a prototype-based
-language, <em>cloning</em>, is nowhere to be seen. There is no method to clone an
-object in JavaScript.</p>
-<p>The closest it has is <code>Object.create()</code>, which lets you create a new object that
+language, <em>cloning</em>, is nowhere to be seen.</p>
+<p>There is no method to clone an object in JavaScript. The closest it has is
+<code>Object.create()</code>, which lets you create a new object that
 delegates to an existing one. Even that wasn&#8217;t added until ECMAScript 5,
 fourteen years after JavaScript came out. Instead of cloning, let me walk you
 through the typical way you define types and create objects in JavaScript. You
@@ -663,7 +668,7 @@ players.</p>
 <nav>
   <span class="prev">&larr; <a href="observer.html">Previous Chapter</a></span>
   <span class="next"><a href="singleton.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

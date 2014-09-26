@@ -38,7 +38,7 @@ at a time. It sweeps across each row of pixels from left to right and then
 moves down to the next row. When it reaches the bottom right corner, it scans
 back up to the top left and starts all over again. It does this so fast --
 around sixty times a second -- that our eyes can't see the scanning. To us, it's
-a single static field of colored pixels, an image.
+a single static field of colored pixels -- an image.
 
 <aside name="scan">
 
@@ -115,7 +115,7 @@ Imagine our users are watching a play produced by ourselves. As scene one ends
 and scene two starts, we need to change the stage setting. If we have the
 stagehands run on after the scene and start dragging props around, the illusion
 of a coherent place will be broken. We could dim the lights while we do that
-(which of course, is what real theaters do), but the audience still knows
+(which, of course, is what real theaters do), but the audience still knows
 *something* is going on. We want there to be no gap in time between scenes.
 
 With a bit of real estate, we come up with this clever solution: we build
@@ -211,8 +211,8 @@ are a couple of caveats, though.
 
 Double-buffering requires a *swap* step once the state is done being modified.
 That operation must be atomic -- no code can access *either* state while they
-are being swapped. Often, the swap is as quick as assigning a pointer, but if it
-takes longer than it does to modify the state to begin with, then we haven't
+are being swapped. Often, this is as quick as assigning a pointer, but if it
+takes longer to swap than it does to modify the state to begin with, then we haven't
 helped ourselves at all.
 
 ### We have to have two buffers

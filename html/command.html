@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="design-patterns-revisited.html">Previous Chapter</a></span>
+  <span class="next"><a href="flyweight.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Command</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="design-patterns-revisited.html">Design Patterns Revisited</a></span></h1>
 <p>Command is one of my favorite patterns. Most large programs I write, games or
@@ -39,7 +44,7 @@ operations.</p>
 <p>I think we can all agree that that&#8217;s a terrible sentence. First of all, it
 mangles whatever metaphor it&#8217;s trying to establish. Outside of the weird world
 of software where words can mean anything, a &#8220;client&#8221; is a <em>person</em>&#8202;&mdash;&#8202;someone
-you do business with. Last I checked, people can&#8217;t be &#8220;parameterized&#8221;.</p>
+you do business with. Last I checked, human beings can&#8217;t be &#8220;parameterized&#8221;.</p>
 <p>Then, the rest of that sentence is just a list of stuff you could maybe possibly
 use the pattern for. Not very illuminating unless your use case happens to be in
 that list. <em>My</em> pithy tagline for the Command pattern is:</p>
@@ -296,7 +301,7 @@ making a networked multi-player game.</p>
 </aside>
 
 <h2><a href="#undo-and-redo" name="undo-and-redo">Undo and Redo</a></h2>
-<p>The last example is the most well-known use of this pattern. If a command object
+<p>The final example is the most well-known use of this pattern. If a command object
 can <em>do</em> things, it&#8217;s a small step for it to be able to <em>undo</em> them. Undo is
 used in some strategy games where you can roll back moves that you didn&#8217;t like.
 It&#8217;s <em>de rigueur</em> in tools that people use to <em>create</em> games. The <span
@@ -352,7 +357,6 @@ name="free"><em>creating</em></span> an instance of this every time the player c
 a move. Something like:</p>
 <div class="codehilite"><pre><span class="n">Command</span><span class="o">*</span> <span class="nf">handleInput</span><span class="p">()</span>
 <span class="p">{</span>
-  <span class="c1">// Get the selected unit...</span>
   <span class="n">Unit</span><span class="o">*</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">getSelectedUnit</span><span class="p">();</span>
 
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_UP</span><span class="p">))</span> <span class="p">{</span>
@@ -464,7 +468,7 @@ pointer back. When they choose <span name="replay">&#8220;Redo&#8221;</span>, we
 pointer
 and then execute that command. If they choose a new command after undoing some,
 everything in the list after the current command is discarded.</p>
-<p>The first time I implemented this in a level editor, I felt like a wizard. I was
+<p>The first time I implemented this in a level editor, I felt like a genius. I was
 astonished at how straightforward it was and how well it worked. It takes
 discipline to make sure every data modification goes through a command, but once
 you do that, the rest is easy.</p>
@@ -570,7 +574,7 @@ pattern">Singleton</a> too, but friends don&#8217;t let friends create singleton
 <nav>
   <span class="prev">&larr; <a href="design-patterns-revisited.html">Previous Chapter</a></span>
   <span class="next"><a href="flyweight.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

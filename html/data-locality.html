@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="optimization-patterns.html">Previous Chapter</a></span>
+  <span class="next"><a href="dirty-flag.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Data Locality</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="optimization-patterns.html">Optimization Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
@@ -242,11 +247,11 @@ problems <em>are caused by cache misses</em>. If your code is slow for other rea
 this won&#8217;t help.</p>
 <p>The cheap way to profile is to manually add a bit of instrumentation that checks
 how much time has elapsed between two points in the code, hopefully using a
-precise timer. To catch cache misses, you&#8217;ll want something a little more
+precise timer. To catch poor cache usage, you&#8217;ll want something a little more
 sophisticated. You really want to see how many cache misses are occurring and
 where.</p>
 <p>Fortunately, there are <span name="cachegrind">profilers</span> out there that
-report cache misses. It&#8217;s worth spending the time to get one of these working and make
+report this. It&#8217;s worth spending the time to get one of these working and make
 sure you understand the (surprisingly complex) numbers it throws at you before
 you do major surgery on your data structures.</p>
 <aside name="cachegrind">
@@ -292,7 +297,7 @@ a few of the most common ways to organize your data. We&#8217;ll cover them in t
 context of some specific part of a game engine, but (as with other patterns),
 keep in mind that the general technique can be applied anywhere it fits.</p>
 <h3><a href="#contiguous-arrays" name="contiguous-arrays">Contiguous arrays</a></h3>
-<p>Let&#8217;s start with a <a href="game-loop.html" class="pattern">Game Loop</a> that
+<p>Let&#8217;s start with a <a href="game-loop.html" class="pattern">game loop</a> that
 processes a bunch of game entities. Those entities are decomposed into different
 domains&#8202;&mdash;&#8202;AI, physics, and rendering&#8202;&mdash;&#8202;using the <a href="component.html"
 class="pattern">Component</a> pattern. Here&#8217;s the <code>GameEntity</code> class:</p>
@@ -783,7 +788,8 @@ both pieces will be at the same index in their respective arrays.</p>
 </aside>
 
 <p>You can see how this starts to get fuzzy, though. In my example here, it&#8217;s
-pretty obvious which data should be hot and cold, but it&#8217;s rarely so clear-cut.
+pretty obvious which data should be hot and cold, but in a real game it&#8217;s
+rarely so clear-cut.
 What if you have fields that are used when an entity is in a certain mode but
 not in others? What if entities use a certain chunk of data only when they&#8217;re in
 certain parts of the level?</p>
@@ -1085,7 +1091,7 @@ important to think about locality.</p>
 <nav>
   <span class="prev">&larr; <a href="optimization-patterns.html">Previous Chapter</a></span>
   <span class="next"><a href="dirty-flag.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

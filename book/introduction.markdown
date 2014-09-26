@@ -48,7 +48,7 @@ good chance this would be a herpetology book instead of a programming one.
 
 </aside>
 
-At first, the challenge was just getting something on screen. Then, it became
+At first, the challenge was just getting something working. Then, it became
 figuring out how to write programs bigger than what would fit in my head. Instead
 of just reading about "How to Program in C++", I started trying to find books
 about how to *organize* programs.
@@ -120,7 +120,7 @@ Most game programming books I've seen fall into one of two categories:
   their careers progress.
 
 * **Whole-engine books.** In contrast, these try to span all of the different
-  parts of an entire game engine. They are composed to build a
+  parts of an entire game engine. They are oriented towards building a
   complete engine suited to some specific genre of game, usually a 3D first-person shooter.
 
 I like both of these kinds of books, but I think they leave some gaps. Books
@@ -132,7 +132,7 @@ The second category covers that, but I often find whole-engine books to be too m
 genre-specific. Especially with the rise of mobile and casual gaming, we're in
 a period where lots of different genres of games are being created. We aren't
 all just cloning Quake anymore. Books that walk you through a single engine
-aren't a good fit when *your* game doesn't fit that mold.
+aren't helpful when *your* game doesn't fit that mold.
 
 Instead, what I'm trying to do here is more <span name="carte">*à la
 carte*</span>. Each of the chapters in this book is an independent idea that

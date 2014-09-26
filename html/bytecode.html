@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="behavioral-patterns.html">Previous Chapter</a></span>
+  <span class="next"><a href="subclass-sandbox.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Bytecode</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="behavioral-patterns.html">Behavioral Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
@@ -148,7 +153,7 @@ language&#8217;s grammar. The simplest one is numbers:</p>
 
 <p>A literal number expression simply evaluates to its value. Addition and
 multiplication are a bit more complex because they contain subexpressions.
-Before they can evaluate themselves, they need to recursively evaluate the
+Before they can evaluate themselves, they need to recursively evaluate their
 subexpressions. Like so:</p>
 <p><span name="addition"></span></p>
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">AdditionExpression</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Expression</span>
@@ -191,7 +196,7 @@ switched to bytecode like this chapter describes. Look how much time I&#8217;m s
 you!</p>
 </aside>
 
-<p>It&#8217;s a <span name="ruby">beautiful</span>, simple pattern, but is has some
+<p>It&#8217;s a <span name="ruby">beautiful</span>, simple pattern, but it has some
 problems. Look up at the illustration. What do you see? Lots of little boxes,
 and lots of arrows between them. Code is represented as a sprawling fractal tree
 of tiny objects. That has some unpleasant consequences:</p>
@@ -287,7 +292,7 @@ least have a better understanding of Lua and many other languages which are
 implemented using it.</p>
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>An <strong>instruction set</strong> defines the low-level operations that can be performed.
-These are encoded as a <strong>sequence of bytes</strong>. A <strong>virtual machine</strong> executes
+A series of instructions is encoded as a <strong>sequence of bytes</strong>. A <strong>virtual machine</strong> executes
 these instructions one at a time, using a <strong>stack for intermediate values</strong>. By
 combining instructions, complex high-level behavior can be defined.</p>
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
@@ -362,8 +367,7 @@ we&#8217;ll see later, it may not be as bad as you think.</p>
 <p>Programming is hard. We know what we want the machine to do, but we don&#8217;t always
 communicate that correctly&#8202;&mdash;&#8202;we write bugs. To help find and fix those, we&#8217;ve
 amassed a pile of tools to understand what our code is doing wrong, and how to
-right it.</p>
-<p>We have debuggers, static analyzers, decompilers, etc. All of those tools are
+right it. We have debuggers, static analyzers, decompilers, etc. All of those tools are
 designed to work with some existing language: either machine code or something
 higher level.</p>
 <p>When you define your own bytecode VM, you leave those tools behind. Sure, you
@@ -435,7 +439,7 @@ operation you want to perform. We can enumerate them:</p>
 
 <p>To encode a spell in data, we store an array of <code>enum</code> values. We&#8217;ve only got
 a few different primitives, so the range of <code>enum</code> values easily fits into a byte.
-This means a spell is just a list of <span name="byte">bytes</span>&#8202;&mdash;&#8202;ergo
+This means the code for a spell is just a list of <span name="byte">bytes</span>&#8202;&mdash;&#8202;ergo
 &#8220;bytecode&#8221;.</p>
 <p><img src="images/bytecode-code.png" alt="A sequence of bytecode instructions: 0x00 HEALTH, 0x03 SOUND, 0x004 PARTICLES, ..." /></p>
 <aside name="byte">
@@ -947,7 +951,7 @@ the VM pops the index from the return stack and jumps back to it.</p>
 </li>
 </ul>
 <h3><a href="#how-are-values-represented" name="how-are-values-represented">How are values represented?</a></h3>
-<p>Our sample VM only works with one kind of value, integers. That makes it easy &#8212;
+<p>Our sample VM only works with one kind of value, integers. That makes answering this easy &#8212;
 the stack is just a stack of <code>int</code>s. A more full-featured VM will support
 different data types: strings, objects, lists, etc. You&#8217;ll have to decide how
 those are stored internally.</p>
@@ -1159,7 +1163,7 @@ easier when you constrain the user interface to a string of characters.</p>
     the LEGO blocks of computing&#8202;&mdash;&#8202;simple, but easily composable in a million
     ways.</p>
 <p>Most non-programmers don&#8217;t think of plaintext like that. To them, text
-files feel like filling in tax forms for a robotic auditor that yells at
+files feel like filling in tax forms for an angry robotic auditor that yells at
 them if they forget a single semicolon.</p>
 </li>
 </ul>
@@ -1193,7 +1197,7 @@ prevent and handle errors.</p>
     systems is trivial.</p>
 <aside name="lines">
 
-<p>Except for line endings. <em>Sigh&#8230;</em></p>
+<p>Except for line endings. And encodings.</p>
 </aside>
 
 <p>When you&#8217;re building a UI, you have to choose which framework to use,
@@ -1237,7 +1241,7 @@ immediately, you output the bytecode instruction to perform that later.</p>
 <nav>
   <span class="prev">&larr; <a href="behavioral-patterns.html">Previous Chapter</a></span>
   <span class="next"><a href="subclass-sandbox.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

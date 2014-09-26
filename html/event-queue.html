@@ -25,6 +25,11 @@
 <body id="top">
 <div class="page sidebar">
 <div class="content">
+<nav class="top">
+  <span class="prev">&larr; <a href="component.html">Previous Chapter</a></span>
+  <span class="next"><a href="service-locator.html">Next Chapter</a> &rarr;</span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
+</nav>
 <h1>Event Queue</h1>
 <h1 class="book"><a href="/">Game Programming Patterns</a><span class="section"><a href="decoupling-patterns.html">Decoupling Patterns</a></span></h1>
 <h2><a href="#intent" name="intent">Intent</a></h2>
@@ -84,7 +89,7 @@ input and when your app gets around to calling <code>getNextEvent()</code>. That
 &#8220;somewhere&#8221; is a <em>queue</em>.</p>
 <p><img src="images/event-queue-loop.png" alt="An event queue. The operating system enqueues Shift, Down, Up, and Click events, and the getNextEvent() function dequeues them." /></p>
 <p>When user input comes in, the OS adds it to a queue of unprocessed events. When
-you call <code>getNextEvent()</code>, it pulls the oldest event off the queue and hands it
+you call <code>getNextEvent()</code>, that pulls the oldest event off the queue and hands it
 to your application.</p>
 <h3><a href="#central-event-bus" name="central-event-bus">Central event bus</a></h3>
 <p>Most <span name="game-loop">games</span> aren&#8217;t event-driven like this, but it
@@ -112,7 +117,7 @@ invaluable for easing the player into your game.</p>
 
 <p>Your gameplay and combat code are likely complex enough as it is. The last thing
 you want to do is stuff a bunch of checks for triggering tutorials in there.
-Instead, some games have a central event queue. Any game system can send to it,
+Instead, you could have a central event queue. Any game system can send to it,
 so the combat code can add an &#8220;enemy died&#8221; event every time you slay a foe.</p>
 <p><span name="blackboard">Likewise</span>, any game system can <em>receive</em> events
 from the queue. The tutorial engine registers itself with the queue and
@@ -129,10 +134,10 @@ the AI field.</p>
 
 <p><img src="images/event-queue-central.png" alt="A central event queue is read from and written to by the Combat and Tutorial code." /></p>
 <p>I thought about using this as the example for the rest of the chapter, but I&#8217;m
-not generally a fan of global systems. Using them is a common technique, but I don&#8217;t
-want you to think that event queues <em>have</em> to be global.</p>
+not generally a fan of big global systems. Event queues don&#8217;t have to be for
+communicating across the entire game engine. They can be just as useful within a single class or domain.</p>
 <h3><a href="#say-what" name="say-what">Say what?</a></h3>
-<p>Instead, let&#8217;s add sound to our game. Humans are mainly visual animals, but
+<p>So, instead, let&#8217;s add sound to our game. Humans are mainly visual animals, but
 hearing is deeply connected to our emotions and our sense of physical space. The
 right simulated echo can make a black screen feel like an enormous cavern, and a
 well-timed violin adagio can make your heartstrings hum in sympathetic
@@ -145,7 +150,8 @@ volume:</p>
 
 <p>While I almost always shy away from the <a href="singleton.html"
 class="gof-pattern">Singleton</a> pattern, this is one of the places where it
-may fit. I&#8217;m taking a simpler approach and just making the method static.</p>
+may fit since the machine likely only has one set of speakers. I&#8217;m taking a
+simpler approach and just making the method static.</p>
 </aside>
 
 <div class="codehilite"><pre><span class="k">class</span> <span class="nc">Audio</span>
@@ -193,7 +199,8 @@ screen freezes for a few frames. We&#8217;ve hit our first issue:</p>
 </ul>
 <p>Our <code>playSound()</code> method is <em>synchronous</em>&#8202;&mdash;&#8202;it doesn&#8217;t return back to the
 caller until bloops are coming out of the speakers. If a sound file has to be
-loaded from disc first, that may take a while.</p>
+loaded from disc first, that may take a while. In the meantime, the rest of the
+game is frozen.</p>
 <p>Ignoring that for now, we move on. In the AI code, we add a call to let out a
 wail of anguish when an enemy takes damage from the player. Nothing warms a
 gamer&#8217;s heart like inflicting simulated pain on a virtual living being.</p>
@@ -315,7 +322,7 @@ captured when the event is sent so they can be used later.</p>
 overflow the stack and crash your game. With a queue, the asynchrony unwinds the
 stack, so the game may keep running even though spurious events are <span
 name="log">sloshing</span> back and forth in there. A common rule to avoid this
-is to avoid sending events from within an event handler.</p>
+is to avoid <em>sending</em> events from within code that&#8217;s <em>handling</em> one.</p>
 <aside name="log">
 
 <p>A little debug logging in your event system is probably a good idea too.</p>
@@ -341,7 +348,7 @@ until later.</p>
 
 
 <p>Next, we need to give <code>Audio</code> some storage space to keep track of these pending
-play messages. Now, your <span name="prof">algorithms professor</span> would
+play messages. Now, your <span name="prof">algorithms professor</span> might
 tell you to use some exciting data structure here like a <a href="http://en.wikipedia.org/wiki/Fibonacci_heap">Fibonacci
 heap</a> or a <a href="http://en.wikipedia.org/wiki/Skip_list">skip
 list</a>, or, hell, at least a <em>linked</em>
@@ -695,7 +702,7 @@ questions to consider:</p>
 <h3><a href="#what-goes-in-the-queue" name="what-goes-in-the-queue">What goes in the queue?</a></h3>
 <p>I&#8217;ve used &#8220;event&#8221; and &#8220;message&#8221; interchangeably so far because it mostly doesn&#8217;t
 matter. You get the same decoupling and aggregation abilities regardless of what
-you&#8217;re stuffing in the queue.</p>
+you&#8217;re stuffing in the queue, but there are some conceptual differences.</p>
 <ul>
 <li>
 <p><strong>If you queue events:</strong></p>
@@ -891,7 +898,7 @@ ownership and is responsible for deallocating it.</p>
 <li>
 <p><strong>Share ownership:</strong></p>
 <p>These days, now that even C++ programmers are more comfortable with garbage
-collection, <span name="shared">shared</span> ownership is more typical.
+collection, <span name="shared">shared</span> ownership is more acceptable.
 With this, the message sticks around as long as anything has a reference to
 it and is automatically freed when forgotten.</p>
 <aside name="shared">
@@ -950,7 +957,7 @@ computation.</p>
 <nav>
   <span class="prev">&larr; <a href="component.html">Previous Chapter</a></span>
   <span class="next"><a href="service-locator.html">Next Chapter</a> &rarr;</span>
-  <span class="toc">&equiv; <a href="/">Table of Contents</a></span>
+  <span class="toc">&equiv; <a href="/">The Book</a></span>
 </nav>
 </div>
 </div>

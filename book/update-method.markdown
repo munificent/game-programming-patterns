@@ -90,7 +90,7 @@ it doesn't know their concrete types. All it knows is that they can be updated.
 This separates each object's behavior both from the game loop and from the other
 objects.
 
-Each frame, the game loop walks the collection and calls `update()` on each
+Once per frame, the game loop walks the collection and calls `update()` on each
 object. This gives each one a chance to perform one frame's worth of behavior.
 By calling it on all objects every frame, they all behave <span
 name="simultaneously">simultaneously</span>.
