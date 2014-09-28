@@ -7,9 +7,14 @@
 
 ## Motivation
 
-We've been lied to. They keep showing us charts where CPU speed goes up and up every year as if Moore's Law isn't just a historical observation but some kind of divine right. Without lifting a finger, we software folks watch our programs magically accelerate just by virtue of new hardware.
+We've been lied to. They keep showing us charts where CPU speed goes up and up 
+every year as if Moore's Law isn't just a historical observation but some kind 
+of divine right. Without lifting a finger, we software folks watch our programs 
+magically accelerate just by virtue of new hardware.
 
-Chips *have* been getting faster (though even that's plateauing now), but the hardware heads failed to mention something. Sure, we can *process* data faster than ever, but we can't *get* that data faster.
+Chips *have* been getting faster (though even that's plateauing now), but the 
+hardware heads failed to mention something. Sure, we can *process* data faster 
+than ever, but we can't *get* that data faster.
 
 <span name="legend"></span>
 
@@ -17,24 +22,35 @@ Chips *have* been getting faster (though even that's plateauing now), but the ha
 
 <aside name="legend">
 
-Processor and RAM speed relative to their respective speeds in 1980. As you can see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.
+Processor and RAM speed relative to their respective speeds in 1980. As you can 
+see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.
 
 Data for this is from *Computer Architecture: A Quantitative Approach*
-by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht's "[Pitfalls of Object-Oriented Programming][poop]&rdquo;.
+by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony 
+Albrecht's "[Pitfalls of Object-Oriented Programming][poop]&rdquo;.
 
 [poop]: http://seven-degrees-of-freedom.blogspot.com/2009/12/pitfalls-of-object-oriented-programming.html
 
 </aside>
 
-For your super-fast CPU to blow through a ream of calculations, it actually has to get the data out of main memory and into registers. As you can see, RAM hasn't been keeping up with increasing CPU speeds. Not even close.
+For your super-fast CPU to blow through a ream of calculations, it actually has 
+to get the data out of main memory and into registers. As you can see, RAM hasn't 
+been keeping up with increasing CPU speeds. Not even close.
 
-With today's hardware, it can take *hundreds* of cycles to fetch a byte of data from <span name="ram">RAM</span>. If most instructions need data, and it takes hundreds of cycles to get it, how is it that our CPUs aren't sitting idle 99% of the time waiting for data?
+With today's hardware, it can take *hundreds* of cycles to fetch a byte of data 
+from <span name="ram">RAM</span>. If most instructions need data, and it takes 
+hundreds of cycles to get it, how is it that our CPUs aren't sitting idle 99% 
+of the time waiting for data?
 
-Actually, they *are* stuck waiting on memory an astonishingly large fraction of time these days, but it's not as bad as it could be. To explain how, let's take a trip to the Land of Overly Long Analogies...
+Actually, they *are* stuck waiting on memory an astonishingly large fraction of 
+time these days, but it's not as bad as it could be. To explain how, let's take 
+a trip to the Land of Overly Long Analogies...
 
 <aside name="ram">
 
-It's called "random access memory" because, unlike disc drives, you can theoretically access any piece of it as quick as any other. You don't have to worry about reading things consecutively like you do a disc.
+It's called "random access memory" because, unlike disc drives, you can 
+theoretically access any piece of it as quick as any other. You don't have 
+to worry about reading things consecutively like you do a disc.
 
 Or, at least, you *didn't*. As we'll see, RAM isn't so random access anymore.
 
@@ -460,7 +476,8 @@ it was doing that before to ensure they were processed in the right order. Even
 so, each component itself is still nicely encapsulated. It owns its own data and
 methods. We simply changed the way it's used.
 
-This doesn't mean we need to get rid of `GameEntity` either. We can leave it as it is with pointers to its components. They'll just point into those
+This doesn't mean we need to get rid of `GameEntity` either. We can leave it as it
+is with pointers to its components. They'll just point into those
 arrays. This is still useful for other parts of the game where you want to pass
 around a conceptual "game entity" and everything that goes with it. The
 important part is that the performance-critical game loop sidesteps that and
