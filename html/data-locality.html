@@ -35,23 +35,39 @@
 <h2><a href="#intent" name="intent">Intent</a></h2>
 <p><em>Accelerate memory access by arranging data to take advantage of CPU caching.</em></p>
 <h2><a href="#motivation" name="motivation">Motivation</a></h2>
-<p>We&#8217;ve been lied to. They keep showing us charts where CPU speed goes up and up every year as if Moore&#8217;s Law isn&#8217;t just a historical observation but some kind of divine right. Without lifting a finger, we software folks watch our programs magically accelerate just by virtue of new hardware.</p>
-<p>Chips <em>have</em> been getting faster (though even that&#8217;s plateauing now), but the hardware heads failed to mention something. Sure, we can <em>process</em> data faster than ever, but we can&#8217;t <em>get</em> that data faster.</p>
+<p>We&#8217;ve been lied to. They keep showing us charts where CPU speed goes up and up 
+every year as if Moore&#8217;s Law isn&#8217;t just a historical observation but some kind 
+of divine right. Without lifting a finger, we software folks watch our programs 
+magically accelerate just by virtue of new hardware.</p>
+<p>Chips <em>have</em> been getting faster (though even that&#8217;s plateauing now), but the 
+hardware heads failed to mention something. Sure, we can <em>process</em> data faster 
+than ever, but we can&#8217;t <em>get</em> that data faster.</p>
 <p><span name="legend"></span></p>
 <p><img src="images/data-locality-chart.png" alt="A chart showing processor and RAM speed from 1980 to 2010. Processor speed increases quickly, but RAM speed lags behind." /></p>
 <aside name="legend">
 
-<p>Processor and RAM speed relative to their respective speeds in 1980. As you can see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.</p>
+<p>Processor and RAM speed relative to their respective speeds in 1980. As you can 
+see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.</p>
 <p>Data for this is from <em>Computer Architecture: A Quantitative Approach</em>
-by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony Albrecht&#8217;s &#8220;<a href="http://seven-degrees-of-freedom.blogspot.com/2009/12/pitfalls-of-object-oriented-programming.html">Pitfalls of Object-Oriented Programming</a>&rdquo;.</p>
+by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony 
+Albrecht&#8217;s &#8220;<a href="http://seven-degrees-of-freedom.blogspot.com/2009/12/pitfalls-of-object-oriented-programming.html">Pitfalls of Object-Oriented Programming</a>&rdquo;.</p>
 </aside>
 
-<p>For your super-fast CPU to blow through a ream of calculations, it actually has to get the data out of main memory and into registers. As you can see, RAM hasn&#8217;t been keeping up with increasing CPU speeds. Not even close.</p>
-<p>With today&#8217;s hardware, it can take <em>hundreds</em> of cycles to fetch a byte of data from <span name="ram">RAM</span>. If most instructions need data, and it takes hundreds of cycles to get it, how is it that our CPUs aren&#8217;t sitting idle 99% of the time waiting for data?</p>
-<p>Actually, they <em>are</em> stuck waiting on memory an astonishingly large fraction of time these days, but it&#8217;s not as bad as it could be. To explain how, let&#8217;s take a trip to the Land of Overly Long Analogies&#8230;</p>
+<p>For your super-fast CPU to blow through a ream of calculations, it actually has 
+to get the data out of main memory and into registers. As you can see, RAM hasn&#8217;t 
+been keeping up with increasing CPU speeds. Not even close.</p>
+<p>With today&#8217;s hardware, it can take <em>hundreds</em> of cycles to fetch a byte of data 
+from <span name="ram">RAM</span>. If most instructions need data, and it takes 
+hundreds of cycles to get it, how is it that our CPUs aren&#8217;t sitting idle 99% 
+of the time waiting for data?</p>
+<p>Actually, they <em>are</em> stuck waiting on memory an astonishingly large fraction of 
+time these days, but it&#8217;s not as bad as it could be. To explain how, let&#8217;s take 
+a trip to the Land of Overly Long Analogies&#8230;</p>
 <aside name="ram">
 
-<p>It&#8217;s called &#8220;random access memory&#8221; because, unlike disc drives, you can theoretically access any piece of it as quick as any other. You don&#8217;t have to worry about reading things consecutively like you do a disc.</p>
+<p>It&#8217;s called &#8220;random access memory&#8221; because, unlike disc drives, you can 
+theoretically access any piece of it as quick as any other. You don&#8217;t have 
+to worry about reading things consecutively like you do a disc.</p>
 <p>Or, at least, you <em>didn&#8217;t</em>. As we&#8217;ll see, RAM isn&#8217;t so random access anymore.</p>
 </aside>
 
@@ -518,7 +534,8 @@ updating the components directly instead of going through the game entities, but
 it was doing that before to ensure they were processed in the right order. Even
 so, each component itself is still nicely encapsulated. It owns its own data and
 methods. We simply changed the way it&#8217;s used.</p>
-<p>This doesn&#8217;t mean we need to get rid of <code>GameEntity</code> either. We can leave it as it is with pointers to its components. They&#8217;ll just point into those
+<p>This doesn&#8217;t mean we need to get rid of <code>GameEntity</code> either. We can leave it as it
+is with pointers to its components. They&#8217;ll just point into those
 arrays. This is still useful for other parts of the game where you want to pass
 around a conceptual &#8220;game entity&#8221; and everything that goes with it. The
 important part is that the performance-critical game loop sidesteps that and

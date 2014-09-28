@@ -160,7 +160,7 @@ def format_file(path, nav, skip_up_to_date):
         headertype = stripped[:index]
         header = pretty(stripped[index:].strip())
         anchor = header.lower().replace(' ', '-')
-        anchor = anchor.translate(None, '.?!:/')
+        anchor = anchor.translate(None, '.?!:/"')
 
         # Add an anchor to the header.
         contents += indentation + headertype
