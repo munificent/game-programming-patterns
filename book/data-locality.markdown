@@ -7,13 +7,13 @@
 
 ## Motivation
 
-We've been lied to. They keep showing us charts where CPU speed goes up and up 
-every year as if Moore's Law isn't just a historical observation but some kind 
-of divine right. Without lifting a finger, we software folks watch our programs 
+We've been lied to. They keep showing us charts where CPU speed goes up and up
+every year as if Moore's Law isn't just a historical observation but some kind
+of divine right. Without lifting a finger, we software folks watch our programs
 magically accelerate just by virtue of new hardware.
 
-Chips *have* been getting faster (though even that's plateauing now), but the 
-hardware heads failed to mention something. Sure, we can *process* data faster 
+Chips *have* been getting faster (though even that's plateauing now), but the
+hardware heads failed to mention something. Sure, we can *process* data faster
 than ever, but we can't *get* that data faster.
 
 <span name="legend"></span>
@@ -22,34 +22,34 @@ than ever, but we can't *get* that data faster.
 
 <aside name="legend">
 
-Processor and RAM speed relative to their respective speeds in 1980. As you can 
+Processor and RAM speed relative to their respective speeds in 1980. As you can
 see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.
 
 Data for this is from *Computer Architecture: A Quantitative Approach*
-by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony 
+by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony
 Albrecht's "[Pitfalls of Object-Oriented Programming][poop]&rdquo;.
 
 [poop]: http://seven-degrees-of-freedom.blogspot.com/2009/12/pitfalls-of-object-oriented-programming.html
 
 </aside>
 
-For your super-fast CPU to blow through a ream of calculations, it actually has 
-to get the data out of main memory and into registers. As you can see, RAM hasn't 
+For your super-fast CPU to blow through a ream of calculations, it actually has
+to get the data out of main memory and into registers. As you can see, RAM hasn't
 been keeping up with increasing CPU speeds. Not even close.
 
-With today's hardware, it can take *hundreds* of cycles to fetch a byte of data 
-from <span name="ram">RAM</span>. If most instructions need data, and it takes 
-hundreds of cycles to get it, how is it that our CPUs aren't sitting idle 99% 
+With today's hardware, it can take *hundreds* of cycles to fetch a byte of data
+from <span name="ram">RAM</span>. If most instructions need data, and it takes
+hundreds of cycles to get it, how is it that our CPUs aren't sitting idle 99%
 of the time waiting for data?
 
-Actually, they *are* stuck waiting on memory an astonishingly large fraction of 
-time these days, but it's not as bad as it could be. To explain how, let's take 
+Actually, they *are* stuck waiting on memory an astonishingly large fraction of
+time these days, but it's not as bad as it could be. To explain how, let's take
 a trip to the Land of Overly Long Analogies...
 
 <aside name="ram">
 
-It's called "random access memory" because, unlike disc drives, you can 
-theoretically access any piece of it as quick as any other. You don't have 
+It's called "random access memory" because, unlike disc drives, you can
+theoretically access any piece of it as quick as any other. You don't have
 to worry about reading things consecutively like you do a disc.
 
 Or, at least, you *didn't*. As we'll see, RAM isn't so random access anymore.
@@ -926,8 +926,7 @@ components?
     time you have performance-critical code that touches a lot of data, it's
     important to think about locality.
 
- *  Tony Albrecht's <a href="http://research.scee.net/files/presentations/gcapau
-    stralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf"
+ *  Tony Albrecht's <a href="http://research.scee.net/files/presentations/gcapaustralia09/Pitfalls_of_Object_Oriented_Programming_GCAP_09.pdf"
     class="pdf">"Pitfalls of Object-Oriented Programming"</a> is probably the
     most widely-read introduction to designing your game's data structures for
     cache-friendliness. It made a lot more people (including me!) aware of how
