@@ -630,7 +630,7 @@ require much knowledge of the other.
 
 ## Observers Today
 
-*Design Patterns* came out in the <span name="90s">90s</span>. Back then,
+*Design Patterns* came out in <span name="90s">1994</span>. Back then,
 object-oriented programming was *the* hot paradigm. Every programmer on Earth
 wanted to "Learn OOP in 30 Days," and middle managers paid them based on the
 number of classes they created. Engineers judged their mettle by the depth of

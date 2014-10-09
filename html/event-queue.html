@@ -338,7 +338,7 @@ starts making the speaker wiggle.</p>
 <p>We want to defer that work until later so that <code>playSound()</code> can return quickly.
 To do that, we need to <em>reify</em> the request to play a sound. We need a little
 structure that stores the details of a pending request so we can keep it around
-until later.</p>
+until later:</p>
 <div class="codehilite"><pre><span class="k">struct</span> <span class="n">PlayMessage</span>
 <span class="p">{</span>
   <span class="n">SoundId</span> <span class="n">id</span><span class="p">;</span>

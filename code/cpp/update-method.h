@@ -102,7 +102,7 @@ namespace UpdateMethod
       //^statues
     }
   }
-  
+
   namespace KeepInMind
   {
     struct Entity
@@ -113,7 +113,7 @@ namespace UpdateMethod
     };
 
     static const int MAX_ENTITIES = 10;
-    
+
     void refreshGame() {}
 
     void skipAdded()
@@ -146,7 +146,7 @@ namespace UpdateMethod
   namespace SampleCode
   {
     static const int MAX_ENTITIES = 10;
-    
+
     //^entity-class
     class Entity
     {
@@ -179,7 +179,7 @@ namespace UpdateMethod
       {}
 
       void gameLoop();
-      
+
     private:
       Entity* entities_[MAX_ENTITIES];
       int numEntities_;
@@ -192,7 +192,7 @@ namespace UpdateMethod
       while (true)
       {
         // Handle user input...
-        
+
         // Update each entity.
         //^update-component-entities
         for (int i = 0; i < numEntities_; i++)
@@ -213,7 +213,7 @@ namespace UpdateMethod
       Skeleton()
       : patrollingLeft_(false)
       {}
-      
+
       virtual void update()
       {
         if (patrollingLeft_)
@@ -247,7 +247,7 @@ namespace UpdateMethod
         if (++frames_ == delay_)
         {
           shootLightning();
-          
+
           // Reset the timer.
           frames_ = 0;
         }
@@ -256,7 +256,7 @@ namespace UpdateMethod
     private:
       int frames_;
       int delay_;
-      
+
       void shootLightning()
       {
         // Shoot the lightning...
@@ -310,7 +310,8 @@ namespace UpdateMethod
       else
       {
         x += elapsed;
-        if (x >= 100) {
+        if (x >= 100)
+        {
           patrollingLeft_ = true;
           x = 100 - (x - 100);
         }

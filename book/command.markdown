@@ -119,12 +119,12 @@ Now the input handling just delegates to those:
 
 <aside name="null">
 
-Notice how we don't check for `null` here? This assumes each button will have
+Notice how we don't check for `NULL` here? This assumes each button will have
 *some* command wired up to it.
 
 If we want to support buttons that do nothing without having to explicitly check
-for `null`, we can define a command class whose `execute()` method does nothing.
-Then, instead of setting a button handler to `null`, we point it to that object.
+for `NULL`, we can define a command class whose `execute()` method does nothing.
+Then, instead of setting a button handler to `NULL`, we point it to that object.
 This is a pattern called [Null
 Object](http://en.wikipedia.org/wiki/Null_Object_pattern).
 
