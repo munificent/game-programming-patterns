@@ -982,7 +982,7 @@ only option.
 
      *  *You have to implement a parser.* Despite their reputation, this part is
         pretty easy. Either use a parser generator like ANTLR or Bison, or --
-        like I do -- hand-roll a little recursive descent one, and you're good to
+        like I do -- hand-roll a little recursive decent one, and you're good to
         go.
 
      *  *You have to handle syntax errors.* This is one of the most important
