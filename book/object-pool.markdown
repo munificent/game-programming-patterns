@@ -252,7 +252,7 @@ called once per frame.
 
 The pool needs to know which particles are available for reuse. It gets this
 from the particle's `inUse()` function. This function takes advantage of the fact that
-particles have a limited lifetime and uses the `_framesLeft` variable to
+particles have a limited lifetime and uses the `framesLeft_` variable to
 discover which particles are in use without having to store a separate flag.
 
 The pool class is also simple:
@@ -319,7 +319,7 @@ the data for the unused particles themselves.
 
 When a particle isn't in use, most of its state is irrelevant. Its position and
 velocity aren't being used. The only state it needs is the stuff required to
-tell if it's dead. In our example, that's the `_framesLeft` member. All those
+tell if it's dead. In our example, that's the `framesLeft_` member. All those
 other bits can be reused. Here's a revised particle:
 
 ^code 4
