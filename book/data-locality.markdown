@@ -615,7 +615,7 @@ particle system that will be spawning and killing particles anyway.
 
 OK, this is the last example of a simple technique for making your cache
 happier. Say we've got an AI component for some game entity. It has some state
-in it -- the animation it's currently playing, a goal position its heading
+in it -- the animation it's currently playing, a goal position it's heading
 towards, energy level, etc. -- stuff it checks and tweaks every single frame.
 Something like:
 
