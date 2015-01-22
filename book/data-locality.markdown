@@ -509,7 +509,7 @@ something like this:
 
 ^code particles-is-active
 
-We give `Particle` a flag to track whether its in use or not. In the update
+We give `Particle` a flag to track whether it's in use or not. In the update
 loop, we <span name="branch">check</span> that for each particle. That loads the
 flag into the cache along with all of that particle's other data. If the
 particle *isn't* active, then we skip over it to the next one. The rest
@@ -615,7 +615,7 @@ particle system that will be spawning and killing particles anyway.
 
 OK, this is the last example of a simple technique for making your cache
 happier. Say we've got an AI component for some game entity. It has some state
-in it -- the animation it's currently playing, a goal position its heading
+in it -- the animation it's currently playing, a goal position it’s heading
 towards, energy level, etc. -- stuff it checks and tweaks every single frame.
 Something like:
 
