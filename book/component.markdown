@@ -612,7 +612,7 @@ likely support more than one at the same time in your designs.
         <span name="queue">Now</span>, if a component has access to its
         container, it can send messages to the container, which will
         rebroadcast the message to all of the contained components. (That
-        inclues the original component that sent the message; be careful that
+        includes the original component that sent the message; be careful that
         you don't get stuck in a feedback loop!) This has a couple of
         consequences:
 
