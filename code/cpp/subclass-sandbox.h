@@ -14,15 +14,15 @@ namespace SimpleExample
   {
   public:
     virtual ~Superpower() {}
-    
+
   protected:
     virtual void activate() = 0;
-    
+
     void move(double x, double y, double z)
     {
       // Code here...
     }
-    
+
     void playSound(SoundId sound, double volume)
     {
       // Code here...
@@ -34,7 +34,7 @@ namespace SimpleExample
     }
   };
   //^1
-  
+
   //^2
   class SkyLaunch : public Superpower
   {
@@ -69,7 +69,7 @@ namespace Elaborated
       return 0;
       //^omit
     }
-    
+
     double getHeroY()
     {
       // Code here...
@@ -77,7 +77,7 @@ namespace Elaborated
       return 0;
       //^omit
     }
-    
+
     double getHeroZ()
     {
       // Code here...
@@ -89,7 +89,7 @@ namespace Elaborated
     // Existing stuff...
   };
   //^3
-  
+
   //^4
   class SkyLaunch : public Superpower
   {
@@ -107,7 +107,7 @@ namespace Elaborated
       {
         // Near the ground, so do a double jump.
         playSound(SOUND_SWOOP, 1.0f);
-        move(0, 0, getHeroZ() - 20);
+        move(0, 0, getHeroZ() + 20);
       }
       else
       {
@@ -127,9 +127,9 @@ namespace Forwarding
   {
     void play(SoundId sound, double volume) {}
   };
-  
+
   SoundEngine soundEngine_;
-  
+
   //^5
   void playSound(SoundId sound, double volume)
   {
@@ -153,12 +153,12 @@ namespace HelperClassBefore
     {
       // Code here...
     }
-    
+
     void setVolume(SoundId sound)
     {
       // Code here...
     }
-    
+
     // Sandbox method and other operations...
   };
   //^6
@@ -173,19 +173,19 @@ namespace HelperClassAfter
     {
       // Code here...
     }
-    
+
     void stopSound(SoundId sound)
     {
       // Code here...
     }
-    
+
     void setVolume(SoundId sound)
     {
       // Code here...
     }
   };
   //^7
-  
+
   //^8
   class Superpower
   {
@@ -194,9 +194,9 @@ namespace HelperClassAfter
     {
       return soundPlayer_;
     }
-    
+
     // Sandbox method and other operations...
-    
+
   private:
     SoundPlayer soundPlayer_;
   };
@@ -206,7 +206,7 @@ namespace HelperClassAfter
 namespace PassToConstructor
 {
   class ParticleSystem {};
-  
+
   //^pass-to-ctor-base
   class Superpower
   {
@@ -214,11 +214,11 @@ namespace PassToConstructor
     Superpower(ParticleSystem* particles)
     : particles_(particles)
     {}
-    
+
     // Sandbox method and other operations...
-    
+
   private:
-    ParticleSystem* particles_;    
+    ParticleSystem* particles_;
   };
   //^pass-to-ctor-base
 
@@ -236,15 +236,15 @@ namespace PassToConstructor
 namespace TwoStageInit
 {
   class ParticleSystem {};
-  
+
   class Superpower
   {
   public:
     void init(ParticleSystem* particles) {}
   };
-  
+
   ParticleSystem* particles;
-  
+
   class SkyLaunch : public Superpower {};
 
   void foo()
@@ -259,15 +259,15 @@ namespace TwoStageInit
 namespace TwoStageInitEncapsulated
 {
   class ParticleSystem {};
-  
+
   class Superpower
   {
   public:
     void init(ParticleSystem* audio) {}
   };
-  
+
   class SkyLaunch : public Superpower {};
-  
+
   //^10
   Superpower* createSkyLaunch(ParticleSystem* particles)
   {
@@ -281,7 +281,7 @@ namespace TwoStageInitEncapsulated
 namespace StaticState
 {
   class ParticleSystem {};
-  
+
   //^11
   class Superpower
   {
@@ -290,7 +290,7 @@ namespace StaticState
     {
       particles_ = particles;
     }
-    
+
     // Sandbox method and other operations...
 
   private:
@@ -305,15 +305,15 @@ namespace UseServiceLocator
   {
     void spawn(ParticleType type, int count);
   };
-  
+
   ParticleSystem particles;
-  
+
   class Locator
   {
   public:
     static ParticleSystem& getParticles() { return particles; }
   };
-  
+
   //^12
   class Superpower
   {
@@ -323,7 +323,7 @@ namespace UseServiceLocator
       ParticleSystem& particles = Locator::getParticles();
       particles.spawn(type, count);
     }
-    
+
     // Sandbox method and other operations...
   };
   //^12
