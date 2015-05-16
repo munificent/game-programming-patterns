@@ -100,12 +100,12 @@ namespace Monolithic
     switch (Controller::getJoystickDirection())
     {
       case DIR_LEFT:
-      velocity_ -= WALK_ACCELERATION;
-      break;
+        velocity_ -= WALK_ACCELERATION;
+        break;
       
       case DIR_RIGHT:
-      velocity_ += WALK_ACCELERATION;
-      break;
+        velocity_ += WALK_ACCELERATION;
+        break;
       //^omit
       case DIR_NONE: break; // Do nothing.
       //^omit
