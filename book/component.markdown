@@ -612,7 +612,7 @@ likely support more than one at the same time in your designs.
         <span name="queue">Now</span>, if a component has access to its
         container, it can send messages to the container, which will
         rebroadcast the message to all of the contained components. (That
-        inclues the original component that sent the message; be careful that
+        includes the original component that sent the message; be careful that
         you don't get stuck in a feedback loop!) This has a couple of
         consequences:
 
@@ -667,7 +667,7 @@ communication paths if you need them.
 ## See Also
 
  *  The [Unity](http://unity3d.com) framework's core [`GameObject`](http://docs.unity3d.com/Documentation/Manual/GameObjects.html) class is designed
-    entirely around [components](http://docs.unity3d.com/Documentation/Manual/UsingComponents40.html).
+    entirely around [components](http://docs.unity3d.com/Manual/UsingComponents.html).
 
  *  The open source [Delta3D](http://www.delta3d.org) engine has a base
     `GameActor` class that implements this pattern with the appropriately named
