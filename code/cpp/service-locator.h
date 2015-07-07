@@ -78,7 +78,6 @@ public:
     wrapped_.stopAllSounds();
   }
 
-
 private:
   void log(const char* message)
   {

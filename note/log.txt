@@ -1,3 +1,15 @@
+2014-10-08 - finish layout, proofread, re-upload to createspace for review
+2014-10-07 - layout through data locality
+2014-10-06 - layout through event queue
+2014-10-05 - layout through subclass sandbox
+2014-10-04 - layout through behavioral patterns
+2014-10-03 - layout through singleton (!)
+2014-10-02 - decimal inches page layout
+2014-10-01 - work on new page layout
+2014-09-30 - work on new page layout
+2014-09-29 - cover and other epub front matter
+2014-09-28 - email
+2014-09-27 - go through bugs and pull requests
 2014-09-26 - finish applying proofreading, tweak other web stuff
 2014-09-25 - apply proofreading to web of six chapters, top nav
 2014-09-24 - more kdp and bowker stuff, description, cover

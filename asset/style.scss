@@ -477,6 +477,10 @@ footer {
 .codehilite .nl { color: $primary; } // keyword label (private: etc.)
 .codehilite .nt { color: $primary; } // json key
 
+// Hack: Pygments isn't recognizing preprocessor directives, so just color the
+// error like a keyword.
+.codehilite .err { color: $primary; }
+
 // On phone-size screens, shrink all of the text a bit.
 @media only screen and (max-width: 479px) {
   .content {

@@ -177,11 +177,11 @@ there&#8217;s a good chance it&#8217;s the Command pattern.</p>
 
 <aside name="null">
 
-<p>Notice how we don&#8217;t check for <code>null</code> here? This assumes each button will have
+<p>Notice how we don&#8217;t check for <code>NULL</code> here? This assumes each button will have
 <em>some</em> command wired up to it.</p>
 <p>If we want to support buttons that do nothing without having to explicitly check
-for <code>null</code>, we can define a command class whose <code>execute()</code> method does nothing.
-Then, instead of setting a button handler to <code>null</code>, we point it to that object.
+for <code>NULL</code>, we can define a command class whose <code>execute()</code> method does nothing.
+Then, instead of setting a button handler to <code>NULL</code>, we point it to that object.
 This is a pattern called <a href="http://en.wikipedia.org/wiki/Null_Object_pattern">Null
 Object</a>.</p>
 </aside>

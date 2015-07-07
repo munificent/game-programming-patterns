@@ -339,7 +339,7 @@ starts making the speaker wiggle.
 We want to defer that work until later so that `playSound()` can return quickly.
 To do that, we need to *reify* the request to play a sound. We need a little
 structure that stores the details of a pending request so we can keep it around
-until later.
+until later:
 
 ^code play-message
 
