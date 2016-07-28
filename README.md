@@ -1,5 +1,18 @@
-This is the source repo for the in-progress book [Game Programming Patterns][].
-Issues and pull requests are more than welcome!
+**Note: Now that the book is done, I'm not actively working on it.**
+
+There are only so many hours in the day, and I have other projects that need my
+love, including a new book. This means I'm not responding to issues and pull
+requests here. However, I do intend to circle back and do a second edition at
+*some* point, so please do continue to file bugs.
+
+Even though I'm not responding, I do deeply appreciate every issue filed.
+Thank you!
+
+&ndash; bob
+
+---
+
+This is the source repo for the book [Game Programming Patterns][].
 
 ## Building the Book
 
