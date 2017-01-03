@@ -210,6 +210,8 @@ namespace ObserverPattern
     //^linked-subject
     class Subject
     {
+      
+    public:
       Subject()
       : head_(NULL)
       {}
