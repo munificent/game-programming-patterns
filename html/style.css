@@ -145,8 +145,12 @@ blockquote p:last-child {
 
 code {
   color: #526d7a;
-  font: normal 15px "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+  font-family: "Source Code Pro", Menlo, Consolas, Monaco, monospace;
   white-space: pre;
+}
+
+p code {
+  font-size: 15px;
 }
 
 a code {
