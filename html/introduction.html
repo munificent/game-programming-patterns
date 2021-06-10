@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -39,16 +39,13 @@ teacher found a printout of some simple BASIC programs for us to tinker with.</p
 run some code, we&#8217;d have to carefully type it in from scratch. This led us
 to prefer programs that were only a few lines long:</p>
 <p><span name="radical"></span></p>
-<div class="codehilite"><pre><span class="mi">10</span> <span class="n">PRINT</span> <span class="s">&quot;BOBBY IS RADICAL!!!&quot;</span>
-<span class="mi">20</span> <span class="n">GOTO</span> <span class="mi">10</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="mf">10</span> <span class="kr">PRINT</span> <span class="s">&quot;BOBBY IS RADICAL!!!&quot;</span>
+<span class="mf">20</span> <span class="kr">GOTO</span> <span class="mf">10</span>
+</code></pre></div>
 
 <aside name="radical">
-
 <p>Maybe if the computer prints it enough times, it will magically become true.</p>
 </aside>
-
 <p>Even so, the process was fraught with peril. We didn&#8217;t know <em>how</em> to program,
 so a tiny syntax error was impenetrable to us. If the program didn&#8217;t work,
 which was often, we started over from the beginning.</p>
@@ -67,12 +64,10 @@ hacking together games. Learning on my own was slow and painful. I&#8217;d get
 something up and running easily&#8202;&mdash;&#8202;maybe a map screen or a little puzzle &#8212;
 but as the program grew, it got harder and harder.</p>
 <aside name="snakes">
-
 <p>Many of my summers were also spent catching snakes and turtles in the swamps
 of southern Louisiana. If it wasn&#8217;t so blisteringly hot outside, there&#8217;s a
 good chance this would be a herpetology book instead of a programming one.</p>
 </aside>
-
 <p>At first, the challenge was just getting something working. Then, it became
 figuring out how to write programs bigger than what would fit in my head. Instead
 of just reading about &#8220;How to Program in C++&#8221;, I started trying to find books
@@ -85,13 +80,11 @@ such a relief to see that other people struggled too and came up with
 solutions. I felt like I finally had a couple of <em>tools</em> to use instead of
 just my bare hands.</p>
 <aside name="friend">
-
 <p>This was the first time we&#8217;d met, and five minutes after being introduced, I
 sat down on his couch and spent the next few hours completely ignoring him and
 reading. I&#8217;d like to think my social skills have improved at least a little
 since then.</p>
 </aside>
-
 <p>In 2001, I landed my dream job: software engineer at Electronic Arts. I
 couldn&#8217;t wait to get a look at some real games and see how the pros put them
 together. What was the architecture like for an enormous game like Madden
@@ -154,18 +147,15 @@ carte</em></span>. Each of the chapters in this book is an independent idea that
 you can apply to your code. This way, you can mix and match them in a way that
 works best for the game <em>you</em> want to make.</p>
 <aside name="carte">
-
 <p>Another example of this <em>&agrave; la carte</em> style is the widely beloved <a href="http://www.satori.org/game-programming-gems/"><em>Game
 Programming Gems</em></a> series.</p>
 </aside>
-
 <h2><a href="#how-it-relates-to-design-patterns" name="how-it-relates-to-design-patterns">How it Relates to Design Patterns</a></h2>
 <p>Any programming book with <span name="alexander">&#8220;Patterns&#8221;</span> in its name
 clearly bears a relationship to the classic <em>Design Patterns: Elements of
 Reusable Object-Oriented Software</em> by Erich Gamma, Richard Helm, Ralph Johnson,
 and John Vlissides (ominously called the &#8220;Gang of Four&#8221;).</p>
 <aside name="alexander">
-
 <p><em>Design Patterns</em> itself was in turn inspired by a previous book. The idea of
 crafting a language of patterns to describe open-ended solutions to problems
 comes from <a href="http://en.wikipedia.org/wiki/A_Pattern_Language"><em>A Pattern
@@ -176,7 +166,6 @@ walls and stuff), but they hoped others would use the same structure to
 describe solutions in other fields. <em>Design Patterns</em> is the Gang of Four&#8217;s
 attempt to do that for software.</p>
 </aside>
-
 <p>By calling this book &#8220;Game Programming Patterns&#8221;, I&#8217;m not trying to imply that
 the Gang of Four&#8217;s book is <span name="nongames">inapplicable</span> to games.
 On the contrary: the <a href="design-patterns-revisited.html">Design Patterns Revisited</a>
@@ -294,13 +283,12 @@ ellipsis will be placed in the sample to show where the missing code goes.</p>
 <p>Consider a function that will do some work and then return a value. The
 pattern being explained is only concerned with the return value, and not the
 work being done. In that case, the sample code will look like:</p>
-<div class="codehilite"><pre><span class="kt">bool</span> <span class="nf">update</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">bool</span> <span class="nf">update</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="c1">// Do work...</span>
   <span class="k">return</span> <span class="n">isDone</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <h2><a href="#where-to-go-from-here" name="where-to-go-from-here">Where to Go From Here</a></h2>
 <p>Patterns are a constantly changing and expanding part of software development.
@@ -318,6 +306,6 @@ what&#8217;s in here, please get in touch!</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

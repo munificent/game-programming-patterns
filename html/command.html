@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -50,23 +50,19 @@ use the pattern for. Not very illuminating unless your use case happens to be in
 that list. <em>My</em> pithy tagline for the Command pattern is:</p>
 <p><strong>A command is a <em><span name="latin">reified</span> method call</em>.</strong></p>
 <aside name="latin">
-
 <p>&#8220;Reify&#8221; comes from the Latin &#8220;res&#8221;, for &#8220;thing&#8221;, with the English suffix
 &#8220;&ndash;fy&#8221;. So it basically means &#8220;thingify&#8221;, which, honestly, would be a more
 fun word to use.</p>
 </aside>
-
 <p>Of course, &#8220;pithy&#8221; often means &#8220;impenetrably terse&#8221;, so this may not be much of
 an improvement. Let me unpack that a bit. &#8220;Reify&#8221;, in case you&#8217;ve never heard
 it, means &#8220;make real&#8221;. Another term for reifying is making something &#8220;first-class&#8221;.</p>
 <aside name="reflection">
-
 <p><em>Reflection systems</em> in some languages let you work with the types in your
 program imperatively at runtime. You can get an object that represents the class
 of some other object, and you can play with that to see what the type can do. In
 other words, reflection is a <em>reified type system</em>.</p>
 </aside>
-
 <p>Both terms mean taking some <span name="reflection"><em>concept</em></span> and turning
 it into a piece of <em>data</em>&#8202;&mdash;&#8202;an object&#8202;&mdash;&#8202;that you can stick in a variable, pass
 to a function, etc. So by saying the Command pattern is a &#8220;reified method call&#8221;,
@@ -89,21 +85,18 @@ translates it to a meaningful action in the game:</p>
 <p><img src="images/command-buttons-one.png" alt="A controller, with A mapped to swapWeapon(), B mapped to lurch(), X mapped to jump(), and Y mapped to fireGun()." /></p>
 <p>A dead simple implementation looks like:</p>
 <p><span name="lurch"></span></p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">InputHandler</span><span class="o">::</span><span class="n">handleInput</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">InputHandler::handleInput</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_X</span><span class="p">))</span> <span class="n">jump</span><span class="p">();</span>
-  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_Y</span><span class="p">))</span> <span class="n">fireGun</span><span class="p">();</span>
-  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_A</span><span class="p">))</span> <span class="n">swapWeapon</span><span class="p">();</span>
-  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_B</span><span class="p">))</span> <span class="n">lurchIneffectively</span><span class="p">();</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_Y</span><span class="p">))</span> <span class="n">fireGun</span><span class="p">();</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_A</span><span class="p">))</span> <span class="n">swapWeapon</span><span class="p">();</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_B</span><span class="p">))</span> <span class="n">lurchIneffectively</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="lurch">
-
 <p>Pro tip: Don&#8217;t press B very often.</p>
 </aside>
-
 <p>This function typically gets called once per frame by the <a class="pattern"
 href="game-loop.html">Game Loop</a>, and I&#8217;m sure you can figure out what it
 does. This code works if we&#8217;re willing to hard-wire user inputs to game actions,
@@ -114,69 +107,62 @@ a variable, so we need an <em>object</em> that we can use to represent a game ac
 Enter: the Command pattern.</p>
 <p>We define a base class that represents a triggerable game command:</p>
 <p><span name="one-method"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Command</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Command</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Command</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">execute</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="one-method">
-
 <p>When you have an interface with a single method that doesn&#8217;t return anything,
 there&#8217;s a good chance it&#8217;s the Command pattern.</p>
 </aside>
-
 <p>Then we create subclasses for each of the different game actions:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">JumpCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">JumpCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">execute</span><span class="p">()</span> <span class="p">{</span> <span class="n">jump</span><span class="p">();</span> <span class="p">}</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">FireCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">execute</span><span class="p">()</span> <span class="p">{</span> <span class="n">fireGun</span><span class="p">();</span> <span class="p">}</span>
 <span class="p">};</span>
 
 <span class="c1">// You get the idea...</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>In our input handler, we store a pointer to a command for each button:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">InputHandler</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">InputHandler</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">handleInput</span><span class="p">();</span>
 
   <span class="c1">// Methods to bind commands...</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Command</span><span class="o">*</span> <span class="n">buttonX_</span><span class="p">;</span>
   <span class="n">Command</span><span class="o">*</span> <span class="n">buttonY_</span><span class="p">;</span>
   <span class="n">Command</span><span class="o">*</span> <span class="n">buttonA_</span><span class="p">;</span>
   <span class="n">Command</span><span class="o">*</span> <span class="n">buttonB_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now the input handling just delegates to those:</p>
 <p><span name="null"></span></p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">InputHandler</span><span class="o">::</span><span class="n">handleInput</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">InputHandler::handleInput</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_X</span><span class="p">))</span> <span class="n">buttonX_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
-  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_Y</span><span class="p">))</span> <span class="n">buttonY_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
-  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_A</span><span class="p">))</span> <span class="n">buttonA_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
-  <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_B</span><span class="p">))</span> <span class="n">buttonB_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_Y</span><span class="p">))</span> <span class="n">buttonY_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_A</span><span class="p">))</span> <span class="n">buttonA_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_B</span><span class="p">))</span> <span class="n">buttonB_</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="null">
-
 <p>Notice how we don&#8217;t check for <code>NULL</code> here? This assumes each button will have
 <em>some</em> command wired up to it.</p>
 <p>If we want to support buttons that do nothing without having to explicitly check
@@ -185,7 +171,6 @@ Then, instead of setting a button handler to <code>NULL</code>, we point it to t
 This is a pattern called <a href="http://en.wikipedia.org/wiki/Null_Object_pattern">Null
 Object</a>.</p>
 </aside>
-
 <p>Where each input used to directly call a function, now there&#8217;s a layer of
 indirection:</p>
 <p><img src="images/command-buttons-two.png" alt="A controller, with each button mapped to a corresponding 'button_' variable which in turn is mapped to a function." /></p>
@@ -200,34 +185,32 @@ player&#8217;s avatar and make him dance like the puppet he is.</p>
 the <code>JumpCommand</code> can make jump is the player. Let&#8217;s loosen that restriction.
 Instead of calling functions that find the commanded object themselves, we&#8217;ll
 <em>pass in</em> the object that we want to order around:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Command</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Command</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Command</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">execute</span><span class="p">(</span><span class="n">GameActor</span><span class="o">&amp;</span> <span class="n">actor</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Here, <code>GameActor</code> is our &#8220;game object&#8221; class that represents a character in the
 game world. We pass it in to <code>execute()</code> so that the derived command can invoke
 methods on an actor of our choice, like so:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">JumpCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">JumpCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">execute</span><span class="p">(</span><span class="n">GameActor</span><span class="o">&amp;</span> <span class="n">actor</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">actor</span><span class="p">.</span><span class="n">jump</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, we can use this one class to make any character in the game hop around.
 We&#8217;re just missing a piece between the input handler and the command that takes
 the command and invokes it on the right object. First, we change <code>handleInput()</code>
 so that it <em>returns</em> commands:</p>
-<div class="codehilite"><pre><span class="n">Command</span><span class="o">*</span> <span class="n">InputHandler</span><span class="o">::</span><span class="n">handleInput</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Command</span><span class="o">*</span> <span class="nf">InputHandler::handleInput</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_X</span><span class="p">))</span> <span class="k">return</span> <span class="n">buttonX_</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">isPressed</span><span class="p">(</span><span class="n">BUTTON_Y</span><span class="p">))</span> <span class="k">return</span> <span class="n">buttonY_</span><span class="p">;</span>
@@ -237,21 +220,19 @@ so that it <em>returns</em> commands:</p>
   <span class="c1">// Nothing pressed, so do nothing.</span>
   <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>It can&#8217;t execute the command immediately since it doesn&#8217;t know what actor to
 pass in. Here&#8217;s where we take advantage of the fact that the command is a
 reified call&#8202;&mdash;&#8202;we can <em>delay</em> when the call is executed.</p>
 <p>Then, we need some code that takes that command and runs it on the actor
 representing the player. Something like:</p>
-<div class="codehilite"><pre><span class="n">Command</span><span class="o">*</span> <span class="n">command</span> <span class="o">=</span> <span class="n">inputHandler</span><span class="p">.</span><span class="n">handleInput</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Command</span><span class="o">*</span> <span class="n">command</span> <span class="o">=</span> <span class="n">inputHandler</span><span class="p">.</span><span class="n">handleInput</span><span class="p">();</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">command</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">command</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">(</span><span class="n">actor</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Assuming <code>actor</code> is a reference to the player&#8217;s character, this correctly drives
 him based on the user&#8217;s input, so we&#8217;re back to the same behavior we had in the
@@ -275,31 +256,25 @@ run on auto-pilot.</p>
 first-class objects, we&#8217;ve removed the tight coupling of a direct method call.
 Instead, think of it as a queue or stream of commands:</p>
 <aside name="queue">
-
 <p>For lots more on what queueing can do for you, see <a href="event-queue.html"
 class="pattern">Event Queue</a>.</p>
 </aside>
-
 <p><span name="stream"></span></p>
 <p><img src="images/command-stream.png" alt="A pipe connecting AI to Actor." /></p>
 <aside name="stream">
-
 <p>Why did I feel the need to draw a picture of a &#8220;stream&#8221; for you? And why does it
 look like a tube?</p>
 </aside>
-
 <p>Some code (the input handler or AI) <span name="network">produces</span>
 commands and places them in the stream. Other code (the dispatcher or actor
 itself) consumes commands and invokes them. By sticking that queue in the
 middle, we&#8217;ve decoupled the producer on one end from the consumer on the other.</p>
 <aside name="network">
-
 <p>If we take those commands and make them <em>serializable</em>, we can send the stream
 of them over the network. We can take the player&#8217;s input, push it over the
 network to another machine, and then replay it. That&#8217;s one important piece of
 making a networked multi-player game.</p>
 </aside>
-
 <h2><a href="#undo-and-redo" name="undo-and-redo">Undo and Redo</a></h2>
 <p>The final example is the most well-known use of this pattern. If a command object
 can <em>do</em> things, it&#8217;s a small step for it to be able to <em>undo</em> them. Undo is
@@ -308,10 +283,8 @@ It&#8217;s <em>de rigueur</em> in tools that people use to <em>create</em> games
 name="hate">surest way</span> to make your game designers hate you is giving
 them a level editor that can&#8217;t undo their fat-fingered mistakes.</p>
 <aside name="hate">
-
 <p>I may be speaking from experience here.</p>
 </aside>
-
 <p>Without the Command pattern, implementing undo is surprisingly hard. With it,
 it&#8217;s a piece of cake. Let&#8217;s say we&#8217;re making a single-player, turn-based game and
 we want to let users undo moves so they can focus more on strategy and less on
@@ -319,9 +292,9 @@ guesswork.</p>
 <p>We&#8217;re conveniently already using commands to abstract input handling, so every
 move the player makes is already encapsulated in them. For example, moving a
 unit may look like:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">MoveUnitCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">MoveUnitCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">MoveUnitCommand</span><span class="p">(</span><span class="n">Unit</span><span class="o">*</span> <span class="n">unit</span><span class="p">,</span> <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">unit_</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span>
     <span class="n">x_</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
@@ -333,12 +306,11 @@ unit may look like:</p>
     <span class="n">unit_</span><span class="o">-&gt;</span><span class="n">moveTo</span><span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">);</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Unit</span><span class="o">*</span> <span class="n">unit_</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Note this is a little different from our previous commands. In the last example,
 we wanted to <em>abstract</em> the command from the actor that it modified. In this
@@ -355,7 +327,7 @@ was pressed.</p>
 a specific point in time. This means that the input handling code will be <span
 name="free"><em>creating</em></span> an instance of this every time the player chooses
 a move. Something like:</p>
-<div class="codehilite"><pre><span class="n">Command</span><span class="o">*</span> <span class="nf">handleInput</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Command</span><span class="o">*</span> <span class="nf">handleInput</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="n">Unit</span><span class="o">*</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">getSelectedUnit</span><span class="p">();</span>
 
@@ -375,33 +347,29 @@ a move. Something like:</p>
 
   <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="free">
-
 <p>Of course, in a non-garbage-collected language like C++, this means the code
 executing commands will also be responsible for freeing their memory.</p>
 </aside>
-
 <p>The fact that commands are one-use-only will come to our advantage in a second.
 To make commands undoable, we define another operation each command class needs
 to implement:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Command</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Command</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Command</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">execute</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">undo</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">undo</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>An <code>undo()</code> method reverses the game state changed by the corresponding
 <code>execute()</code> method. Here&#8217;s our previous move command with undo support:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">MoveUnitCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">MoveUnitCommand</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Command</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">MoveUnitCommand</span><span class="p">(</span><span class="n">Unit</span><span class="o">*</span> <span class="n">unit</span><span class="p">,</span> <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">unit_</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span>
     <span class="n">xBefore_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
@@ -425,20 +393,18 @@ to implement:</p>
     <span class="n">unit_</span><span class="o">-&gt;</span><span class="n">moveTo</span><span class="p">(</span><span class="n">xBefore_</span><span class="p">,</span> <span class="n">yBefore_</span><span class="p">);</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Unit</span><span class="o">*</span> <span class="n">unit_</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">xBefore_</span><span class="p">,</span> <span class="n">yBefore_</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Note that we added some <span name="memento">more state</span> to the class.
 When a unit moves, it forgets where it used to be. If we want to be able to undo
 that move, we have to remember the unit&#8217;s previous position ourselves, which is
 what <code>xBefore_</code> and <code>yBefore_</code> do.</p>
 <aside name="memento">
-
 <p>This seems like a place for the <a
 href="http://en.wikipedia.org/wiki/Memento_pattern"
 class="gof-pattern">Memento</a> pattern, but I haven&#8217;t found it to work well.
@@ -454,7 +420,6 @@ much cheaper than cloning the entire object.</p>
 object before the command was performed, and undo just means switching back to
 the old object.</p>
 </aside>
-
 <p>To let the player undo a move, we keep around the last command they executed.
 When they bang on Control-Z, we call that command&#8217;s <code>undo()</code> method. (If they&#8217;ve
 already undone, then it becomes &#8220;redo&#8221; and we execute the command again.)</p>
@@ -473,7 +438,6 @@ astonished at how straightforward it was and how well it worked. It takes
 discipline to make sure every data modification goes through a command, but once
 you do that, the rest is easy.</p>
 <aside name="replay">
-
 <p>Redo may not be common in games, but re-<em>play</em> is. A na&iuml;ve implementation would
 record the entire game state at each frame so it can be replayed, but that would
 use too much memory.</p>
@@ -481,7 +445,6 @@ use too much memory.</p>
 frame. To replay the game, the engine just runs the normal game simulation,
 executing the pre-recorded commands.</p>
 </aside>
-
 <h2><a href="#classy-and-dysfunctional" name="classy-and-dysfunctional">Classy and Dysfunctional?</a></h2>
 <p>Earlier, I said commands are similar to first-class functions or closures, but
 every example I showed here used class definitions. If you&#8217;re familiar with
@@ -496,7 +459,6 @@ languages. If you have the luxury of a language with real closures, by all means
 use them! In <span name="some">some</span> ways, the Command pattern is a way of
 emulating closures in languages that don&#8217;t have them.</p>
 <aside name="some">
-
 <p>I say <em>some</em> ways here because building actual classes or structures for
 commands is still useful even in languages that have closures. If your command
 has multiple operations (like undoable commands), mapping that to a single
@@ -506,20 +468,18 @@ the command contains. Closures are a wonderfully terse way of automatically
 wrapping up some state, but they can be so automatic that it&#8217;s hard to see what
 state they&#8217;re actually holding.</p>
 </aside>
-
 <p>For example, if we were building a game in JavaScript, we could create a move
 unit command just like this:</p>
-<div class="codehilite"><pre><span class="kd">function</span> <span class="nx">makeMoveUnitCommand</span><span class="p">(</span><span class="nx">unit</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+<div class="codehilite"><pre><span></span><code><span class="kd">function</span> <span class="nx">makeMoveUnitCommand</span><span class="p">(</span><span class="nx">unit</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// This function here is the command object:</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="nx">unit</span><span class="p">.</span><span class="nx">moveTo</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We could add support for undo as well using a pair of closures:</p>
-<div class="codehilite"><pre><span class="kd">function</span> <span class="nx">makeMoveUnitCommand</span><span class="p">(</span><span class="nx">unit</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+<div class="codehilite"><pre><span></span><code><span class="kd">function</span> <span class="nx">makeMoveUnitCommand</span><span class="p">(</span><span class="nx">unit</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">xBefore</span><span class="p">,</span> <span class="nx">yBefore</span><span class="p">;</span>
   <span class="k">return</span> <span class="p">{</span>
     <span class="nx">execute</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
@@ -532,8 +492,7 @@ unit command just like this:</p>
     <span class="p">}</span>
   <span class="p">};</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>If you&#8217;re comfortable with a functional style, this way of doing things is
 natural. If you aren&#8217;t, I hope this chapter helped you along the way a bit. For
@@ -564,11 +523,9 @@ functional paradigm is for many problems.</p>
     since all instances are equivalent. The <a class="gof-pattern"
     href="flyweight.html">Flyweight</a> pattern addresses that.</p>
 <aside name="singleton">
-
 <p>You could make it a <a href="singleton.html" class="gof-
 pattern">Singleton</a> too, but friends don&#8217;t let friends create singletons.</p>
 </aside>
-
 </li>
 </ul>
 <nav>
@@ -578,6 +535,6 @@ pattern">Singleton</a> too, but friends don&#8217;t let friends create singleton
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

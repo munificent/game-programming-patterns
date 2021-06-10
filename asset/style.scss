@@ -177,7 +177,7 @@ blockquote {
 code {
   color: hsl(200, 20%, 40%);
   font: normal 15px $mono;
-  white-space: nowrap;
+  white-space: pre;
 }
 
 a code {

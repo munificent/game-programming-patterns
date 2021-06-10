@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -41,10 +41,8 @@ covered, so ours will star a Danish <span name="baker">baker</span>, Bj&oslash;r
 stands to reason that we&#8217;ll have a class representing our friendly pastry chef,
 and it will contain everything he does in the game.</p>
 <aside name="baker">
-
 <p>Brilliant game ideas like this are why I&#8217;m a programmer and not a designer.</p>
 </aside>
-
 <p>Since the player controls him, that means reading controller input and
 translating that input into motion. And, of course, he needs to interact with the level,
 so some physics and collision go in there. Once that&#8217;s done, he&#8217;s got to show
@@ -68,18 +66,16 @@ collects <em>features</em>.</p>
 <p>Even worse than the simple scale problem is the <span name="coupling">coupling
 </span> one. All of the different systems in our game have been tied into a
 giant knotted ball of code like:</p>
-<div class="codehilite"><pre><span class="k">if</span> <span class="p">(</span><span class="n">collidingWithFloor</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">getRenderState</span><span class="p">()</span> <span class="o">!=</span> <span class="n">INVISIBLE</span><span class="p">))</span>
+<div class="codehilite"><pre><span></span><code><span class="k">if</span> <span class="p">(</span><span class="n">collidingWithFloor</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">getRenderState</span><span class="p">()</span> <span class="o">!=</span> <span class="n">INVISIBLE</span><span class="p">))</span>
 <span class="p">{</span>
   <span class="n">playSound</span><span class="p">(</span><span class="n">HIT_FLOOR</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Any programmer trying to make a change in code like that will need to know
 something about physics, graphics, and sound just to make sure they don&#8217;t break
 anything.</p>
 <aside name="coupling">
-
 <p>While coupling like this sucks in <em>any</em> game, it&#8217;s even worse on modern games
 that use concurrency. On multi-core hardware, it&#8217;s vital that code is running on
 multiple threads simultaneously. One common way to split a game across threads
@@ -91,7 +87,6 @@ an <code>UpdateSounds()</code> method that must be called from one thread and a
 <code>RenderGraphics()</code> method that must be called from another is begging for
 those kinds of bugs to happen.</p>
 </aside>
-
 <p>These two problems compound each other; the class touches so many domains that
 every programmer will have to work on it, but it&#8217;s so huge that doing so is a
 nightmare. If it gets bad enough, coders will start putting hacks in other parts
@@ -128,7 +123,6 @@ decorations but can be touched: boxes, boulders, and trees. <em>Zones</em> are t
 opposite of decorations&#8202;&mdash;&#8202;invisible but interactive. They&#8217;re useful for things
 like triggering a cutscene when Bj&oslash;rn enters an area.</p>
 <aside name="inheritance">
-
 <p>When object-oriented programming first hit the scene, inheritance was the
 shiniest tool in its toolbox. It was considered the ultimate code-reuse hammer,
 and coders swung it often. Since then, we&#8217;ve learned the hard way that it&#8217;s a
@@ -139,7 +133,6 @@ inheritance when possible. Instead of sharing code between two classes by having
 them <em>inherit</em> from the same class, we do so by having them both <em>own an
 instance</em> of the same class.</p>
 </aside>
-
 <p>Now, consider how we&#8217;d set up an inheritance hierarchy for those classes if we
 weren&#8217;t using components. A first pass might look like:</p>
 <p><img src="images/component-uml.png" alt="A class diagram. Zone has collision code and inherits from GameObject. Decoration also inherits from GameObject and has rendering code. Prop inherits from Zone but then has redundant rendering code." /></p>
@@ -150,13 +143,11 @@ orientation. <code>Zone</code> inherits from that and adds collision detection. 
 from <code>Decoration</code> to reuse the <em>rendering</em> code without running into the <span
 name="diamond">Deadly Diamond</span>.</p>
 <aside name="diamond">
-
 <p>The &#8220;Deadly Diamond&#8221; occurs in class hierarchies with multiple inheritance where
 there are two different paths to the same base class. The pain that causes is a
 bit out of the scope of this book, but understand that they named it
 &#8220;deadly&#8221; for a reason.</p>
 </aside>
-
 <p>We could flip things around so that <code>Prop</code> inherits from <code>Decoration</code>, but then
 we end up having to duplicate the <em>collision</em> code. Either way, there&#8217;s no clean
 way to reuse the collision and rendering code between the classes that need it
@@ -170,7 +161,6 @@ classes: <code>PhysicsComponent</code> and <code>GraphicsComponent</code>. A dec
 opposite, and a prop has both components. No code duplication, no multiple
 inheritance, and only three classes instead of four.</p>
 <aside name="menu">
-
 <p>A restaurant menu is a good analogy. If each entity is a monolithic class, it&#8217;s
 like you can only order combos. We need to have a separate class for each
 possible <em>combination</em> of features. To satisfy every customer, we would need
@@ -179,7 +169,6 @@ dozens of combos.</p>
 dishes they want, and the menu is a list of the dishes they can choose
 from.</p>
 </aside>
-
 <p>Components are basically plug-and-play for objects. They let us build complex
 entities with rich behavior by plugging different reusable component
 objects into sockets on the entity. Think software Voltron.</p>
@@ -188,7 +177,6 @@ objects into sockets on the entity. Think software Voltron.</p>
 code for each is placed in its own <strong><span name="component">component</span>
 class</strong>. The entity is reduced to a simple <strong>container of components</strong>.</p>
 <aside name="component">
-
 <p>&#8220;Component&#8221;, like &#8220;Object&#8221;, is one of those words that means everything and
 nothing in programming. Because of that, it&#8217;s been used to describe a few
 concepts. In business software, there&#8217;s a &#8220;Component&#8221; design pattern that
@@ -199,7 +187,6 @@ about documenting existing practices, I don&#8217;t have the luxury of coining a
 term. So, following in the footsteps of XNA, Delta3D, and others, &#8220;Component&#8221; it
 is.</p>
 </aside>
-
 <h2><a href="#when-to-use-it" name="when-to-use-it">When to Use It</a></h2>
 <p>Components are most commonly found within the core class that defines the
 entities in a game, but they may be useful in other places as well. This pattern can
@@ -233,13 +220,11 @@ have to get the component you want, <em>then</em> you can do what you need. In <
 name="perf">performance</span>-critical inner loops, this pointer following may
 lead to poor performance.</p>
 <aside name="perf">
-
 <p>There&#8217;s a flip side to this coin. The Component pattern can often <em>improve</em>
 performance and cache coherence. Components make it easier to use the <a
 class="pattern" href="data-locality.html"> Data Locality</a> pattern to organize
 your data in the order that the CPU wants it.</p>
 </aside>
-
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>One of the biggest challenges for me in writing this book is figuring out how to
 isolate each pattern. Many design patterns exist to contain code that itself
@@ -258,7 +243,6 @@ we&#8217;re going for.</p>
 a monolithic <span name="cat"><code>Bjorn</code></span> class that does everything we need
 but <em>doesn&#8217;t</em> use this pattern:</p>
 <aside name="cat">
-
 <p>I should point out that using the actual name of the character in the codebase
 is usually a bad idea. The marketing department has an annoying habit of
 demanding name changes days before you ship. &#8220;Focus tests show males between 11
@@ -268,10 +252,9 @@ instead.&#8221;</p>
 because it&#8217;s more fun to tell people you&#8217;re working on &#8220;Big Electric Cat&#8221; than
 just &#8220;the next version of Photoshop.&#8221;</p>
 </aside>
-
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Bjorn</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Bjorn</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Bjorn</span><span class="p">()</span>
   <span class="o">:</span> <span class="n">velocity_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
     <span class="n">x_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">y_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -279,7 +262,7 @@ just &#8220;the next version of Photoshop.&#8221;</p>
 
   <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">);</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">WALK_ACCELERATION</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 
   <span class="kt">int</span> <span class="n">velocity_</span><span class="p">;</span>
@@ -291,22 +274,21 @@ just &#8220;the next version of Photoshop.&#8221;</p>
   <span class="n">Sprite</span> <span class="n">spriteWalkLeft_</span><span class="p">;</span>
   <span class="n">Sprite</span> <span class="n">spriteWalkRight_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><code>Bjorn</code> has an <code>update()</code> method that gets called once per frame by the game:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Bjorn</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Bjorn::update</span><span class="p">(</span><span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Apply user input to hero&#39;s velocity.</span>
   <span class="k">switch</span> <span class="p">(</span><span class="n">Controller</span><span class="o">::</span><span class="n">getJoystickDirection</span><span class="p">())</span>
   <span class="p">{</span>
-    <span class="k">case</span> <span class="n">DIR_LEFT</span>:
-    <span class="n">velocity_</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
-    <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="nl">DIR_LEFT</span><span class="p">:</span>
+      <span class="n">velocity_</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
+      <span class="k">break</span><span class="p">;</span>
 
-    <span class="k">case</span> <span class="n">DIR_RIGHT</span>:
-    <span class="n">velocity_</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
-    <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="nl">DIR_RIGHT</span><span class="p">:</span>
+      <span class="n">velocity_</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
+      <span class="k">break</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="c1">// Modify position by velocity.</span>
@@ -326,8 +308,7 @@ just &#8220;the next version of Photoshop.&#8221;</p>
 
   <span class="n">graphics</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="o">*</span><span class="n">sprite</span><span class="p">,</span> <span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>It reads the joystick to determine how to accelerate the baker. Then it resolves
 its new position with the physics engine. Finally, it draws Bj&oslash;rn onto the
@@ -343,35 +324,34 @@ can get an idea of how painful it can become.</p>
 separate component class. We&#8217;ll start with the first domain that gets processed:
 input. The first thing <code>Bjorn</code> does is read in user input and adjust his
 velocity based on it. Let&#8217;s move that logic out into a separate class:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">InputComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">InputComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Bjorn</span><span class="o">&amp;</span> <span class="n">bjorn</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">switch</span> <span class="p">(</span><span class="n">Controller</span><span class="o">::</span><span class="n">getJoystickDirection</span><span class="p">())</span>
     <span class="p">{</span>
-      <span class="k">case</span> <span class="n">DIR_LEFT</span>:
+      <span class="k">case</span> <span class="nl">DIR_LEFT</span><span class="p">:</span>
         <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
         <span class="k">break</span><span class="p">;</span>
 
-      <span class="k">case</span> <span class="n">DIR_RIGHT</span>:
+      <span class="k">case</span> <span class="nl">DIR_RIGHT</span><span class="p">:</span>
         <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
         <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">WALK_ACCELERATION</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Pretty simple. We&#8217;ve taken the first section of <code>Bjorn</code>&rsquo;s <code>update()</code>
 method and put it into this class. The changes to <code>Bjorn</code> are also
 straightforward:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Bjorn</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Bjorn</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">velocity</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
 
@@ -397,7 +377,7 @@ straightforward:</p>
     <span class="n">graphics</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="o">*</span><span class="n">sprite</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">InputComponent</span> <span class="n">input_</span><span class="p">;</span>
 
   <span class="n">Volume</span> <span class="n">volume_</span><span class="p">;</span>
@@ -406,14 +386,12 @@ straightforward:</p>
   <span class="n">Sprite</span> <span class="n">spriteWalkLeft_</span><span class="p">;</span>
   <span class="n">Sprite</span> <span class="n">spriteWalkRight_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><code>Bjorn</code> now owns an <code>InputComponent</code> object. Where before he was handling user
 input directly in the <code>update()</code> method, now he delegates to the component:</p>
-<div class="codehilite"><pre><span class="n">input_</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">input_</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
+</code></pre></div>
 
 <p>We&#8217;ve only started, but already we&#8217;ve gotten rid of some coupling&#8202;&mdash;&#8202;the main
 <code>Bjorn</code> class no longer has any reference to <code>Controller</code>. This will come in
@@ -421,9 +399,9 @@ handy later.</p>
 <h3><a href="#splitting-out-the-rest" name="splitting-out-the-rest">Splitting out the rest</a></h3>
 <p>Now, let&#8217;s go ahead and do the same cut-and-paste job on the physics and graphics
 code. Here&#8217;s our new <code>PhysicsComponent</code>:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">PhysicsComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">PhysicsComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Bjorn</span><span class="o">&amp;</span> <span class="n">bjorn</span><span class="p">,</span> <span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">bjorn</span><span class="p">.</span><span class="n">x</span> <span class="o">+=</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span><span class="p">;</span>
@@ -431,19 +409,18 @@ code. Here&#8217;s our new <code>PhysicsComponent</code>:</p>
         <span class="n">bjorn</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span><span class="p">);</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Volume</span> <span class="n">volume_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>In addition to moving the physics <em>behavior</em> out of the main <code>Bjorn</code> class, you
 can see we&#8217;ve also moved out the <em>data</em> too: The <code>Volume</code> object is now owned by
 the component.</p>
 <p>Last but not least, here&#8217;s where the rendering code lives now:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">GraphicsComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">GraphicsComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Bjorn</span><span class="o">&amp;</span> <span class="n">bjorn</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">Sprite</span><span class="o">*</span> <span class="n">sprite</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">spriteStand_</span><span class="p">;</span>
@@ -459,19 +436,18 @@ the component.</p>
     <span class="n">graphics</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="o">*</span><span class="n">sprite</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">bjorn</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Sprite</span> <span class="n">spriteStand_</span><span class="p">;</span>
   <span class="n">Sprite</span> <span class="n">spriteWalkLeft_</span><span class="p">;</span>
   <span class="n">Sprite</span> <span class="n">spriteWalkRight_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We&#8217;ve yanked almost everything out, so what&#8217;s left of our humble pastry chef?
 Not much:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Bjorn</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Bjorn</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">velocity</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
 
@@ -482,13 +458,12 @@ Not much:</p>
     <span class="n">graphics_</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">graphics</span><span class="p">);</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">InputComponent</span> <span class="n">input_</span><span class="p">;</span>
   <span class="n">PhysicsComponent</span> <span class="n">physics_</span><span class="p">;</span>
   <span class="n">GraphicsComponent</span> <span class="n">graphics_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The <code>Bjorn</code> class now basically does two things: it holds the set of components
 that actually define it, and it holds the state that is shared across multiple
@@ -505,45 +480,43 @@ haven&#8217;t <em>abstracted</em> the behavior out. <code>Bjorn</code> still kno
 classes where his behavior is defined. Let&#8217;s change that.</p>
 <p>We&#8217;ll take our component for handling user input and hide it behind an
 interface. We&#8217;ll turn <code>InputComponent</code> into an abstract base class:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">InputComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">InputComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">InputComponent</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Bjorn</span><span class="o">&amp;</span> <span class="n">bjorn</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Then, we&#8217;ll take our existing user input handling code and push it down into a
 class that implements that interface:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">PlayerInputComponent</span> <span class="o">:</span> <span class="k">public</span> <span class="n">InputComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">PlayerInputComponent</span> <span class="o">:</span> <span class="k">public</span> <span class="n">InputComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Bjorn</span><span class="o">&amp;</span> <span class="n">bjorn</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">switch</span> <span class="p">(</span><span class="n">Controller</span><span class="o">::</span><span class="n">getJoystickDirection</span><span class="p">())</span>
     <span class="p">{</span>
-      <span class="k">case</span> <span class="n">DIR_LEFT</span>:
+      <span class="k">case</span> <span class="nl">DIR_LEFT</span><span class="p">:</span>
         <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">-=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
         <span class="k">break</span><span class="p">;</span>
 
-      <span class="k">case</span> <span class="n">DIR_RIGHT</span>:
+      <span class="k">case</span> <span class="nl">DIR_RIGHT</span><span class="p">:</span>
         <span class="n">bjorn</span><span class="p">.</span><span class="n">velocity</span> <span class="o">+=</span> <span class="n">WALK_ACCELERATION</span><span class="p">;</span>
         <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">WALK_ACCELERATION</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We&#8217;ll change <code>Bjorn</code> to hold a pointer to the input component instead of having
 an inline instance:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Bjorn</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Bjorn</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">velocity</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
 
@@ -558,19 +531,17 @@ an inline instance:</p>
     <span class="n">graphics_</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">graphics</span><span class="p">);</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">InputComponent</span><span class="o">*</span> <span class="n">input_</span><span class="p">;</span>
   <span class="n">PhysicsComponent</span> <span class="n">physics_</span><span class="p">;</span>
   <span class="n">GraphicsComponent</span> <span class="n">graphics_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, when we instantiate <code>Bjorn</code>, we can pass in an input component for it to
 use, like so:</p>
-<div class="codehilite"><pre><span class="n">Bjorn</span><span class="o">*</span> <span class="n">bjorn</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Bjorn</span><span class="p">(</span><span class="k">new</span> <span class="n">PlayerInputComponent</span><span class="p">());</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">Bjorn</span><span class="o">*</span> <span class="n">bjorn</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Bjorn</span><span class="p">(</span><span class="k">new</span> <span class="n">PlayerInputComponent</span><span class="p">());</span>
+</code></pre></div>
 
 <p>This instance can be any concrete type that implements our abstract
 <code>InputComponent</code> interface. We pay a price for this&#8202;&mdash;&#8202;<code>update()</code> is now a virtual
@@ -583,22 +554,20 @@ on a kiosk in a store.</p>
 <p>Hiding the input component class behind an interface lets us get that working.
 We already have our concrete <code>PlayerInputComponent</code> that&#8217;s normally used when
 playing the game. Now, let&#8217;s make another one:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">DemoInputComponent</span> <span class="o">:</span> <span class="k">public</span> <span class="n">InputComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">DemoInputComponent</span> <span class="o">:</span> <span class="k">public</span> <span class="n">InputComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Bjorn</span><span class="o">&amp;</span> <span class="n">bjorn</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// AI to automatically control Bjorn...</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>When the game goes into demo mode, instead of constructing Bj&oslash;rn like we did
 earlier, we&#8217;ll wire him up with our new component:</p>
-<div class="codehilite"><pre><span class="n">Bjorn</span><span class="o">*</span> <span class="n">bjorn</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Bjorn</span><span class="p">(</span><span class="k">new</span> <span class="n">DemoInputComponent</span><span class="p">());</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">Bjorn</span><span class="o">*</span> <span class="n">bjorn</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Bjorn</span><span class="p">(</span><span class="k">new</span> <span class="n">DemoInputComponent</span><span class="p">());</span>
+</code></pre></div>
 
 <p>And now, just by swapping out a component, we&#8217;ve got a fully functioning
 computer-controlled player for demo mode. We&#8217;re able to reuse all of the other
@@ -606,10 +575,8 @@ code for Bj&oslash;rn&#8202;&mdash;&#8202;physics and graphics don&#8217;t even 
 Maybe I&#8217;m a bit strange, but it&#8217;s stuff like this that gets me up in the <span
 name="coffee">morning</span>.</p>
 <aside name="coffee">
-
 <p>That, and coffee. Sweet, steaming hot coffee.</p>
 </aside>
-
 <h3><a href="#no-bj&oslash;rn-at-all" name="no-bj&oslash;rn-at-all">No Bj&oslash;rn at all?</a></h3>
 <p>If you look at our <code>Bjorn</code> class now, you&#8217;ll notice there&#8217;s nothing really
 &#8220;Bj&oslash;rn&#8221; about it&#8202;&mdash;&#8202;it&#8217;s just a component bag. In fact, it looks like a pretty
@@ -618,27 +585,26 @@ in the game. All we need to do is pass in <em>all</em> the components, and we ca
 any kind of object by picking and choosing parts like Dr. Frankenstein.</p>
 <p>Let&#8217;s take our two remaining concrete components&#8202;&mdash;&#8202;physics and graphics&#8202;&mdash;&#8202;and
 hide them behind interfaces like we did with input:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">PhysicsComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">PhysicsComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">PhysicsComponent</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">GameObject</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">,</span> <span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">GraphicsComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">GraphicsComponent</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">GameObject</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Then we re-christen <code>Bjorn</code> into a <span name="id">generic</span> <code>GameObject</code>
 class that uses those interfaces:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">GameObject</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">GameObject</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">velocity</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
 
@@ -657,16 +623,14 @@ class that uses those interfaces:</p>
     <span class="n">graphics_</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">graphics</span><span class="p">);</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">InputComponent</span><span class="o">*</span> <span class="n">input_</span><span class="p">;</span>
   <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics_</span><span class="p">;</span>
   <span class="n">GraphicsComponent</span><span class="o">*</span> <span class="n">graphics_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="id">
-
 <p>Some component systems take this even further. Instead of a <code>GameObject</code> that
 contains its components, the game entity is just an ID, a number. Then, you
 maintain separate collections of components where each one knows the ID of the
@@ -677,11 +641,10 @@ components to the extreme and let you add new components to an entity without
 the entity even knowing. The <a href="data-locality.html" class="pattern">Data
 Locality</a> chapter has more details.</p>
 </aside>
-
 <p>Our existing concrete classes will get renamed and implement those interfaces:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">BjornPhysicsComponent</span> <span class="o">:</span> <span class="k">public</span> <span class="n">PhysicsComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">BjornPhysicsComponent</span> <span class="o">:</span> <span class="k">public</span> <span class="n">PhysicsComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">GameObject</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">,</span> <span class="n">World</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Physics code...</span>
@@ -690,34 +653,30 @@ Locality</a> chapter has more details.</p>
 
 <span class="k">class</span> <span class="nc">BjornGraphicsComponent</span> <span class="o">:</span> <span class="k">public</span> <span class="n">GraphicsComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">GameObject</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">,</span> <span class="n">Graphics</span><span class="o">&amp;</span> <span class="n">graphics</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Graphics code...</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>And now we can build an object that has all of Bj&oslash;rn&#8217;s original behavior without
 having to actually create a class for him, just like this:</p>
 <p><span name="factory"></span></p>
-<div class="codehilite"><pre><span class="n">GameObject</span><span class="o">*</span> <span class="nf">createBjorn</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="n">GameObject</span><span class="o">*</span> <span class="nf">createBjorn</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">return</span> <span class="k">new</span> <span class="n">GameObject</span><span class="p">(</span><span class="k">new</span> <span class="n">PlayerInputComponent</span><span class="p">(),</span>
                         <span class="k">new</span> <span class="n">BjornPhysicsComponent</span><span class="p">(),</span>
                         <span class="k">new</span> <span class="n">BjornGraphicsComponent</span><span class="p">());</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="factory">
-
 <p>This <code>createBjorn()</code> function is, of course, an example of the classic Gang of
 Four <a class="gof-pattern" href="http://c2.com/cgi/wiki?FactoryMethod">Factory
 Method</a> pattern.</p>
 </aside>
-
 <p>By defining other functions that instantiate <code>GameObjects</code> with different
 components, we can create all of the different kinds of objects our game needs.</p>
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
@@ -814,13 +773,11 @@ frame, not this one. If you imagine several more components and lots
 more code, then you can get an idea of how hard it can be to avoid bugs
 like this.</p>
 <aside name="pure">
-
 <p>Shared mutable state like this where lots of code is reading and writing
 the same data is notoriously hard to get right. That&#8217;s a big part of why
 academics are spending time researching pure functional languages like
 Haskell where there is no mutable state at all.</p>
 </aside>
-
 </li>
 </ul>
 </li>
@@ -834,9 +791,9 @@ he should be drawn using a jump sprite or not. It can determine this by
 asking the physics engine if he&#8217;s currently on the ground. An easy way
 to do this is by letting the graphics component know about the physics
 component directly:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">BjornGraphicsComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">BjornGraphicsComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">BjornGraphicsComponent</span><span class="p">(</span><span class="n">BjornPhysicsComponent</span><span class="o">*</span> <span class="n">physics</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">physics_</span><span class="p">(</span><span class="n">physics</span><span class="p">)</span>
   <span class="p">{}</span>
@@ -856,7 +813,7 @@ component directly:</p>
     <span class="n">graphics</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="o">*</span><span class="n">sprite</span><span class="p">,</span> <span class="n">obj</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">obj</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">BjornPhysicsComponent</span><span class="o">*</span> <span class="n">physics_</span><span class="p">;</span>
 
   <span class="n">Sprite</span> <span class="n">spriteStand_</span><span class="p">;</span>
@@ -864,8 +821,7 @@ component directly:</p>
   <span class="n">Sprite</span> <span class="n">spriteWalkRight_</span><span class="p">;</span>
   <span class="n">Sprite</span> <span class="n">spriteJump_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>When we construct Bj&oslash;rn&#8217;s <code>GraphicsComponent</code>, we&#8217;ll give it a reference
 to his corresponding <code>PhysicsComponent</code>.</p>
@@ -893,23 +849,22 @@ to his corresponding <code>PhysicsComponent</code>.</p>
     broadcast information to each other.</p>
 <p>Here&#8217;s one possible implementation. We&#8217;ll start by defining a base
 <code>Component</code> interface that all of our components will implement:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Component</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Component</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Component</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">receive</span><span class="p">(</span><span class="kt">int</span> <span class="n">message</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>It has a single <code>receive()</code> method that component classes implement in
 order to listen to an incoming message. Here, we&#8217;re just using an <code>int</code>
 to identify the message, but a fuller implementation could attach
 additional data to the message.</p>
 <p>Then, we&#8217;ll add a method to our container object for sending messages:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">ContainerObject</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">ContainerObject</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">send</span><span class="p">(</span><span class="kt">int</span> <span class="n">message</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">MAX_COMPONENTS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
@@ -921,26 +876,23 @@ additional data to the message.</p>
     <span class="p">}</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">MAX_COMPONENTS</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
   <span class="n">Component</span><span class="o">*</span> <span class="n">components_</span><span class="p">[</span><span class="n">MAX_COMPONENTS</span><span class="p">];</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><span name="queue">Now</span>, if a component has access to its
 container, it can send messages to the container, which will
 rebroadcast the message to all of the contained components. (That
-inclues the original component that sent the message; be careful that
+includes the original component that sent the message; be careful that
 you don&#8217;t get stuck in a feedback loop!) This has a couple of
 consequences:</p>
 <aside name="queue">
-
 <p>If you really want to get fancy, you can even make this message system
 <em>queue</em> messages to be delivered later. For more on this, see <a
 href="event-queue.html" class="pattern">Event Queue</a>.</p>
 </aside>
-
 </li>
 <li>
 <p><em>Sibling components are decoupled.</em> By going <span
@@ -949,14 +901,12 @@ href="event-queue.html" class="pattern">Event Queue</a>.</p>
     decoupled from each other. With this system, the only coupling they have
     is the message values themselves.</p>
 <aside name="mediator">
-
 <p>The Gang of Four call this the <a class="gof-pattern"
 href="http://c2.com/cgi-bin/wiki?MediatorPattern">Mediator</a> pattern &#8212;
 two or more objects communicate with each other indirectly by routing
 the message through an intermediate object. In this case, the container
 object itself is the mediator.</p>
 </aside>
-
 </li>
 <li>
 <p><em>The container object is simple.</em> Unlike using shared state where the
@@ -986,7 +936,7 @@ communication paths if you need them.</p>
 <ul>
 <li>
 <p>The <a href="http://unity3d.com">Unity</a> framework&#8217;s core <a href="http://docs.unity3d.com/Documentation/Manual/GameObjects.html"><code>GameObject</code></a> class is designed
-    entirely around <a href="http://docs.unity3d.com/Documentation/Manual/UsingComponents40.html">components</a>.</p>
+    entirely around <a href="http://docs.unity3d.com/Manual/UsingComponents.html">components</a>.</p>
 </li>
 <li>
 <p>The open source <a href="http://www.delta3d.org">Delta3D</a> engine has a base
@@ -1023,6 +973,6 @@ strategy.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

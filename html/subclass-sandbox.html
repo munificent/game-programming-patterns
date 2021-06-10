@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -46,7 +46,6 @@ name="lots">derived</span> class that implements each superpower. We&#8217;ll di
 the design doc among our team of programmers and get coding. When we&#8217;re done,
 we&#8217;ll have a hundred superpower classes.</p>
 <aside name="lots">
-
 <p>When you find yourself with a <em>lot</em> of subclasses, like in this example, that
 often means a data-driven approach is better. Instead of lots of <em>code</em> for
 defining different powers, try finding a way to define that behavior in <em>data</em>
@@ -56,7 +55,6 @@ class="pattern" href="bytecode.html">Bytecode</a>, and <a class="gof-pattern"
 href="http://en.wikipedia.org/wiki/Interpreter_pattern">Interpreter</a> can all
 help.</p>
 </aside>
-
 <p>We want to immerse our players in a world teeming with variety. Whatever power
 they dreamed up when they were a kid, we want in our game. That means these
 superpower subclasses will be able to do just about everything: play sounds,
@@ -137,13 +135,11 @@ class with a lot of direct subclasses, we have a point of leverage in our
 codebase. Time and love that we put into <code>Superpower</code> can benefit a wide set of
 classes in the game.</p>
 <aside name="wide">
-
 <p>Lately, you find a lot of people criticizing inheritance in object-oriented
 languages. Inheritance <em>is</em> problematic&#8202;&mdash;&#8202;there&#8217;s really no deeper coupling in
 a codebase than the one between a base class and its subclass&#8202;&mdash;&#8202;but I find
 <em>wide</em> inheritance trees to be easier to work with than <em>deep</em> ones.</p>
 </aside>
-
 <h2><a href="#the-pattern" name="the-pattern">The Pattern</a></h2>
 <p>A <strong>base class</strong> defines an abstract <strong>sandbox method</strong> and several <strong>provided
 operations</strong>. Marking them protected makes it clear that they are for use by
@@ -193,12 +189,12 @@ class="pattern" href="component.html">Component</a> pattern can help here.</p>
 doesn&#8217;t mean it isn&#8217;t useful&#8202;&mdash;&#8202;the pattern is about the <em>intent</em>, not the
 complexity of its implementation.</p>
 <p>We&#8217;ll start with our <code>Superpower</code> base class:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Superpower</span><span class="p">()</span> <span class="p">{}</span>
 
-<span class="nl">protected:</span>
+<span class="k">protected</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">activate</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
   <span class="kt">void</span> <span class="nf">move</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">z</span><span class="p">)</span>
@@ -216,8 +212,7 @@ complexity of its implementation.</p>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The <code>activate()</code> method is the sandbox method. Since it is virtual and abstract,
 subclasses <em>must</em> override it. This makes it clear to someone creating a power
@@ -232,9 +227,9 @@ will talk to the audio engine, etc. Since this is all in the <em>implementation<
 the base class, it keeps that coupling encapsulated within <code>Superpower</code> itself.</p>
 <p>OK, now let&#8217;s get our radioactive spiders out and create a power. Here&#8217;s one:</p>
 <p><span name="jump"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">SkyLaunch</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Superpower</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">SkyLaunch</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Superpower</span>
 <span class="p">{</span>
-<span class="nl">protected:</span>
+<span class="k">protected</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">activate</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="c1">// Spring into the air.</span>
@@ -243,15 +238,12 @@ the base class, it keeps that coupling encapsulated within <code>Superpower</cod
     <span class="n">move</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="jump">
-
 <p>OK, maybe being able to <em>jump</em> isn&#8217;t all that <em>super</em>, but I&#8217;m trying to keep
 things basic here.</p>
 </aside>
-
 <p>This power springs the superhero into the air, playing an appropriate sound and
 kicking up a little cloud of dust. If all of the superpowers were this simple &#8212;
 just a combination of sound, particle effect, and motion&#8202;&mdash;&#8202;then we wouldn&#8217;t
@@ -259,9 +251,9 @@ need this pattern at all. Instead, <code>Superpower</code> could have a baked-in
 implementation of <code>activate()</code> that accesses fields for the sound ID, particle
 type, and movement. But that only works when every power essentially works the
 same way with only some differences in data. Let&#8217;s elaborate on it a bit:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
-<span class="nl">protected:</span>
+<span class="k">protected</span><span class="o">:</span>
   <span class="kt">double</span> <span class="n">getHeroX</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
@@ -279,14 +271,13 @@ same way with only some differences in data. Let&#8217;s elaborate on it a bit:<
 
   <span class="c1">// Existing stuff...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Here, we&#8217;ve added a couple of methods to get the hero&#8217;s position. Our
 <code>SkyLaunch</code> subclass can now use those:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">SkyLaunch</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Superpower</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">SkyLaunch</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Superpower</span>
 <span class="p">{</span>
-<span class="nl">protected:</span>
+<span class="k">protected</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">activate</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">getHeroZ</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
@@ -300,7 +291,7 @@ same way with only some differences in data. Let&#8217;s elaborate on it a bit:<
     <span class="p">{</span>
       <span class="c1">// Near the ground, so do a double jump.</span>
       <span class="n">playSound</span><span class="p">(</span><span class="n">SOUND_SWOOP</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">);</span>
-      <span class="n">move</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">getHeroZ</span><span class="p">()</span> <span class="o">-</span> <span class="mi">20</span><span class="p">);</span>
+      <span class="n">move</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">getHeroZ</span><span class="p">()</span> <span class="o">+</span> <span class="mi">20</span><span class="p">);</span>
     <span class="p">}</span>
     <span class="k">else</span>
     <span class="p">{</span>
@@ -311,8 +302,7 @@ same way with only some differences in data. Let&#8217;s elaborate on it a bit:<
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Since we have access to some state, now our sandbox method can do actual,
 interesting control flow. Here, it&#8217;s still just a couple of simple <code>if</code>
@@ -320,12 +310,10 @@ statements, but you can do <span name="data">anything</span> you want. By having
 the sandbox method be an actual full-fledged method that contains arbitrary
 code, the sky&#8217;s the limit.</p>
 <aside name="data">
-
 <p>Earlier, I suggested a data-driven approach for powers. This is one reason why
 you may decide <em>not</em> to do that. If your behavior is complex and imperative,
 it is more difficult to define in data.</p>
 </aside>
-
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>As you can see, Subclass Sandbox is a fairly &#8220;soft&#8221; pattern. It describes a basic idea, but
 it doesn&#8217;t have a lot of detailed mechanics. That means you&#8217;ll be making some
@@ -341,11 +329,9 @@ name="include"><em>every</em></span> operation that a subclass may need. Subclas
 <em>only</em> coupled to the base class and don&#8217;t call into any outside systems
 whatsoever.</p>
 <aside name="include">
-
 <p>Concretely, this means each source file for a subclass would only need a single
 <code>#include</code>&#8202;&mdash;&#8202;the one for its base class.</p>
 </aside>
-
 <p>Between these two points, there&#8217;s a wide middle ground where some operations are
 provided by the base class and others are accessed directly from the outside
 system that defines it. The more operations you provide, the less coupled
@@ -372,7 +358,6 @@ special case subclasses call out to the external systems directly.</p>
     it&#8217;s a <span name="safe">&#8220;safe&#8221;</span> coupling because it can&#8217;t break
     anything in the game.</p>
 <aside name="safe">
-
 <p>&#8220;Safe&#8221; is in quotes here because technically, even just accessing data can
 cause problems. If your game is multi-threaded, you could read something at
 the same time that it&#8217;s being modified. If you aren&#8217;t careful, you could end up
@@ -382,7 +367,6 @@ many online games are in order to keep players in sync). If you access
 something outside of the set of synchronized game state, you can cause
 incredibly painful non-determinism bugs.</p>
 </aside>
-
 <p>Calls that do modify state, on the other hand, more deeply tie you to those
 parts of the codebase, and you need to be much more cognizant of that. That
 makes them good candidates for being rolled up into provided operations in
@@ -395,12 +379,11 @@ the more visible base class.</p>
 <p>However, even simple forwarding can still be useful&#8202;&mdash;&#8202;those methods often
 access state that the base class doesn&#8217;t want to directly expose to
 subclasses. For example, let&#8217;s say <code>Superpower</code> provided this:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">double</span> <span class="n">volume</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">double</span> <span class="n">volume</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">soundEngine_</span><span class="p">.</span><span class="n">play</span><span class="p">(</span><span class="n">sound</span><span class="p">,</span> <span class="n">volume</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>It&#8217;s just forwarding the call to some <code>soundEngine_</code> field in <code>Superpower</code>.
 The advantage, though, is that it keeps that field encapsulated in
@@ -414,9 +397,9 @@ some of those methods over to other classes. The provided operations in the base
 class then just return one of those objects.</p>
 <p>For example, to let a power play sounds, we could add these directly to
 <code>Superpower</code>:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
-<span class="nl">protected:</span>
+<span class="k">protected</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">double</span> <span class="n">volume</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
@@ -434,36 +417,34 @@ class then just return one of those objects.</p>
 
   <span class="c1">// Sandbox method and other operations...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>But if <code>Superpower</code> is already getting large and unwieldy, we might want to
 avoid that. Instead, we create a <code>SoundPlayer</code> class that exposes that
 functionality:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">SoundPlayer</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">SoundPlayer</span>
 <span class="p">{</span>
-  <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">double</span> <span class="n">volume</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="nf">playSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">,</span> <span class="kt">double</span> <span class="n">volume</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>
 
-  <span class="kt">void</span> <span class="n">stopSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="nf">stopSound</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>
 
-  <span class="kt">void</span> <span class="n">setVolume</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="nf">setVolume</span><span class="p">(</span><span class="n">SoundId</span> <span class="n">sound</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Code here...</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Then <code>Superpower</code> provides access to it:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
-<span class="nl">protected:</span>
+<span class="k">protected</span><span class="o">:</span>
   <span class="n">SoundPlayer</span><span class="o">&amp;</span> <span class="n">getSoundPlayer</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="k">return</span> <span class="n">soundPlayer_</span><span class="p">;</span>
@@ -471,11 +452,10 @@ functionality:</p>
 
   <span class="c1">// Sandbox method and other operations...</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">SoundPlayer</span> <span class="n">soundPlayer_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Shunting provided operations into auxiliary classes like this can do a few
 things for you:</p>
@@ -510,32 +490,30 @@ particle system object, how would it get one?</p>
 <p><strong>Pass it to the base class constructor:</strong></p>
 <p>The simplest solution is to have the base class take it as a constructor
 argument:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Superpower</span><span class="p">(</span><span class="n">ParticleSystem</span><span class="o">*</span> <span class="n">particles</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">particles_</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
   <span class="p">{}</span>
 
   <span class="c1">// Sandbox method and other operations...</span>
 
-<span class="nl">private:</span>
-  <span class="n">ParticleSystem</span><span class="o">*</span> <span class="n">particles_</span><span class="p">;</span>    
+<span class="k">private</span><span class="o">:</span>
+  <span class="n">ParticleSystem</span><span class="o">*</span> <span class="n">particles_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This safely ensures that every superpower does have a particle system by the
 time it&#8217;s constructed. But let&#8217;s look at a derived class:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">SkyLaunch</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Superpower</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">SkyLaunch</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Superpower</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">SkyLaunch</span><span class="p">(</span><span class="n">ParticleSystem</span><span class="o">*</span> <span class="n">particles</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">Superpower</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
   <span class="p">{}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Here we see the problem. Every derived class will need to have a constructor
 that calls the base class one and passes along that argument. That exposes
@@ -551,10 +529,9 @@ have to be modified to pass it along.</p>
 initialization into two steps. The constructor will take no parameters and
 just create the object. Then, we call a separate method defined directly on
 the base class to pass in the rest of the data that it needs:</p>
-<div class="codehilite"><pre><span class="n">Superpower</span><span class="o">*</span> <span class="n">power</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SkyLaunch</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Superpower</span><span class="o">*</span> <span class="n">power</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SkyLaunch</span><span class="p">();</span>
 <span class="n">power</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="n">particles</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Note here that since we aren&#8217;t passing anything into the constructor for
 <code>SkyLaunch</code>, it isn&#8217;t coupled to anything we want to keep private in
@@ -564,23 +541,20 @@ have a power that&#8217;s in some twilight half-created state and won&#8217;t wo
 <p>You can fix that by encapsulating the entire process into a single function,
 like so:</p>
 <p><span name="friend"></span></p>
-<div class="codehilite"><pre><span class="n">Superpower</span><span class="o">*</span> <span class="nf">createSkyLaunch</span><span class="p">(</span><span class="n">ParticleSystem</span><span class="o">*</span> <span class="n">particles</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Superpower</span><span class="o">*</span> <span class="nf">createSkyLaunch</span><span class="p">(</span><span class="n">ParticleSystem</span><span class="o">*</span> <span class="n">particles</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">Superpower</span><span class="o">*</span> <span class="n">power</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SkyLaunch</span><span class="p">();</span>
   <span class="n">power</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="n">particles</span><span class="p">);</span>
   <span class="k">return</span> <span class="n">power</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="friend">
-
 <p>With a little trickery like private constructors and friend classes, you can
 ensure this <code>createSkylaunch()</code> function is the <em>only</em> function that can
 actually create powers. That way, you can&#8217;t forget any of the initialization
 stages.</p>
 </aside>
-
 </li>
 <li>
 <p><strong>Make the state static:</strong></p>
@@ -594,17 +568,15 @@ it <span name="singleton"><em>static</em></span>. The game will still have to ma
 sure that it initializes the state, but it only has to initialize the
 <code>Superpower</code> <em>class</em> once for the entire game, and not each instance.</p>
 <aside name="singleton">
-
 <p>Keep in mind that this still has many of the problems of a singleton. You&#8217;ve
 got some state shared between lots and lots of objects (all of the
 <code>Superpower</code> instances). The particle system is encapsulated, so it isn&#8217;t
 globally <em>visible</em>, which is good, but it can still make reasoning about
 powers harder because they can all poke at the same object.</p>
 </aside>
-
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">static</span> <span class="kt">void</span> <span class="n">init</span><span class="p">(</span><span class="n">ParticleSystem</span><span class="o">*</span> <span class="n">particles</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">particles_</span> <span class="o">=</span> <span class="n">particles</span><span class="p">;</span>
@@ -612,11 +584,10 @@ powers harder because they can all poke at the same object.</p>
 
   <span class="c1">// Sandbox method and other operations...</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="n">ParticleSystem</span><span class="o">*</span> <span class="n">particles_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Note here that <code>init()</code> and <code>particles_</code> are both static. As long as the
 game calls <code>Superpower::init()</code> once early on, every power can access the
@@ -634,9 +605,9 @@ burden of initialization on the surrounding code. Another option is to let
 the base class handle it by pulling in the state it needs. One way to do
 that is by using the <a class="pattern" href="service-locator.html">Service
 Locator</a> pattern:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Superpower</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Superpower</span>
 <span class="p">{</span>
-<span class="nl">protected:</span>
+<span class="k">protected</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">spawnParticles</span><span class="p">(</span><span class="n">ParticleType</span> <span class="n">type</span><span class="p">,</span> <span class="kt">int</span> <span class="n">count</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">ParticleSystem</span><span class="o">&amp;</span> <span class="n">particles</span> <span class="o">=</span> <span class="n">Locator</span><span class="o">::</span><span class="n">getParticles</span><span class="p">();</span>
@@ -645,8 +616,7 @@ Locator</a> pattern:</p>
 
   <span class="c1">// Sandbox method and other operations...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Here, <code>spawnParticles()</code> needs a particle system. Instead of being <em>given</em>
 one by outside code, it fetches one itself from the service locator.</p>
@@ -682,6 +652,6 @@ one by outside code, it fetches one itself from the service locator.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

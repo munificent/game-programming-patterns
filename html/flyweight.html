@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -58,9 +58,9 @@ to the GPU.</p>
 <li>Tuning parameters like size and tint so that each tree looks different.</li>
 </ul>
 <p>If you were to sketch it out in code, you&#8217;d have something like this:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Tree</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Tree</span>
 <span class="p">{</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Mesh</span> <span class="n">mesh_</span><span class="p">;</span>
   <span class="n">Texture</span> <span class="n">bark_</span><span class="p">;</span>
   <span class="n">Texture</span> <span class="n">leaves_</span><span class="p">;</span>
@@ -70,8 +70,7 @@ to the GPU.</p>
   <span class="n">Color</span> <span class="n">barkTint_</span><span class="p">;</span>
   <span class="n">Color</span> <span class="n">leafTint_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>That&#8217;s a lot of data, and the mesh and textures are particularly large. An entire
 forest of these objects is too much to throw at the GPU in one frame.
@@ -81,38 +80,33 @@ forest, they mostly look similar. They will likely all use the <span
 name="same">same</span> mesh and textures. That means most of the fields in
 these objects are the <em>same</em> between all of those instances.</p>
 <aside name="same">
-
 <p>You&#8217;d have to be crazy or a billionaire to budget for the artists to
 individually model each tree in an entire forest.</p>
 </aside>
-
 <p><span name="trees"></span></p>
 <p><img src="images/flyweight-trees.png" alt="A row of trees, each of which has its own Mesh, Bark, Leaves, Params, and Position." /></p>
 <aside name="trees">
-
 <p>Note that the stuff in the small boxes is the same for each tree.</p>
 </aside>
-
 <p>We can model that explicitly by splitting the object in half. First, we pull
 out the data that all trees have <span name="type">in common</span> and move it
 into a separate class:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">TreeModel</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">TreeModel</span>
 <span class="p">{</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Mesh</span> <span class="n">mesh_</span><span class="p">;</span>
   <span class="n">Texture</span> <span class="n">bark_</span><span class="p">;</span>
   <span class="n">Texture</span> <span class="n">leaves_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The game only needs a single one of these, since there&#8217;s no reason to have the
 same meshes and textures in memory a thousand times. Then, each <em>instance</em> of a
 tree in the world has a <em>reference</em> to that shared <code>TreeModel</code>. What remains in
 <code>Tree</code> is the state that is instance-specific:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Tree</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Tree</span>
 <span class="p">{</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">TreeModel</span><span class="o">*</span> <span class="n">model_</span><span class="p">;</span>
 
   <span class="n">Vector</span> <span class="n">position_</span><span class="p">;</span>
@@ -121,13 +115,11 @@ tree in the world has a <em>reference</em> to that shared <code>TreeModel</code>
   <span class="n">Color</span> <span class="n">barkTint_</span><span class="p">;</span>
   <span class="n">Color</span> <span class="n">leafTint_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>You can visualize it like this:</p>
 <p><img src="images/flyweight-tree-model.png" alt="A row of trees each with its own Params and Position, but pointing to a shared Model with a Mesh, Bark, and Leaves." /></p>
 <aside name="type">
-
 <p>This looks a lot like the <a href="type-object.html" class="pattern">Type
 Object</a> pattern. Both involve delegating part of an object&#8217;s state to some
 other object shared between a number of instances. However, the intent behind
@@ -136,7 +128,6 @@ the patterns differs.</p>
 define by lifting &#8220;types&#8221; into your own object model. Any memory sharing you get
 from that is a bonus. The Flyweight pattern is purely about efficiency.</p>
 </aside>
-
 <p>This is all well and good for storing stuff in main memory, but that doesn&#8217;t
 help rendering. Before the forest gets on screen, it has to work its way over to
 the GPU. We need to express this resource sharing in a way that the graphics
@@ -157,12 +148,10 @@ arboreal example. The second is the list of instances and their parameters that
 will be used to vary that first chunk of data each time it&#8217;s drawn. With a
 single draw call, an entire forest grows.</p>
 <aside name="hardware">
-
 <p>The fact that this API is implemented directly by the graphics card means the
 Flyweight pattern may be the only Gang of Four design pattern to have actual
 hardware support.</p>
 </aside>
-
 <h2><a href="#the-flyweight-pattern" name="the-flyweight-pattern">The Flyweight Pattern</a></h2>
 <p>Now that we&#8217;ve got one concrete example under our belts, I can walk you through
 the general pattern. Flyweight, like its name implies, comes into play when you
@@ -203,32 +192,27 @@ world is a huge grid of tiny tiles. Each tile is covered in one kind of terrain.
 store all of that state in <span name="learned">each</span> tile in the world.
 Instead, a common approach is to use an enum for terrain types:</p>
 <aside name="learned">
-
 <p>After all, we already learned our lesson with those trees.</p>
 </aside>
-
-<div class="codehilite"><pre><span class="k">enum</span> <span class="n">Terrain</span>
+<div class="codehilite"><pre><span></span><code><span class="k">enum</span> <span class="nc">Terrain</span>
 <span class="p">{</span>
   <span class="n">TERRAIN_GRASS</span><span class="p">,</span>
   <span class="n">TERRAIN_HILL</span><span class="p">,</span>
   <span class="n">TERRAIN_RIVER</span>
   <span class="c1">// Other terrains...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Then the world maintains a huge grid of those:</p>
 <p><span name="grid"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">World</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">World</span>
 <span class="p">{</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Terrain</span> <span class="n">tiles_</span><span class="p">[</span><span class="n">WIDTH</span><span class="p">][</span><span class="n">HEIGHT</span><span class="p">];</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="grid">
-
 <p>Here I&#8217;m using a nested array to store the 2D grid. That&#8217;s efficient in C/C++
 because it will pack all of the elements together. In Java or other memory-
 managed languages, doing that will actually give you an array of rows where each
@@ -238,31 +222,29 @@ friendly as you&#8217;d like.</p>
 detail behind a nice 2D grid data structure. I&#8217;m doing this here just to keep it
 simple.</p>
 </aside>
-
 <p>To actually get the useful data about a tile, we do something like:</p>
-<div class="codehilite"><pre><span class="kt">int</span> <span class="n">World</span><span class="o">::</span><span class="n">getMovementCost</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">int</span> <span class="nf">World::getMovementCost</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">switch</span> <span class="p">(</span><span class="n">tiles_</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">])</span>
   <span class="p">{</span>
-    <span class="k">case</span> <span class="n">TERRAIN_GRASS</span>: <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">case</span> <span class="n">TERRAIN_HILL</span>:  <span class="k">return</span> <span class="mi">3</span><span class="p">;</span>
-    <span class="k">case</span> <span class="n">TERRAIN_RIVER</span>: <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">case</span> <span class="nl">TERRAIN_GRASS</span><span class="p">:</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">case</span> <span class="nl">TERRAIN_HILL</span><span class="p">:</span>  <span class="k">return</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="k">case</span> <span class="nl">TERRAIN_RIVER</span><span class="p">:</span> <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
       <span class="c1">// Other terrains...</span>
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="kt">bool</span> <span class="n">World</span><span class="o">::</span><span class="n">isWater</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span>
+<span class="kt">bool</span> <span class="nf">World::isWater</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">switch</span> <span class="p">(</span><span class="n">tiles_</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">])</span>
   <span class="p">{</span>
-    <span class="k">case</span> <span class="n">TERRAIN_GRASS</span>: <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="k">case</span> <span class="n">TERRAIN_HILL</span>:  <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
-    <span class="k">case</span> <span class="n">TERRAIN_RIVER</span>: <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">case</span> <span class="nl">TERRAIN_GRASS</span><span class="p">:</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">case</span> <span class="nl">TERRAIN_HILL</span><span class="p">:</span>  <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">case</span> <span class="nl">TERRAIN_RIVER</span><span class="p">:</span> <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
       <span class="c1">// Other terrains...</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>You get the idea. This works, but I find it ugly. I think of movement cost and
 wetness as <em>data</em> about a terrain, but here that&#8217;s embedded in code. Worse, the
@@ -271,9 +253,9 @@ really nice to keep all of that encapsulated together. After all, that&#8217;s w
 objects are designed for.</p>
 <p>It would be great if we could have an actual terrain <em>class</em>, like:</p>
 <p><span name="const"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Terrain</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Terrain</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Terrain</span><span class="p">(</span><span class="kt">int</span> <span class="n">movementCost</span><span class="p">,</span>
           <span class="kt">bool</span> <span class="n">isWater</span><span class="p">,</span>
           <span class="n">Texture</span> <span class="n">texture</span><span class="p">)</span>
@@ -286,16 +268,14 @@ objects are designed for.</p>
   <span class="kt">bool</span> <span class="n">isWater</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">isWater_</span><span class="p">;</span> <span class="p">}</span>
   <span class="k">const</span> <span class="n">Texture</span><span class="o">&amp;</span> <span class="n">getTexture</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">texture_</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">movementCost_</span><span class="p">;</span>
   <span class="kt">bool</span> <span class="n">isWater_</span><span class="p">;</span>
   <span class="n">Texture</span> <span class="n">texture_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="const">
-
 <p>You&#8217;ll notice that all of the methods here are <code>const</code>. That&#8217;s no coincidence.
 Since the same object is used in multiple contexts, if you were to modify it,
 the changes would appear in multiple places simultaneously.</p>
@@ -303,7 +283,6 @@ the changes would appear in multiple places simultaneously.</p>
 optimization that doesn&#8217;t affect the visible behavior of the app. Because of
 this, Flyweight objects are almost always immutable.</p>
 </aside>
-
 <p>But we don&#8217;t want to pay the cost of having an instance of that for each tile in
 the world. If you look at that class, you&#8217;ll notice that there&#8217;s actually
 <em>nothing</em> in there that&#8217;s specific to <em>where</em> that tile is. In flyweight terms,
@@ -312,43 +291,41 @@ the world. If you look at that class, you&#8217;ll notice that there&#8217;s act
 grass tile on the ground is identical to every other one. Instead of having the
 world be a grid of enums or Terrain objects, it will be a grid of <em>pointers</em> to
 <code>Terrain</code> objects:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">World</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">World</span>
 <span class="p">{</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Terrain</span><span class="o">*</span> <span class="n">tiles_</span><span class="p">[</span><span class="n">WIDTH</span><span class="p">][</span><span class="n">HEIGHT</span><span class="p">];</span>
 
   <span class="c1">// Other stuff...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Each tile that uses the same terrain will point to the same terrain instance.</p>
 <p><img src="images/flyweight-tiles.png" alt="A row of tiles. Each tile points to either a shared Grass, River, or Hill object." /></p>
 <p>Since the terrain instances are used in multiple places, their lifetimes would
 be a little more complex to manage if you were to dynamically allocate them.
 Instead, we&#8217;ll just store them directly in the world:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">World</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">World</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">World</span><span class="p">()</span>
   <span class="o">:</span> <span class="n">grassTerrain_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">GRASS_TEXTURE</span><span class="p">),</span>
     <span class="n">hillTerrain_</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">HILL_TEXTURE</span><span class="p">),</span>
     <span class="n">riverTerrain_</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="n">RIVER_TEXTURE</span><span class="p">)</span>
   <span class="p">{}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Terrain</span> <span class="n">grassTerrain_</span><span class="p">;</span>
   <span class="n">Terrain</span> <span class="n">hillTerrain_</span><span class="p">;</span>
   <span class="n">Terrain</span> <span class="n">riverTerrain_</span><span class="p">;</span>
 
   <span class="c1">// Other stuff...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Then we can use those to paint the ground like this:</p>
 <p><span name="generate"></span></p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">World</span><span class="o">::</span><span class="n">generateTerrain</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">World::generateTerrain</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="c1">// Fill the ground with grass.</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">WIDTH</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
@@ -373,29 +350,24 @@ Instead, we&#8217;ll just store them directly in the world:</p>
     <span class="n">tiles_</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">riverTerrain_</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="generate">
-
 <p>I&#8217;ll admit this isn&#8217;t the world&#8217;s greatest procedural terrain generation
 algorithm.</p>
 </aside>
-
 <p>Now instead of methods on <code>World</code> for accessing the terrain properties, we can
 expose the <code>Terrain</code> object directly:</p>
-<div class="codehilite"><pre><span class="k">const</span> <span class="n">Terrain</span><span class="o">&amp;</span> <span class="n">World</span><span class="o">::</span><span class="n">getTile</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span> <span class="k">const</span>
+<div class="codehilite"><pre><span></span><code><span class="k">const</span> <span class="n">Terrain</span><span class="o">&amp;</span> <span class="nf">World::getTile</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span><span class="p">)</span> <span class="k">const</span>
 <span class="p">{</span>
   <span class="k">return</span> <span class="o">*</span><span class="n">tiles_</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">];</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This way, <code>World</code> is no longer coupled to all sorts of details of terrains. If
 you want some property of the tile, you can get it right from that object:</p>
-<div class="codehilite"><pre><span class="kt">int</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">getTile</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">).</span><span class="n">getMovementCost</span><span class="p">();</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="kt">int</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">getTile</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">).</span><span class="n">getMovementCost</span><span class="p">();</span>
+</code></pre></div>
 
 <p>We&#8217;re back to the pleasant API of working with real objects, and we did this
 with almost no overhead&#8202;&mdash;&#8202;a pointer is often no larger than an enum.</p>
@@ -407,11 +379,9 @@ you first have to follow the pointer in the grid to find the terrain object and
 then find the movement cost there. Chasing a pointer like this can cause a <span
 name="cache">cache miss</span>, which can slow things down.</p>
 <aside name="cache">
-
 <p>For lots more on pointer chasing and cache misses, see the chapter on <a href
 ="data-locality.html" class="pattern">Data Locality</a>.</p>
 </aside>
-
 <p>As always, the golden rule of optimization is <em>profile first</em>. Modern computer
 hardware is too complex for performance to be a game of pure reason anymore. In
 my tests for this chapter, there was no penalty for using a flyweight over an
@@ -462,6 +432,6 @@ pattern">Factory Method</a> pattern.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

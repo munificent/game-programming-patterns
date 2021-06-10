@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -47,18 +47,16 @@ they&#8217;re still clear enough for you to get the big picture.</p>
 to other programming circles. I think they should be more widely known, so I&#8217;m
 going to throw them at a different kind of problem here.</p>
 <aside name="two-camps">
-
 <p>This pairing echoes the early days of artificial intelligence. In the &rsquo;50s and
 &rsquo;60s, much of AI research was focused on language processing. Many of the
 techniques compilers now use for parsing programming languages were invented for
 parsing human languages.</p>
 </aside>
-
 <h2><a href="#we've-all-been-there" name="we've-all-been-there">We&#8217;ve All Been There</a></h2>
 <p>We&#8217;re working on a little side-scrolling platformer. Our job is to implement the
 heroine that is the player&#8217;s avatar in the game world. That means making her
 respond to user input. Push the B button and she should jump. Simple enough:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
   <span class="p">{</span>
@@ -66,15 +64,14 @@ respond to user input. Push the B button and she should jump. Simple enough:</p>
     <span class="n">setGraphics</span><span class="p">(</span><span class="n">IMAGE_JUMP</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Spot the bug?</p>
 <p>There&#8217;s nothing to prevent &#8220;air jumping&#8221;&#8202;&mdash;&#8202;keep hammering B while she&#8217;s in the
 air, and she will float forever. The simple <span name="landing">fix</span> is to
 add an <code>isJumping_</code> Boolean field to <code>Heroine</code> that tracks when she&#8217;s jumping,
 and then do:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
   <span class="p">{</span>
@@ -85,18 +82,15 @@ and then do:</p>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="landing">
-
 <p>There should also be code that sets <code>isJumping_</code> back to <code>false</code> when the
 heroine touches the ground. I&#8217;ve omitted that here for brevity&#8217;s sake.</p>
 </aside>
-
 <p>Next, we want the heroine to duck if the player presses down while she&#8217;s on the
 ground and stand back up when the button is released:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
   <span class="p">{</span>
@@ -114,8 +108,7 @@ ground and stand back up when the button is released:</p>
     <span class="n">setGraphics</span><span class="p">(</span><span class="n">IMAGE_STAND</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Spot the bug this time?</p>
 <p>With this code, the player could:</p>
@@ -126,7 +119,7 @@ ground and stand back up when the button is released:</p>
 </ol>
 <p>The heroine will switch to her standing graphic in the middle of the jump. Time
 for another flag&#8230;</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
   <span class="p">{</span>
@@ -152,12 +145,11 @@ for another flag&#8230;</p>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Next, it would be cool if the heroine did a dive attack if the player presses
 down in the middle of a jump:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
   <span class="p">{</span>
@@ -187,8 +179,7 @@ down in the middle of a jump:</p>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Bug hunting time again. Find it?</p>
 <p>We check that you can&#8217;t air jump while jumping, but not while diving. Yet
@@ -198,14 +189,12 @@ we touch this handful of code, we break something. We need to add a bunch more
 moves&#8202;&mdash;&#8202;we haven&#8217;t even added <em>walking</em> yet&#8202;&mdash;&#8202;but at this rate, it will
 collapse into a heap of bugs before we&#8217;re done with it.</p>
 <aside name="se">
-
 <p>Those coders you idolize who always seem to create flawless code aren&#8217;t simply
 superhuman programmers. Instead, they have an intuition about which <em>kinds</em> of
 code are error-prone, and they steer away from them.</p>
 <p>Complex branching and mutable state&#8202;&mdash;&#8202;fields that change over time&#8202;&mdash;&#8202;are two
 of those error-prone kinds of code, and the examples above have both.</p>
 </aside>
-
 <h2><a href="#finite-state-machines-to-the-rescue" name="finite-state-machines-to-the-rescue">Finite State Machines to the Rescue</a></h2>
 <p>In a fit of frustration, you sweep everything off your desk except a pen and
 paper and start drawing a flowchart. You draw a box for each thing the heroine
@@ -245,7 +234,6 @@ You can draw it out like a little flowchart. Unfortunately, the compiler doesn&#
 recognize our scribbles, so how do we go about <em>implementing</em> one? The Gang of
 Four&#8217;s State pattern is one method&#8202;&mdash;&#8202;which we&#8217;ll get to&#8202;&mdash;&#8202;but let&#8217;s start simpler.</p>
 <aside name="adventure">
-
 <p>My favorite analogy for FSMs is the old text adventure games like Zork. You have
 a world of rooms that are connected to each other by exits. You explore them by
 entering commands like &#8220;go north&#8221;.</p>
@@ -253,7 +241,6 @@ entering commands like &#8220;go north&#8221;.</p>
 is the current state. Each room&#8217;s exits are its transitions. The navigation
 commands are the inputs.</p>
 </aside>
-
 <h2><a href="#enums-and-switches" name="enums-and-switches">Enums and Switches</a></h2>
 <p>One problem our <code>Heroine</code> class has is some combinations of those Boolean fields
 aren&#8217;t valid: <code>isJumping_</code> and <code>isDucking_</code> should never both be true, for
@@ -261,26 +248,25 @@ example. When you have a handful of flags where only one is <code>true</code> at
 that&#8217;s a hint that what you really want is an <code>enum</code>.</p>
 <p>In this case, that <code>enum</code> is exactly the set of states for our FSM, so let&#8217;s
 define that:</p>
-<div class="codehilite"><pre><span class="k">enum</span> <span class="n">State</span>
+<div class="codehilite"><pre><span></span><code><span class="k">enum</span> <span class="nc">State</span>
 <span class="p">{</span>
   <span class="n">STATE_STANDING</span><span class="p">,</span>
   <span class="n">STATE_JUMPING</span><span class="p">,</span>
   <span class="n">STATE_DUCKING</span><span class="p">,</span>
   <span class="n">STATE_DIVING</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Instead of a bunch of flags, <code>Heroine</code> will just have one <code>state_</code> field. We
 also flip the order of our branching. In the previous code, we switched on
 input, <em>then</em> on state. This kept the code for handling one button press
 together, but it smeared around the code for one state. We want to keep that
 together, so we switch on state first. That gives us:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">switch</span> <span class="p">(</span><span class="n">state_</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="k">case</span> <span class="n">STATE_STANDING</span>:
+    <span class="k">case</span> <span class="nl">STATE_STANDING</span><span class="p">:</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
       <span class="p">{</span>
         <span class="n">state_</span> <span class="o">=</span> <span class="n">STATE_JUMPING</span><span class="p">;</span>
@@ -294,7 +280,7 @@ together, so we switch on state first. That gives us:</p>
       <span class="p">}</span>
       <span class="k">break</span><span class="p">;</span>
 
-    <span class="k">case</span> <span class="n">STATE_JUMPING</span>:
+    <span class="k">case</span> <span class="nl">STATE_JUMPING</span><span class="p">:</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_DOWN</span><span class="p">)</span>
       <span class="p">{</span>
         <span class="n">state_</span> <span class="o">=</span> <span class="n">STATE_DIVING</span><span class="p">;</span>
@@ -302,7 +288,7 @@ together, so we switch on state first. That gives us:</p>
       <span class="p">}</span>
       <span class="k">break</span><span class="p">;</span>
 
-    <span class="k">case</span> <span class="n">STATE_DUCKING</span>:
+    <span class="k">case</span> <span class="nl">STATE_DUCKING</span><span class="p">:</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">RELEASE_DOWN</span><span class="p">)</span>
       <span class="p">{</span>
         <span class="n">state_</span> <span class="o">=</span> <span class="n">STATE_STANDING</span><span class="p">;</span>
@@ -311,8 +297,7 @@ together, so we switch on state first. That gives us:</p>
       <span class="k">break</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This seems trivial, but it&#8217;s a real improvement over the previous code. We still
 have some conditional branching, but we simplified the <span
@@ -320,19 +305,17 @@ name="invalid">mutable</span> state to a single field. All of the code for
 handling a single state is now nicely lumped together. This is the simplest way
 to implement a state machine and is fine for some uses.</p>
 <aside name="invalid">
-
 <p>In particular, the heroine can no longer be in an <em>invalid</em> state. With the
 Boolean flags, some sets of values were possible but meaningless. With the <code>enum</code>,
 each value is valid.</p>
 </aside>
-
 <p>Your problem may outgrow this solution, though. Say we want to add a move where
 our heroine can duck for a while to charge up and unleash a special attack.
 While she&#8217;s ducking, we need to track the charge time.</p>
 <p>We add a <code>chargeTime_</code> field to <code>Heroine</code> to store how long the attack has
 charged. Assume we already have an <span name="update"><code>update()</code></span> that
 gets called each frame. In there, we add:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::update</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">state_</span> <span class="o">==</span> <span class="n">STATE_DUCKING</span><span class="p">)</span>
   <span class="p">{</span>
@@ -343,22 +326,19 @@ gets called each frame. In there, we add:</p>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="update">
-
 <p>If you guessed that this is the <a href="update-method.html"
 class="pattern">Update Method</a> pattern, you win a prize!</p>
 </aside>
-
 <p>We need to reset the timer when she starts ducking, so we modify
 <code>handleInput()</code>:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">switch</span> <span class="p">(</span><span class="n">state_</span><span class="p">)</span>
   <span class="p">{</span>
-    <span class="k">case</span> <span class="n">STATE_STANDING</span>:
+    <span class="k">case</span> <span class="nl">STATE_STANDING</span><span class="p">:</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_DOWN</span><span class="p">)</span>
       <span class="p">{</span>
         <span class="n">state_</span> <span class="o">=</span> <span class="n">STATE_DUCKING</span><span class="p">;</span>
@@ -371,8 +351,7 @@ class="pattern">Update Method</a> pattern, you win a prize!</p>
       <span class="c1">// Other states...</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>All in all, to add this charge attack, we had to modify two methods and add a
 <code>chargeTime_</code> field onto <code>Heroine</code> even though it&#8217;s only meaningful while in
@@ -384,13 +363,11 @@ name="branch">branch</span> is an opportunity to use dynamic dispatch (in other
 words a virtual method call in C++). I think you can go too far down that
 rabbit hole. Sometimes an <code>if</code> is all you need.</p>
 <aside name="branch">
-
 <p>There&#8217;s a historical basis for this. Many of the original object-oriented
 apostles like <em>Design Patterns</em>&#8216; Gang of Four, and <em>Refactoring</em>&#8216;s Martin Fowler
 came from Smalltalk. There, <code>ifThen:</code> is just a method you invoke on the
 condition, which is implemented differently by the <code>true</code> and <code>false</code> objects.</p>
 </aside>
-
 <p>But in our example, we&#8217;ve reached a tipping point where something
 object-oriented is a better fit. That gets us to the State pattern. In the words
 of the Gang of Four:</p>
@@ -403,23 +380,22 @@ they describe looks like this when applied to our heroine:</p>
 <p>First, we define an interface for the state. Every bit of behavior that is
 state-dependent&#8202;&mdash;&#8202;every place we had a <code>switch</code> before&#8202;&mdash;&#8202;becomes a virtual
 method in that interface. For us, that&#8217;s <code>handleInput()</code> and <code>update()</code>:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">HeroineState</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">HeroineState</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">HeroineState</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span> <span class="n">Input</span> <span class="n">input</span><span class="p">)</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">)</span> <span class="p">{}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <h3><a href="#classes-for-each-state" name="classes-for-each-state">Classes for each state</a></h3>
 <p>For each state, we define a class that implements the interface. Its methods
 define the heroine&#8217;s behavior when in that state. In other words, take each <code>case</code>
 from the earlier <code>switch</code> statements and move them into their state&#8217;s class. For example:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">DuckingState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">HeroineState</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">DuckingState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">HeroineState</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">DuckingState</span><span class="p">()</span>
   <span class="o">:</span> <span class="n">chargeTime_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
   <span class="p">{}</span>
@@ -440,11 +416,10 @@ from the earlier <code>switch</code> statements and move them into their state&#
     <span class="p">}</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">chargeTime_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Note that we also moved <code>chargeTime_</code> out of <code>Heroine</code> and into the <code>DuckingState</code>
 class. This is great&#8202;&mdash;&#8202;that piece of data is only meaningful while in that state,
@@ -452,9 +427,9 @@ and now our object model reflects that explicitly.</p>
 <h3><a href="#delegate-to-the-state" name="delegate-to-the-state">Delegate to the state</a></h3>
 <p>Next, we give the <code>Heroine</code> a pointer to her current state, lose each big <code>switch</code>, and delegate to the state instead:</p>
 <p><span name="delegate"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Heroine</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Heroine</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">state_</span><span class="o">-&gt;</span><span class="n">handleInput</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
@@ -466,16 +441,14 @@ and now our object model reflects that explicitly.</p>
   <span class="p">}</span>
 
   <span class="c1">// Other methods...</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">HeroineState</span><span class="o">*</span> <span class="n">state_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>In order to &#8220;change state&#8221;, we just need to assign <code>state_</code> to point to a
 different <code>HeroineState</code> object. That&#8217;s the State pattern in its entirety.</p>
 <aside name="delegate">
-
 <p>This looks like the <a href="http://en.wikipedia.org/wiki/Strategy_pattern"
 class="gof-pattern">Strategy</a> and <a href="type-object.html"
 class="pattern">Type Object</a> patterns. In all three, you have a main object
@@ -495,7 +468,6 @@ that delegates to another subordinate one. The difference is <em>intent</em>.</p
 </li>
 </ul>
 </aside>
-
 <h2><a href="#where-are-the-state-objects" name="where-are-the-state-objects">Where Are the State Objects?</a></h2>
 <p>I did gloss over one bit here. To change states, we need to assign <code>state_</code> to
 point to the new one, but where does that object come from? With our <code>enum</code>
@@ -508,27 +480,23 @@ the only data it stores is a pointer to the internal virtual method table so
 that its methods can be called. In that case, there&#8217;s no reason to ever have
 more than one instance of it. Every instance would be identical anyway.</p>
 <aside name="fn">
-
 <p>If your state has no fields and only <em>one</em> virtual method in it, you can
 simplify this pattern even more. Replace each state <em>class</em> with a state
 <em>function</em>&#8202;&mdash;&#8202;just a plain vanilla top-level function. Then, the <code>state_</code> field
 in your main class becomes a simple function pointer.</p>
 </aside>
-
 <p>In that case, you can make a single <em>static</em> instance. Even if you have a
 bunch of FSMs all going at the same time in that same state, they can all point
 to the <span name="flyweight">same instance</span> since it has nothing
 machine-specific about it.</p>
 <aside name="flyweight">
-
 <p>This is the <a href="flyweight.html" class="gof-pattern">Flyweight</a> pattern.</p>
 </aside>
-
 <p><em>Where</em> you put that static instance is up to you. Find a place that makes
 sense. For no particular reason, let&#8217;s put ours inside the base state class:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">HeroineState</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">HeroineState</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">static</span> <span class="n">StandingState</span> <span class="n">standing</span><span class="p">;</span>
   <span class="k">static</span> <span class="n">DuckingState</span> <span class="n">ducking</span><span class="p">;</span>
   <span class="k">static</span> <span class="n">JumpingState</span> <span class="n">jumping</span><span class="p">;</span>
@@ -536,18 +504,16 @@ sense. For no particular reason, let&#8217;s put ours inside the base state clas
 
   <span class="c1">// Other code...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Each of those static fields is the one instance of that state that the game
 uses. To make the heroine jump, the standing state would do something like:</p>
-<div class="codehilite"><pre><span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">heroine</span><span class="p">.</span><span class="n">state_</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">HeroineState</span><span class="o">::</span><span class="n">jumping</span><span class="p">;</span>
   <span class="n">heroine</span><span class="p">.</span><span class="n">setGraphics</span><span class="p">(</span><span class="n">IMAGE_JUMP</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <h3><a href="#instantiated-states" name="instantiated-states">Instantiated states</a></h3>
 <p>Sometimes, though, this doesn&#8217;t fly. A static state won&#8217;t work for the ducking
@@ -558,7 +524,7 @@ screen at the same time, we&#8217;ll have problems.</p>
 <p>In that case, we have to <span name="fragment">create</span> a state
 object when we transition to it. This lets each FSM have its own instance of the state. Of course, if we&#8217;re allocating a <em>new</em> state, that means we need to free the <em>current</em> one. We have to be careful here, since the code that&#8217;s triggering the change is in a method in the current state. We don&#8217;t want to delete <code>this</code> out from under ourselves.</p>
 <p>Instead, we&#8217;ll allow <code>handleInput()</code> in <code>HeroineState</code> to optionally return a new state. When it does, <code>Heroine</code> will delete the old one and swap in the new one, like so:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">HeroineState</span><span class="o">*</span> <span class="n">state</span> <span class="o">=</span> <span class="n">state_</span><span class="o">-&gt;</span><span class="n">handleInput</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">state</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
@@ -567,11 +533,10 @@ object when we transition to it. This lets each FSM have its own instance of the
     <span class="n">state_</span> <span class="o">=</span> <span class="n">state</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>That way, we don&#8217;t delete the previous state until we&#8217;ve returned from its method. Now, the standing state can transition to ducking by creating a new instance:</p>
-<div class="codehilite"><pre><span class="n">HeroineState</span><span class="o">*</span> <span class="n">StandingState</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span>
+<div class="codehilite"><pre><span></span><code><span class="n">HeroineState</span><span class="o">*</span> <span class="nf">StandingState::handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span>
                                          <span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_DOWN</span><span class="p">)</span>
@@ -583,42 +548,38 @@ object when we transition to it. This lets each FSM have its own instance of the
   <span class="c1">// Stay in this state.</span>
   <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>When I can, I prefer to use static states since they don&#8217;t burn memory and CPU cycles allocating objects
 each state change. For states that are more, uh, <em>stateful</em>, though, this is the
 way to go.</p>
 <aside name="fragment">
-
 <p>When you dynamically allocate states, you may have to worry about fragmentation.
 The <a href="object-pool.html" class="pattern">Object Pool</a> pattern can help.</p>
 </aside>
-
 <h2><a href="#enter-and-exit-actions" name="enter-and-exit-actions">Enter and Exit Actions</a></h2>
 <p>The goal of the State pattern is to encapsulate all of the behavior and data for
 one state in a single class. We&#8217;re partway there, but we still have
 some loose ends.</p>
 <p>When the heroine changes state, we also switch her sprite. Right now, that code is owned by the state she&#8217;s switching <em>from</em>. When she goes from ducking to standing, the ducking state sets her image:</p>
-<div class="codehilite"><pre><span class="n">HeroineState</span><span class="o">*</span> <span class="n">DuckingState</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span>
+<div class="codehilite"><pre><span></span><code><span class="n">HeroineState</span><span class="o">*</span> <span class="nf">DuckingState::handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span>
                                         <span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">RELEASE_DOWN</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">heroine</span><span class="p">.</span><span class="n">setGraphics</span><span class="p">(</span><span class="n">IMAGE_STAND</span><span class="p">);</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="nf">StandingState</span><span class="p">();</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">StandingState</span><span class="p">();</span>
   <span class="p">}</span>
 
   <span class="c1">// Other code...</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>What we really want is each state to control its own graphics. We can
 handle that by giving the state an <em>entry action</em>:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">StandingState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">HeroineState</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">StandingState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">HeroineState</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">enter</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">heroine</span><span class="p">.</span><span class="n">setGraphics</span><span class="p">(</span><span class="n">IMAGE_STAND</span><span class="p">);</span>
@@ -626,12 +587,11 @@ handle that by giving the state an <em>entry action</em>:</p>
 
   <span class="c1">// Other code...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Back in <code>Heroine</code>, we modify the code for handling state changes to call that
 on the new state:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">HeroineState</span><span class="o">*</span> <span class="n">state</span> <span class="o">=</span> <span class="n">state_</span><span class="o">-&gt;</span><span class="n">handleInput</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">state</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
@@ -643,11 +603,10 @@ on the new state:</p>
     <span class="n">state_</span><span class="o">-&gt;</span><span class="n">enter</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This lets us simplify the ducking code to:</p>
-<div class="codehilite"><pre><span class="n">HeroineState</span><span class="o">*</span> <span class="n">DuckingState</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span>
+<div class="codehilite"><pre><span></span><code><span class="n">HeroineState</span><span class="o">*</span> <span class="nf">DuckingState::handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span>
                                         <span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">RELEASE_DOWN</span><span class="p">)</span>
@@ -657,8 +616,7 @@ on the new state:</p>
 
   <span class="c1">// Other code...</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>All it does is switch to standing and the standing state takes care of
 the graphics. Now our states really are encapsulated. One particularly nice thing
@@ -678,7 +636,6 @@ for some problems. But their greatest virtue is also their greatest flaw.</p>
 name="turing">constrained</span> structure on it. All you&#8217;ve got is a fixed set
 of states, a single current state, and some hardcoded transitions.</p>
 <aside name="turing">
-
 <p>A finite state machine isn&#8217;t even <em>Turing complete</em>. Automata theory describes
 computation using a series of abstract models, each more complex than the
 previous. A <em>Turing machine</em> is one of the most expressive models.</p>
@@ -687,7 +644,6 @@ enough to implement a Turing machine in it, which means all Turing complete
 languages are, in some ways, equally expressive. FSMs are not flexible enough
 to be in that club.</p>
 </aside>
-
 <p>If you try using a state machine for something more complex like game AI, you
 will slam face-first into the limitations of that model. Thankfully, our
 forebears have found ways to dodge some of those barriers. I&#8217;ll close this
@@ -709,50 +665,42 @@ state&#8202;&mdash;&#8202;what she&#8217;s <em>doing</em> and what she&#8217;s <
 To model all possible combinations, we would need a state for each <em>pair</em>. The
 fix is obvious: have two separate state machines.</p>
 <aside name="combination">
-
 <p>If we want to cram <em>n</em> states for what she&#8217;s doing and <em>m</em> states for what she&#8217;s
 carrying into a single machine, we need <em>n &times; m</em> states. With two machines,
 it&#8217;s just <em>n + m</em>.</p>
 </aside>
-
 <p>We keep our original state machine for what she&#8217;s doing and leave it alone. Then
 we define a separate state machine for what she&#8217;s carrying. <code>Heroine</code> will have
 <em>two</em> &#8220;state&#8221; references, one for each, like:</p>
 <p><span name="equip-state"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Heroine</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Heroine</span>
 <span class="p">{</span>
   <span class="c1">// Other code...</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">HeroineState</span><span class="o">*</span> <span class="n">state_</span><span class="p">;</span>
   <span class="n">HeroineState</span><span class="o">*</span> <span class="n">equipment_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="equip-state">
-
 <p>For illustrative purposes, we&#8217;re using the full State pattern for her equipment.
 In practice, since it only has two states, a Boolean flag would work too.</p>
 </aside>
-
 <p>When the heroine delegates inputs to the states, she hands it to both of them:</p>
 <p><span name="consume"></span></p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Heroine</span><span class="o">::</span><span class="n">handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Heroine::handleInput</span><span class="p">(</span><span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">state_</span><span class="o">-&gt;</span><span class="n">handleInput</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
   <span class="n">equipment_</span><span class="o">-&gt;</span><span class="n">handleInput</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="consume">
-
 <p>A more full-featured system would probably have a way for one state machine to
 <em>consume</em> an input so that the other doesn&#8217;t receive it. That would prevent both
 machines from erroneously trying to respond to the same input.</p>
 </aside>
-
 <p>Each state machine can then respond to inputs, spawn behavior, and change its
 state independently of the other machine. When the two sets of states are mostly
 unrelated, this works well.</p>
@@ -774,12 +722,10 @@ name="inheritance">inheritance</span>. We could define a class for an &#8220;on
 ground&#8221; state that handles jumping and ducking. Standing, walking, running, and
 sliding would then inherit from that and add their own additional behavior.</p>
 <aside name="inheritance">
-
 <p>This has both good and bad implications. Inheritance is a powerful means of code
 reuse, but it&#8217;s also a very strong coupling between two chunks of code. It&#8217;s a big
 hammer, so swing it carefully.</p>
 </aside>
-
 <p>It turns out, this is a common structure called a <em>hierarchical state machine</em>.
 A state can have a <em>superstate</em> (making itself a <em>substate</em>). When an event
 comes in, if the substate doesn&#8217;t handle it, it rolls up the chain of
@@ -787,9 +733,9 @@ superstates. In other words, it works just like overriding inherited methods.</p
 <p>In fact, if we&#8217;re using the State pattern to implement our FSM, we can
 use class inheritance to implement the hierarchy. Define a base class for the
 superstate:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">OnGroundState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">HeroineState</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">OnGroundState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">HeroineState</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span> <span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">PRESS_B</span><span class="p">)</span>
@@ -802,13 +748,12 @@ superstate:</p>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>And then each substate inherits it:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">DuckingState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">OnGroundState</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">DuckingState</span> <span class="o">:</span> <span class="k">public</span> <span class="n">OnGroundState</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">handleInput</span><span class="p">(</span><span class="n">Heroine</span><span class="o">&amp;</span> <span class="n">heroine</span><span class="p">,</span> <span class="n">Input</span> <span class="n">input</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="n">RELEASE_DOWN</span><span class="p">)</span>
@@ -822,8 +767,7 @@ superstate:</p>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This isn&#8217;t the only way to implement the hierarchy, of course. If you aren&#8217;t
 using the Gang of Four&#8217;s State pattern, this won&#8217;t work. Instead, you can model
@@ -846,11 +790,9 @@ animation and spawns the bullet and any visual effects. So we slap together a
 <code>FiringState</code> and make <span name="shared">all of the states</span> that she can
 fire from transition into that when the fire button is pressed.</p>
 <aside name="shared">
-
 <p>Since this behavior is duplicated across several states, it may also be a good
 place to use a hierarchical state machine to reuse that code.</p>
 </aside>
-
 <p>The tricky part is what state she transitions to <em>after</em> firing. She can pop off
 a round while standing, running, jumping, and ducking. When the firing sequence
 is complete, she should transition back to what she was doing before.</p>
@@ -915,6 +857,6 @@ network protocols, and other asynchronous behavior.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

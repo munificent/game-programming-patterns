@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -42,11 +42,9 @@ steps that can be performed one after another. Often, though, our users need to
 see things occur in a single instantaneous step or see multiple tasks performed
 simultaneously.</p>
 <aside name="sequential">
-
 <p>With threading and multi-core architectures this is becoming less true, but
 even with several cores, only a few operations are running concurrently.</p>
 </aside>
-
 <p>A typical example, and one that every game engine must address, is rendering.
 When the game draws the world the users see, it does so one piece at a time&#8202;&mdash;&#8202;the
 mountains in the distance, the rolling hills, the trees, each in its turn. If
@@ -63,14 +61,12 @@ back up to the top left and starts all over again. It does this so fast &#8212;
 around sixty times a second&#8202;&mdash;&#8202;that our eyes can&#8217;t see the scanning. To us, it&#8217;s
 a single static field of colored pixels&#8202;&mdash;&#8202;an image.</p>
 <aside name="scan">
-
 <p>This explanation is, err, &#8220;simplified&#8221;. If you&#8217;re a low-level hardware person
 and you&#8217;re cringing right now, feel free to skip to the next section. You
 already know enough to understand the rest of the chapter. If you <em>aren&#8217;t</em> that
 person, my goal here is to give you just enough context to understand the
 pattern we&#8217;ll discuss later.</p>
 </aside>
-
 <p>You can think of this process like a tiny hose that pipes pixels to the display.
 Individual colors go into the back of the hose, and it sprays them out across
 the display, one bit of color to each pixel in its turn. So how does the hose
@@ -81,13 +77,11 @@ framebuffer is an array of pixels in memory, a chunk of RAM where each couple of
 hose sprays across the display, it reads in the color values from this array,
 one byte at a time.</p>
 <aside name="color">
-
 <p>The specific mapping between byte values and colors is described by the <em>pixel
 format</em> and the <em>color depth</em> of the system. In most gaming consoles today, each
 pixel gets 32 bits: eight each for the red, green, and blue channels, and another
 eight left over for various other purposes.</p>
 </aside>
-
 <p>Ultimately, in order to get our game to appear on screen, all we do is write to
 that array. All of the crazy advanced graphics algorithms we have boil down to
 just that: setting byte values in the framebuffer. But there&#8217;s a little problem.</p>
@@ -106,7 +100,6 @@ outpaces us and moves into pixels we haven&#8217;t written yet. The result is
 <p><span name="tearing"></span></p>
 <p><img src="images/double-buffer-tearing.png" alt="A series of images of an in-progress frame being rendered. A pointer writes pixels while another reads them. The reader outpaces the writer until it starts reading pixels that haven't been rendered yet." /></p>
 <aside name="tearing">
-
 <p>We start drawing pixels just as the video driver starts reading from the
 framebuffer (Fig. 1). The video driver eventually catches up to the renderer and
 then races past it to pixels we haven&#8217;t written yet (Fig. 2). We finish drawing
@@ -114,7 +107,6 @@ then races past it to pixels we haven&#8217;t written yet (Fig. 2). We finish dr
 <p>The result (Fig. 4) is that the user sees half of the drawing. The name
 &#8220;tearing&#8221; comes from the fact that it looks like the bottom half was torn off.</p>
 </aside>
-
 <p>This is why we need this pattern. Our program renders the pixels one at a time,
 but we need the display driver to see them all at once&#8202;&mdash;&#8202;in one frame the face
 isn&#8217;t there, and in the next one it is. Double buffering solves this. I&#8217;ll explain how
@@ -140,14 +132,12 @@ scene. Every scene transition, we just toggle the lights between the two stages.
 Our audience gets a continuous performance with no delay between scenes. They
 never see a stagehand.</p>
 <aside name="stage">
-
 <p>Using a half-silvered mirror and some very smart layout, you could actually
 build this so that the two stages would appear to the audience in the same <em>place</em>. As
 soon as the lights switch, they would be looking at a different stage, but they would
 never have to change where they look. Building this is left as an exercise for
 the reader.</p>
 </aside>
-
 <h3><a href="#back-to-the-graphics" name="back-to-the-graphics">Back to the graphics</a></h3>
 <p>That is <span name="sync">exactly</span> how double buffering works, and this
 process underlies the rendering system of just about every game you&#8217;ve ever
@@ -155,12 +145,10 @@ seen. Instead of a single framebuffer, we have <em>two</em>. One of them represe
 current frame, stage A in our analogy. It&#8217;s the one the video hardware is
 reading from. The GPU can scan through it as much as it wants whenever it wants.</p>
 <aside name="sync">
-
 <p>Not <em>all</em> games and consoles do this, though. Older and simpler consoles where
 memory is limited carefully sync their drawing to the video refresh
 instead. It&#8217;s tricky.</p>
 </aside>
-
 <p>Meanwhile, our rendering code is writing to the <em>other</em> framebuffer. This is our
 darkened stage B. When our rendering code is done drawing the scene, it switches
 the lights by <em>swapping</em> the buffers. This tells the video hardware to start
@@ -224,9 +212,9 @@ very bare-bones graphics system that lets us draw pixels on a framebuffer. In
 most consoles and PCs, the video driver provides this low-level part of the
 graphics system, but implementing it by hand here will let us see what&#8217;s going on.
 First up is the buffer itself:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Framebuffer</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Framebuffer</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Framebuffer</span><span class="p">()</span> <span class="p">{</span> <span class="n">clear</span><span class="p">();</span> <span class="p">}</span>
 
   <span class="kt">void</span> <span class="n">clear</span><span class="p">()</span>
@@ -247,14 +235,13 @@ First up is the buffer itself:</p>
     <span class="k">return</span> <span class="n">pixels_</span><span class="p">;</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">WIDTH</span> <span class="o">=</span> <span class="mi">160</span><span class="p">;</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">HEIGHT</span> <span class="o">=</span> <span class="mi">120</span><span class="p">;</span>
 
   <span class="kt">char</span> <span class="n">pixels_</span><span class="p">[</span><span class="n">WIDTH</span> <span class="o">*</span> <span class="n">HEIGHT</span><span class="p">];</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>It has basic operations for clearing the entire buffer to a default color and
 setting the color of an individual pixel. It also has a function, <code>getPixels()</code>,
@@ -264,9 +251,9 @@ memory from the buffer onto the screen.</p>
 <p>We wrap this raw buffer in a <code>Scene</code> class. It&#8217;s job here is to render something
 by making a bunch of <code>draw()</code> calls on its buffer:</p>
 <p><span name="draw"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Scene</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Scene</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">draw</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="n">buffer_</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
@@ -281,41 +268,37 @@ by making a bunch of <code>draw()</code> calls on its buffer:</p>
 
   <span class="n">Framebuffer</span><span class="o">&amp;</span> <span class="n">getBuffer</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">buffer_</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Framebuffer</span> <span class="n">buffer_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="draw">
-
 <p>Specifically, it draws this artistic masterpiece:</p>
 <p><img src="images/double-buffer-face.png" width="240" alt="A pixellated smiley face." /></p>
 </aside>
-
 <p>Every frame, the game tells the scene to draw. The scene clears the buffer and
 then draws a bunch of pixels, one at a time. It also provides access to the
 internal buffer through <code>getBuffer()</code> so that the video driver can get to it.</p>
 <p>This seems pretty straightforward, but if we leave it like this, we&#8217;ll run into
 problems. The trouble is that the video driver can call <code>getPixels()</code> on the
 buffer at <em>any</em> point in time, even here:</p>
-<div class="codehilite"><pre><span class="n">buffer_</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><code><span class="n">buffer_</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 <span class="n">buffer_</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 <span class="c1">// &lt;- Video driver reads pixels here!</span>
 <span class="n">buffer_</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
 <span class="n">buffer_</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
 <span class="n">buffer_</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
 <span class="n">buffer_</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>When that happens, the user will see the eyes of the face, but the mouth will
 disappear for a single frame. In the next frame, it could get interrupted at some
 other point. The end result is horribly flickering graphics. We&#8217;ll fix this with
 double buffering:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Scene</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Scene</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Scene</span><span class="p">()</span>
   <span class="o">:</span> <span class="n">current_</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buffers_</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
     <span class="n">next_</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buffers_</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -334,7 +317,7 @@ double buffering:</p>
 
   <span class="n">Framebuffer</span><span class="o">&amp;</span> <span class="n">getBuffer</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="o">*</span><span class="n">current_</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">swap</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="c1">// Just switch the pointers.</span>
@@ -347,8 +330,7 @@ double buffering:</p>
   <span class="n">Framebuffer</span><span class="o">*</span> <span class="n">current_</span><span class="p">;</span>
   <span class="n">Framebuffer</span><span class="o">*</span> <span class="n">next_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now <code>Scene</code> has two buffers, stored in the <code>buffers_</code> array. We don&#8217;t directly
 reference them from the array. Instead, there are two members, <code>next_</code> and
@@ -374,9 +356,9 @@ interacting with each other. Double-buffering is often helpful here too.</p>
 <p>Let&#8217;s say we&#8217;re building the behavioral system for, of all things, a game based
 on slapstick comedy. The game has a stage containing a bunch of actors that run
 around and get up to various hijinks and shenanigans. Here&#8217;s our base actor:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Actor</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Actor</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Actor</span><span class="p">()</span> <span class="o">:</span> <span class="n">slapped_</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span> <span class="p">{}</span>
 
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Actor</span><span class="p">()</span> <span class="p">{}</span>
@@ -386,29 +368,26 @@ around and get up to various hijinks and shenanigans. Here&#8217;s our base acto
   <span class="kt">void</span> <span class="nf">slap</span><span class="p">()</span>       <span class="p">{</span> <span class="n">slapped_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
   <span class="kt">bool</span> <span class="nf">wasSlapped</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">slapped_</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">bool</span> <span class="n">slapped_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Every frame, the game is responsible for calling <span
 name="update"><code>update()</code></span> on the actor so that it has a chance to do some
 processing. Critically, from the user&#8217;s perspective, <em>all actors should appear
 to update simultaneously</em>.</p>
 <aside name="update">
-
 <p>This is an example of the <a class="pattern" href="update-method.html">Update
 Method</a> pattern.</p>
 </aside>
-
 <p>Actors can also interact with each other, if by &#8220;interacting&#8221;, we mean &#8220;they can
 slap each other around&#8221;. When updating, the actor can call <code>slap()</code> on another
 actor to slap it and call <code>wasSlapped()</code> to determine if it has been slapped.</p>
 <p>The actors need a stage where they can interact, so let&#8217;s build that:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Stage</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Stage</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">add</span><span class="p">(</span><span class="n">Actor</span><span class="o">*</span> <span class="n">actor</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">actors_</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">actor</span><span class="p">;</span>
@@ -423,13 +402,12 @@ actor to slap it and call <code>wasSlapped()</code> to determine if it has been 
     <span class="p">}</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">NUM_ACTORS</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
 
   <span class="n">Actor</span><span class="o">*</span> <span class="n">actors_</span><span class="p">[</span><span class="n">NUM_ACTORS</span><span class="p">];</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><code>Stage</code> lets us add actors, and provides a single <code>update()</code> call that updates each
 actor. To the user, actors appear to move simultaneously, but internally,
@@ -440,9 +418,9 @@ slap once.</p>
 <p>To get things going, let&#8217;s define a concrete actor subclass. Our comedian here
 is pretty simple. He faces a single actor. Whenever he gets slapped&#8202;&mdash;&#8202;by
 anyone&#8202;&mdash;&#8202;he responds by slapping the actor he faces.</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Comedian</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Actor</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Comedian</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Actor</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">face</span><span class="p">(</span><span class="n">Actor</span><span class="o">*</span> <span class="n">actor</span><span class="p">)</span> <span class="p">{</span> <span class="n">facing_</span> <span class="o">=</span> <span class="n">actor</span><span class="p">;</span> <span class="p">}</span>
 
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">update</span><span class="p">()</span>
@@ -450,16 +428,15 @@ anyone&#8202;&mdash;&#8202;he responds by slapping the actor he faces.</p>
     <span class="k">if</span> <span class="p">(</span><span class="n">wasSlapped</span><span class="p">())</span> <span class="n">facing_</span><span class="o">-&gt;</span><span class="n">slap</span><span class="p">();</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Actor</span><span class="o">*</span> <span class="n">facing_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, let&#8217;s throw some comedians on a stage and see what happens. We&#8217;ll set up
 three comedians, each facing the next. The last one will face the first, in a
 big circle:</p>
-<div class="codehilite"><pre><span class="n">Stage</span> <span class="n">stage</span><span class="p">;</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Stage</span> <span class="n">stage</span><span class="p">;</span>
 
 <span class="n">Comedian</span><span class="o">*</span> <span class="n">harry</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Comedian</span><span class="p">();</span>
 <span class="n">Comedian</span><span class="o">*</span> <span class="n">baldy</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Comedian</span><span class="p">();</span>
@@ -472,31 +449,28 @@ big circle:</p>
 <span class="n">stage</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">harry</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 <span class="n">stage</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">baldy</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 <span class="n">stage</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">chump</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The resulting stage is set up as shown in the following image. The arrows
 show who the actors are facing, and the numbers show their index in the stage&#8217;s array.</p>
 <p><img src="images/double-buffer-slaps-1.png" alt="Boxes for Harry, Baldy, and Chump, in that order. Harry has an arrow pointing to Baldy, who has an arrow pointing to Chump, who has an arrow pointing back to Harry." /></p>
 <p>We&#8217;ll slap Harry to get things going and see what happens when we start
 processing:</p>
-<div class="codehilite"><pre><span class="n">harry</span><span class="o">-&gt;</span><span class="n">slap</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><code><span class="n">harry</span><span class="o">-&gt;</span><span class="n">slap</span><span class="p">();</span>
 
 <span class="n">stage</span><span class="p">.</span><span class="n">update</span><span class="p">();</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Remember that the <code>update()</code> function in <code>Stage</code> updates each actor in turn, so if
 we step through the code, we&#8217;ll find that the following occurs:</p>
-<div class="codehilite"><pre><span class="n">Stage</span> <span class="n">updates</span> <span class="n">actor</span> <span class="mi">0</span> <span class="p">(</span><span class="n">Harry</span><span class="p">)</span>
-  <span class="n">Harry</span> <span class="n">was</span> <span class="n">slapped</span><span class="p">,</span> <span class="n">so</span> <span class="n">he</span> <span class="n">slaps</span> <span class="n">Baldy</span>
-<span class="n">Stage</span> <span class="n">updates</span> <span class="n">actor</span> <span class="mi">1</span> <span class="p">(</span><span class="n">Baldy</span><span class="p">)</span>
-  <span class="n">Baldy</span> <span class="n">was</span> <span class="n">slapped</span><span class="p">,</span> <span class="n">so</span> <span class="n">he</span> <span class="n">slaps</span> <span class="n">Chump</span>
-<span class="n">Stage</span> <span class="n">updates</span> <span class="n">actor</span> <span class="mi">2</span> <span class="p">(</span><span class="n">Chump</span><span class="p">)</span>
-  <span class="n">Chump</span> <span class="n">was</span> <span class="n">slapped</span><span class="p">,</span> <span class="n">so</span> <span class="n">he</span> <span class="n">slaps</span> <span class="n">Harry</span>
-<span class="n">Stage</span> <span class="n">update</span> <span class="n">ends</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>Stage updates actor 0 (Harry)
+  Harry was slapped, so he slaps Baldy
+Stage updates actor 1 (Baldy)
+  Baldy was slapped, so he slaps Chump
+Stage updates actor 2 (Chump)
+  Chump was slapped, so he slaps Harry
+Stage update ends
+</code></pre></div>
 
 <p>In a single frame, our initial slap on Harry has propagated through all of
 the comedians. Now, to mix things up a bit, let&#8217;s say we reorder the comedians
@@ -504,22 +478,20 @@ within the stage&#8217;s array but leave them facing each other the same way.</p
 <p><img src="images/double-buffer-slaps-2.png" alt="The same boxes as before with the same arrows, but now they are ordered Chump, Baldy, Harry." /></p>
 <p>We&#8217;ll leave the rest of the stage setup alone, but we&#8217;ll replace the chunk of code
 where we add the actors to the stage with this:</p>
-<div class="codehilite"><pre><span class="n">stage</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">harry</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><code><span class="n">stage</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">harry</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
 <span class="n">stage</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">baldy</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 <span class="n">stage</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">chump</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Let&#8217;s see what happens when we run our experiment again:</p>
-<div class="codehilite"><pre><span class="n">Stage</span> <span class="n">updates</span> <span class="n">actor</span> <span class="mi">0</span> <span class="p">(</span><span class="n">Chump</span><span class="p">)</span>
-  <span class="n">Chump</span> <span class="n">was</span> <span class="n">not</span> <span class="n">slapped</span><span class="p">,</span> <span class="n">so</span> <span class="n">he</span> <span class="n">does</span> <span class="n">nothing</span>
-<span class="n">Stage</span> <span class="n">updates</span> <span class="n">actor</span> <span class="mi">1</span> <span class="p">(</span><span class="n">Baldy</span><span class="p">)</span>
-  <span class="n">Baldy</span> <span class="n">was</span> <span class="n">not</span> <span class="n">slapped</span><span class="p">,</span> <span class="n">so</span> <span class="n">he</span> <span class="n">does</span> <span class="n">nothing</span>
-<span class="n">Stage</span> <span class="n">updates</span> <span class="n">actor</span> <span class="mi">2</span> <span class="p">(</span><span class="n">Harry</span><span class="p">)</span>
-  <span class="n">Harry</span> <span class="n">was</span> <span class="n">slapped</span><span class="p">,</span> <span class="n">so</span> <span class="n">he</span> <span class="n">slaps</span> <span class="n">Baldy</span>
-<span class="n">Stage</span> <span class="n">update</span> <span class="n">ends</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>Stage updates actor 0 (Chump)
+  Chump was not slapped, so he does nothing
+Stage updates actor 1 (Baldy)
+  Baldy was not slapped, so he does nothing
+Stage updates actor 2 (Harry)
+  Harry was slapped, so he slaps Baldy
+Stage update ends
+</code></pre></div>
 
 <p>Uh, oh. Totally different. The problem is straightforward. When we
 update the actors, we modify their &#8220;slapped&#8221; states, the exact same
@@ -527,12 +499,10 @@ state we also <em>read</em> during the update. Because of this, changes to
 that state early in the update affect <span name="cascade">later</span> parts of that <em>same</em>
 update step.</p>
 <aside name="cascade">
-
 <p>If you continue to update the stage, you&#8217;ll see the slaps gradually
 cascade through the actors, one per frame. In the first frame, Harry
 slaps Baldy. In the next frame, Baldy slaps Chump, and so on.</p>
 </aside>
-
 <p>The ultimate result is that an actor may respond to being slapped in
 either the <em>same</em> frame as the slap or in the <em>next</em> frame based
 entirely on how the two actors happen to be ordered on the stage. This
@@ -543,9 +513,9 @@ matter.</p>
 <p>Fortunately, our Double Buffer pattern can help. This time, instead of
 having two copies of a monolithic &#8220;buffer&#8221; object, we&#8217;ll be buffering
 at a much finer granularity: each actor&#8217;s &#8220;slapped&#8221; state:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Actor</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Actor</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Actor</span><span class="p">()</span> <span class="o">:</span> <span class="n">currentSlapped_</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span> <span class="p">{}</span>
 
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Actor</span><span class="p">()</span> <span class="p">{}</span>
@@ -563,12 +533,11 @@ at a much finer granularity: each actor&#8217;s &#8220;slapped&#8221; state:</p>
   <span class="kt">void</span> <span class="nf">slap</span><span class="p">()</span>       <span class="p">{</span> <span class="n">nextSlapped_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
   <span class="kt">bool</span> <span class="nf">wasSlapped</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">currentSlapped_</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">bool</span> <span class="n">currentSlapped_</span><span class="p">;</span>
   <span class="kt">bool</span> <span class="n">nextSlapped_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Instead of a single <code>slapped_</code> state, each actor now has two. Just
 like the previous graphics example, the current state is used for
@@ -577,7 +546,7 @@ reading, and the next state is used for writing.</p>
 before clearing the swap state, it copies the next state into the
 current one, making it the new current state. This also requires a
 small change in <code>Stage</code>:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Stage</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Stage::update</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_ACTORS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
   <span class="p">{</span>
@@ -589,8 +558,7 @@ small change in <code>Stage</code>:</p>
     <span class="n">actors_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">swap</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The <code>update()</code> function now updates all of the actors and <em>then</em> swaps
 all of their states. The end result of this is that an actor will only see a
@@ -634,12 +602,11 @@ that case, we won&#8217;t be able to use this option.</p>
 <p><em>Existing data on the buffer will be from two frames ago, not the last
     frame.</em> Successive frames are drawn on alternating buffers with no data
     copied between them, like so:</p>
-<div class="codehilite"><pre>Frame 1 drawn on buffer A
+<div class="codehilite"><pre><span></span><code>Frame 1 drawn on buffer A
 Frame 2 drawn on buffer B
 Frame 3 drawn on buffer A
 ...
-</pre></div>
-
+</code></pre></div>
 
 <p>You&#8217;ll note that when we go to draw the third frame, the data already on
 the buffer is from frame <em>one</em>, not the more recent second frame. In
@@ -649,12 +616,10 @@ name="blur">reuse</span> some of the existing data on the buffer, it&#8217;s
 important to take into account that that data will be a frame older than
 we might expect.</p>
 <aside name="blur">
-
 <p>One classic use of old framebuffer data is simulating motion blur. The
 current frame is blended with a bit of the previously rendered frame to
 make a resulting image that looks more like what a real camera captures.</p>
 </aside>
-
 </li>
 </ul>
 </li>
@@ -714,23 +679,22 @@ monolithic buffer while distributing the buffer across multiple objects.</p>
 <p>The idea is to get the &#8220;current&#8221; and &#8220;next&#8221; pointer concept and apply it
 to each of our objects by turning them into object-relative <em>offsets</em>.
 Like so:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Actor</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Actor</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">static</span> <span class="kt">void</span> <span class="n">init</span><span class="p">()</span> <span class="p">{</span> <span class="n">current_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
   <span class="k">static</span> <span class="kt">void</span> <span class="n">swap</span><span class="p">()</span> <span class="p">{</span> <span class="n">current_</span> <span class="o">=</span> <span class="n">next</span><span class="p">();</span> <span class="p">}</span>
 
   <span class="kt">void</span> <span class="n">slap</span><span class="p">()</span>        <span class="p">{</span> <span class="n">slapped_</span><span class="p">[</span><span class="n">next</span><span class="p">()]</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
   <span class="kt">bool</span> <span class="n">wasSlapped</span><span class="p">()</span>  <span class="p">{</span> <span class="k">return</span> <span class="n">slapped_</span><span class="p">[</span><span class="n">current_</span><span class="p">];</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="kt">int</span> <span class="n">current_</span><span class="p">;</span>
   <span class="k">static</span> <span class="kt">int</span> <span class="nf">next</span><span class="p">()</span>  <span class="p">{</span> <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">current_</span><span class="p">;</span> <span class="p">}</span>
 
   <span class="kt">bool</span> <span class="n">slapped_</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Actors access their current slap state by using <code>current_</code> to index into
 the state array. The next state is always the other index in the array,
@@ -756,6 +720,6 @@ actor&#8217;s state will be swapped.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

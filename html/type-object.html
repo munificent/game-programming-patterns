@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -57,29 +57,26 @@ to the design, a dragon <span name="isa">is a</span> kind of monster, a troll is
 another kind, and so on with the other breeds. Thinking object-oriented, that
 leads us to a <code>Monster</code> base class:</p>
 <aside name="isa">
-
 <p>This is the so-called &#8220;is-a&#8221; relationship. In conventional OOP thinking, since a
 dragon &#8220;is-a&#8221; monster, we model that by making <code>Dragon</code> a subclass of <code>Monster</code>. As
 we&#8217;ll see, subclassing is only one way of enshrining a conceptual relation like
 that into code.</p>
 </aside>
-
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Monster</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Monster</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-<span class="nl">protected:</span>
+<span class="k">protected</span><span class="o">:</span>
   <span class="n">Monster</span><span class="p">(</span><span class="kt">int</span> <span class="n">startingHealth</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">health_</span><span class="p">(</span><span class="n">startingHealth</span><span class="p">)</span>
   <span class="p">{}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">health_</span><span class="p">;</span> <span class="c1">// Current health.</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The public <code>getAttack()</code> function lets the combat code get the string that
 should be displayed when the monster attacks the hero. Each derived breed class
@@ -90,9 +87,9 @@ constructors that call this one, passing in the starting health that is
 appropriate for that breed.</p>
 <p>Now let&#8217;s see a couple of breed subclasses:</p>
 <p><span name="exclaim"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Dragon</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Dragon</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Dragon</span><span class="p">()</span> <span class="o">:</span> <span class="n">Monster</span><span class="p">(</span><span class="mi">230</span><span class="p">)</span> <span class="p">{}</span>
 
   <span class="k">virtual</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span>
@@ -103,7 +100,7 @@ appropriate for that breed.</p>
 
 <span class="k">class</span> <span class="nc">Troll</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Troll</span><span class="p">()</span> <span class="o">:</span> <span class="n">Monster</span><span class="p">(</span><span class="mi">48</span><span class="p">)</span> <span class="p">{}</span>
 
   <span class="k">virtual</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span>
@@ -111,14 +108,11 @@ appropriate for that breed.</p>
     <span class="k">return</span> <span class="s">&quot;The troll clubs you!&quot;</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="exclaim">
-
 <p>Exclamation points make everything more exciting!</p>
 </aside>
-
 <p>Each class derived from <code>Monster</code> passes in the starting health and overrides
 <code>getAttack()</code> to return the attack string for that breed. Everything works as
 expected, and before long, we&#8217;ve got our hero running around slaying a variety of
@@ -171,11 +165,9 @@ hierarchy like this:</p>
 <p><span name="inherits-arrow"></span></p>
 <p><img src="images/type-object-subclasses.png" alt="A Monster base class with derived classes for Dragon, Troll, etc." /></p>
 <aside name="inherits-arrow">
-
 <p>Here, the <img src="images/arrow-inherits.png" class="arrow" alt="A UML arrow representing inheritance." /> means &#8220;inherits
 from&#8221;.</p>
 </aside>
-
 <p>Each instance of a monster in the game will be of one of the derived monster
 types. The more breeds we have, the bigger the class hierarchy. That&#8217;s the
 problem of course: adding new breeds means adding new code, and each breed has
@@ -186,11 +178,9 @@ breed, we have a single <code>Monster</code> class and a single <code>Breed</cod
 <p><span name="references-arrow"></span></p>
 <p><img src="images/type-object-breed.png" alt="A Monster object has a reference to a Breed object." /></p>
 <aside name="references-arrow">
-
 <p>Here, the <img src="images/arrow-references.png" class="arrow" alt="A UML arrow for an object reference." /> means &#8220;is
 referenced by&#8221;.</p>
 </aside>
-
 <p>That&#8217;s it. Two classes. Notice that there&#8217;s no inheritance at all. With this
 system, each monster in the game is simply an instance of class <code>Monster</code>. The
 <code>Breed</code> class contains the information that&#8217;s shared between all monsters of the
@@ -252,7 +242,6 @@ correctly initialized with a reference to a valid breed.</p>
 <p>We&#8217;ve freed ourselves from some of the limitations of the compiler, but the cost
 is that we have to re-implement some of what it used to be doing for us.</p>
 <aside name="vtable">
-
 <p>Under the hood, C++ virtual methods are implemented using something called a
 &#8220;virtual function table&#8221;, or just &#8220;vtable&#8221;. A vtable is a simple <code>struct</code>
 containing a set of function pointers, one for each virtual method in a class.
@@ -265,7 +254,6 @@ the table.</p>
 the reference the monster holds to its breed. C++ classes are the Type Object
 pattern applied to C, handled automatically by the compiler.</p>
 </aside>
-
 <h3><a href="#it's-harder-to-define-*behavior*-for-each-type" name="it's-harder-to-define-*behavior*-for-each-type">It&#8217;s harder to define <em>behavior</em> for each type</a></h3>
 <p>With subclassing, you can override a method and do whatever you want to &#8212;
 calculate values procedurally, call other code, etc. The sky is the limit. We
@@ -288,11 +276,9 @@ name="fn">functions</span> to implement each of those behaviors. Then, we can
 associate an AI algorithm with a breed by having it store a pointer to
 the appropriate function.</p>
 <aside name="fn">
-
 <p>Sound familiar again? Now we&#8217;re back to really implementing vtables in <em>our</em>
 type objects.</p>
 </aside>
-
 <p>Another more powerful solution is to actually support defining behavior
 completely in <span name="data">data</span>. The <a class="gof-pattern"
 href="http://c2.com/cgi-bin/wiki?InterpreterPattern">Interpreter</a> and <a
@@ -301,7 +287,6 @@ objects that represent behavior. If we read in a data file and use that to
 create a data structure for one of these patterns, we&#8217;ve moved the behavior&#8217;s
 definition completely out of code and into content.</p>
 <aside name="data">
-
 <p>Over time, games are getting more data-driven. Hardware gets more powerful, and
 we find ourselves limited more by how much content we can author than how hard
 we can push the hardware. With a 64K cartridge, the challenge was <em>cramming</em> the
@@ -312,14 +297,13 @@ give us a much needed productivity boost, at the expense of less optimal runtime
 performance. Since hardware keeps getting better but our brainpower doesn&#8217;t,
 that trade-off starts to make more and more sense.</p>
 </aside>
-
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>For our first pass at an implementation, let&#8217;s start simple and build the basic
 system described in the motivation section. We&#8217;ll start with the <code>Breed</code>
 class:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Breed</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Breed</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Breed</span><span class="p">(</span><span class="kt">int</span> <span class="n">health</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">attack</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">health_</span><span class="p">(</span><span class="n">health</span><span class="p">),</span>
     <span class="n">attack_</span><span class="p">(</span><span class="n">attack</span><span class="p">)</span>
@@ -328,18 +312,17 @@ class:</p>
   <span class="kt">int</span> <span class="n">getHealth</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">health_</span><span class="p">;</span> <span class="p">}</span>
   <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">attack_</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">health_</span><span class="p">;</span> <span class="c1">// Starting health.</span>
   <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">attack_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Very simple. It&#8217;s basically just a container for two data fields: the starting
 health and the attack string. Let&#8217;s see how monsters use it:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Monster</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Monster</span><span class="p">(</span><span class="n">Breed</span><span class="o">&amp;</span> <span class="n">breed</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">health_</span><span class="p">(</span><span class="n">breed</span><span class="p">.</span><span class="n">getHealth</span><span class="p">()),</span>
     <span class="n">breed_</span><span class="p">(</span><span class="n">breed</span><span class="p">)</span>
@@ -350,12 +333,11 @@ health and the attack string. Let&#8217;s see how monsters use it:</p>
     <span class="k">return</span> <span class="n">breed_</span><span class="p">.</span><span class="n">getAttack</span><span class="p">();</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">int</span>    <span class="n">health_</span><span class="p">;</span> <span class="c1">// Current health.</span>
   <span class="n">Breed</span><span class="o">&amp;</span> <span class="n">breed_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>When we construct a monster, we give it a reference to a breed object. This
 defines the monster&#8217;s breed instead of the subclasses we were previously using.
@@ -370,18 +352,16 @@ instantiated in most OOP languages&#8202;&mdash;&#8202;we don&#8217;t usually al
 memory and then <em>give</em> it its class. Instead, we call a constructor function on
 the class itself, and it&#8217;s responsible for giving us a new instance.</p>
 <p>We can apply this same <span name="pattern">pattern</span> to our type objects:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Breed</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Breed</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Monster</span><span class="o">*</span> <span class="n">newMonster</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="k">new</span> <span class="n">Monster</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span> <span class="p">}</span>
 
   <span class="c1">// Previous Breed code...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="pattern">
-
 <p>&#8220;Pattern&#8221; is the right word here. What we&#8217;re talking about is one of the classic
 patterns from Design Patterns: <a class="gof-pattern"
 href="http://c2.com/cgi/wiki?FactoryMethodPattern">Factory Method</a>.</p>
@@ -389,16 +369,15 @@ href="http://c2.com/cgi/wiki?FactoryMethodPattern">Factory Method</a>.</p>
 Ruby, Smalltalk, Objective-C, and other languages where classes are objects, you
 construct new instances by calling a method on the class object itself.</p>
 </aside>
-
 <p>And the class that uses them:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Monster</span>
 <span class="p">{</span>
   <span class="k">friend</span> <span class="k">class</span> <span class="nc">Breed</span><span class="p">;</span>
 
-<span class="nl">public:</span>
-  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="nf">getAttack</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">breed_</span><span class="p">.</span><span class="n">getAttack</span><span class="p">();</span> <span class="p">}</span>
+<span class="k">public</span><span class="o">:</span>
+  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">getAttack</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">breed_</span><span class="p">.</span><span class="n">getAttack</span><span class="p">();</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Monster</span><span class="p">(</span><span class="n">Breed</span><span class="o">&amp;</span> <span class="n">breed</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">health_</span><span class="p">(</span><span class="n">breed</span><span class="p">.</span><span class="n">getHealth</span><span class="p">()),</span>
     <span class="n">breed_</span><span class="p">(</span><span class="n">breed</span><span class="p">)</span>
@@ -407,14 +386,12 @@ construct new instances by calling a method on the class object itself.</p>
   <span class="kt">int</span> <span class="n">health_</span><span class="p">;</span> <span class="c1">// Current health.</span>
   <span class="n">Breed</span><span class="o">&amp;</span> <span class="n">breed_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The key <span name="friend">difference</span> is the <code>newMonster()</code> function in
 <code>Breed</code>. That&#8217;s our &#8220;constructor&#8221; factory method. With our original
 implementation, creating a monster looked like:</p>
 <aside name="friend">
-
 <p>There&#8217;s another minor difference here. Because the sample code is in C++, we can
 use a handy little feature: <em>friend classes.</em></p>
 <p>We&#8217;ve made <code>Monster</code>&rsquo;s constructor private, which prevents anyone from
@@ -422,15 +399,12 @@ calling it directly. Friend classes sidestep that restriction so <code>Breed</co
 still access it. This means the <em>only</em> way to create monsters is by going
 through <code>newMonster()</code>.</p>
 </aside>
-
-<div class="codehilite"><pre><span class="n">Monster</span><span class="o">*</span> <span class="n">monster</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Monster</span><span class="p">(</span><span class="n">someBreed</span><span class="p">);</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">Monster</span><span class="o">*</span> <span class="n">monster</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Monster</span><span class="p">(</span><span class="n">someBreed</span><span class="p">);</span>
+</code></pre></div>
 
 <p>After our changes, it&#8217;s like this:</p>
-<div class="codehilite"><pre><span class="n">Monster</span><span class="o">*</span> <span class="n">monster</span> <span class="o">=</span> <span class="n">someBreed</span><span class="p">.</span><span class="n">newMonster</span><span class="p">();</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">Monster</span><span class="o">*</span> <span class="n">monster</span> <span class="o">=</span> <span class="n">someBreed</span><span class="p">.</span><span class="n">newMonster</span><span class="p">();</span>
+</code></pre></div>
 
 <p>So, why do this? There are two steps to creating an object: allocation and
 initialization. <code>Monster</code>&rsquo;s constructor lets us do all of the
@@ -463,9 +437,9 @@ mechanism, we&#8217;ll implement it ourselves within our type objects.</p>
 <p>To keep things simple, we&#8217;ll only support single inheritance. In the same way
 that a class can have a parent base class, we&#8217;ll allow a breed to have a parent
 breed:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Breed</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Breed</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Breed</span><span class="p">(</span><span class="n">Breed</span><span class="o">*</span> <span class="n">parent</span><span class="p">,</span> <span class="kt">int</span> <span class="n">health</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">attack</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">parent_</span><span class="p">(</span><span class="n">parent</span><span class="p">),</span>
     <span class="n">health_</span><span class="p">(</span><span class="n">health</span><span class="p">),</span>
@@ -475,13 +449,12 @@ breed:</p>
   <span class="kt">int</span>         <span class="n">getHealth</span><span class="p">();</span>
   <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="nf">getAttack</span><span class="p">();</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Breed</span><span class="o">*</span>      <span class="n">parent_</span><span class="p">;</span>
   <span class="kt">int</span>         <span class="n">health_</span><span class="p">;</span> <span class="c1">// Starting health.</span>
   <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">attack_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>When we construct a breed, we give it a parent that it inherits from. We can
 pass in <code>NULL</code> for a base breed that has no ancestors.</p>
@@ -492,7 +465,7 @@ a non-zero value and overrides the attack by having a non-<code>NULL</code> stri
 Otherwise, the attribute will be inherited from its parent.</p>
 <p>There are two ways we can implement this. One is to handle the delegation
 dynamically every time the attribute is requested, like this:</p>
-<div class="codehilite"><pre><span class="kt">int</span> <span class="n">Breed</span><span class="o">::</span><span class="n">getHealth</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">int</span> <span class="nf">Breed::getHealth</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="c1">// Override.</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">health_</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">parent_</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="n">health_</span><span class="p">;</span>
@@ -501,7 +474,7 @@ dynamically every time the attribute is requested, like this:</p>
   <span class="k">return</span> <span class="n">parent_</span><span class="o">-&gt;</span><span class="n">getHealth</span><span class="p">();</span>
 <span class="p">}</span>
 
-<span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">Breed</span><span class="o">::</span><span class="n">getAttack</span><span class="p">()</span>
+<span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="nf">Breed::getAttack</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="c1">// Override.</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">attack_</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">parent_</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="n">attack_</span><span class="p">;</span>
@@ -509,8 +482,7 @@ dynamically every time the attribute is requested, like this:</p>
   <span class="c1">// Inherit.</span>
   <span class="k">return</span> <span class="n">parent_</span><span class="o">-&gt;</span><span class="n">getAttack</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This has the advantage of doing the right thing if a breed is modified at
 runtime to no longer override, or no longer inherit some attribute. On the other
@@ -521,7 +493,7 @@ attribute.</p>
 apply the inheritance at <em>construction time</em>. This is called &#8220;copy-down&#8221;
 delegation because we <em>copy</em> inherited attributes <em>down</em> into the derived type
 when it&#8217;s created. It looks like this:</p>
-<div class="codehilite"><pre><span class="n">Breed</span><span class="p">(</span><span class="n">Breed</span><span class="o">*</span> <span class="n">parent</span><span class="p">,</span> <span class="kt">int</span> <span class="n">health</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">attack</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Breed</span><span class="p">(</span><span class="n">Breed</span><span class="o">*</span> <span class="n">parent</span><span class="p">,</span> <span class="kt">int</span> <span class="n">health</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">attack</span><span class="p">)</span>
 <span class="o">:</span> <span class="n">health_</span><span class="p">(</span><span class="n">health</span><span class="p">),</span>
   <span class="n">attack_</span><span class="p">(</span><span class="n">attack</span><span class="p">)</span>
 <span class="p">{</span>
@@ -532,21 +504,19 @@ when it&#8217;s created. It looks like this:</p>
     <span class="k">if</span> <span class="p">(</span><span class="n">attack</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="n">attack_</span> <span class="o">=</span> <span class="n">parent</span><span class="o">-&gt;</span><span class="n">getAttack</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Note that we no longer need a field for the parent breed. Once the constructor
 is done, we can forget the parent since we&#8217;ve already copied all of its
 attributes in. To access a breed&#8217;s attribute, now we just return the field:</p>
-<div class="codehilite"><pre><span class="kt">int</span>         <span class="nf">getHealth</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">health_</span><span class="p">;</span> <span class="p">}</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">int</span>         <span class="nf">getHealth</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">health_</span><span class="p">;</span> <span class="p">}</span>
 <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="nf">getAttack</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">attack_</span><span class="p">;</span> <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Nice and fast!</p>
 <p>Let&#8217;s say our game engine is set up to create the breeds by loading a JSON file
 that defines them. It could look like:</p>
-<div class="codehilite"><pre><span class="p">{</span>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;Troll&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="nt">&quot;health&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
     <span class="nt">&quot;attack&quot;</span><span class="p">:</span> <span class="s2">&quot;The troll hits you!&quot;</span>
@@ -562,8 +532,7 @@ that defines them. It could look like:</p>
     <span class="nt">&quot;attack&quot;</span><span class="p">:</span> <span class="s2">&quot;The troll wizard casts a spell on you!&quot;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We&#8217;d have a chunk of code that reads each breed entry and instantiates a new
 breed instance with its data. As you can see from the <code>"parent": "Troll"</code>
@@ -593,23 +562,20 @@ breed. From the codebase&#8217;s perspective, monsters are essentially typeless,
 the fact that they have breeds is an implementation detail.</p>
 <p>We can easily change this and allow <code>Monster</code> to return its <code>Breed</code>:</p>
 <p><span name="null"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Monster</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Breed</span><span class="o">&amp;</span> <span class="n">getBreed</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">breed_</span><span class="p">;</span> <span class="p">}</span>
 
   <span class="c1">// Existing code...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="null">
-
 <p>As in other examples in this book, we&#8217;re following a convention where we return
 objects by reference instead of pointer to indicate to users that <code>NULL</code> will
 never be returned.</p>
 </aside>
-
 <p>Doing this changes the design of <code>Monster</code>. The fact that all monsters have
 breeds is now a publicly visible part of its API. There are benefits with either
 choice.</p>
@@ -627,7 +593,7 @@ choice.</p>
     object</em>. Let&#8217;s say we wanted to change the monster&#8217;s attack string when
     it&#8217;s near death. Since the attack string is always accessed through
     <code>Monster</code>, we have a convenient place to put that code:</p>
-<div class="codehilite"><pre><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">Monster</span><span class="o">::</span><span class="n">getAttack</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="nf">Monster::getAttack</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">health_</span> <span class="o">&lt;</span> <span class="n">LOW_HEALTH</span><span class="p">)</span>
   <span class="p">{</span>
@@ -636,8 +602,7 @@ choice.</p>
 
   <span class="k">return</span> <span class="n">breed_</span><span class="p">.</span><span class="n">getAttack</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>If outside code was calling <code>getAttack()</code> directly on the breed, we
 wouldn&#8217;t have the opportunity to insert that logic.</p>
@@ -846,6 +811,6 @@ having our Type Object serve double duty as a State too.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

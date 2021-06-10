@@ -1,2 +1,2 @@
 #!/bin/bash
-python script/format.py --watch $@
+python3 script/format.py --watch $@

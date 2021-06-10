@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -57,31 +57,25 @@ but it&#8217;s fragmented into two seven-byte pieces with a chunk of in-use memo
 between them. If we try to allocate a twelve-byte object, we&#8217;ll fail. No more
 sparklies on screen.</p>
 <aside name="park">
-
 <p>It&#8217;s like trying to parallel park on a busy street where the already parked cars
 are spread out a bit too far. If they&#8217;d bunch up, there would be room, but the
 free space is <em>fragmented</em> into bits of open curb between half a dozen cars.</p>
 </aside>
-
 <p><span name="heap"></span></p>
 <p><img src="images/object-pool-heap-fragment.png" alt="A series of memory operations leading to fragmentation." /></p>
 <aside name="heap">
-
 <p>Here&#8217;s how a heap becomes fragmented and how it can cause an allocation to fail
 even where there&#8217;s theoretically enough memory available.</p>
 </aside>
-
 <p>Even if fragmentation is infrequent, it can still <span
 name="soak">gradually</span> reduce the heap to an unusable foam of open holes
 and filled-in crevices, ultimately hosing the game completely.</p>
 <aside name="soak">
-
 <p>Most console makers require games to pass &#8220;soak tests&#8221; where they leave the game
 running in demo mode for several days. If the game crashes, they don&#8217;t allow it
 to ship. While soak tests sometimes fail because of a rarely occurring bug, it&#8217;s
 usually creeping fragmentation or memory leakage that brings the game down.</p>
 </aside>
-
 <h3><a href="#the-best-of-both-worlds" name="the-best-of-both-worlds">The best of both worlds</a></h3>
 <p>Because of fragmentation and because allocation may be slow, games are very
 careful about when and how they manage memory. A simple solution is often best &#8212;
@@ -196,13 +190,11 @@ luggage tray just for your keys and wallet.</p>
 pool into <span name="pools">separate</span> pools for different sizes of
 object&#8202;&mdash;&#8202;big trays for luggage, little trays for pocket stuff.</p>
 <aside name="pools">
-
 <p>This is a common pattern for implementing speed-efficient memory managers. The
 manager has a number of pools of different block sizes. When you ask it to
 allocate a block, it finds in an open slot in the pool of the appropriate size
 and allocates from that pool.</p>
 </aside>
-
 <h3><a href="#reused-objects-aren't-automatically-cleared" name="reused-objects-aren't-automatically-cleared">Reused objects aren&#8217;t automatically cleared</a></h3>
 <p>Most memory managers have a debug feature that will clear freshly allocated or
 freed memory to some obvious magic value like <code>0xdeadbeef</code>. This helps you find
@@ -218,10 +210,8 @@ the pool <em>fully</em> initializes the object. It may even be worth spending a 
 time adding a debug feature that <span name="clear">clears</span> the memory for
 an object slot when the object is reclaimed.</p>
 <aside name="clear">
-
 <p>I&#8217;d be honored if you clear it to <code>0x1deadb0b</code>.</p>
 </aside>
-
 <h3><a href="#unused-objects-will-remain-in-memory" name="unused-objects-will-remain-in-memory">Unused objects will remain in memory</a></h3>
 <p>Object pools are less common in systems that support garbage collection because
 the memory manager will usually deal with fragmentation for you. But pools are
@@ -239,9 +229,9 @@ line for a certain number of frames and then kill the particle. Not exactly film
 caliber, but it should illustrate how to use an object pool.</p>
 <p>We&#8217;ll start with the simplest possible implementation. First up is the little
 particle class:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Particle</span><span class="p">()</span>
   <span class="o">:</span> <span class="n">framesLeft_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
   <span class="p">{}</span>
@@ -265,13 +255,12 @@ particle class:</p>
 
   <span class="kt">bool</span> <span class="n">inUse</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">framesLeft_</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">framesLeft_</span><span class="p">;</span>
   <span class="kt">double</span> <span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">;</span>
   <span class="kt">double</span> <span class="n">xVel_</span><span class="p">,</span> <span class="n">yVel_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The default constructor initializes the particle to &#8220;not in use&#8221;. A later call
 to <code>init()</code> initializes the particle to a live state. Particles are animated
@@ -279,12 +268,12 @@ over time using the unsurprisingly named <code>animate()</code> function, which 
 called once per frame.</p>
 <p>The pool needs to know which particles are available for reuse. It gets this
 from the particle&#8217;s <code>inUse()</code> function. This function takes advantage of the fact that
-particles have a limited lifetime and uses the <code>_framesLeft</code> variable to
+particles have a limited lifetime and uses the <code>framesLeft_</code> variable to
 discover which particles are in use without having to store a separate flag.</p>
 <p>The pool class is also simple:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">ParticlePool</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">ParticlePool</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">create</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span>
               <span class="kt">double</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">double</span> <span class="n">yVel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">lifetime</span><span class="p">);</span>
 
@@ -296,28 +285,25 @@ discover which particles are in use without having to store a separate flag.</p>
     <span class="p">}</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">POOL_SIZE</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
   <span class="n">Particle</span> <span class="n">particles_</span><span class="p">[</span><span class="n">POOL_SIZE</span><span class="p">];</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The <code>create()</code> function lets external code create new particles. The game calls
 <span name="update"><code>animate()</code></span> once per frame, which in turn animates
 each particle in the pool.</p>
 <aside name="update">
-
 <p>This <code>animate()</code> method is an example of the <a href="update-method.html"
 class="pattern">Update Method</a> pattern.</p>
 </aside>
-
 <p>The particles themselves are simply stored in a fixed-size array in the class.
 In this sample implementation, the pool size is hardcoded in the class
 declaration, but this could be defined externally by using a dynamic array of a
 given size or by using a value template parameter.</p>
 <p>Creating a new particle is straightforward:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticlePool</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">ParticlePool::create</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span>
                           <span class="kt">double</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">double</span> <span class="n">yVel</span><span class="p">,</span>
                           <span class="kt">int</span> <span class="n">lifetime</span><span class="p">)</span>
 <span class="p">{</span>
@@ -331,8 +317,7 @@ given size or by using a value template parameter.</p>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We iterate through the pool looking for the first available particle. When we
 find it, we initialize it and we&#8217;re done. Note that in this implementation, if
@@ -347,11 +332,9 @@ a new particle requires <span name="create">iterating</span> through
 very large and mostly full, that can get slow. Let&#8217;s see how we can improve
 that.</p>
 <aside name="create">
-
 <p>Creating a particle has <em>O(n)</em> complexity, for those of us who remember our
 algorithms class.</p>
 </aside>
-
 <h3><a href="#a-free-list" name="a-free-list">A free list</a></h3>
 <p>If we don&#8217;t want to waste time <em>finding</em> free particles, the obvious answer is
 to not lose track of them. We could store a separate list of pointers to each
@@ -366,17 +349,17 @@ memory. Conveniently, there is some memory already lying around that we can borr
 the data for the unused particles themselves.</p>
 <p>When a particle isn&#8217;t in use, most of its state is irrelevant. Its position and
 velocity aren&#8217;t being used. The only state it needs is the stuff required to
-tell if it&#8217;s dead. In our example, that&#8217;s the <code>_framesLeft</code> member. All those
+tell if it&#8217;s dead. In our example, that&#8217;s the <code>framesLeft_</code> member. All those
 other bits can be reused. Here&#8217;s a revised particle:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="c1">// ...</span>
 
   <span class="n">Particle</span><span class="o">*</span> <span class="n">getNext</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">state_</span><span class="p">.</span><span class="n">next</span><span class="p">;</span> <span class="p">}</span>
   <span class="kt">void</span> <span class="n">setNext</span><span class="p">(</span><span class="n">Particle</span><span class="o">*</span> <span class="n">next</span><span class="p">)</span> <span class="p">{</span> <span class="n">state_</span><span class="p">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">framesLeft_</span><span class="p">;</span>
 
   <span class="k">union</span>
@@ -392,8 +375,7 @@ other bits can be reused. Here&#8217;s a revised particle:</p>
     <span class="n">Particle</span><span class="o">*</span> <span class="n">next</span><span class="p">;</span>
   <span class="p">}</span> <span class="n">state_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We&#8217;ve moved all of the member variables except for <code>framesLeft_</code>
 into a <code>live</code> struct inside a <code>state_</code> <span name="union">union</span>. This
@@ -401,14 +383,12 @@ struct holds the particle&#8217;s state when it&#8217;s being animated. When the
 unused, the other case of the union, the <code>next</code> member, is used. It holds a
 pointer to the next available particle after this one.</p>
 <aside name="union">
-
 <p>Unions don&#8217;t seem to be used that often these days, so the syntax may be
 unfamiliar to you. If you&#8217;re on a game team, you&#8217;ve probably got a &#8220;memory
 guru&#8221;, that beleaguered compatriot whose job it is to come up with a solution
 when the game has inevitably blown its memory budget. Ask them about unions.
 They&#8217;ll know all about them and other fun bit-packing tricks.</p>
 </aside>
-
 <p>We can use these pointers to build a linked list that chains together every
 unused particle in the pool. We have the list of available particles we need,
 but we didn&#8217;t need to use any additional memory. Instead, we cannibalize the memory
@@ -418,18 +398,17 @@ list</em></a>. For it to work, we need to make
 sure the pointers are initialized correctly and are maintained when particles
 are created and destroyed. And, of course, we need to keep track of the list&#8217;s
 head:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">ParticlePool</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">ParticlePool</span>
 <span class="p">{</span>
   <span class="c1">// ...</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Particle</span><span class="o">*</span> <span class="n">firstAvailable_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>When a pool is first created, <em>all</em> of the particles are available, so our free
 list should thread through the entire pool. The pool constructor sets that up:</p>
-<div class="codehilite"><pre><span class="n">ParticlePool</span><span class="o">::</span><span class="n">ParticlePool</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="n">ParticlePool</span><span class="o">::</span><span class="n">ParticlePool</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="c1">// The first one is available.</span>
   <span class="n">firstAvailable_</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">particles_</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
@@ -443,17 +422,14 @@ list should thread through the entire pool. The pool constructor sets that up:</
   <span class="c1">// The last one terminates the list.</span>
   <span class="n">particles_</span><span class="p">[</span><span class="n">POOL_SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">setNext</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now to create a new particle, we jump directly to the <span
 name="first">first</span> available one:</p>
 <aside name="first">
-
 <p><em>O(1)</em> complexity, baby! Now we&#8217;re cooking!</p>
 </aside>
-
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticlePool</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">ParticlePool::create</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span>
                           <span class="kt">double</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">double</span> <span class="n">yVel</span><span class="p">,</span>
                           <span class="kt">int</span> <span class="n">lifetime</span><span class="p">)</span>
 <span class="p">{</span>
@@ -466,13 +442,12 @@ name="first">first</span> available one:</p>
 
   <span class="n">newParticle</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xVel</span><span class="p">,</span> <span class="n">yVel</span><span class="p">,</span> <span class="n">lifetime</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We need to know when a particle dies so we can add it back to the free list, so
 we&#8217;ll change <code>animate()</code> to return <code>true</code> if the previously live particle gave
 up the ghost in that frame:</p>
-<div class="codehilite"><pre><span class="kt">bool</span> <span class="n">Particle</span><span class="o">::</span><span class="n">animate</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">bool</span> <span class="nf">Particle::animate</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">inUse</span><span class="p">())</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
 
@@ -482,11 +457,10 @@ up the ghost in that frame:</p>
 
   <span class="k">return</span> <span class="n">framesLeft_</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>When that happens, we simply thread it back onto the list:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticlePool</span><span class="o">::</span><span class="n">animate</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">ParticlePool::animate</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">POOL_SIZE</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
   <span class="p">{</span>
@@ -498,8 +472,7 @@ up the ghost in that frame:</p>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>There you go, a nice little object pool with constant-time creation and
 deletion.</p>
@@ -526,11 +499,11 @@ objects.</p>
 <p><em>You can ensure that the objects can only be created by the pool.</em> In
     C++, a simple way to do this is to make the pool class a friend of the
     object class and then make the object&#8217;s constructor private.</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
   <span class="k">friend</span> <span class="k">class</span> <span class="nc">ParticlePool</span><span class="p">;</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Particle</span><span class="p">()</span>
   <span class="o">:</span> <span class="n">inUse_</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span>
   <span class="p">{}</span>
@@ -542,8 +515,7 @@ objects.</p>
 <span class="p">{</span>
   <span class="n">Particle</span> <span class="n">pool_</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This relationship documents the intended way to use the class and
 ensures your users don&#8217;t create objects that aren&#8217;t tracked by the pool.</p>
@@ -570,17 +542,16 @@ ensures your users don&#8217;t create objects that aren&#8217;t tracked by the p
 <li>
 <p><em>The &#8220;in use&#8221; state must be tracked outside the objects.</em> The simplest
     way to do this is by creating a separate bit field:</p>
-<div class="codehilite"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TObject</span><span class="o">&gt;</span>
+<div class="codehilite"><pre><span></span><code><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TObject</span><span class="o">&gt;</span>
 <span class="k">class</span> <span class="nc">GenericPool</span>
 <span class="p">{</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">POOL_SIZE</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
 
   <span class="n">TObject</span> <span class="n">pool_</span><span class="p">[</span><span class="n">POOL_SIZE</span><span class="p">];</span>
   <span class="kt">bool</span>    <span class="n">inUse_</span><span class="p">[</span><span class="n">POOL_SIZE</span><span class="p">];</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 </li>
 </ul>
@@ -605,17 +576,17 @@ outside.</p>
     offer multiple functions that initialize it. If the pool manages
     initialization, its interface needs to support all of those and forward
     them to the object.</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
   <span class="c1">// Multiple ways to initialize.</span>
-  <span class="kt">void</span> <span class="n">init</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">);</span>
   <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">angle</span><span class="p">);</span>
   <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">xVel</span><span class="p">,</span> <span class="kt">double</span> <span class="n">yVel</span><span class="p">);</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">ParticlePool</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">create</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Forward to Particle...</span>
@@ -631,8 +602,7 @@ outside.</p>
     <span class="c1">// Forward to Particle...</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 </li>
 </ul>
@@ -644,9 +614,9 @@ outside.</p>
 <p><em>The pool&#8217;s interface can be simpler.</em> Instead of offering multiple
     functions to cover each way an object can be initialized, the pool can
     simply return a reference to the new object:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="c1">// Multiple ways to initialize.</span>
   <span class="kt">void</span> <span class="n">init</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">);</span>
   <span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">angle</span><span class="p">);</span>
@@ -655,26 +625,24 @@ outside.</p>
 
 <span class="k">class</span> <span class="nc">ParticlePool</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Particle</span><span class="o">*</span> <span class="n">create</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="c1">// Return reference to available particle...</span>
   <span class="p">}</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Particle</span> <span class="n">pool_</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The caller can then initialize the object by calling any method the
 object exposes:</p>
-<div class="codehilite"><pre><span class="n">ParticlePool</span> <span class="n">pool</span><span class="p">;</span>
+<div class="codehilite"><pre><span></span><code><span class="n">ParticlePool</span> <span class="n">pool</span><span class="p">;</span>
 
 <span class="n">pool</span><span class="p">.</span><span class="n">create</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
 <span class="n">pool</span><span class="p">.</span><span class="n">create</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">);</span>
 <span class="n">pool</span><span class="p">.</span><span class="n">create</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">3.3</span><span class="p">,</span> <span class="mf">4.4</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 </li>
 <li>
@@ -683,10 +651,9 @@ object exposes:</p>
     return a pointer to an object. If the pool is full, though, it may
     return <code>NULL</code> instead. To be safe, you&#8217;ll need to check for that before
     you try to initialize the object:</p>
-<div class="codehilite"><pre><span class="n">Particle</span><span class="o">*</span> <span class="n">particle</span> <span class="o">=</span> <span class="n">pool</span><span class="p">.</span><span class="n">create</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Particle</span><span class="o">*</span> <span class="n">particle</span> <span class="o">=</span> <span class="n">pool</span><span class="p">.</span><span class="n">create</span><span class="p">();</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">particle</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="n">particle</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 </li>
 </ul>
@@ -719,6 +686,6 @@ expectation that an object will be shared within its lifetime.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

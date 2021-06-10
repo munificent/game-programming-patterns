@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -48,13 +48,12 @@ NPC fires his rifle and a shot rings out (AI). The user selects a menu item with
 a beep of confirmation (user interface).</p>
 <p>Each of these places will need to be able to call into the audio system with
 something like one of these:</p>
-<div class="codehilite"><pre><span class="c1">// Use a static class?</span>
+<div class="codehilite"><pre><span></span><code><span class="c1">// Use a static class?</span>
 <span class="n">AudioSystem</span><span class="o">::</span><span class="n">playSound</span><span class="p">(</span><span class="n">VERY_LOUD_BANG</span><span class="p">);</span>
 
 <span class="c1">// Or maybe a singleton?</span>
 <span class="n">AudioSystem</span><span class="o">::</span><span class="n">instance</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">playSound</span><span class="p">(</span><span class="n">VERY_LOUD_BANG</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Either gets us where we&#8217;re trying to go, but we stumbled into some sticky
 coupling along the way. Every place in the game calling into our audio system
@@ -105,11 +104,9 @@ more flexible, more configurable cousin of the Singleton pattern. When used <spa
 name="well">well</span>, it can make your codebase more flexible with little
 runtime cost.</p>
 <aside name="well">
-
 <p>Conversely, when used poorly, it carries with it all of the baggage of the
 Singleton pattern with worse runtime performance.</p>
 </aside>
-
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <p>The core difficulty with a service locator is that it takes a dependency&#8202;&mdash;&#8202;a
 bit of coupling between two pieces of code&#8202;&mdash;&#8202;and defers wiring it up until
@@ -135,16 +132,15 @@ system to the rest of the codebase through a service locator.</p>
 <h3><a href="#the-service" name="the-service">The service</a></h3>
 <p>We&#8217;ll start off with the audio API. This is the interface that our service will
 be exposing:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Audio</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Audio</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Audio</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">stopSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">stopAllSounds</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">stopSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">stopAllSounds</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>A real audio engine would be much more complex than this, of course, but this
 shows the basic idea. What&#8217;s important is that it&#8217;s an abstract interface class
@@ -154,9 +150,9 @@ with no implementation bound to it.</p>
 implementation. This book isn&#8217;t about how to write audio code for a game
 console, so you&#8217;ll have to imagine there&#8217;s some actual code in the bodies of
 these functions, but you get the idea:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">ConsoleAudio</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Audio</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">ConsoleAudio</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Audio</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Play sound using console audio api...</span>
@@ -172,8 +168,7 @@ these functions, but you get the idea:</p>
     <span class="c1">// Stop all sounds using console audio api...</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now we have an interface and an implementation. The remaining piece is the
 service locator&#8202;&mdash;&#8202;the class that ties the two together.</p>
@@ -181,9 +176,9 @@ service locator&#8202;&mdash;&#8202;the class that ties the two together.</p>
 <p>The implementation here is about the simplest kind of service locator you can
 define:</p>
 <p><span name="di"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Locator</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Locator</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">static</span> <span class="n">Audio</span><span class="o">*</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
 
   <span class="k">static</span> <span class="kt">void</span> <span class="n">provide</span><span class="p">(</span><span class="n">Audio</span><span class="o">*</span> <span class="n">service</span><span class="p">)</span>
@@ -191,14 +186,12 @@ define:</p>
     <span class="n">service_</span> <span class="o">=</span> <span class="n">service</span><span class="p">;</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="n">Audio</span><span class="o">*</span> <span class="n">service_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="di">
-
 <p>The technique this uses is called <em>dependency injection</em>, an awkward bit of
 jargon for a very simple idea. Say you have one class that depends on another.
 In our case, our <code>Locator</code> class needs an instance of the <code>Audio</code> service.
@@ -206,22 +199,19 @@ Normally, the locator would be responsible for constructing that instance itself
 Dependency injection instead says that outside code is responsible for
 <em>injecting</em> that dependency into the object that needs it.</p>
 </aside>
-
 <p>The static <code>getAudio()</code> function does the locating. We can call it from
 anywhere in the codebase, and it will give us back an instance of our <code>Audio</code>
 service to use:</p>
-<div class="codehilite"><pre><span class="n">Audio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="n">Locator</span><span class="o">::</span><span class="n">getAudio</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Audio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="n">Locator</span><span class="o">::</span><span class="n">getAudio</span><span class="p">();</span>
 <span class="n">audio</span><span class="o">-&gt;</span><span class="n">playSound</span><span class="p">(</span><span class="n">VERY_LOUD_BANG</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The way it &#8220;locates&#8221; is very simple&#8202;&mdash;&#8202;it relies on some outside code to register
 a service provider before anything tries to use the service. When the game is
 starting up, it calls some code like this:</p>
-<div class="codehilite"><pre><span class="n">ConsoleAudio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConsoleAudio</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><code><span class="n">ConsoleAudio</span> <span class="o">*</span><span class="n">audio</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConsoleAudio</span><span class="p">();</span>
 <span class="n">Locator</span><span class="o">::</span><span class="n">provide</span><span class="p">(</span><span class="n">audio</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The key part to notice here is that the code that calls <code>playSound()</code> isn&#8217;t aware of
 the concrete <code>ConsoleAudio</code> class; it only knows the abstract <code>Audio</code> interface. Equally
@@ -241,13 +231,11 @@ it has one big shortcoming: if we try to use the service <span
 name="temporal">before</span> a provider has been registered, it returns <code>NULL</code>.
 If the calling code doesn&#8217;t check that, we&#8217;re going to crash the game.</p>
 <aside name="temporal">
-
 <p>I sometimes hear this called &#8220;temporal coupling&#8221;&#8202;&mdash;&#8202;two separate pieces of code
 that must be called in the right order for the program to work correctly. All
 stateful software has some degree of this, but as with other kinds of coupling,
 reducing temporal coupling makes the codebase easier to manage.</p>
 </aside>
-
 <p>Fortunately, there&#8217;s another design pattern called &#8220;Null Object&#8221; that we can use
 to address this. The basic idea is that in places where we would return <code>NULL</code>
 when we fail to find or create an object, we instead return a special object
@@ -255,22 +243,21 @@ that implements the same interface as the desired object. Its implementation
 basically does nothing, but it allows code that receives the object to safely
 continue on as if it had received a &#8220;real&#8221; one.</p>
 <p>To use this, we&#8217;ll define another &#8220;null&#8221; service provider:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">NullAudio</span><span class="o">:</span> <span class="k">public</span> <span class="n">Audio</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">NullAudio</span><span class="o">:</span> <span class="k">public</span> <span class="n">Audio</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">playSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* Do nothing. */</span> <span class="p">}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">stopSound</span><span class="p">(</span><span class="kt">int</span> <span class="n">soundID</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* Do nothing. */</span> <span class="p">}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">stopAllSounds</span><span class="p">()</span>        <span class="p">{</span> <span class="cm">/* Do nothing. */</span> <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>As you can see, it implements the service interface, but doesn&#8217;t actually do
 anything. Now, we change our locator to this:</p>
 <p><span name="ref"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Locator</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Locator</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">static</span> <span class="kt">void</span> <span class="n">initialize</span><span class="p">()</span> <span class="p">{</span> <span class="n">service_</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">nullService_</span><span class="p">;</span> <span class="p">}</span>
 
   <span class="k">static</span> <span class="n">Audio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="o">*</span><span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
@@ -288,15 +275,13 @@ anything. Now, we change our locator to this:</p>
     <span class="p">}</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="n">Audio</span><span class="o">*</span> <span class="n">service_</span><span class="p">;</span>
   <span class="k">static</span> <span class="n">NullAudio</span> <span class="n">nullService_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="ref">
-
 <p>You may notice we&#8217;re returning the service by reference instead of by pointer
 now. Since references in C++ are (in theory!) never <code>NULL</code>, returning a
 reference is a hint to users of the code that they can expect to always get a
@@ -307,7 +292,6 @@ on to make sure that the locator initially correctly defaults to the null
 provider. In return, it moves the branch out of <code>getAudio()</code>, which will save us
 a couple of cycles every time the service is accessed.</p>
 </aside>
-
 <p>Calling code will never know that a &#8220;real&#8221; service wasn&#8217;t found, nor does it
 have to worry about handling <code>NULL</code>. It&#8217;s guaranteed to always get back a valid
 object.</p>
@@ -316,14 +300,12 @@ object.</p>
 way to do so: simply don&#8217;t register a provider for the service, and the locator
 will default to a null provider.</p>
 <aside name="disable">
-
 <p>Turning off audio is handy during development. It frees up some memory and CPU
 cycles. More importantly, when you break into a debugger just as a loud sound
 starts playing, it saves you from having your eardrums shredded. There&#8217;s nothing
 like twenty milliseconds of a scream sound effect looping at full volume to get
 your blood flowing in the morning.</p>
 </aside>
-
 <h3><a href="#logging-decorator" name="logging-decorator">Logging decorator</a></h3>
 <p>Now that our system is pretty robust, let&#8217;s discuss another refinement this
 pattern lets us do&#8202;&mdash;&#8202;decorated services. I&#8217;ll explain with an example.</p>
@@ -343,9 +325,9 @@ different systems we want to conditionally log are exposed as services, then we
 can solve this using the <a class="gof-pattern"
 href="http://www.c2.com/cgi/wiki?DecoratorPattern">Decorator</a> pattern. Let&#8217;s
 define another audio service provider implementation like this:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">LoggedAudio</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Audio</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">LoggedAudio</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Audio</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">LoggedAudio</span><span class="p">(</span><span class="n">Audio</span> <span class="o">&amp;</span><span class="n">wrapped</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">wrapped_</span><span class="p">(</span><span class="n">wrapped</span><span class="p">)</span>
   <span class="p">{}</span>
@@ -368,7 +350,7 @@ define another audio service provider implementation like this:</p>
     <span class="n">wrapped_</span><span class="p">.</span><span class="n">stopAllSounds</span><span class="p">();</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">log</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">message</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Code to log message...</span>
@@ -376,13 +358,12 @@ define another audio service provider implementation like this:</p>
 
   <span class="n">Audio</span> <span class="o">&amp;</span><span class="n">wrapped_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>As you can see, it wraps another audio provider and exposes the same interface.
 It forwards the actual audio behavior to the inner provider, but it also logs each
 sound call. If a programmer wants to enable audio logging, they call this:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">enableAudioLogging</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">enableAudioLogging</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="c1">// Decorate the existing service.</span>
   <span class="n">Audio</span> <span class="o">*</span><span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LoggedAudio</span><span class="p">(</span><span class="n">Locator</span><span class="o">::</span><span class="n">getAudio</span><span class="p">());</span>
@@ -390,8 +371,7 @@ sound call. If a programmer wants to enable audio logging, they call this:</p>
   <span class="c1">// Swap it in.</span>
   <span class="n">Locator</span><span class="o">::</span><span class="n">provide</span><span class="p">(</span><span class="n">service</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, any calls to the audio service will be logged before continuing as before.
 And, of course, this plays nicely with our null service, so you can both
@@ -448,20 +428,19 @@ service&#8217;s abstract interface.</p>
 <p><strong>Bind to it at compile time:</strong></p>
 <p>The idea here is that the &#8220;location&#8221; process actually occurs at compile time
 using preprocessor macros. Like so:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Locator</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Locator</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">static</span> <span class="n">Audio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
-  <span class="err">#</span><span class="k">if</span> <span class="n">DEBUG</span>
+<span class="k">private</span><span class="o">:</span>
+  <span class="cp">#if DEBUG</span>
     <span class="k">static</span> <span class="n">DebugAudio</span> <span class="n">service_</span><span class="p">;</span>
-  <span class="err">#</span><span class="k">else</span>
+  <span class="cp">#else</span>
     <span class="k">static</span> <span class="n">ReleaseAudio</span> <span class="n">service_</span><span class="p">;</span>
-  <span class="err">#</span><span class="n">endif</span>
+  <span class="cp">#endif</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Locating the service like this implies a few things:</p>
 <ul>
@@ -491,7 +470,6 @@ using preprocessor macros. Like so:</p>
 requested, the locator does some <span name="reflection">magic</span> at
 runtime to hunt down the actual implementation requested.</p>
 <aside name="reflection">
-
 <p><em>Reflection</em> is a capability of some programming languages to interact with
 the type system at runtime. For example, we could find a class with a given
 name, find its constructor, and then invoke it to create an instance.</p>
@@ -499,7 +477,6 @@ name, find its constructor, and then invoke it to create an instance.</p>
 their very nature, but newer static languages like C# and Java also support
 it.</p>
 </aside>
-
 <p>Typically, this means loading a configuration file that identifies the
 provider and then using reflection to instantiate that class at runtime. This
 does a few things for us:</p>
@@ -578,9 +555,9 @@ service, it just returns <code>NULL</code>. This implies:</p>
 compile-time, but that doesn&#8217;t mean we can&#8217;t <em>declare</em> that availability is
 part of the runtime contract of the locator. The simplest way to do this is
 with an assertion:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Locator</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Locator</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">static</span> <span class="n">Audio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="n">Audio</span><span class="o">*</span> <span class="n">service</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
@@ -591,8 +568,7 @@ with an assertion:</p>
     <span class="k">return</span> <span class="o">*</span><span class="n">service</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>If the service isn&#8217;t located, the game stops before any subsequent code
 tries to use it. The <span name="assert"><code>assert()</code></span> call there doesn&#8217;t solve the problem of
@@ -600,11 +576,9 @@ failing to locate the service, but it does make it clear whose problem it
 is. By asserting here, we say, &#8220;Failing to locate a service is a bug in the
 locator.&#8221;</p>
 <aside name="assert">
-
 <p>The <a href="singleton.html" class="pattern">Singleton</a> chapter
 explains the <code>assert()</code> function if you&#8217;ve never seen it before.</p>
 </aside>
-
 <p>So what does this do for us?</p>
 <ul>
 <li>
@@ -647,11 +621,9 @@ behave how we want. <span name="null">It</span> will take some work to
 trace that issue back to the fact that a service wasn&#8217;t there when we
 thought it would be.</p>
 <aside name="null">
-
 <p>We can alleviate this by having the null service print some debug output
 whenever it&#8217;s used.</p>
 </aside>
-
 </li>
 </ul>
 </li>
@@ -670,19 +642,18 @@ working on.</p>
 service to <em>anyone</em> who wants it. While this is the typical way the pattern is
 used, another option is to limit access to a single class and its descendants,
 like so:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Base</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Base</span>
 <span class="p">{</span>
   <span class="c1">// Code to locate service and set service_...</span>
 
-<span class="nl">protected:</span>
+<span class="k">protected</span><span class="o">:</span>
   <span class="c1">// Derived classes can use service</span>
   <span class="k">static</span> <span class="n">Audio</span><span class="o">&amp;</span> <span class="n">getAudio</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="o">*</span><span class="n">service_</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="n">Audio</span><span class="o">*</span> <span class="n">service_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>With this, access to the service is restricted to classes that inherit <code>Base</code>.
 There are advantages either way:</p>
@@ -755,6 +726,6 @@ get used more widely like logging should be global.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

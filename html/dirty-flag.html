@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -44,14 +44,12 @@ name="transform"><em>transform</em></span>. The transform describes the object&#
 position, rotation, and scale in the world. To move or turn an object, we simply
 change its transform.</p>
 <aside name="transform">
-
 <p>The mechanics of <em>how</em> this transform is stored and manipulated are unfortunately
 out of scope here. The comically abbreviated summary is that it&#8217;s a 4x4 matrix.
 You can make a single transform that combines two transforms&#8202;&mdash;&#8202;for example,
 translating and then rotating an object&#8202;&mdash;&#8202;by multiplying the two matrices.</p>
 <p>How and why that works is left as an exercise for the reader.</p>
 </aside>
-
 <p>When the renderer draws an object, it takes the object&#8217;s model, applies the
 transform to it, and then renders it there in the world. If we had a scene
 <em>bag</em> and not a scene <em>graph</em>, that would be it, and life would be simple.</p>
@@ -66,21 +64,17 @@ the sea. The crow&#8217;s nest&#8217;s transform positions the nest on the ship,
 <p><span name="pirate"></span>
 <img src="images/dirty-flag-pirate.png" alt="A pirate ship containing a crow's nest with a pirate in it with a parrot on his shoulder." /></p>
 <aside name="pirate">
-
 <p>Programmer art!</p>
 </aside>
-
 <p>This way, when a parent object moves, its children move with it automatically.
 If we change the local transform of the ship, the crow&#8217;s nest, pirate, and
 parrot go along for the ride. It would be a total <span
 name="slide">headache</span> if, when the ship moved, we had to manually adjust
 the transforms of all the objects on it to keep them from sliding off.</p>
 <aside name="slide">
-
 <p>To be honest, when you are at sea you <em>do</em> have to keep manually adjusting your
 position to keep from sliding off. Maybe I should have chosen a drier example.</p>
 </aside>
-
 <p>But to actually draw the parrot on screen, we need to know its absolute position
 in the world. I&#8217;ll call the parent-relative transform the object&#8217;s <em>local
 transform</em>. To render an object, we need to know its <em>world transform</em>.</p>
@@ -91,11 +85,9 @@ transforms as you go. In other words, the parrot&#8217;s world transform is:</p>
 <p><span name="degenerate"></span>
 <img src="images/dirty-flag-multiply.png" alt="The parrot's world position comes from multiplying the local positions for the ship, nest, pirate, and parrot." /></p>
 <aside name="degenerate">
-
 <p>In the degenerate case where the object has no parent, its local and world
 transforms are equivalent.</p>
 </aside>
-
 <p>We need the world transform for every object in the world every frame, so even
 though there are only a handful of matrix multiplications per model, it&#8217;s on the hot
 code path where performance is critical. Keeping them up to date is tricky
@@ -126,11 +118,9 @@ happening?</p>
 <p><span name="stars"></span>
 <img src="images/dirty-flag-update-bad.png" alt="Any time an object moves, the world coordinates are recalculated eagerly and redundantly." /></p>
 <aside name="stars">
-
 <p>You can see on the lines marked &#x2605; that we&#8217;re recalculating the parrot&#8217;s
 world transform <em>four</em> times when we only need the result of the final one.</p>
 </aside>
-
 <p>We only moved four objects, but we did <em>ten</em> world transform calculations.
 That&#8217;s six pointless calculations that get thrown out before they are ever used
 by the renderer. We calculated the parrot&#8217;s world transform <em>four</em> times, but it
@@ -146,11 +136,9 @@ local transforms in a single batch and <em>then</em> recalculate the affected wo
 transform just once after all of those modifications are done, right before we
 need it to render.</p>
 <aside name="decoupling">
-
 <p>It&#8217;s interesting how much of software architecture is intentionally
 engineering a little slippage.</p>
 </aside>
-
 <p>To do this, we add a <em>flag</em> to each object in the graph. &#8220;Flag&#8221; and &#8220;bit&#8221; are
 synonymous in programming&#8202;&mdash;&#8202;they both mean a single micron of data that can be
 in one of two states. We call those &#8220;true&#8221; and &#8220;false&#8221;, or sometimes &#8220;set&#8221; and
@@ -164,11 +152,9 @@ Hence: <em>a dirty flag</em>. &#8220;Dirty bit&#8221; is an equally
 <span name="specific">common</span> name for this pattern, but I figured I&#8217;d
 stick with the name that didn&#8217;t seem as prurient.</p>
 <aside name="specific">
-
 <p>Wikipedia&#8217;s editors don&#8217;t have my level of self-control and went with <a href="http://en.wikipedia.org/wiki/Dirty_bit">dirty
 bit</a>.</p>
 </aside>
-
 <p>If we apply this pattern and then move all of the objects in our previous
 example, the game ends up doing:</p>
 <p><img src="images/dirty-flag-update-good.png" alt="By deferring until all moves are done, we only recalculate once." /></p>
@@ -235,11 +221,9 @@ find a place here or there where they help. <span name="hacks">Searching</span>
 your average game codebase for the word &#8220;dirty&#8221; will often turn up uses of this
 pattern.</p>
 <aside name="hacks">
-
 <p>From my research, it also turns up a lot of comments apologizing for &#8220;dirty&#8221;
 hacks.</p>
 </aside>
-
 <h2><a href="#keep-in-mind" name="keep-in-mind">Keep in Mind</a></h2>
 <p>Even after you&#8217;ve convinced yourself this pattern is a good fit, there are a few
 wrinkles that can cause you some discomfort.</p>
@@ -269,7 +253,6 @@ for this shortcoming. The auto-save frequency is a point on the continuum
 between not losing too much work when a crash occurs and not thrashing the file
 system too much by saving all the time.</p>
 <aside name="gc">
-
 <p>This mirrors the different garbage collection strategies in systems that
 automatically manage memory. Reference counting frees memory the second it&#8217;s no
 longer needed, but it burns CPU time updating ref counts eagerly every time
@@ -281,7 +264,6 @@ collector is done scouring the heap.</p>
 incremental GC that reclaim memory less eagerly than pure ref-counting but more
 eagerly than stop-the-world collectors.</p>
 </aside>
-
 <h3><a href="#you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes" name="you-have-to-make-sure-to-set-the-flag-*every*-time-the-state-changes">You have to make sure to set the flag <em>every</em> time the state changes</a></h3>
 <p>Since the derived data is calculated from the primary data, it&#8217;s essentially a
 cache. Whenever you have cached data, the trickiest aspect of it is <span
@@ -289,11 +271,9 @@ name="cache"><em>cache invalidation</em></span>&#8202;&mdash;&#8202;correctly no
 out of sync with its source data. In this pattern, that means setting the dirty
 flag when <em>any</em> primary data changes.</p>
 <aside name="cache">
-
 <p>Phil Karlton famously said, &#8220;There are only two hard things in Computer Science:
 cache invalidation and naming things.&#8221;</p>
 </aside>
-
 <p>Miss it in one place, and your program will incorrectly use stale derived data.
 This leads to confused players and bugs that are very hard to track down. When you use
 this pattern, you&#8217;ll have to take care that any code that modifies the primary
@@ -308,12 +288,10 @@ won&#8217;t be missed.</p>
 previously calculated data. This is obvious, but that does imply that you have
 to keep that derived data around in memory in case you end up needing it later.</p>
 <aside name="sync">
-
 <p>This isn&#8217;t much of an issue when you&#8217;re using this pattern to synchronize the
 primary state to some other place. In that case, the derived data isn&#8217;t usually
 in memory at all.</p>
 </aside>
-
 <p>If you weren&#8217;t using this pattern, you could calculate the derived data on the
 fly whenever you needed it, then discard it when you were done. That avoids the
 expense of keeping it cached in memory at the cost of having to do that
@@ -325,26 +303,23 @@ trade-off makes sense when the calculation is slow and memory is cheap. When
 you&#8217;ve got more time than memory on your hands, it&#8217;s better to calculate it
 as needed.</p>
 <aside name="trade">
-
 <p>Conversely, compression algorithms make the opposite trade-off: they optimize
 <em>space</em> at the expense of the processing time needed to decompress.</p>
 </aside>
-
 <h2><a href="#sample-code" name="sample-code">Sample Code</a></h2>
 <p>Let&#8217;s assume we&#8217;ve met the surprisingly long list of requirements and see how
 the pattern looks in code. As I mentioned before, the actual math behind
 transform matrices is beyond the humble aims of this book, so I&#8217;ll just
 encapsulate that in a class whose implementation you can presume exists
 somewhere out in the &aelig;ther:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Transform</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Transform</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">static</span> <span class="n">Transform</span> <span class="n">origin</span><span class="p">();</span>
 
   <span class="n">Transform</span> <span class="nf">combine</span><span class="p">(</span><span class="n">Transform</span><span class="o">&amp;</span> <span class="n">other</span><span class="p">);</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The only operation we need here is <code>combine()</code> so that we can get an object&#8217;s
 world transform by combining all of the local transforms along its parent chain.
@@ -352,23 +327,22 @@ It also has a method to get an &#8220;origin&#8221; transform&#8202;&mdash;&#820
 matrix that means no translation, rotation, or scaling at all.</p>
 <p>Next, we&#8217;ll sketch out the class for an object in the scene graph. This is the
 bare minimum we need <em>before</em> applying this pattern:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">GraphNode</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">GraphNode</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">GraphNode</span><span class="p">(</span><span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">mesh_</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span>
     <span class="n">local_</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">())</span>
   <span class="p">{}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Transform</span> <span class="n">local_</span><span class="p">;</span>
   <span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh_</span><span class="p">;</span>
 
   <span class="n">GraphNode</span><span class="o">*</span> <span class="n">children_</span><span class="p">[</span><span class="n">MAX_CHILDREN</span><span class="p">];</span>
   <span class="kt">int</span> <span class="n">numChildren_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Each node has a local transform which describes where it is relative to its
 parent. It has a mesh which is the actual graphic for the object. (We&#8217;ll allow
@@ -377,17 +351,15 @@ their children.) Finally, each node has a possibly empty collection of child
 nodes.</p>
 <p>With this, a &#8220;scene graph&#8221; is really only a single root <code>GraphNode</code> whose
 children (and grandchildren, etc.) are all of the objects in the world:</p>
-<div class="codehilite"><pre><span class="n">GraphNode</span><span class="o">*</span> <span class="n">graph_</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GraphNode</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><code><span class="n">GraphNode</span><span class="o">*</span> <span class="n">graph_</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GraphNode</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
 <span class="c1">// Add children to root graph node...</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>In order to render a scene graph, all we need to do is traverse that tree of
 nodes, starting at the root, and call the following function for each node&#8217;s mesh
 with the right world transform:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">renderMesh</span><span class="p">(</span><span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">Transform</span> <span class="n">transform</span><span class="p">);</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">renderMesh</span><span class="p">(</span><span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">Transform</span> <span class="n">transform</span><span class="p">);</span>
+</code></pre></div>
 
 <p>We won&#8217;t implement this here, but if we did, it would do whatever magic the
 renderer needs to draw that mesh at the given location in the world. If we can
@@ -397,7 +369,7 @@ happy.</p>
 <p>To get our hands dirty, let&#8217;s throw together a basic traversal for rendering the
 scene graph that calculates the world positions on the fly. It won&#8217;t be optimal,
 but it will be simple. We&#8217;ll add a new method to <code>GraphNode</code>:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">GraphNode</span><span class="o">::</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span> <span class="n">parentWorld</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">GraphNode::render</span><span class="p">(</span><span class="n">Transform</span> <span class="n">parentWorld</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">Transform</span> <span class="n">world</span> <span class="o">=</span> <span class="n">local_</span><span class="p">.</span><span class="n">combine</span><span class="p">(</span><span class="n">parentWorld</span><span class="p">);</span>
 
@@ -408,8 +380,7 @@ but it will be simple. We&#8217;ll add a new method to <code>GraphNode</code>:</
     <span class="n">children_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We pass the world transform of the node&#8217;s parent into this using <code>parentWorld</code>.
 With that, all that&#8217;s left to get the correct world transform of <em>this</em> node is
@@ -421,18 +392,17 @@ the mesh, if we have one. Finally, we recurse into the child nodes, passing in
 <em>this</em> node&#8217;s world transform. All in all, it&#8217;s a tight, simple recursive
 method.</p>
 <p>To draw an entire scene graph, we kick off the process at the root node:</p>
-<div class="codehilite"><pre><span class="n">graph_</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">());</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">graph_</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">());</span>
+</code></pre></div>
 
 <h3><a href="#let's-get-dirty" name="let's-get-dirty">Let&#8217;s get dirty</a></h3>
 <p>So this code does the right thing&#8202;&mdash;&#8202;it renders all the meshes in the right place
 &#8212; but it doesn&#8217;t do it efficiently. It&#8217;s calling <code>local_.combine(parentWorld)</code>
 on every node in the graph, every frame. Let&#8217;s see how this pattern fixes that.
 First, we need to add two fields to <code>GraphNode</code>:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">GraphNode</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">GraphNode</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">GraphNode</span><span class="p">(</span><span class="n">Mesh</span><span class="o">*</span> <span class="n">mesh</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">mesh_</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span>
     <span class="n">local_</span><span class="p">(</span><span class="n">Transform</span><span class="o">::</span><span class="n">origin</span><span class="p">()),</span>
@@ -441,13 +411,12 @@ First, we need to add two fields to <code>GraphNode</code>:</p>
 
   <span class="c1">// Other methods...</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Transform</span> <span class="n">world_</span><span class="p">;</span>
   <span class="kt">bool</span> <span class="n">dirty_</span><span class="p">;</span>
   <span class="c1">// Other fields...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The <code>world_</code> field caches the previously calculated world transform, and
 <code>dirty_</code>, of course, is the dirty flag. Note that the flag starts out <code>true</code>.
@@ -455,13 +424,12 @@ When we create a new node, we haven&#8217;t calculated its world transform yet. 
 birth, it&#8217;s already out of sync with the local transform.</p>
 <p>The only reason we need this pattern is because objects can <em>move</em>, so let&#8217;s add
 support for that:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">GraphNode</span><span class="o">::</span><span class="n">setTransform</span><span class="p">(</span><span class="n">Transform</span> <span class="n">local</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">GraphNode::setTransform</span><span class="p">(</span><span class="n">Transform</span> <span class="n">local</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">local_</span> <span class="o">=</span> <span class="n">local</span><span class="p">;</span>
   <span class="n">dirty_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The important part here is that it sets the dirty flag too. Are we forgetting
 anything? Right&#8202;&mdash;&#8202;the child nodes!</p>
@@ -470,7 +438,7 @@ invalidated too. But here, we aren&#8217;t setting their dirty flags. We <em>cou
 that, but that&#8217;s recursive and slow. Instead, we&#8217;ll do something clever when we
 go to render. Let&#8217;s see:</p>
 <p><span name="branch"></span></p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">GraphNode</span><span class="o">::</span><span class="n">render</span><span class="p">(</span><span class="n">Transform</span> <span class="n">parentWorld</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">dirty</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">GraphNode::render</span><span class="p">(</span><span class="n">Transform</span> <span class="n">parentWorld</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">dirty</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">dirty</span> <span class="o">|=</span> <span class="n">dirty_</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">dirty</span><span class="p">)</span>
@@ -486,11 +454,9 @@ go to render. Let&#8217;s see:</p>
     <span class="n">children_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">render</span><span class="p">(</span><span class="n">world_</span><span class="p">,</span> <span class="n">dirty</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="branch">
-
 <p>There&#8217;s a subtle assumption here that the <code>if</code> check is faster than a matrix
 multiply. Intuitively, you would think it is; surely testing a single bit is
 faster than a bunch of floating point arithmetic.</p>
@@ -502,7 +468,6 @@ refilling the pipeline.</p>
 more about how modern CPUs try to go faster and how you can avoid tripping them
 up like this.</p>
 </aside>
-
 <p>This is similar to the original na&iuml;ve implementation. The key changes are that
 we check to see if the node is dirty before calculating the world transform and
 we store the result in a field instead of a local variable. When the node is
@@ -520,12 +485,10 @@ the world transform.</p>
 is just a couple of assignments, and rendering the world calculates the exact
 minimum number of world transforms that have changed since the last frame.</p>
 <aside name="clever">
-
 <p>Note that this clever trick only works because <code>render()</code> is the <em>only</em> thing in
 <code>GraphNode</code> that needs an up-to-date world transform. If other things accessed
 it, we&#8217;d have to do something different.</p>
 </aside>
-
 <h2><a href="#design-decisions" name="design-decisions">Design Decisions</a></h2>
 <p>This pattern is fairly specific, so there are only a couple of knobs to twiddle:</p>
 <h3><a href="#when-is-the-dirty-flag-cleaned" name="when-is-the-dirty-flag-cleaned">When is the dirty flag cleaned?</a></h3>
@@ -576,11 +539,9 @@ longer than you expect.</p>
 on the first modification and then process all of the changes that happen
 between then and when the timer fires.</p>
 <aside name="hysteresis">
-
 <p>The term in human-computer interaction for an intentional delay between
 when a program receives user input and when it responds is <a href="http://en.wikipedia.org/wiki/Hysteresis"><em>hysteresis</em></a>.</p>
 </aside>
-
 <ul>
 <li>
 <p><em>You can tune how often the work is performed.</em> By adjusting the timer
@@ -627,11 +588,9 @@ on the ship this modification occurred.</p>
 <p>Alternatively, we could associate a dirty bit with each deck.
 Changing anything on it marks the entire deck <span name="swab">dirty</span>.</p>
 <aside name="swab">
-
 <p>I could make some terrible joke about it needing to be swabbed here, but
 I&#8217;ll refrain.</p>
 </aside>
-
 <ul>
 <li>
 <p><em>You end up processing unchanged data.</em> Add a single barrel to a deck
@@ -674,6 +633,6 @@ I&#8217;ll refrain.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

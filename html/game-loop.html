@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -45,10 +45,8 @@ name="beard">beards</span>, programs worked like your dishwasher. You dumped a
 load of code in, pushed a button, waited, and got results out. Done. These were
 <em>batch mode</em> programs&#8202;&mdash;&#8202;once the work was done, the program stopped.</p>
 <aside name="beard">
-
 <p>Ada Lovelace and Rear Admiral Grace Hopper had honorary beards.</p>
 </aside>
-
 <p>You still see these today, though thankfully we don&#8217;t have to write them on
 punch cards anymore. Shell scripts, command line programs, and even the little
 Python script that turns a pile of Markdown into this book are all batch mode
@@ -60,53 +58,46 @@ slow way to get the bugs out of a program. They wanted immediate feedback.
 <em>Interactive</em> programs were born. Some of the first interactive programs were
 games:</p>
 <p><span name="cave"></span></p>
-<div class="codehilite"><pre><span class="n">YOU</span> <span class="n">ARE</span> <span class="n">STANDING</span> <span class="n">AT</span> <span class="n">THE</span> <span class="n">END</span> <span class="n">OF</span> <span class="n">A</span> <span class="n">ROAD</span> <span class="n">BEFORE</span> <span class="n">A</span> <span class="n">SMALL</span> <span class="n">BRICK</span>
-<span class="n">BUILDING</span> <span class="p">.</span> <span class="n">AROUND</span> <span class="n">YOU</span> <span class="n">IS</span> <span class="n">A</span> <span class="n">FOREST</span><span class="p">.</span> <span class="n">A</span> <span class="n">SMALL</span>
-<span class="n">STREAM</span> <span class="n">FLOWS</span> <span class="n">OUT</span> <span class="n">OF</span> <span class="n">THE</span> <span class="n">BUILDING</span> <span class="n">AND</span> <span class="n">DOWN</span> <span class="n">A</span> <span class="n">GULLY</span><span class="p">.</span>
+<div class="codehilite"><pre><span></span><code><span class="n">YOU</span><span class="w"> </span><span class="k">ARE</span><span class="w"> </span><span class="n">STANDING</span><span class="w"> </span><span class="k">AT</span><span class="w"> </span><span class="n">THE</span><span class="w"> </span><span class="k">END</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">ROAD</span><span class="w"> </span><span class="k">BEFORE</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">SMALL</span><span class="w"> </span><span class="n">BRICK</span><span class="w"></span>
+<span class="n">BUILDING</span><span class="w"> </span><span class="p">.</span><span class="w"> </span><span class="n">AROUND</span><span class="w"> </span><span class="n">YOU</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">FOREST</span><span class="p">.</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">SMALL</span><span class="w"></span>
+<span class="n">STREAM</span><span class="w"> </span><span class="n">FLOWS</span><span class="w"> </span><span class="k">OUT</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="n">THE</span><span class="w"> </span><span class="n">BUILDING</span><span class="w"> </span><span class="ow">AND</span><span class="w"> </span><span class="n">DOWN</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">GULLY</span><span class="p">.</span><span class="w"></span>
 
-<span class="o">&gt;</span> <span class="n">GO</span> <span class="n">IN</span>
-<span class="n">YOU</span> <span class="n">ARE</span> <span class="n">INSIDE</span> <span class="n">A</span> <span class="n">BUILDING</span><span class="p">,</span> <span class="n">A</span> <span class="n">WELL</span> <span class="n">HOUSE</span> <span class="n">FOR</span> <span class="n">A</span> <span class="n">LARGE</span> <span class="n">SPRING</span><span class="p">.</span>
-</pre></div>
-
+<span class="o">&gt;</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="ow">IN</span><span class="w"></span>
+<span class="n">YOU</span><span class="w"> </span><span class="k">ARE</span><span class="w"> </span><span class="n">INSIDE</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">BUILDING</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">WELL</span><span class="w"> </span><span class="n">HOUSE</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="k">LARGE</span><span class="w"> </span><span class="n">SPRING</span><span class="p">.</span><span class="w"></span>
+</code></pre></div>
 
 <aside name="cave">
-
 <p>This is <a href="http://en.wikipedia.org/wiki/Colossal_Cave_Adventure">Colossal Cave
 Adventure</a>, the first
 adventure game.</p>
 </aside>
-
 <p>You could have a live conversation with the program. It waited for your input,
 then it would respond to you. You would reply back, taking turns just like you
 learned to do in kindergarten. When it was your turn, it sat there doing
 nothing. Something like:</p>
 <p><span name="exit"></span></p>
-<div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">char</span><span class="o">*</span> <span class="n">command</span> <span class="o">=</span> <span class="n">readCommand</span><span class="p">();</span>
   <span class="n">handleCommand</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="exit">
-
 <p>This loops forever, so there&#8217;s no way to quit the game. A real game would do
 something like <code>while (!done)</code> and set <code>done</code> to exit. I&#8217;ve omitted that to keep
 things simple.</p>
 </aside>
-
 <h3><a href="#event-loops" name="event-loops">Event loops</a></h3>
 <p>Modern graphic UI applications are surprisingly similar to old adventure games
 once you shuck their skin off. Your word processor usually just sits there doing
 nothing until you press a key or click something:</p>
-<div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">Event</span><span class="o">*</span> <span class="n">event</span> <span class="o">=</span> <span class="n">waitForEvent</span><span class="p">();</span>
   <span class="n">dispatchEvent</span><span class="p">(</span><span class="n">event</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The main difference is that instead of <em>text commands</em>, the program is waiting
 for <em>user input events</em>&#8202;&mdash;&#8202;mouse clicks and key presses. It still works
@@ -117,22 +108,19 @@ input. If you sit staring at the screen, the game doesn&#8217;t freeze. Animatio
 keep animating. Visual effects dance and sparkle. If you&#8217;re unlucky, that
 monster keeps chomping on your hero.</p>
 <aside name="idle">
-
 <p>Most event loops do have &#8220;idle&#8221; events so you can intermittently do stuff
 without user input. That&#8217;s good enough for a blinking cursor or a progress bar,
 but too rudimentary for games.</p>
 </aside>
-
 <p>This is the first key part of a real game loop: <em>it processes user input, but
 doesn&#8217;t wait for it</em>. The loop always keeps spinning:</p>
-<div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">processInput</span><span class="p">();</span>
   <span class="n">update</span><span class="p">();</span>
   <span class="n">render</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We&#8217;ll refine this later, but the basic pieces are here. <code>processInput()</code> handles
 any user input that has happened since the last call. Then, <span
@@ -140,21 +128,17 @@ name="update"><code>update()</code></span> advances the game simulation one step
 AI and physics (usually in that order). Finally, <code>render()</code> draws the game so
 the player can see what happened.</p>
 <aside name="update">
-
 <p>As you might guess from the name, <code>update()</code> is a good place to use the <a
 href="update-method.html" class="pattern">Update Method</a> pattern.</p>
 </aside>
-
 <h3><a href="#a-world-out-of-time" name="a-world-out-of-time">A world out of time</a></h3>
 <p>If this loop isn&#8217;t blocking on input, that leads to the obvious question: how
 <em>fast</em> does it spin? Each turn through the game loop advances the state of the
 game by some amount. From the perspective of an inhabitant of the game world,
 the hand of their clock has <span name="tick">ticked</span> forward.</p>
 <aside name="tick">
-
 <p>The common terms for one crank of the game loop are &#8220;tick&#8221; and &#8220;frame&#8221;.</p>
 </aside>
-
 <p>Meanwhile, the <em>player&#8217;s</em> actual clock is ticking. If we measure how quickly the
 game loop cycles in terms of real time, we get the game&#8217;s &#8220;frames per second&#8221;.
 If the game loop cycles quickly, the FPS is high and the game moves smoothly and
@@ -176,13 +160,11 @@ game ran at the speed the developers wanted. But if you tried to play that same
 game on a faster or slower <span name="turbo">machine</span>, then the game
 itself would speed up or slow down.</p>
 <aside name="turbo">
-
 <p>This is why old PCs used to have
 &#8220;<a href="http://en.wikipedia.org/wiki/Turbo_button">turbo</a>&#8221; buttons. New PCs were
 faster and couldn&#8217;t play old games because the games would run too fast. Turning
 the turbo button <em>off</em> would slow the machine down and make old games playable.</p>
 </aside>
-
 <p>These days, though, few developers have the luxury of knowing exactly what
 hardware their game will run on. Instead, our games must intelligently adapt to
 a variety of devices.</p>
@@ -201,12 +183,10 @@ patterns isn&#8217;t to cram as many into your codebase as you can.</p>
 you <em>will</em> use this pattern. If you&#8217;re using a game <span
 name="engine">engine</span>, you won&#8217;t write it yourself, but it&#8217;s still there.</p>
 <aside name="engine">
-
 <p>For me, this is the difference between an &#8220;engine&#8221; and a &#8220;library&#8221;. With
 libraries, you own the main game loop and call into the library. An engine owns
 the loop and calls into <em>your</em> code.</p>
 </aside>
-
 <p>You might think you won&#8217;t need this if you&#8217;re making a turn-based game. But even
 there, though the <em>game state</em> won&#8217;t advance until the user takes their turn,
 the <em>visual</em> and <em>audible</em> states of the game usually do. Animation and music
@@ -217,11 +197,9 @@ game. They say a program spends <span name="percent">90%</span> of its time in
 10% of the code. Your game loop will be firmly in that 10%. Take care with this
 code, and be mindful of its efficiency.</p>
 <aside name="percent">
-
 <p>Made up statistics like this are why &#8220;real&#8221; engineers like mechanical and
 electrical engineers don&#8217;t take us seriously.</p>
 </aside>
-
 <h3><a href="#you-may-need-to-coordinate-with-the-platform's-event-loop" name="you-may-need-to-coordinate-with-the-platform's-event-loop">You may need to coordinate with the platform&#8217;s event loop</a></h3>
 <p>If you&#8217;re building your game on top of an OS or platform that has a graphic UI
 and an event loop built in, then you have <em>two</em> application loops in play. They&#8217;ll
@@ -246,14 +224,13 @@ Actually implementing <code>render()</code>, <code>update()</code> and others is
 (challenging!) exercise for the reader.</p>
 <h3><a href="#run,-run-as-fast-as-you-can" name="run,-run-as-fast-as-you-can">Run, run as fast as you can</a></h3>
 <p>We&#8217;ve already seen the simplest possible game loop:</p>
-<div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">processInput</span><span class="p">();</span>
   <span class="n">update</span><span class="p">();</span>
   <span class="n">render</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The problem with it is you have no control over how fast the game runs. On a
 fast machine, that loop will spin so fast users won&#8217;t be able to see what&#8217;s
@@ -269,11 +246,9 @@ the frame and then <em>wait</em> until it&#8217;s time for the next one, like so
 <p><img src="images/game-loop-simple.png" alt="A simple game loop flowchart. Process Input &rarr; Update Game &rarr; Render &rarr; Wait, then loop back to the beginning." /></p>
 <p>The code looks a bit like this:</p>
 <aside name="16">
-
 <p><em>1000 ms / FPS = ms per frame</em>.</p>
 </aside>
-
-<div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">double</span> <span class="n">start</span> <span class="o">=</span> <span class="n">getCurrentTime</span><span class="p">();</span>
   <span class="n">processInput</span><span class="p">();</span>
@@ -282,8 +257,7 @@ the frame and then <em>wait</em> until it&#8217;s time for the next one, like so
 
   <span class="n">sleep</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">MS_PER_FRAME</span> <span class="o">-</span> <span class="n">getCurrentTime</span><span class="p">());</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The <code>sleep()</code> here makes sure the game doesn&#8217;t run too <em>fast</em> if it processes a
 frame quickly. It <em>doesn&#8217;t</em> help if your game runs too <em>slowly</em>. If it takes
@@ -313,7 +287,7 @@ passed since the last frame. The longer the frame takes, the bigger steps the
 game takes. It always keeps up with real time because it will take bigger and
 bigger steps to get there. They call this a <em>variable</em> or <em>fluid</em> time step. It
 looks like:</p>
-<div class="codehilite"><pre><span class="kt">double</span> <span class="n">lastTime</span> <span class="o">=</span> <span class="n">getCurrentTime</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">double</span> <span class="n">lastTime</span> <span class="o">=</span> <span class="n">getCurrentTime</span><span class="p">();</span>
 <span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">double</span> <span class="n">current</span> <span class="o">=</span> <span class="n">getCurrentTime</span><span class="p">();</span>
@@ -323,8 +297,7 @@ looks like:</p>
   <span class="n">render</span><span class="p">();</span>
   <span class="n">lastTime</span> <span class="o">=</span> <span class="n">current</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Each frame, we determine how much <em>real</em> time passed since the last game update
 (<code>elapsed</code>). When we update the game state, we pass that in. The engine is then
@@ -347,7 +320,6 @@ big slow ones. This looks like a winner:</p>
 name="deterministic">non-deterministic</span> and unstable. Here&#8217;s one example
 of the trap we&#8217;ve set for ourselves:</p>
 <aside name="deterministic">
-
 <p>&#8220;Deterministic&#8221; means that every time you run the program, if you give it the
 same inputs, you get the exact same outputs back. As you can imagine, it&#8217;s much
 easier to track down bugs in deterministic programs&#8202;&mdash;&#8202;find the inputs that caused
@@ -357,7 +329,6 @@ Non-determinism appears when the messy real world creeps in. For example,
 networking, the system clock, and thread scheduling all rely on bits of the
 external world outside of the program&#8217;s control.</p>
 </aside>
-
 <p>Say we&#8217;ve got a two-player networked game and Fred has some beast of a gaming
 machine while George is using his grandmother&#8217;s antique PC. That aforementioned
 bullet is flying across both of their screens. On Fred&#8217;s machine, the game is
@@ -376,11 +347,9 @@ real laws of mechanics. To keep those approximations from <span
 name="blowup">blowing up</span>, damping is applied. That damping is carefully
 tuned to a certain time step. Vary that, and the physics gets unstable.</p>
 <aside name="blowup">
-
 <p>&#8220;Blowing up&#8221; is literal here. When a physics engine flakes out, objects can get
 completely wrong velocities and launch themselves into the air.</p>
 </aside>
-
 <p>This instability is bad enough that this example is only here as a cautionary
 tale and to lead us to something better&#8230;</p>
 <h3><a href="#play-catch-up" name="play-catch-up">Play catch up</a></h3>
@@ -389,11 +358,9 @@ tale and to lead us to something better&#8230;</p>
 instant in time, it doesn&#8217;t care how much time advanced since the last one. It
 renders things wherever they happen to be right then.</p>
 <aside name="render">
-
 <p>This is more or less true. Things like motion blur can be affected by time step,
 but if they&#8217;re a bit off, the player doesn&#8217;t usually notice.</p>
 </aside>
-
 <p>We can use this fact to our advantage. We&#8217;ll <em>update</em> the game using a fixed
 time step because that makes everything simpler and more stable for physics and
 AI. But we&#8217;ll allow flexibility in when we <em>render</em> in order to free up some
@@ -402,7 +369,7 @@ processor time.</p>
 of the game loop. This is how much game time we need to simulate for the game&#8217;s
 &#8220;now&#8221; to catch up with the player&#8217;s. We do that using a <em>series</em> of <em>fixed</em> time
 steps. The code looks a bit like:</p>
-<div class="codehilite"><pre><span class="kt">double</span> <span class="n">previous</span> <span class="o">=</span> <span class="n">getCurrentTime</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">double</span> <span class="n">previous</span> <span class="o">=</span> <span class="n">getCurrentTime</span><span class="p">();</span>
 <span class="kt">double</span> <span class="n">lag</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
 <span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
@@ -421,8 +388,7 @@ steps. The code looks a bit like:</p>
 
   <span class="n">render</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>There&#8217;s a few pieces here. At the beginning of each frame, we update <code>lag</code> based
 on how much real time passed. This measures how far the game&#8217;s clock is behind
@@ -440,12 +406,10 @@ machines.</p>
 is greater than the time it takes to process an <code>update()</code>, even on the <span
 name="bail">slowest</span> hardware. Otherwise, your game simply can&#8217;t catch up.</p>
 <aside name="bail">
-
 <p>I left it out here, but you can safeguard this by having the inner update loop
 bail after a maximum number of iterations. The game will slow down then, but
 that&#8217;s better than locking up completely.</p>
 </aside>
-
 <p>Fortunately, we&#8217;ve bought ourselves some breathing room here. The trick is that
 we&#8217;ve <em>yanked rendering out of the update loop</em>. That frees up a bunch of CPU
 time. The end result is the game <em>simulates</em> at a constant rate using safe fixed
@@ -474,19 +438,16 @@ less than the update time step, not when it&#8217;s <em>zero</em>. That leftover
 That&#8217;s how far into the next frame we are.</p>
 <p>When we go to render, we&#8217;ll pass that in:</p>
 <p><span name="normal"></span></p>
-<div class="codehilite"><pre><span class="n">render</span><span class="p">(</span><span class="n">lag</span> <span class="o">/</span> <span class="n">MS_PER_UPDATE</span><span class="p">);</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">render</span><span class="p">(</span><span class="n">lag</span> <span class="o">/</span> <span class="n">MS_PER_UPDATE</span><span class="p">);</span>
+</code></pre></div>
 
 <aside name="normal">
-
 <p>We divide by <code>MS_PER_UPDATE</code> here to <em>normalize</em> the value. The value passed to
 <code>render()</code> will vary from 0 (right at the previous frame) to just under 1.0
 (right at the next frame), regardless of the update time step. This way, the
 renderer doesn&#8217;t have to worry about the frame rate. It just deals in values
 from 0 to 1.</p>
 </aside>
-
 <p>The renderer knows each game object <em>and its current velocity</em>. Say that bullet
 is 20 pixels from the left side of the screen and is moving right 400 pixels per
 frame. If we are halfway between frames, then we&#8217;ll end up passing 0.5 to
@@ -606,13 +567,11 @@ time. There are a <span name="platform">near-infinite</span> number of platforms
 that games can run on, and any single game may run on quite a few. How it
 accommodates that variation is key.</p>
 <aside name="platform">
-
 <p>Game-making seems to be part of human nature, because every time we&#8217;ve built a
 machine that can do computing, one of the first things we&#8217;ve done is made games
 on it. The PDP-1 was a 2 kHz machine with only 4,096 words of memory, yet Steve
 Russell and friends managed to create Spacewar! on it.</p>
 </aside>
-
 <ul>
 <li>
 <p><strong>Fixed time step with no synchronization:</strong></p>
@@ -714,7 +673,7 @@ the most adaptable. It updates with a fixed time step, but it can drop
 </li>
 <li>
 <p>The <a href="http://unity3d.com/">Unity</a> framework has a complex game loop detailed
-    in a wonderful illustration <a href="https://web.archive.org/web/20140319005648/http://www.richardfine.co.uk/junk/unity%20lifetime.png" target="_blank">here</a>.</p>
+    in a wonderful illustration <a href="http://docs.unity3d.com/Manual/ExecutionOrder.html">here</a>.</p>
 </li>
 </ul>
 <nav>
@@ -724,6 +683,6 @@ the most adaptable. It updates with a fixed time step, but it can drop
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

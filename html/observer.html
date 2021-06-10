@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -38,12 +38,10 @@ underlying that is the Observer pattern. Observer is so pervasive that Java put
 it in its core library (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Observer.html"><code>java.util.Observer</code></a>) and C# baked it right into
 the <em>language</em> (the <a href="http://msdn.microsoft.com/en-us/library/8627sbea.aspx"><code>event</code></a> keyword).</p>
 <aside name="devised">
-
 <p>Like so many things in software, MVC was invented by Smalltalkers in the
 seventies. Lispers probably claim they came up with it in the sixties but didn&#8217;t
 bother writing it down.</p>
 </aside>
-
 <p>Observer is one of the most widely used and widely known of the original Gang of
 Four patterns, but the game development world can be strangely cloistered at
 times, so maybe this is all news to you. In case you haven&#8217;t left the abbey in a
@@ -54,11 +52,9 @@ It will feature dozens of different badges players can earn for completing
 specific milestones like &#8220;Kill 100 Monkey Demons&#8221;, &#8220;Fall off a Bridge&#8221;, or
 &#8220;Complete a Level Wielding Only a Dead Weasel&#8221;.</p>
 <aside name="weasel">
-
 <p><img src="images/observer-weasel-wielder.png" width="240" alt="Achievement: Weasel Wielder" /></p>
 <p>I swear I had no double meaning in mind when I drew this.</p>
 </aside>
-
 <p>This is tricky to implement cleanly since we have such a wide range of
 achievements that are unlocked by all sorts of different behaviors. If we aren&#8217;t
 careful, tendrils of our achievement system will twine their way through every
@@ -67,12 +63,10 @@ dark corner of our codebase. Sure, &#8220;Fall off a Bridge&#8221; is somehow ti
 to <code>unlockFallOffBridge()</code> right in the middle of the linear algebra in our
 collision resolution algorithm?</p>
 <aside name="physics">
-
 <p>This is a rhetorical question. No self-respecting physics programmer would ever
 let us sully their beautiful mathematics with something as pedestrian as
 <em>gameplay</em>.</p>
 </aside>
-
 <p>What we&#8217;d like, as always, is to have all the code concerned with one facet of
 the game nicely lumped in one place. The challenge is that achievements are
 triggered by a bunch of different aspects of gameplay. How can that work without
@@ -84,7 +78,7 @@ notification</em>.</p>
 bodies are relaxing on nice flat surfaces and which are plummeting toward sure
 demise. To implement the &#8220;Fall off a Bridge&#8221; badge, we could just jam the
 achievement code right in there, but that&#8217;s a mess. Instead, we can just do:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Physics</span><span class="o">::</span><span class="n">updateEntity</span><span class="p">(</span><span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Physics::updateEntity</span><span class="p">(</span><span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="kt">bool</span> <span class="n">wasOnSurface</span> <span class="o">=</span> <span class="n">entity</span><span class="p">.</span><span class="n">isOnSurface</span><span class="p">();</span>
   <span class="n">entity</span><span class="p">.</span><span class="n">accelerate</span><span class="p">(</span><span class="n">GRAVITY</span><span class="p">);</span>
@@ -94,18 +88,15 @@ achievement code right in there, but that&#8217;s a mess. Instead, we can just d
     <span class="n">notify</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">EVENT_START_FALL</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><span name="subtle">All</span> it does is say, &#8220;Uh, I don&#8217;t know if anyone
 cares, but this thing just fell. Do with that as you will.&#8221;</p>
 <aside name="subtle">
-
 <p>The physics engine does have to decide what notifications to send, so it isn&#8217;t
 entirely decoupled. But in architecture, we&#8217;re most often trying to make systems
 <em>better</em>, not <em>perfect</em>.</p>
 </aside>
-
 <p>The achievement system registers itself so that whenever the physics code sends
 a notification, the achievement system receives it. It can then check to see if
 the falling body is our less-than-graceful hero, and if his perch prior to this
@@ -117,13 +108,11 @@ out the entire achievement system without touching a line of the physics engine.
 It will still send out its notifications, oblivious to the fact that nothing is
 receiving them anymore.</p>
 <aside name="tear">
-
 <p>Of course, if we <em>permanently</em> remove achievements and nothing else ever
 listens to the physics engine&#8217;s notifications, we may as well remove the
 notification code too. But during the game&#8217;s evolution, it&#8217;s nice to have this
 flexibility.</p>
 </aside>
-
 <h2><a href="#how-it-works" name="how-it-works">How it Works</a></h2>
 <p>If you don&#8217;t already know how to implement the pattern, you could probably
 guess from the previous description, but to keep things easy on you, I&#8217;ll walk
@@ -132,17 +121,15 @@ through it quickly.</p>
 <p>We&#8217;ll start with the nosy class that wants to know when another object does
 something interesting. These inquisitive objects are defined by this interface:</p>
 <p><span name="signature"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Observer</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Observer</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Observer</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">onNotify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="signature">
-
 <p>The parameters to <code>onNotify()</code> are up to you. That&#8217;s why this is the Observer
 <em>pattern</em> and not the Observer &#8220;ready-made code you can paste into your game&#8221;.
 Typical parameters are the object that sent the notification and a generic
@@ -152,17 +139,16 @@ them here, but it&#8217;s also fine to tailor them to your specific use case. He
 I&#8217;m just hardcoding it to take a game entity and an enum that describes what
 happened.</p>
 </aside>
-
 <p>Any concrete class that implements this becomes an observer. In our example,
 that&#8217;s the achievement system, so we&#8217;d have something like so:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Achievements</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Observer</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Achievements</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Observer</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="kt">void</span> <span class="n">onNotify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">switch</span> <span class="p">(</span><span class="n">event</span><span class="p">)</span>
     <span class="p">{</span>
-    <span class="k">case</span> <span class="n">EVENT_ENTITY_FELL</span>:
+    <span class="k">case</span> <span class="nl">EVENT_ENTITY_FELL</span><span class="p">:</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">entity</span><span class="p">.</span><span class="n">isHero</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">heroIsOnBridge_</span><span class="p">)</span>
       <span class="p">{</span>
         <span class="n">unlock</span><span class="p">(</span><span class="n">ACHIEVEMENT_FELL_OFF_BRIDGE</span><span class="p">);</span>
@@ -173,7 +159,7 @@ that&#8217;s the achievement system, so we&#8217;d have something like so:</p>
     <span class="p">}</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">unlock</span><span class="p">(</span><span class="n">Achievement</span> <span class="n">achievement</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Unlock if not already unlocked...</span>
@@ -181,35 +167,31 @@ that&#8217;s the achievement system, so we&#8217;d have something like so:</p>
 
   <span class="kt">bool</span> <span class="n">heroIsOnBridge_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <h3><a href="#the-subject" name="the-subject">The subject</a></h3>
 <p>The notification method is invoked by the object being observed. In Gang of Four
 parlance, that object is called the &#8220;subject&#8221;. It has two jobs. First, it holds
 the list of observers that are waiting oh-so-patiently for a missive from it:</p>
 <p><span name="stl"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Subject</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Subject</span>
 <span class="p">{</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Observer</span><span class="o">*</span> <span class="n">observers_</span><span class="p">[</span><span class="n">MAX_OBSERVERS</span><span class="p">];</span>
   <span class="kt">int</span> <span class="n">numObservers_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="stl">
-
 <p>In real code, you would use a dynamically-sized collection instead of a dumb
 array. I&#8217;m sticking with the basics here for people coming from other languages
 who don&#8217;t know C++&#8217;s standard library.</p>
 </aside>
-
 <p>The important bit is that the subject exposes a <em>public</em> API for modifying that
 list:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Subject</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Subject</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">addObserver</span><span class="p">(</span><span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="c1">// Add to array...</span>
@@ -222,8 +204,7 @@ list:</p>
 
   <span class="c1">// Other stuff...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>That allows outside code to control who receives notifications. The subject
 communicates with the observers, but it isn&#8217;t <em>coupled</em> to them. In our example,
@@ -242,9 +223,9 @@ others. As far as they know, each is the only thing in the world with eyes on
 the subject.</p>
 <p>The other job of the subject is sending notifications:</p>
 <p><span name="concurrent"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Subject</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Subject</span>
 <span class="p">{</span>
-<span class="nl">protected:</span>
+<span class="k">protected</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">notify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numObservers_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
@@ -255,50 +236,43 @@ the subject.</p>
 
   <span class="c1">// Other stuff...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="concurrent">
-
 <p>Note that this code assumes observers don&#8217;t modify the list in their <code>onNotify()</code>
 methods. A more robust implementation would either prevent or gracefully handle
 concurrent modification like that.</p>
 </aside>
-
 <h3><a href="#observable-physics" name="observable-physics">Observable physics</a></h3>
 <p>Now, we just need to hook all of this into the physics engine so that it can send
 notifications and the achievement system can wire itself up to receive them.
 We&#8217;ll stay close to the original <em>Design Patterns</em> recipe and <span
 name="event">inherit</span> <code>Subject</code>:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Physics</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Subject</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Physics</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Subject</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">updateEntity</span><span class="p">(</span><span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">);</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This lets us make <code>notify()</code> in <code>Subject</code> protected. That way the derived
 physics engine class can call it to send notifications, but code outside of it
 cannot. Meanwhile, <code>addObserver()</code> and <code>removeObserver()</code> are public, so
 anything that can get to the physics system can observe it.</p>
 <aside name="event">
-
 <p>In real code, I would avoid using inheritance here. Instead, I&#8217;d make <code>Physics</code>
 <em>have</em> an instance of <code>Subject</code>. Instead of observing the physics engine itself,
 the subject would be a separate &#8220;falling event&#8221; object. Observers could register
 themselves using something like:</p>
-<div class="codehilite"><pre><span class="n">physics</span><span class="p">.</span><span class="n">entityFell</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="n">physics</span><span class="p">.</span><span class="n">entityFell</span><span class="p">()</span>
   <span class="p">.</span><span class="n">addObserver</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>To me, this is the difference between &#8220;observer&#8221; systems and &#8220;event&#8221; systems.
 With the former, you observe <em>the thing that did something interesting</em>. With
 the latter, you observe an object that represents <em>the interesting thing that
 happened</em>.</p>
 </aside>
-
 <p>Now, when the physics engine does something noteworthy, it calls <code>notify()</code>
 like in the motivating example before. That walks the observer list and gives
 them all the heads up.</p>
@@ -322,7 +296,6 @@ name="names">&#8220;messages&#8221;</span>, and even &#8220;data binding&#8221;.
 <em>can</em> be slow (often deliberately, and for good reason). They involve things
 like queuing or doing dynamic allocation for each notification.</p>
 <aside name="names">
-
 <p>This is why I think documenting patterns is important. When we get fuzzy about
 terminology, we lose the ability to communicate clearly and succinctly. You say,
 &#8220;Observer&#8221;, and someone hears &#8220;Events&#8221; or &#8220;Messaging&#8221; because either no one
@@ -331,7 +304,6 @@ bothered to write down the difference or they didn&#8217;t happen to read it.</p
 chapter on events and messages too: <a href="event-queue.html"
 class="pattern">Event Queue</a>.</p>
 </aside>
-
 <p>But, now that you&#8217;ve seen how the pattern is actually implemented, you know that
 isn&#8217;t the case. Sending a notification is simply walking a list and calling some
 virtual methods. Granted, it&#8217;s a <em>bit</em> slower than a statically dispatched
@@ -366,7 +338,6 @@ allocation still matters, even in managed languages. <span
 name="fragment">Dynamic</span> allocation takes time, as does reclaiming memory,
 even if it happens automatically.</p>
 <aside name="fragment">
-
 <p>Many game developers are less worried about allocation and more worried about
 <em>fragmentation.</em> When your game needs to run continuously for days without
 crashing in order to get certified, an increasingly fragmented heap can prevent
@@ -374,7 +345,6 @@ you from shipping.</p>
 <p>The <a href="object-pool.html" class="pattern">Object Pool</a> chapter goes into
 more detail about this and a common technique for avoiding it.</p>
 </aside>
-
 <p>In the example code before, I used a fixed array because I&#8217;m trying to keep
 things dead simple. In real implementations, the observer list is almost always
 a dynamically allocated collection that grows and shrinks as observers are
@@ -398,35 +368,33 @@ the observer objects become nodes in a linked list:</p>
 <p><img src="images/observer-linked.png" alt="A linked list of Observers. Each has a next_ field pointing to the next one. A Subject has a head_ pointing to the first Observer." /></p>
 <p>To implement this, first we&#8217;ll get rid of the array in <code>Subject</code> and replace it
 with a pointer to the head of the list of observers:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Subject</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Subject</span>
 <span class="p">{</span>
   <span class="n">Subject</span><span class="p">()</span>
   <span class="o">:</span> <span class="n">head_</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span>
   <span class="p">{}</span>
 
   <span class="c1">// Methods...</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Observer</span><span class="o">*</span> <span class="n">head_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Then we&#8217;ll extend <code>Observer</code> with a pointer to the next observer in the list:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Observer</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Observer</span>
 <span class="p">{</span>
   <span class="k">friend</span> <span class="k">class</span> <span class="nc">Subject</span><span class="p">;</span>
 
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Observer</span><span class="p">()</span>
   <span class="o">:</span> <span class="n">next_</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span>
   <span class="p">{}</span>
 
   <span class="c1">// Other stuff...</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Observer</span><span class="o">*</span> <span class="n">next_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We&#8217;re also making <code>Subject</code> a friend class here. The subject owns the API for adding
 and removing observers, but the list it will be managing is now inside the
@@ -434,13 +402,12 @@ and removing observers, but the list it will be managing is now inside the
 list is by making it a friend.</p>
 <p>Registering a new observer is just wiring it into the list. We&#8217;ll take the easy
 option and insert it at the front:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">addObserver</span><span class="p">(</span><span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Subject::addObserver</span><span class="p">(</span><span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">observer</span><span class="o">-&gt;</span><span class="n">next_</span> <span class="o">=</span> <span class="n">head_</span><span class="p">;</span>
   <span class="n">head_</span> <span class="o">=</span> <span class="n">observer</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The other option is to add it to the end of the linked list. Doing that adds a
 bit more complexity. <code>Subject</code> has to either walk the list to find the end or
@@ -457,7 +424,7 @@ means those two observers have some subtle coupling that could end up biting
 you.</p>
 <p>Let&#8217;s get removal working:</p>
 <p><span name="remove"></span></p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">removeObserver</span><span class="p">(</span><span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Subject::removeObserver</span><span class="p">(</span><span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">head_</span> <span class="o">==</span> <span class="n">observer</span><span class="p">)</span>
   <span class="p">{</span>
@@ -479,11 +446,9 @@ you.</p>
     <span class="n">current</span> <span class="o">=</span> <span class="n">current</span><span class="o">-&gt;</span><span class="n">next_</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="remove">
-
 <p>Removing a node from a linked list usually requires a bit of ugly special case
 handling for removing the very first node, like you see here. There&#8217;s a more
 elegant solution using a pointer to a pointer.</p>
@@ -491,7 +456,6 @@ elegant solution using a pointer to a pointer.</p>
 It&#8217;s a worthwhile exercise for you to do, though: It helps you really think in
 terms of pointers.</p>
 </aside>
-
 <p>Because we have a singly linked list, we have to walk it to find the observer
 we&#8217;re removing. We&#8217;d have to do the same thing if we were using a regular array
 for that matter. If we use a <em>doubly</em> linked list, where each observer has a
@@ -499,7 +463,7 @@ pointer to both the observer after it and before it, we can remove an observer
 in constant time. If this were real code, I&#8217;d do that.</p>
 <p>The <span name="chain">only</span> thing left to do is send a notification.
 That&#8217;s as simple as walking the list:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">Subject</span><span class="o">::</span><span class="n">notify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">Subject::notify</span><span class="p">(</span><span class="k">const</span> <span class="n">Entity</span><span class="o">&amp;</span> <span class="n">entity</span><span class="p">,</span> <span class="n">Event</span> <span class="n">event</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">Observer</span><span class="o">*</span> <span class="n">observer</span> <span class="o">=</span> <span class="n">head_</span><span class="p">;</span>
   <span class="k">while</span> <span class="p">(</span><span class="n">observer</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
@@ -508,11 +472,9 @@ That&#8217;s as simple as walking the list:</p>
     <span class="n">observer</span> <span class="o">=</span> <span class="n">observer</span><span class="o">-&gt;</span><span class="n">next_</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="chain">
-
 <p>Here, we walk the entire list and notify every single observer in it. This
 ensures that all of the observers get equal priority and are independent of each
 other.</p>
@@ -522,7 +484,6 @@ that, you&#8217;re pretty close to having the <a href="http://en.wikipedia.org/w
 /Chain-of-responsibility_pattern" class="gof-pattern">Chain of
 Responsibility</a> pattern.</p>
 </aside>
-
 <p>Not too bad, right? A subject can have as many observers as it wants, without a
 single whiff of dynamic memory. Registering and unregistering is as fast as it
 was with a simple array. We have sacrificed one small feature, though.</p>
@@ -546,7 +507,6 @@ pointer to the observer and then a pointer to the next node in the list.</p>
 can be in more than one subject&#8217;s list at the same time. We&#8217;re back to being
 able to observe multiple subjects simultaneously.</p>
 <aside name="intrusive">
-
 <p>Linked lists come in two flavors. In the one you learned in school, you have a
 node object that contains the data. In our previous linked observer example,
 that was flipped around: the <em>data</em> (in this case the observer) contained the
@@ -556,7 +516,6 @@ a list intrudes into the definition of that object itself. That makes intrusive
 lists less flexible but, as we&#8217;ve seen, also more efficient. They&#8217;re popular in
 places like the Linux kernel where that trade-off makes sense.</p>
 </aside>
-
 <p>The way you avoid dynamic allocation is simple: since all of those nodes are the
 same size and type, you pre-allocate an <a href="object-pool.html"
 class="pattern">Object Pool</a> of them. That gives you a fixed-size pile of
@@ -582,11 +541,9 @@ have a pointer to it. That&#8217;s now a dangling pointer into deallocated memor
 When that subject tries to send a notification, well&#8230; let&#8217;s just say you&#8217;re
 not going to have a good time.</p>
 <aside name="destruct">
-
 <p>Not to point fingers, but I&#8217;ll note that <em>Design Patterns</em> doesn&#8217;t mention this
 issue at all.</p>
 </aside>
-
 <p>Destroying the subject is easier since in most implementations, the observer
 doesn&#8217;t have any references to it. But even then, sending the subject&#8217;s bits to
 the memory manager&#8217;s recycle bin may cause some problems. Those observers may
@@ -599,20 +556,16 @@ subjects when it gets deleted. More often than not, the observer <em>does</em> k
 which subjects it&#8217;s observing, so it&#8217;s usually just a matter of <span
 name="destructor">adding</span> a <code>removeObserver()</code> call to its destructor.</p>
 <aside name="destructor">
-
 <p>As is often the case, the hard part isn&#8217;t doing it, it&#8217;s <em>remembering</em> to do it.</p>
 </aside>
-
 <p>If you don&#8217;t want to leave observers hanging when a subject gives up the ghost,
 that&#8217;s easy to fix. Just have the subject send one final &#8220;dying breath&#8221;
 notification right before it gets destroyed. That way, any observer can receive
 that and take <span name="mourn">whatever action</span> it thinks is
 appropriate.</p>
 <aside name="mourn">
-
 <p>Mourn, send flowers, compose elegy, etc.</p>
 </aside>
-
 <p>People&#8202;&mdash;&#8202;even those of us who&#8217;ve spent enough time in the company of machines
 to have some of their precise nature rub off on us&#8202;&mdash;&#8202;are reliably terrible at
 being reliable. That&#8217;s why we invented computers: they don&#8217;t make the mistakes
@@ -648,11 +601,9 @@ sounds, you&#8217;ll get noticeably wrong behavior.</p>
 references to their listeners, you can end up with zombie UI objects lingering
 in memory. The lesson here is to be disciplined about unregistration.</p>
 <aside name="lapsed">
-
 <p>An even surer sign of its significance: it has <a href="http://en.wikipedia.org/wiki/Lapsed_listener_problem">a Wikipedia
 article</a>.</p>
 </aside>
-
 <h3><a href="#what's-going-on" name="what's-going-on">What&#8217;s going on?</a></h3>
 <p>The other, deeper issue with the Observer pattern is a direct consequence of its
 intended purpose. We use it because it helps us loosen the coupling between two
@@ -693,11 +644,9 @@ wanted to &#8220;Learn OOP in 30 Days,&#8221; and middle managers paid them base
 number of classes they created. Engineers judged their mettle by the depth of
 their inheritance hierarchies.</p>
 <aside name="90s">
-
 <p>That same year, Ace of Base had not one but <em>three</em> hit singles, so that may
 tell you something about our taste and discernment back then.</p>
 </aside>
-
 <p>The Observer pattern got popular during that zeitgeist, so it&#8217;s no surprise that
 it&#8217;s class-heavy. But mainstream coders now are more comfortable with functional
 programming. Having to implement an entire interface just to receive a
@@ -706,23 +655,19 @@ notification doesn&#8217;t fit today&#8217;s aesthetic.</p>
 heavyweight and rigid. For example, you can&#8217;t have a single class that uses
 different notification methods for different subjects.</p>
 <aside name="different">
-
 <p>This is why the subject usually passes itself to the observer. Since an observer
 only has a single <code>onNotify()</code> method, if it&#8217;s observing multiple subjects, it
 needs to be able to tell which one called it.</p>
 </aside>
-
 <p>A more modern approach is for an &#8220;observer&#8221; to be only a reference to a method
 or function. In languages with first-class functions, and especially ones with
 <span name="closures">closures</span>, this is a much more common way to do
 observers.</p>
 <aside name="closures">
-
 <p>These days, practically <em>every</em> language has closures. C++ overcame the challenge
 of closures in a language without garbage collection, and even Java finally got
 its act together and introduced them in JDK 8.</p>
 </aside>
-
 <p>For example, C# has &#8220;events&#8221; baked into the language. With those, the observer
 you register is a &#8220;delegate&#8221;, which is that language&#8217;s term for a reference to a
 method. In JavaScript&#8217;s event system, observers <em>can</em> be objects supporting a
@@ -733,10 +678,8 @@ name="function">function-based</span> instead of class-based. Even in C++, I
 would tend toward a system that let you register member function pointers as
 observers instead of instances of some <code>Observer</code> interface.</p>
 <aside name="function">
-
 <p><a href="http://molecularmusings.wordpress.com/2011/09/19/generic-type-safe-delegates-and-events-in-c/">Here&#8217;s</a> an interesting blog post on one way to implement this in C++.</p>
 </aside>
-
 <h2><a href="#observers-tomorrow" name="observers-tomorrow">Observers Tomorrow</a></h2>
 <p>Event systems and other observer-like patterns are incredibly common these days.
 They&#8217;re a well-worn path. But if you write a few large apps using them, you
@@ -779,6 +722,6 @@ me, those are often the two most important criteria for a solution.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -45,14 +45,12 @@ than ever, but we can&#8217;t <em>get</em> that data faster.</p>
 <p><span name="legend"></span></p>
 <p><img src="images/data-locality-chart.png" alt="A chart showing processor and RAM speed from 1980 to 2010. Processor speed increases quickly, but RAM speed lags behind." /></p>
 <aside name="legend">
-
 <p>Processor and RAM speed relative to their respective speeds in 1980. As you can
 see, CPUs have grown in leaps and bounds, but RAM access is lagging far behind.</p>
 <p>Data for this is from <em>Computer Architecture: A Quantitative Approach</em>
 by John L. Hennessy, David A. Patterson, Andrea C. Arpaci-Dusseau by way of Tony
 Albrecht&#8217;s &#8220;<a href="http://seven-degrees-of-freedom.blogspot.com/2009/12/pitfalls-of-object-oriented-programming.html">Pitfalls of Object-Oriented Programming</a>&rdquo;.</p>
 </aside>
-
 <p>For your super-fast CPU to blow through a ream of calculations, it actually has
 to get the data out of main memory and into registers. As you can see, RAM hasn&#8217;t
 been keeping up with increasing CPU speeds. Not even close.</p>
@@ -64,13 +62,11 @@ of the time waiting for data?</p>
 time these days, but it&#8217;s not as bad as it could be. To explain how, let&#8217;s take
 a trip to the Land of Overly Long Analogies&#8230;</p>
 <aside name="ram">
-
 <p>It&#8217;s called &#8220;random access memory&#8221; because, unlike disc drives, you can
 theoretically access any piece of it as quick as any other. You don&#8217;t have
 to worry about reading things consecutively like you do a disc.</p>
 <p>Or, at least, you <em>didn&#8217;t</em>. As we&#8217;ll see, RAM isn&#8217;t so random access anymore.</p>
 </aside>
-
 <h3><a href="#a-data-warehouse" name="a-data-warehouse">A data warehouse</a></h3>
 <p>Imagine you&#8217;re an accountant in a tiny little office. Your job is to request a
 box of papers and then do some <span name="accountant">accountant</span>-y stuff
@@ -78,11 +74,9 @@ with them&#8202;&mdash;&#8202;add up a bunch of numbers or something. You must d
 specific labeled boxes according to some arcane logic that only makes sense to
 other accountants.</p>
 <aside name="accountant">
-
 <p>I probably shouldn&#8217;t have used a job I know absolutely nothing about in this
 analogy.</p>
 </aside>
-
 <p>Thanks to a mixture of hard work, natural aptitude, and stimulants, you can
 finish an entire box in, say, a minute. There&#8217;s a little problem, though. All of
 those boxes are stored in a warehouse in a separate building. To get a box, you
@@ -109,11 +103,9 @@ watching you work for a few days, they notice a few things:</p>
 </li>
 </ul>
 <aside name="next">
-
 <p>The technical term for using something near the thing you just used is <em>locality
 of reference</em>.</p>
 </aside>
-
 <p>They come up with a clever fix. Whenever you request a box from the warehouse
 guy, he&#8217;ll grab an entire pallet of them. He gets the box you want and then some
 more boxes that are next to it. He doesn&#8217;t know if you want those (and, given
@@ -144,14 +136,12 @@ inside the chip. The CPU can pull data from this much faster than it can from
 main memory. It&#8217;s small because it has to fit in the chip and because the faster
 type of memory it uses (static RAM or &#8220;SRAM&#8221;) is way more expensive.</p>
 <aside name="caches">
-
 <p>Modern hardware has multiple levels of caching, which is what they mean
 when you hear &#8220;L1&#8221;, &#8220;L2&#8221;, &#8220;L3&#8221;, etc. Each level is larger but slower than the
 previous. For this chapter, we won&#8217;t worry about the fact that memory is
 actually a <a href="http://en.wikipedia.org/wiki/Memory_hierarchy">hierarchy</a>, but it&#8217;s
 important to know.</p>
 </aside>
-
 <p>This little chunk of memory is called a <em>cache</em> (in particular, the chunk on the
 chip is your <em>L1 cache</em>), and in my belabored analogy, its part was played by the
 pallet of boxes. Whenever your chip needs a byte of data from RAM, it
@@ -165,25 +155,22 @@ than hitting RAM. Successfully finding a piece of data in the cache is called a
 <em>cache hit</em>. If it can&#8217;t find it in there and has to go to main memory, that&#8217;s a
 <em>cache miss</em>.</p>
 <aside name="pallet">
-
 <p>I glossed over (at least) one detail in the analogy. In your office, there was
 only room for one pallet, or one cache line. A real cache contains a number of
 cache lines. The details about how those work is out of scope here, but search
 for &#8220;cache associativity&#8221; to feed your brain.</p>
 </aside>
-
 <p>When a cache miss occurs, the CPU <em>stalls</em>&#8202;&mdash;&#8202;it can&#8217;t process the next
 instruction because it needs data. It sits there, bored out of its mind for a
 few hundred cycles until the fetch completes. Our mission is to avoid that.
 Imagine you&#8217;re trying to optimize some performance-critical piece of game code
 and it looks like this:</p>
-<div class="codehilite"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_THINGS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NUM_THINGS</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">sleepFor500Cycles</span><span class="p">();</span>
   <span class="n">things</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">doStuff</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>What&#8217;s the first change you&#8217;re going to make to that code? Right. Take out that
 pointless, expensive function call. That call is equivalent to the performance
@@ -200,14 +187,12 @@ wrote two programs</span> that did the <em>exact same</em> computation. The only
 difference was how many cache misses they caused. The slow one was <em>fifty times</em>
 slower than the other.</p>
 <aside name="ymmv">
-
 <p>There are a lot of caveats here. In particular, different computers have different
 cache setups, so my machine may be different from yours, and dedicated game
 consoles are very different from PCs, which are quite different from mobile
 devices.</p>
 <p>Your mileage will vary.</p>
 </aside>
-
 <p>This was a real eye-opener to me. I&#8217;m used to thinking of performance being an
 aspect of <em>code</em>, not <em>data</em>. A byte isn&#8217;t slow or fast, it&#8217;s just some static
 thing sitting there. But because of caching, <em>the way you organize data
@@ -218,11 +203,9 @@ here. Optimization for cache usage is a huge topic. I haven&#8217;t even touched
 the CPU before it can be executed. Someone more versed on the subject could
 write an entire <span name="book">book</span> on it.</p>
 <aside name="book">
-
 <p>In fact, someone <em>did</em> write a book on it: <a href="http://www.dataorienteddesign.com/dodmain/"><em>Data-Oriented
 Design</em></a>, by Richard Fabian.</p>
 </aside>
-
 <p>Since you&#8217;re already reading <em>this</em> book right now, though, I have a few basic
 techniques that will get you started along the path of thinking about how data
 structures impact your performance.</p>
@@ -232,13 +215,11 @@ name="line">cache line, the faster you go</span>. So the goal then is to
 <em>organize your data structures so that the things you&#8217;re processing are next to
 each other in memory</em>.</p>
 <aside name="line">
-
 <p>There&#8217;s a key assumption here, though: one thread. If you are modifying nearby
 data on multiple threads, it&#8217;s faster to have it on <em>different</em> cache lines. If
 two threads try to tweak data on the same cache line, both cores have to do some
 costly synchronization of their caches.</p>
 </aside>
-
 <p>In other words, if your code is crunching on <code>Thing</code>, then <code>Another</code>, then
 <code>Also</code>, you want them laid out in memory like this:</p>
 <p><img src="images/data-locality-things.png" alt="Thing, Another, and Also laid out directly next to each other in order in memory." /></p>
@@ -271,7 +252,6 @@ report this. It&#8217;s worth spending the time to get one of these working and 
 sure you understand the (surprisingly complex) numbers it throws at you before
 you do major surgery on your data structures.</p>
 <aside name="cachegrind">
-
 <p>Unfortunately, most of those tools aren&#8217;t cheap. If you&#8217;re on a console dev
 team, you probably already have licenses for them.</p>
 <p>If not, an excellent free option is
@@ -279,7 +259,6 @@ team, you probably already have licenses for them.</p>
 program on top of a simulated CPU and cache hierarchy and then reports all of
 the cache interactions.</p>
 </aside>
-
 <p>That being said, cache misses <em>will</em> affect the performance of your game. While
 you shouldn&#8217;t spend a ton of time pre-emptively optimizing for cache usage, do
 think about how cache-friendly your data structures are throughout the design
@@ -294,12 +273,10 @@ name="virtual">pointers or references</span>. But going through a pointer means
 hopping across memory, which leads to the cache misses this pattern works to
 avoid.</p>
 <aside name="virtual">
-
 <p>The other half of interfaces is <em>virtual method calls</em>. Those require the CPU to
 look up an object&#8217;s vtable and then find the pointer to the actual method to
 call there. So, again, you&#8217;re chasing pointers, which can cause cache misses.</p>
 </aside>
-
 <p>In order to please this pattern, you will have to sacrifice some of your
 precious abstractions. The more you design your program around data locality,
 the more you will have to give up inheritance, interfaces, and the benefits
@@ -317,9 +294,9 @@ keep in mind that the general technique can be applied anywhere it fits.</p>
 processes a bunch of game entities. Those entities are decomposed into different
 domains&#8202;&mdash;&#8202;AI, physics, and rendering&#8202;&mdash;&#8202;using the <a href="component.html"
 class="pattern">Component</a> pattern. Here&#8217;s the <code>GameEntity</code> class:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">GameEntity</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">GameEntity</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">GameEntity</span><span class="p">(</span><span class="n">AIComponent</span><span class="o">*</span> <span class="n">ai</span><span class="p">,</span>
              <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics</span><span class="p">,</span>
              <span class="n">RenderComponent</span><span class="o">*</span> <span class="n">render</span><span class="p">)</span>
@@ -330,53 +307,49 @@ class="pattern">Component</a> pattern. Here&#8217;s the <code>GameEntity</code> 
   <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">physics_</span><span class="p">;</span> <span class="p">}</span>
   <span class="n">RenderComponent</span><span class="o">*</span> <span class="n">render</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">render_</span><span class="p">;</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">AIComponent</span><span class="o">*</span> <span class="n">ai_</span><span class="p">;</span>
   <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physics_</span><span class="p">;</span>
   <span class="n">RenderComponent</span><span class="o">*</span> <span class="n">render_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Each component has a relatively small amount of state, maybe little more than a
 few vectors or a matrix, and then a method to <span name="update">update</span>
 it. The details aren&#8217;t important here, but imagine something roughly along the
 lines of:</p>
 <aside name="update">
-
 <p>As the name implies, these are examples of the <a href="update-method.html"
 class="pattern">Update Method</a> pattern. Even <code>render()</code> is this pattern, just
 by another name.</p>
 </aside>
-
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">AIComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">AIComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">update</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* Work with and modify state... */</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="c1">// Goals, mood, etc. ...</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">PhysicsComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">update</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* Work with and modify state... */</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="c1">// Rigid body, velocity, mass, etc. ...</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">RenderComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">render</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* Work with and modify state... */</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="c1">// Mesh, textures, shaders, etc. ...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The game maintains a big array of pointers to all of the entities in the world.
 Each spin of the game loop, we need to run the following:</p>
@@ -392,7 +365,7 @@ Each spin of the game loop, we need to run the following:</p>
 </li>
 </ol>
 <p>Lots of game engines implement that like so:</p>
-<div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">gameOver</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">gameOver</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Process AI.</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numEntities</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
@@ -414,8 +387,7 @@ Each spin of the game loop, we need to run the following:</p>
 
   <span class="c1">// Other game loop machinery for timing...</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Before you ever heard of a CPU cache, this looked totally innocuous. But by now,
 you&#8217;ve got an inkling that something isn&#8217;t right here. This code isn&#8217;t just
@@ -444,11 +416,9 @@ organized.</p>
 <p><span name="lines"></span></p>
 <p><img src="images/data-locality-pointer-chasing.png" alt="A tangled mess of objects strewn randomly through memory with pointers wiring them all together." /></p>
 <aside name="lines">
-
 <p>Every frame, the game loop has to follow all of those arrows to get to the data
 it cares about.</p>
 </aside>
-
 <p>If our goal was to take a whirlwind tour around the game&#8217;s address space like
 some &#8220;256MB of RAM in Four Nights!&#8221; cheap vacation package, this would be a
 fantastic deal. But our goal is to run the game quickly, and <span
@@ -456,11 +426,9 @@ name="chase">traipsing</span> all over main memory is <em>not</em> the way to do
 Remember that <code>sleepFor500Cycles()</code> function? Well this code is effectively
 calling that <em>all the time</em>.</p>
 <aside name="chase">
-
 <p>The term for wasting a bunch of time traversing pointers is &#8220;pointer chasing&#8221;,
 which it turns out is nowhere near as fun as it sounds.</p>
 </aside>
-
 <p>Let&#8217;s do something better. Our first observation is that the only reason we
 follow a pointer to get to the game entity is so we can immediately follow
 <em>another</em> pointer to get to a component. <code>GameEntity</code> itself has no interesting
@@ -472,26 +440,23 @@ Earth. We&#8217;ll have a big array for each type of component: a flat array of 
 components, another for physics, and another for rendering.</p>
 <p>Like this:</p>
 <p><span name="long-name"></span></p>
-<div class="codehilite"><pre><span class="n">AIComponent</span><span class="o">*</span> <span class="n">aiComponents</span> <span class="o">=</span>
+<div class="codehilite"><pre><span></span><code><span class="n">AIComponent</span><span class="o">*</span> <span class="n">aiComponents</span> <span class="o">=</span>
     <span class="k">new</span> <span class="n">AIComponent</span><span class="p">[</span><span class="n">MAX_ENTITIES</span><span class="p">];</span>
 <span class="n">PhysicsComponent</span><span class="o">*</span> <span class="n">physicsComponents</span> <span class="o">=</span>
     <span class="k">new</span> <span class="n">PhysicsComponent</span><span class="p">[</span><span class="n">MAX_ENTITIES</span><span class="p">];</span>
 <span class="n">RenderComponent</span><span class="o">*</span> <span class="n">renderComponents</span> <span class="o">=</span>
     <span class="k">new</span> <span class="n">RenderComponent</span><span class="p">[</span><span class="n">MAX_ENTITIES</span><span class="p">];</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="long-name">
-
 <p>My least favorite part about using components is how long the word &#8220;component&#8221;
 is.</p>
 </aside>
-
 <p>Let me stress that these are arrays of <em>components</em> and not <em>pointers to
 components</em>. The data is all there, one byte after the other. The game loop can
 then walk these directly:</p>
 <p><span name="arrow"></span></p>
-<div class="codehilite"><pre><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">gameOver</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">gameOver</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Process AI.</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numEntities</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
@@ -513,16 +478,13 @@ then walk these directly:</p>
 
   <span class="c1">// Other game loop machinery for timing...</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <aside name="arrow">
-
 <p>One hint that we&#8217;re doing better here is how few <code>-&gt;</code> operators there are in the
 new code. If you want to improve data locality, look for indirection operators
 you can get rid of.</p>
 </aside>
-
 <p>We&#8217;ve ditched all of that pointer chasing. Instead of skipping around in memory,
 we&#8217;re doing a straight crawl through three contiguous arrays.</p>
 <p><img src="images/data-locality-component-arrays.png" alt="An array for each of three different kinds of components. Each array neatly packs its components together." /></p>
@@ -545,59 +507,54 @@ goes straight to the data.</p>
 we&#8217;ve got all of our particles in a nice big contiguous array. Let&#8217;s wrap it in
 a little <span name="pool">manager class</span> too:</p>
 <aside name="pool">
-
 <p>The <code>ParticleSystem</code> class is an example of an <a href="object-pool.html"
 class="pattern">Object Pool</a> custom built for a single type of object.</p>
 </aside>
-
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Particle</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Particle</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">update</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* Gravity, etc. ... */</span> <span class="p">}</span>
   <span class="c1">// Position, velocity, etc. ...</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">ParticleSystem</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">ParticleSystem</span><span class="p">()</span>
   <span class="o">:</span> <span class="n">numParticles_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
   <span class="p">{}</span>
 
   <span class="kt">void</span> <span class="n">update</span><span class="p">();</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">MAX_PARTICLES</span> <span class="o">=</span> <span class="mi">100000</span><span class="p">;</span>
 
   <span class="kt">int</span> <span class="n">numParticles_</span><span class="p">;</span>
   <span class="n">Particle</span> <span class="n">particles_</span><span class="p">[</span><span class="n">MAX_PARTICLES</span><span class="p">];</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>A rudimentary update method for the system just looks like this:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticleSystem</span><span class="o">::</span><span class="n">update</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">ParticleSystem::update</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numParticles_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
   <span class="p">{</span>
     <span class="n">particles_</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">update</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>But it turns out that we don&#8217;t actually need to process <em>all</em> of the particles
 all the time. The particle system has a fixed-size pool of objects, but they
 aren&#8217;t usually all actively twinkling across the screen. The easy answer is
 something like this:</p>
-<div class="codehilite"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numParticles_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numParticles_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">particles_</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">isActive</span><span class="p">())</span>
   <span class="p">{</span>
     <span class="n">particles_</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">update</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>We give <code>Particle</code> a flag to track whether its in use or not. In the update
 loop, we <span name="branch">check</span> that for each particle. That loads the
@@ -612,7 +569,6 @@ particles in it, we&#8217;re back to thrashing the cache again.</p>
 actually processing aren&#8217;t contiguous in it. If it&#8217;s littered with inactive
 objects we have to dance around, we&#8217;re right back to the original problem.</p>
 <aside name="branch">
-
 <p>Savvy low-level coders can see another problem here. Doing an <code>if</code> check for
 every particle can cause a <em>branch misprediction</em> and a <em>pipeline stall</em>. In
 modern CPUs, a single &#8220;instruction&#8221; actually takes several clock cycles. To keep
@@ -632,19 +588,17 @@ processing (a <em>pipeline flush</em>) and start over. The performance impact of
 varies widely by machine, but this is why you sometimes see developers avoid
 flow control in hot code.</p>
 </aside>
-
 <p>Given the title of this section, you can probably guess the answer. Instead of
 <em>checking</em> the active flag, we&#8217;ll <em>sort</em> by it. We&#8217;ll keep all of the active
 particles in the front of the list. If we know all of those particles are
 active, we don&#8217;t have to check the flag at all.</p>
 <p>We can also easily keep track of how many active particles there are. With this,
 our update loop turns into this thing of beauty:</p>
-<div class="codehilite"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numActive_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numActive_</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">update</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now we aren&#8217;t skipping over <em>any</em> data. Every byte that gets sucked into the
 cache is a piece of an active particle that we actually need to process.</p>
@@ -656,7 +610,7 @@ are inactive&#8202;&mdash;&#8202;the only time it can become <em>un</em>sorted i
 been activated or deactivated. We can handle those two cases pretty easily. When
 a particle gets activated, we move it up to the end of the active particles by
 swapping it with the first <em>in</em>active one:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticleSystem</span><span class="o">::</span><span class="n">activateParticle</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">ParticleSystem::activateParticle</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Shouldn&#39;t already be active!</span>
   <span class="n">assert</span><span class="p">(</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="n">numActive_</span><span class="p">);</span>
@@ -670,11 +624,10 @@ swapping it with the first <em>in</em>active one:</p>
   <span class="c1">// Now there&#39;s one more.</span>
   <span class="n">numActive_</span><span class="o">++</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>To deactivate a particle, we just do the opposite:</p>
-<div class="codehilite"><pre><span class="kt">void</span> <span class="n">ParticleSystem</span><span class="o">::</span><span class="n">deactivateParticle</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span> <span class="nf">ParticleSystem::deactivateParticle</span><span class="p">(</span><span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// Shouldn&#39;t already be inactive!</span>
   <span class="n">assert</span><span class="p">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">numActive_</span><span class="p">);</span>
@@ -688,8 +641,7 @@ swapping it with the first <em>in</em>active one:</p>
   <span class="n">particles_</span><span class="p">[</span><span class="n">numActive_</span><span class="p">]</span> <span class="o">=</span> <span class="n">particles_</span><span class="p">[</span><span class="n">index</span><span class="p">];</span>
   <span class="n">particles_</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Lots of programmers (myself included) have developed allergies to moving things
 around in memory. Schlepping a bunch of bytes around <em>feels</em> heavyweight
@@ -698,11 +650,9 @@ compared to assigning a pointer. But when you add in the cost of
 In <span name="profile">some cases</span>, it&#8217;s cheaper to push things around in
 memory if it helps you keep the cache full.</p>
 <aside name="profile">
-
 <p>This is your friendly reminder to <em>profile</em> when making these kinds of
 decisions.</p>
 </aside>
-
 <p>There&#8217;s a neat consequence of keeping the particles <em>sorted</em> by their active
 state&#8202;&mdash;&#8202;we don&#8217;t need to store an active flag in each particle at all. It can be
 inferred by its position in the array and the <code>numActive_</code> counter. This makes
@@ -721,40 +671,38 @@ particle system that will be spawning and killing particles anyway.</p>
 <h3><a href="#hotcold-splitting" name="hotcold-splitting">Hot/cold splitting</a></h3>
 <p>OK, this is the last example of a simple technique for making your cache
 happier. Say we&#8217;ve got an AI component for some game entity. It has some state
-in it&#8202;&mdash;&#8202;the animation it&#8217;s currently playing, a goal position its heading
+in it&#8202;&mdash;&#8202;the animation it&#8217;s currently playing, a goal position it&#8217;s heading
 towards, energy level, etc.&#8202;&mdash;&#8202;stuff it checks and tweaks every single frame.
 Something like:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">AIComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">AIComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">update</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Animation</span><span class="o">*</span> <span class="n">animation_</span><span class="p">;</span>
   <span class="kt">double</span> <span class="n">energy_</span><span class="p">;</span>
   <span class="n">Vector</span> <span class="n">goalPos_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>But it also has some state for rarer eventualities. It stores some data
 describing what loot it drops when it has an unfortunate encounter with the
 noisy end of a shotgun. That drop data is only used once in the entity&#8217;s
 lifetime, right at its bitter end:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">AIComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">AIComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="kt">void</span> <span class="n">update</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="c1">// Previous fields...</span>
   <span class="n">LootType</span> <span class="n">drop_</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">minDrops_</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">maxDrops_</span><span class="p">;</span>
   <span class="kt">double</span> <span class="n">chanceOfDrop_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Assuming we followed the earlier patterns, when we update these AI components,
 we walk through a nice packed, contiguous array of data. But that data includes
@@ -771,11 +719,11 @@ everything else that gets used less frequently.</p>
 so we don&#8217;t want to chase a pointer to find it. The cold component can be off to
 the side, but we still need to get to it, so we give the hot component a pointer
 to it, like so:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">AIComponent</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">AIComponent</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="c1">// Methods...</span>
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Animation</span><span class="o">*</span> <span class="n">animation_</span><span class="p">;</span>
   <span class="kt">double</span> <span class="n">energy_</span><span class="p">;</span>
   <span class="n">Vector</span> <span class="n">goalPos_</span><span class="p">;</span>
@@ -791,19 +739,16 @@ to it, like so:</p>
   <span class="kt">int</span> <span class="n">maxDrops_</span><span class="p">;</span>
   <span class="kt">double</span> <span class="n">chanceOfDrop_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now when we&#8217;re walking the AI components every frame, the only data that gets
 loaded into the cache is stuff we are actually processing (with the <span
 name="parallel">exception</span> of that one little pointer to the cold data).</p>
 <aside name="parallel">
-
 <p>We could conceivably ditch the pointer too by having parallel arrays for the hot
 and cold components. Then we can find the cold AI data for a component since
 both pieces will be at the same index in their respective arrays.</p>
 </aside>
-
 <p>You can see how this starts to get fuzzy, though. In my example here, it&#8217;s
 pretty obvious which data should be hot and cold, but in a real game it&#8217;s
 rarely so clear-cut.
@@ -823,12 +768,10 @@ pattern you apply to a few core data structures.</p>
 <p>The biggest questions you&#8217;ll need to answer are when and where you apply this
 pattern, but here are a couple of others that may come up.</p>
 <aside name="dod">
-
 <p>Noel Llopis&#8217; <a href="http://gamesfromwithin.com/data-oriented-design">famous article</a>
 that got a lot more people thinking about designing games around cache usage
 calls this &#8220;data-oriented design&#8221;.</p>
 </aside>
-
 <h3><a href="#how-do-you-handle-polymorphism" name="how-do-you-handle-polymorphism">How do you handle polymorphism?</a></h3>
 <p>Up to this point, we&#8217;ve avoided subclassing and virtual methods. We have assumed we
 have nice packed arrays of <em>homogenous</em> objects. That way, we know they&#8217;re all
@@ -842,12 +785,10 @@ or at least avoid it in places where you&#8217;re optimizing for cache usage.
 Software engineer culture is drifting away from heavy use of inheritance
 anyway.</p>
 <aside name="type">
-
 <p>One way to keep much of the flexibility of polymorphism without using
 subclassing is through the <a href="type-object.html" class="pattern">Type
 Object</a> pattern.</p>
 </aside>
-
 <ul>
 <li>
 <p><em>It&#8217;s safe and easy.</em> You know exactly what class you&#8217;re dealing with,
@@ -861,7 +802,6 @@ Object</a> pattern.</p>
 </li>
 </ul>
 <aside name="cpp">
-
 <p>As usual, the only absolute is that there are no absolutes. In most cases, a
 C++ compiler will require an indirection for a virtual method call. But in
 <em>some</em> cases, the compiler may be able to do <em>devirtualization</em> and
@@ -869,7 +809,6 @@ statically call the right method if it knows what concrete type the receiver
 is. Devirtualization is more common in just-in-time compilers for languages
 like Java and JavaScript.</p>
 </aside>
-
 <ul>
 <li><em>It&#8217;s inflexible.</em> Of course, the reason we use dynamic dispatch is
     because it gives us a powerful way to vary behavior between objects. If
@@ -999,12 +938,10 @@ component array.</p>
 components. With this, you <span name="singleton">need</span> the game
 entity <em>and the component registry too</em>.</p>
 <aside name="singleton">
-
 <p>You may be thinking, &#8220;I&#8217;ll just make it a singleton! Problem solved!&#8221;
 Well, sort of. You might want to check out <a href="singleton.html">the
 chapter</a> on those first.</p>
 </aside>
-
 </li>
 </ul>
 </li>
@@ -1111,6 +1048,6 @@ important to think about locality.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

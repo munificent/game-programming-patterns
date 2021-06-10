@@ -9,7 +9,7 @@
      the viewport. -->
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link href="http://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Source+Code+Pro|Source+Sans+Pro:200,300,400,600,400italic,600italic|Rock+Salt" rel="stylesheet" type="text/css">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,7 +19,7 @@
   ga('create', 'UA-42804721-1', 'gameprogrammingpatterns.com');
   ga('send', 'pageview');
 </script>
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.6.0.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body id="top">
@@ -40,7 +40,6 @@ show you other, more interesting places where the term &#8220;prototype&#8221; a
 concepts behind it have popped up. But first, let&#8217;s revisit the <span
 name="original">original</span> pattern.</p>
 <aside name="original">
-
 <p>I don&#8217;t say &#8220;original&#8221; lightly here. <em>Design Patterns</em> cites Ivan Sutherland&#8217;s
 legendary <a href="http://en.wikipedia.org/wiki/Sketchpad">Sketchpad</a> project in <em>1963</em>
 as one of the first examples of this pattern in the wild. While everyone else
@@ -50,7 +49,6 @@ programming.</p>
 <p>Watch <a href="http://www.youtube.com/watch?v=USyoT_Ha_bA">the demo</a> and prepare to be
 blown away.</p>
 </aside>
-
 <h2><a href="#the-prototype-design-pattern" name="the-prototype-design-pattern">The Prototype Design Pattern</a></h2>
 <p>Pretend we&#8217;re making a game in the style of Gauntlet. We&#8217;ve got creatures and
 fiends swarming around the hero, vying for their share of his flesh. These
@@ -58,7 +56,7 @@ unsavory dinner companions enter the arena by way of &#8220;spawners&#8221;, and
 different spawner for each kind of enemy.</p>
 <p>For the sake of this example, let&#8217;s say we have different classes for each kind
 of monster in the game&#8202;&mdash;&#8202;<code>Ghost</code>, <code>Demon</code>, <code>Sorcerer</code>, etc., like:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Monster</span>
 <span class="p">{</span>
   <span class="c1">// Stuff...</span>
 <span class="p">};</span>
@@ -66,8 +64,7 @@ of monster in the game&#8202;&mdash;&#8202;<code>Ghost</code>, <code>Demon</code
 <span class="k">class</span> <span class="nc">Ghost</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span> <span class="p">{};</span>
 <span class="k">class</span> <span class="nc">Demon</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span> <span class="p">{};</span>
 <span class="k">class</span> <span class="nc">Sorcerer</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span> <span class="p">{};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>A spawner constructs instances of one particular monster type. To support every
 monster in the game, we <em>could</em> brute-force it by having a spawner class for
@@ -75,22 +72,20 @@ each monster class, leading to a parallel class hierarchy:</p>
 <p><span name="inherits-arrow"></span></p>
 <p><img src="images/prototype-hierarchies.png" alt="Parallel class hierarchies. Ghost, Demon, and Sorceror all inherit from Monster. GhostSpawner, DemonSpawner, and SorcerorSpawner inherit from Spawner." /></p>
 <aside name="inherits-arrow">
-
 <p>I had to dig up a dusty UML book to make this diagram. The <img
 src="images/arrow-inherits.png" class="arrow" alt="A UML arrow." /> means &#8220;inherits from&#8221;.</p>
 </aside>
-
 <p>Implementing it would look like this:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Spawner</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Spawner</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Spawner</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="n">Monster</span><span class="o">*</span> <span class="n">spawnMonster</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">GhostSpawner</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Spawner</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="n">Monster</span><span class="o">*</span> <span class="n">spawnMonster</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="k">return</span> <span class="k">new</span> <span class="n">Ghost</span><span class="p">();</span>
@@ -99,7 +94,7 @@ src="images/arrow-inherits.png" class="arrow" alt="A UML arrow." /> means &#8220
 
 <span class="k">class</span> <span class="nc">DemonSpawner</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Spawner</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="n">Monster</span><span class="o">*</span> <span class="n">spawnMonster</span><span class="p">()</span>
   <span class="p">{</span>
     <span class="k">return</span> <span class="k">new</span> <span class="n">Demon</span><span class="p">();</span>
@@ -107,8 +102,7 @@ src="images/arrow-inherits.png" class="arrow" alt="A UML arrow." /> means &#8220
 <span class="p">};</span>
 
 <span class="c1">// You get the idea...</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Unless you get paid by the line of code, this is obviously not a fun way
 to hack this together. Lots of classes, lots of boilerplate, lots of redundancy,
@@ -120,21 +114,20 @@ be treated as a <em>prototypal</em> monster used to generate other versions of
 itself.</p>
 <p>To implement this, we give our base class, <code>Monster</code>, an abstract <code>clone()</code>
 method:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Monster</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Monster</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Monster</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="n">Monster</span><span class="o">*</span> <span class="n">clone</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
   <span class="c1">// Other stuff...</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Each monster subclass provides an implementation that returns a new object
 identical in class and state to itself. For example:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Ghost</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span> <span class="p">{</span>
-<span class="nl">public:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Ghost</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Monster</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Ghost</span><span class="p">(</span><span class="kt">int</span> <span class="n">health</span><span class="p">,</span> <span class="kt">int</span> <span class="n">speed</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">health_</span><span class="p">(</span><span class="n">health</span><span class="p">),</span>
     <span class="n">speed_</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
@@ -145,18 +138,17 @@ identical in class and state to itself. For example:</p>
     <span class="k">return</span> <span class="k">new</span> <span class="n">Ghost</span><span class="p">(</span><span class="n">health_</span><span class="p">,</span> <span class="n">speed_</span><span class="p">);</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="kt">int</span> <span class="n">health_</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">speed_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Once all our monsters support that, we no longer need a spawner class for each
 monster class. Instead, we define a single one:</p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Spawner</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Spawner</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Spawner</span><span class="p">(</span><span class="n">Monster</span><span class="o">*</span> <span class="n">prototype</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">prototype_</span><span class="p">(</span><span class="n">prototype</span><span class="p">)</span>
   <span class="p">{}</span>
@@ -166,11 +158,10 @@ monster class. Instead, we define a single one:</p>
     <span class="k">return</span> <span class="n">prototype_</span><span class="o">-&gt;</span><span class="n">clone</span><span class="p">();</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">Monster</span><span class="o">*</span> <span class="n">prototype_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>It internally holds a monster, a hidden one whose sole purpose is to be used by
 the spawner as a template to stamp out more monsters like it, sort of like a
@@ -178,10 +169,9 @@ queen bee who never leaves the hive.</p>
 <p><img src="images/prototype-spawner.png" alt="A Spawner contains a prototype field referencing a Monster. It calls clone() on the prototype to create new monsters." /></p>
 <p>To create a ghost spawner, we create a prototypal ghost instance and
 then create a spawner holding that prototype:</p>
-<div class="codehilite"><pre><span class="n">Monster</span><span class="o">*</span> <span class="n">ghostPrototype</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Ghost</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Monster</span><span class="o">*</span> <span class="n">ghostPrototype</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Ghost</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
 <span class="n">Spawner</span><span class="o">*</span> <span class="n">ghostSpawner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Spawner</span><span class="p">(</span><span class="n">ghostPrototype</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>One neat part about this pattern is that it doesn&#8217;t just clone the <em>class</em> of
 the prototype, it clones its <em>state</em> too. This means we could make a spawner for
@@ -210,20 +200,19 @@ enshrining each in its own class.</p>
 <p>Even if we do have different classes for each monster, there are other ways to
 decorticate this <em>Felis catus</em>. Instead of making separate spawner <em>classes</em> for
 each monster, we could make spawn <em>functions</em>, like so:</p>
-<div class="codehilite"><pre><span class="n">Monster</span><span class="o">*</span> <span class="nf">spawnGhost</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Monster</span><span class="o">*</span> <span class="nf">spawnGhost</span><span class="p">()</span>
 <span class="p">{</span>
   <span class="k">return</span> <span class="k">new</span> <span class="n">Ghost</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This is less boilerplate than rolling a whole class for constructing a monster
 of some type. Then the one spawner class can simply store a function pointer:</p>
-<div class="codehilite"><pre><span class="k">typedef</span> <span class="n">Monster</span><span class="o">*</span> <span class="p">(</span><span class="o">*</span><span class="n">SpawnCallback</span><span class="p">)();</span>
+<div class="codehilite"><pre><span></span><code><span class="k">typedef</span> <span class="n">Monster</span><span class="o">*</span> <span class="p">(</span><span class="o">*</span><span class="n">SpawnCallback</span><span class="p">)();</span>
 
 <span class="k">class</span> <span class="nc">Spawner</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="n">Spawner</span><span class="p">(</span><span class="n">SpawnCallback</span> <span class="n">spawn</span><span class="p">)</span>
   <span class="o">:</span> <span class="n">spawn_</span><span class="p">(</span><span class="n">spawn</span><span class="p">)</span>
   <span class="p">{}</span>
@@ -233,16 +222,14 @@ of some type. Then the one spawner class can simply store a function pointer:</p
     <span class="k">return</span> <span class="n">spawn_</span><span class="p">();</span>
   <span class="p">}</span>
 
-<span class="nl">private:</span>
+<span class="k">private</span><span class="o">:</span>
   <span class="n">SpawnCallback</span> <span class="n">spawn_</span><span class="p">;</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>To create a spawner for ghosts, you do:</p>
-<div class="codehilite"><pre><span class="n">Spawner</span><span class="o">*</span> <span class="n">ghostSpawner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Spawner</span><span class="p">(</span><span class="n">spawnGhost</span><span class="p">);</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">Spawner</span><span class="o">*</span> <span class="n">ghostSpawner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Spawner</span><span class="p">(</span><span class="n">spawnGhost</span><span class="p">);</span>
+</code></pre></div>
 
 <h3><a href="#templates" name="templates">Templates</a></h3>
 <p>By <span name="templates">now</span>, most C++ developers are familiar with
@@ -250,16 +237,14 @@ templates. Our spawner class needs to construct instances of some type, but we
 don&#8217;t want to hard code some specific monster class. The natural solution then
 is to make it a <em>type parameter</em>, which templates let us do:</p>
 <aside name="templates">
-
 <p>I&#8217;m not sure if C++ programmers learned to love them or if templates just
 scared some people completely away from C++. Either way, everyone I see using
 C++ today uses templates too.</p>
 </aside>
-
 <p><span name="base"></span></p>
-<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Spawner</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Spawner</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="o">~</span><span class="n">Spawner</span><span class="p">()</span> <span class="p">{}</span>
   <span class="k">virtual</span> <span class="n">Monster</span><span class="o">*</span> <span class="n">spawnMonster</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span>
@@ -267,26 +252,22 @@ C++ today uses templates too.</p>
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
 <span class="k">class</span> <span class="nc">SpawnerFor</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Spawner</span>
 <span class="p">{</span>
-<span class="nl">public:</span>
+<span class="k">public</span><span class="o">:</span>
   <span class="k">virtual</span> <span class="n">Monster</span><span class="o">*</span> <span class="n">spawnMonster</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="k">new</span> <span class="n">T</span><span class="p">();</span> <span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Using it looks like:</p>
-<div class="codehilite"><pre><span class="n">Spawner</span><span class="o">*</span> <span class="n">ghostSpawner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SpawnerFor</span><span class="o">&lt;</span><span class="n">Ghost</span><span class="o">&gt;</span><span class="p">();</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="n">Spawner</span><span class="o">*</span> <span class="n">ghostSpawner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SpawnerFor</span><span class="o">&lt;</span><span class="n">Ghost</span><span class="o">&gt;</span><span class="p">();</span>
+</code></pre></div>
 
 <aside name="base">
-
 <p>The <code>Spawner</code> class here is so that code that doesn&#8217;t care what kind of monster
 a spawner creates can just use it and work with pointers to <code>Monster</code>.</p>
 <p>If we only had the <code>SpawnerFor&lt;T&gt;</code> class, there would be no single supertype the
 instantiations of that template all shared, so any code that worked with
 spawners of any monster type would itself need to take a template parameter.</p>
 </aside>
-
 <h3><a href="#first-class-types" name="first-class-types">First-class types</a></h3>
 <p>The previous two solutions address the need to have a class, <code>Spawner</code>, which is
 parameterized by a type. In C++, types aren&#8217;t generally first-class, so that
@@ -294,14 +275,12 @@ requires some <span name="type-obj">gymnastics</span>. If you&#8217;re using a
 dynamically-typed language like JavaScript, Python, or Ruby where classes <em>are</em>
  regular objects you can pass around, you can solve this much more directly.</p>
 <aside name="type-obj">
-
 <p>In some ways, the <a href="type-object.html" class="pattern">Type Object</a>
 pattern is another workaround for the lack of first-class types. That pattern
 can still be useful even in languages with them, though, because it lets <em>you</em>
 define what a &#8220;type&#8221; is. You may want different semantics than what the
 language&#8217;s built-in classes provide.</p>
 </aside>
-
 <p>When you make a spawner, just pass in the class of monster that it should
 construct&#8202;&mdash;&#8202;the actual runtime object that represents the monster&#8217;s
 class. Easy as pie.</p>
@@ -332,21 +311,17 @@ in the <em>class</em>. There&#8217;s always that level of indirection to get to 
 which means fields and methods are different.</p>
 <p><img src="images/prototype-class.png" alt="A Class contains a list of Methods. An Instance contains a list of Fields and a reference to its Class." /></p>
 <aside name="vtable">
-
 <p>For example, to invoke a virtual method in C++, you look in the instance for the
 pointer to its vtable, then look up the method there.</p>
 </aside>
-
 <p>Self eliminates that distinction. To look up <em>anything</em>, you just look on the
 object. An instance can contain both state and behavior. You can have a single
 object that has a method completely unique to it.</p>
 <p><span name="island"></span></p>
 <p><img src="images/prototype-object.png" alt="An Object contains a mixed list of Fields and Methods." /></p>
 <aside name="island">
-
 <p>No man is an island, but this object is.</p>
 </aside>
-
 <p>If that was all Self did, it would be hard to use. Inheritance in class-based
 languages, despite its faults, gives you a useful mechanism for reusing
 polymorphic code and avoiding duplication. To accomplish something similar
@@ -358,12 +333,10 @@ When we fail to find a property on the first object, we try its parent, and its
 parent, and so on. In other words, failed lookups are <em>delegated</em> to an object&#8217;s
 parent.</p>
 <aside name="parent">
-
 <p>I&#8217;m simplifying here. Self actually supports multiple parents. Parents are just
 specially marked fields, which means you can do things like inherit parents or
 change them at runtime, leading to what&#8217;s called <em>dynamic inheritance</em>.</p>
 </aside>
-
 <p><img src="images/prototype-delegate.png" alt="An Object contains Fields and Methods and a reference to another object that it delegates to." /></p>
 <p>Parent objects let us reuse behavior (and state!) across multiple objects, so
 we&#8217;ve covered part of the utility of classes. The other key thing classes do is
@@ -389,18 +362,15 @@ having to implement <code>clone()</code> ourselves; it&#8217;s built into the sy
 <p>This is such a beautiful, clever, minimal system that as soon as I learned about
 it, <span name="finch">I started</span> creating a prototype-based language to get more experience with it.</p>
 <aside name="finch">
-
 <p>I realize building a language from scratch is not the most efficient way to
 learn, but what can I say? I&#8217;m a bit peculiar. If you&#8217;re curious, the language
 is called <a href="http://finch.stuffwithstuff.com/">Finch</a>.</p>
 </aside>
-
 <h3><a href="#how-did-it-go" name="how-did-it-go">How did it go?</a></h3>
 <p>I was super excited to play with a pure prototype-based language, but once I had
 mine up and running, I <span name="no-fun">discovered</span> an unpleasant fact:
 it just wasn&#8217;t that fun to program in.</p>
 <aside name="no-fun">
-
 <p>I&#8217;ve since heard through the grapevine that many of the Self programmers came to
 the same conclusion. The project was far from a loss, though. Self was so
 dynamic that it needed all sorts of virtual machine innovations in order to run
@@ -410,7 +380,6 @@ optimizing method dispatch are the exact same techniques&#8202;&mdash;&#8202;oft
 the same people!&#8202;&mdash;&#8202;that now make many of the world&#8217;s dynamically-typed
 languages fast enough to use for massively popular applications.</p>
 </aside>
-
 <p>Sure, the language was simple to implement, but that was because it punted the
 complexity onto the user. As soon as I started trying to use it, I found myself
 missing the structure that classes give. I ended up trying to recapitulate it at
@@ -428,11 +397,9 @@ knew about, I&#8217;m glad that most of us aren&#8217;t actually programming usi
 every day. <span name="telling">The code</span> I&#8217;ve seen that fully embraces
 prototypes has a weird mushiness to it that I find hard to wrap my head around.</p>
 <aside name="telling">
-
 <p>It&#8217;s also telling how <em>little</em> code there actually is written in a prototypal
 style. I&#8217;ve looked.</p>
 </aside>
-
 <h3><a href="#what-about-javascript" name="what-about-javascript">What about JavaScript?</a></h3>
 <p>OK, if prototype-based languages are so unfriendly, how do I explain JavaScript?
 Here&#8217;s a language with prototypes used by millions of people every day. More
@@ -444,12 +411,10 @@ fields and &#8220;methods&#8221; (which are really just functions stored as fiel
 object can also have another object, called its &#8220;prototype&#8221;, that it delegates
 to if a field access fails.</p>
 <aside name="ten">
-
 <p>As a language designer, one appealing thing about prototypes is that they are
 simpler to implement than classes. Eich took full advantage of this: the first
 version of JavaScript was created in ten days.</p>
 </aside>
-
 <p>But, despite that, I believe that JavaScript in practice has more in common with
 class-based languages than with prototypal ones. One hint that JavaScript has
 taken steps away from Self is that the core operation in a prototype-based
@@ -460,17 +425,15 @@ delegates to an existing one. Even that wasn&#8217;t added until ECMAScript 5,
 fourteen years after JavaScript came out. Instead of cloning, let me walk you
 through the typical way you define types and create objects in JavaScript. You
 start with a <em>constructor function</em>:</p>
-<div class="codehilite"><pre><span class="kd">function</span> <span class="nx">Weapon</span><span class="p">(</span><span class="nx">range</span><span class="p">,</span> <span class="nx">damage</span><span class="p">)</span> <span class="p">{</span>
+<div class="codehilite"><pre><span></span><code><span class="kd">function</span> <span class="nx">Weapon</span><span class="p">(</span><span class="nx">range</span><span class="p">,</span> <span class="nx">damage</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">range</span> <span class="o">=</span> <span class="nx">range</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">damage</span> <span class="o">=</span> <span class="nx">damage</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This creates a new object and initializes its fields. You invoke it like:</p>
-<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">sword</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Weapon</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">16</span><span class="p">);</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="kd">var</span> <span class="nx">sword</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Weapon</span><span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="mf">16</span><span class="p">);</span>
+</code></pre></div>
 
 <p>The <code>new</code> here invokes the body of the <code>Weapon()</code> function with <code>this</code> bound to a
 new empty object. The body adds a bunch of fields to it, then the now-filled-in
@@ -480,15 +443,14 @@ it wires it up to delegate to a prototype object. You can get to that object
 directly using <code>Weapon.prototype</code>.</p>
 <p>While state is added in the constructor body, to define <em>behavior</em>, you usually
 add methods to the prototype object. Something like this:</p>
-<div class="codehilite"><pre><span class="nx">Weapon</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">attack</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="p">{</span>
+<div class="codehilite"><pre><span></span><code><span class="nx">Weapon</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">attack</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">distanceTo</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="o">&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">range</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Out of range!&quot;</span><span class="p">);</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
     <span class="nx">target</span><span class="p">.</span><span class="nx">health</span> <span class="o">-=</span> <span class="k">this</span><span class="p">.</span><span class="nx">damage</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This adds an <code>attack</code> property to the weapon prototype whose value is a
 function. Since every object returned by <code>new Weapon()</code> delegates to
@@ -543,37 +505,32 @@ using prototypes and delegation for reusing data.</p>
 Gauntlet rip-off</span> I mentioned earlier. The game designers need to specify
 the attributes for monsters and items in some kind of files.</p>
 <aside name="shameless">
-
 <p>I mean completely original title in no way inspired by any previously existing
 top-down multi-player dungeon crawl arcade games. Please don&#8217;t sue me.</p>
 </aside>
-
 <p>One common approach is to use JSON. Data entities are basically <em>maps</em>, or
 <em>property bags</em>, or any of a dozen other terms because there&#8217;s nothing
 programmers like more than <span name="inventing">inventing</span> a new name
 for something that already has one.</p>
 <aside name="inventing">
-
 <p>We&#8217;ve re-invented them so many times that Steve Yegge calls them <a href="http://steve-yegge.blogspot.com/2008/10/universal-design-patter
 n.html">&#8220;The Universal
 Design Pattern&#8221;</a>.</p>
 </aside>
-
 <p>So a goblin in the game might be defined something like this:</p>
-<div class="codehilite"><pre><span class="p">{</span>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;goblin grunt&quot;</span><span class="p">,</span>
   <span class="nt">&quot;minHealth&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
   <span class="nt">&quot;maxHealth&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
   <span class="nt">&quot;resists&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cold&quot;</span><span class="p">,</span> <span class="s2">&quot;poison&quot;</span><span class="p">],</span>
   <span class="nt">&quot;weaknesses&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fire&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">]</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This is pretty straightforward and even the most text-averse designer can handle
 that. So you throw in a couple of sibling branches on the Great Goblin Family
 Tree:</p>
-<div class="codehilite"><pre><span class="p">{</span>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;goblin wizard&quot;</span><span class="p">,</span>
   <span class="nt">&quot;minHealth&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
   <span class="nt">&quot;maxHealth&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
@@ -590,8 +547,7 @@ Tree:</p>
   <span class="nt">&quot;weaknesses&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fire&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">],</span>
   <span class="nt">&quot;attacks&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;short bow&quot;</span><span class="p">]</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, if this was code, our aesthetic sense would be tingling. There&#8217;s a lot of
 duplication between these entities, and well-trained programmers <em>hate</em> that. It
@@ -607,15 +563,13 @@ field, then that defines the name of another object that this one delegates to.
 Any properties that don&#8217;t exist on the first object fall back to being looked up
 on the prototype.</p>
 <aside name="meta">
-
 <p>This makes the <code>"prototype"</code> a piece of <em>meta</em>data instead of data. Goblins have
 warty green skin and yellow teeth. They don&#8217;t have prototypes. Prototypes are a
 property of the <em>data object representing the goblin</em>, and not the goblin
 itself.</p>
 </aside>
-
 <p>With that, we can simplify the JSON for our goblin horde:</p>
-<div class="codehilite"><pre><span class="p">{</span>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;goblin grunt&quot;</span><span class="p">,</span>
   <span class="nt">&quot;minHealth&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
   <span class="nt">&quot;maxHealth&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
@@ -634,8 +588,7 @@ itself.</p>
   <span class="nt">&quot;prototype&quot;</span><span class="p">:</span> <span class="s2">&quot;goblin grunt&quot;</span><span class="p">,</span>
   <span class="nt">&quot;attacks&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;short bow&quot;</span><span class="p">]</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Since the archer and wizard have the grunt as their prototype, we don&#8217;t have to
 repeat the health, resists, and weaknesses in each of them. The logic we&#8217;ve added
@@ -653,13 +606,12 @@ special entities in the game world.</p>
 common object in the game, and prototypal delegation is a good fit for defining
 those. The magic Sword of Head-Detaching, which is really just a longsword with
 some bonuses, can be expressed as that directly:</p>
-<div class="codehilite"><pre><span class="p">{</span>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Sword of Head-Detaching&quot;</span><span class="p">,</span>
   <span class="nt">&quot;prototype&quot;</span><span class="p">:</span> <span class="s2">&quot;longsword&quot;</span><span class="p">,</span>
   <span class="nt">&quot;damageBonus&quot;</span><span class="p">:</span> <span class="s2">&quot;20&quot;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>A little extra power in your game engine&#8217;s data modeling system can make it
 easier for designers to add lots of little variations to the armaments and
@@ -672,6 +624,6 @@ players.</p>
 </nav>
 </div>
 </div>
-<footer>&copy; 2009-2014 Robert Nystrom</footer>
+<footer>&copy; 2009-2021 Robert Nystrom</footer>
 </body>
 </html>

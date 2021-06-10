@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Converts from the source markup format to HTML for the web version.
@@ -152,7 +152,7 @@ def format_file(path, nav, skip_up_to_date):
         elif command == 'outline':
           isoutline = True
         else:
-          print "UNKNOWN COMMAND:", command, args
+          print("UNKNOWN COMMAND:", command, args)
 
       elif extension != "xml" and stripped.startswith('#'):
         # Build the page navigation from the headers.
@@ -160,7 +160,7 @@ def format_file(path, nav, skip_up_to_date):
         headertype = stripped[:index]
         header = pretty(stripped[index:].strip())
         anchor = header.lower().replace(' ', '-')
-        anchor = anchor.translate(None, '.?!:/"')
+        anchor = anchor.translate(str.maketrans('', '', '.?!:/"'))
 
         # Add an anchor to the header.
         contents += indentation + headertype
@@ -224,19 +224,19 @@ def format_file(path, nav, skip_up_to_date):
     num_chapters += 1
     if word_count < 50:
       empty_chapters += 1
-      print "  {}".format(basename)
+      print("  {}".format(basename))
     elif word_count < 2000:
       empty_chapters += 1
-      print "{}-{} {} ({} words)".format(
-        YELLOW, DEFAULT, basename, word_count)
+      print("{}-{} {} ({} words)".format(
+        YELLOW, DEFAULT, basename, word_count))
     else:
       total_words += word_count
-      print "{}✓{} {} ({} words)".format(
-        GREEN, DEFAULT, basename, word_count)
+      print("{}✓{} {} ({} words)".format(
+        GREEN, DEFAULT, basename, word_count))
   else:
     # Section header chapters aren't counted like regular chapters.
-    print "{}•{} {} ({} words)".format(
-      GREEN, DEFAULT, basename, word_count)
+    print("{}•{} {} ({} words)".format(
+      GREEN, DEFAULT, basename, word_count))
 
 
 def clean_up_xml(output):
@@ -417,8 +417,8 @@ def include_code(pattern, index, indentation):
         else:
           code_line = line[blockindent:]
           if len(code_line) > 64:
-            print "Warning long source line ({} chars):\n{}".format(
-                len(code_line), code_line)
+            print("Warning long source line ({} chars):\n{}".format(
+                len(code_line), code_line))
           code += indentation + '    ' + code_line
 
     else:
@@ -466,7 +466,7 @@ def check_sass():
     return
 
   subprocess.call(['sass', 'asset/style.scss', 'html/style.css'])
-  print "{}✓{} style.css".format(GREEN, DEFAULT)
+  print("{}✓{} style.css".format(GREEN, DEFAULT))
 
 
 searchpath = ('book/*.markdown')
@@ -494,5 +494,5 @@ else:
   estimated_word_count = total_words + (empty_chapters * average_word_count)
   percent_finished = total_words * 100 / estimated_word_count
 
-  print "{}/~{} words ({}%)".format(
-    total_words, estimated_word_count, percent_finished)
+  print("{}/~{} words ({}%)".format(
+    total_words, estimated_word_count, percent_finished))

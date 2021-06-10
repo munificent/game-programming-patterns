@@ -3,7 +3,7 @@ $(document).ready(function() {
 
   // Since we may not have the height correct for the images, adjust the asides
   // too when an image is loaded.
-  $('img').load(function() {
+  $('img').on('load', function() {
     refreshAsides();
   });
 
