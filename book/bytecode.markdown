@@ -927,7 +927,7 @@ those are stored internally.
 
  *  **An interface:**
 
-    The object-oriented solution for a value that maybe be one of several
+    The object-oriented solution for a value that may be one of several
     different types is through polymorphism. An interface provides virtual
     methods for the various type tests and conversions, along the lines of:
 
