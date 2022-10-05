@@ -28,19 +28,19 @@ function refreshAsides() {
 
   // Vertically position the asides next to the span they annotate.
   $("aside").each(function() {
-  var aside = $(this);
+    var aside = $(this);
 
-  // Find the span the aside should be anchored next to.
-  var name = aside.attr("name");
-  var span = $("span[name='" + name.replace("'", "\\'") + "']");
-  if (span == null) {
-    window.console.log("Could not find span for '" + name + "'");
-    return;
-  }
+    // Find the span the aside should be anchored next to.
+    var name = aside.attr("name");
+    var span = $("span[name='" + name.replace("'", "\\'") + "']");
+    if (span == null) {
+      window.console.log("Could not find span for '" + name + "'");
+      return;
+    }
 
-  if (span.position()) {
-    aside.offset({top: span.position().top - 3});
-  }
+    if (span.position()) {
+      aside.offset({top: span.position().top - 3});
+    }
   });
 }
 
