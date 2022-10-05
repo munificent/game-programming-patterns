@@ -19,6 +19,7 @@ $(document).ready(function() {
   window.setTimeout(refreshAsides, 200);
 
   refreshAsides();
+  loadInitialTheme();
 });
 
 function refreshAsides() {
@@ -27,16 +28,37 @@ function refreshAsides() {
 
   // Vertically position the asides next to the span they annotate.
   $("aside").each(function() {
-    var aside = $(this);
+  var aside = $(this);
 
-    // Find the span the aside should be anchored next to.
-    var name = aside.attr("name");
-    var span = $("span[name='" + name + "']");
-    if (span == null) {
-      window.console.log("Could not find span for '" + name + "'");
-      return;
-    }
+  // Find the span the aside should be anchored next to.
+  var name = aside.attr("name");
+  var span = $("span[name='" + name.replace("'", "\\'") + "']");
+  if (span == null) {
+    window.console.log("Could not find span for '" + name + "'");
+    return;
+  }
 
+  if (span.position()) {
     aside.offset({top: span.position().top - 3});
+  }
   });
+}
+
+function loadInitialTheme() {
+  const theme = localStorage.getItem('theme');
+  if(theme === 'dark') {
+    toggleTheme();
+  }
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+
+  if(document.body.classList.contains('dark')) {
+    document.querySelector('.theme-toggler').setAttribute('title', 'light theme');
+    localStorage.setItem('theme', 'dark')
+  } else {
+    document.querySelector('.theme-toggler').setAttribute('title', 'dark theme');
+    localStorage.removeItem('theme')
+    }
 }
