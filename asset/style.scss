@@ -609,3 +609,13 @@ footer {
     }
   }
 }
+
+.theme-toggler {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+
+  &:before {
+    content: '🕶'; // used toggling to datk theme
+  }
+}
