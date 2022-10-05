@@ -1,0 +1,93 @@
+body.dark {
+  background: rgb(51, 51, 51);
+
+  .theme-toggler::before {
+    content: '☀️'; // used for toggling to light theme
+  }
+
+  .content {
+    background-color: rgb(28, 28, 33);
+    color: rgb(191, 191, 191);
+  }
+
+  .page {
+    background: rgb(31, 31, 31);
+    border-left: 1px solid rgb(94, 94, 94);
+    border-right: 1px solid rgb(94, 94, 94);
+  }
+
+  nav {
+    background-color: rgb(18, 43, 54);
+    color: rgb(179, 195, 204);
+  }
+
+  a {
+    color: rgb(153, 204, 230);
+
+    &:hover {
+      border-bottom: 1px solid rgb(20, 61, 82);
+    }
+  }
+
+  h1 {
+    border-bottom: 1px solid rgb(43, 43, 43);
+
+    &.book {
+      color: rgb(191, 191, 191);
+    }
+  }
+
+  h2 {
+    border-left: 8px solid rgb(26, 60, 76);
+  }
+
+  h3 {
+    border-left: 8px solid rgb(26, 60, 76);
+  }
+
+
+  @media only screen and (min-width: 800px) {
+    aside {
+      border-left: 8px solid rgb(72, 58, 30);
+    }
+  }
+
+  aside {
+    color: rgb(194, 193, 188);
+  }
+
+  img {
+    border: 1px solid rgb(38, 38, 38);
+    filter: invert(1);
+  }
+
+  pre {
+    background-color: rgb(31, 31, 31);
+    border-color: rgb(36, 36, 36) rgb(36, 36, 36) rgb(26, 60, 76);
+  }
+
+  .codehilite .k {
+    color: rgb(153, 204, 230);
+  }
+
+  code {
+    color: rgb(179, 195, 204);
+  }
+
+  .codehilite .kt {
+    color: rgb(153, 222, 230);
+  }
+
+  .codehilite .c1 {
+    color: rgb(191, 191, 191);
+  }
+
+  blockquote {
+    background-color: rgb(31, 31, 31);
+    border: 1px solid darkgray;
+
+    p {
+      color: azure;
+    }
+  }
+}

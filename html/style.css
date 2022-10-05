@@ -567,4 +567,107 @@ footer {
   }
 }
 
+.theme-toggler {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+}
+
+.theme-toggler:before {
+  content: '🕶';
+}
+
+body.dark {
+  background: #333333;
+}
+
+body.dark .theme-toggler::before {
+  content: '☀️';
+}
+
+body.dark .content {
+  background-color: #1c1c21;
+  color: #bfbfbf;
+}
+
+body.dark .page {
+  background: #1f1f1f;
+  border-left: 1px solid #5e5e5e;
+  border-right: 1px solid #5e5e5e;
+}
+
+body.dark nav {
+  background-color: #122b36;
+  color: #b3c3cc;
+}
+
+body.dark a {
+  color: #99cce6;
+}
+
+body.dark a:hover {
+  border-bottom: 1px solid #143d52;
+}
+
+body.dark h1 {
+  border-bottom: 1px solid #2b2b2b;
+}
+
+body.dark h1.book {
+  color: #bfbfbf;
+}
+
+body.dark h2 {
+  border-left: 8px solid #1a3c4c;
+}
+
+body.dark h3 {
+  border-left: 8px solid #1a3c4c;
+}
+
+@media only screen and (min-width: 800px) {
+  body.dark aside {
+    border-left: 8px solid #483a1e;
+  }
+}
+
+body.dark aside {
+  color: #c2c1bc;
+}
+
+body.dark img {
+  border: 1px solid #262626;
+  filter: invert(1);
+}
+
+body.dark pre {
+  background-color: #1f1f1f;
+  border-color: #242424 #242424 #1a3c4c;
+}
+
+body.dark .codehilite .k {
+  color: #99cce6;
+}
+
+body.dark code {
+  color: #b3c3cc;
+}
+
+body.dark .codehilite .kt {
+  color: #99dee6;
+}
+
+body.dark .codehilite .c1 {
+  color: #bfbfbf;
+}
+
+body.dark blockquote {
+  background-color: rgb(31, 31, 31);
+  border: 1px solid darkgray;
+}
+
+body.dark blockquote p {
+  color: azure;
+}
+
 /*# sourceMappingURL=style.css.map */
