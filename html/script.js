@@ -19,6 +19,7 @@ $(document).ready(function() {
   window.setTimeout(refreshAsides, 200);
 
   refreshAsides();
+  loadInitialTheme();
 });
 
 function refreshAsides() {
@@ -31,12 +32,65 @@ function refreshAsides() {
 
     // Find the span the aside should be anchored next to.
     var name = aside.attr("name");
-    var span = $("span[name='" + name + "']");
+    var span = $("span[name='" + name.replace("'", "\\'") + "']");
     if (span == null) {
       window.console.log("Could not find span for '" + name + "'");
       return;
     }
 
-    aside.offset({top: span.position().top - 3});
+    if (span.position()) {
+      aside.offset({top: span.position().top - 3});
+    }
   });
 }
+
+function loadInitialTheme() {
+  const theme = localStorage.getItem("theme");
+  if (theme === "dark") {
+    toggleTheme();
+    return;
+  }
+
+  const userPrefersDarkTheme = window.matchMedia(
+    "(prefers-color-scheme: dark)"
+  ).matches;
+
+  if (userPrefersDarkTheme) {
+    toggleTheme();
+    return;
+  }
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+
+  if (document.body.classList.contains("dark")) {
+    document
+      .querySelector(".theme-toggler")
+      .setAttribute("title", "light theme");
+    localStorage.setItem("theme", "dark");
+  } else {
+    document
+      .querySelector(".theme-toggler")
+      .setAttribute("title", "dark theme");
+    localStorage.removeItem("theme");
+  }
+}
+
+function getCurentTheme() {
+  return localStorage.getItem("theme") === "dark" ? "dark" : "light";
+}
+
+window
+  .matchMedia("(prefers-color-scheme: dark)")
+  .addEventListener("change", function (e) {
+    const prefersDarkTheme = e.matches;
+    const prefersLightTheme = !prefersDarkTheme;
+    if (
+      (prefersDarkTheme && getCurentTheme() !== "dark") ||
+      (prefersLightTheme && getCurentTheme() !== "light")
+    ) {
+      toggleTheme();
+    }
+  });
+
