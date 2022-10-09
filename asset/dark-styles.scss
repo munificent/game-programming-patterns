@@ -53,7 +53,14 @@ body.dark {
   }
 
   aside {
+    background-color: darkslategrey;
     color: rgb(194, 193, 188);
+  }
+
+  @media only screen and (min-width: 800px) {
+    aside {
+      background-color: transparent;
+    }
   }
 
   img {

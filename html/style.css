@@ -534,6 +534,16 @@ footer {
     font-size: 13px;
   }
 }
+.theme-toggler {
+  position: absolute;
+  right: 10px;
+  top: 40px;
+  cursor: pointer;
+}
+.theme-toggler:before {
+  content: "🕶";
+}
+
 @media only screen and (min-width: 800px) {
   .page {
     padding-right: 300px;
@@ -565,107 +575,85 @@ footer {
   .page .narrow-sign-up {
     display: none;
   }
-}
-
 .theme-toggler {
-  position: absolute;
-  right: 10px;
-  cursor: pointer;
+    top: 10px;
 }
-
-.theme-toggler:before {
-  content: '🕶';
 }
-
 body.dark {
-  background: #333333;
+  background: rgb(51, 51, 51);
 }
-
 body.dark .theme-toggler::before {
-  content: '☀️';
+  content: "☀️";
 }
-
 body.dark .content {
-  background-color: #1c1c21;
-  color: #bfbfbf;
+  background-color: rgb(28, 28, 33);
+  color: rgb(191, 191, 191);
 }
-
 body.dark .page {
-  background: #1f1f1f;
-  border-left: 1px solid #5e5e5e;
-  border-right: 1px solid #5e5e5e;
+  background: rgb(31, 31, 31);
+  border-left: 1px solid rgb(94, 94, 94);
+  border-right: 1px solid rgb(94, 94, 94);
 }
-
 body.dark nav {
-  background-color: #122b36;
-  color: #b3c3cc;
+  background-color: rgb(18, 43, 54);
+  color: rgb(179, 195, 204);
 }
-
 body.dark a {
-  color: #99cce6;
+  color: rgb(153, 204, 230);
 }
-
 body.dark a:hover {
-  border-bottom: 1px solid #143d52;
+  border-bottom: 1px solid rgb(20, 61, 82);
 }
-
 body.dark h1 {
-  border-bottom: 1px solid #2b2b2b;
+  border-bottom: 1px solid rgb(43, 43, 43);
 }
-
 body.dark h1.book {
-  color: #bfbfbf;
+  color: rgb(191, 191, 191);
 }
-
 body.dark h2 {
-  border-left: 8px solid #1a3c4c;
+  border-left: 8px solid rgb(26, 60, 76);
 }
-
 body.dark h3 {
-  border-left: 8px solid #1a3c4c;
+  border-left: 8px solid rgb(26, 60, 76);
 }
-
 @media only screen and (min-width: 800px) {
   body.dark aside {
-    border-left: 8px solid #483a1e;
+    border-left: 8px solid rgb(72, 58, 30);
   }
 }
-
 body.dark aside {
-  color: #c2c1bc;
+  background-color: darkslategrey;
+  color: rgb(194, 193, 188);
 }
-
+@media only screen and (min-width: 800px) {
+  body.dark aside {
+    background-color: transparent;
+  }
+}
 body.dark img {
-  border: 1px solid #262626;
+  border: 1px solid rgb(38, 38, 38);
   filter: invert(1);
 }
-
 body.dark pre {
-  background-color: #1f1f1f;
-  border-color: #242424 #242424 #1a3c4c;
+  background-color: rgb(31, 31, 31);
+  border-color: rgb(36, 36, 36) rgb(36, 36, 36) rgb(26, 60, 76);
 }
-
 body.dark .codehilite .k {
-  color: #99cce6;
+  color: rgb(153, 204, 230);
 }
-
 body.dark code {
-  color: #b3c3cc;
+  color: rgb(179, 195, 204);
 }
-
 body.dark .codehilite .kt {
-  color: #99dee6;
+  color: rgb(153, 222, 230);
 }
-
 body.dark .codehilite .c1 {
-  color: #bfbfbf;
+  color: rgb(191, 191, 191);
 }
-
 body.dark blockquote {
   background-color: rgb(31, 31, 31);
   border: 1px solid darkgray;
 }
-
 body.dark blockquote p {
   color: azure;
 }

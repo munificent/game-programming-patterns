@@ -563,6 +563,17 @@ footer {
   }
 }
 
+.theme-toggler {
+  position: absolute;
+  right: 10px;
+  top: 40px;
+  cursor: pointer;
+  
+  &:before {
+    content: '🕶'; // used toggling to datk theme
+  }
+}
+
 // On wide enough screens, put the asides on the... side.
 @media only screen and (min-width: 800px) {
   .page {
@@ -608,15 +619,9 @@ footer {
       display: none;
     }
   }
-}
 
-.theme-toggler {
-  position: absolute;
-  right: 10px;
-  cursor: pointer;
-
-  &:before {
-    content: '🕶'; // used toggling to datk theme
+  .theme-toggler {
+    top: 10px;
   }
 }
 
