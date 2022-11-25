@@ -202,7 +202,7 @@ After all, it is more code you have to deal with.
 <aside name="yagni">
 
 Some folks coined the term "YAGNI" -- [You aren't gonna need
-it](http://en.wikipedia.org/wiki/You_aren't_gonna_need_it) -- as a mantra to use
+it](http://en.wikipedia.org/wiki/You_aren't_gonna_need_it) -- as a mantra used
 to fight this urge to speculate about what your future self may want.
 
 </aside>
