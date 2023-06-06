@@ -239,7 +239,7 @@ to expose the raw array of memory holding the pixel data. We won't see this in
 the example, but the video driver will call that function frequently to stream
 memory from the buffer onto the screen.
 
-We wrap this raw buffer in a `Scene` class. It's job here is to render something
+We wrap this raw buffer in a `Scene` class. Its job here is to render something
 by making a bunch of `draw()` calls on its buffer:
 
 <span name="draw"></span>
