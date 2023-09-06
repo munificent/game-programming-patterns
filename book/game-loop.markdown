@@ -669,7 +669,7 @@ Russell and friends managed to create Spacewar! on it.
     chapter wouldn't be the same without it.
 
  *  Witters' article on [game
-    loops](http://www.koonsolo.com/news/dewitters-gameloop/) is a close
+    loops](https://dewitters.com/dewitters-gameloop/) is a close
     runner-up.
 
  *  The [Unity](http://unity3d.com/) framework has a complex game loop detailed
