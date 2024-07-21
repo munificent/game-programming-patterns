@@ -665,7 +665,7 @@ Russell and friends managed to create Spacewar! on it.
 ## See Also
 
  *  The classic article on game loops is Glenn Fiedler's "[Fix Your
-    Timestep](http://gafferongames.com/game-physics/fix-your-timestep/)". This
+    Timestep](http://gafferongames.com/post/fix_your_timestep/)". This
     chapter wouldn't be the same without it.
 
  *  Witters' article on [game
