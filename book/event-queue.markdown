@@ -507,7 +507,7 @@ If the maximum capacity bugs you, you can use a growable array. When the queue
 gets full, allocate a new array twice the size of the current array (or some
 other multiple), then copy the items over.
 
-Even though you copy when they array grows, enqueuing an item still has constant
+Even though you copy when the array grows, enqueuing an item still has constant
 *amortized* complexity.
 
 </aside>
