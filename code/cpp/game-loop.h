@@ -90,10 +90,10 @@ namespace FluidFramerate
     {
       double current = getCurrentTime();
       double elapsed = current - lastTime;
+      lastTime = current;
       processInput();
       update(elapsed);
       render();
-      lastTime = current;
     }
     //^5
   }
